@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, X, RefreshCw, AlertCircle, Timer, Zap } from 'lucide-react';
+import { Camera, X, RefreshCw, AlertCircle, Timer, Zap, CheckCircle, RotateCcw, Check } from 'lucide-react';
 
 interface CameraCaptureProps {
   onCapture: (dataUrl: string) => void;
@@ -19,6 +19,7 @@ export default function CameraCapture({ onCapture, onClose, isDarkMode }: Camera
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [showFlash, setShowFlash] = useState<boolean>(false);
   const [useTimer, setUseTimer] = useState<boolean>(false);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -128,7 +129,7 @@ export default function CameraCapture({ onCapture, onClose, isDarkMode }: Camera
       ctx.drawImage(video, sx, sy, size, size, 0, 0, canvas.width, canvas.height);
       
       const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-      onCapture(dataUrl);
+      setCapturedPhoto(dataUrl);
     }
   };
 
@@ -175,7 +176,7 @@ export default function CameraCapture({ onCapture, onClose, isDarkMode }: Camera
         <div className="flex justify-between items-center px-5 py-4 border-b border-slate-200/50 dark:border-slate-800">
           <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Camera className="text-emerald-500 animate-pulse" size={15} />
-            <span>Capture Portal Photo</span>
+            <span>{capturedPhoto ? 'Review Portal Photo' : 'Capture Portal Photo'}</span>
           </h3>
           <button 
             onClick={onClose}
@@ -200,7 +201,7 @@ export default function CameraCapture({ onCapture, onClose, isDarkMode }: Camera
           ) : (
             <div className="space-y-4">
               {/* Camera Switcher Dropdown */}
-              {devices.length > 1 && (
+              {devices.length > 1 && !capturedPhoto && (
                 <div className="flex items-center justify-between gap-2.5 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800/80">
                   <span className="text-[10px] uppercase font-black text-slate-400 pl-1.5">Select Device</span>
                   <select
@@ -219,11 +220,13 @@ export default function CameraCapture({ onCapture, onClose, isDarkMode }: Camera
 
               {/* Viewfinder Window */}
               <div 
-                onClick={handleCaptureClick}
-                className="relative aspect-square w-full bg-slate-950 rounded-xl overflow-hidden border border-slate-200/50 dark:border-slate-800 shadow-inner flex items-center justify-center cursor-pointer group hover:border-emerald-500/80 transition-all duration-200"
-                title="Click anywhere inside the live feed to capture instantly"
+                onClick={capturedPhoto ? undefined : handleCaptureClick}
+                className={`relative aspect-square w-full bg-slate-950 rounded-xl overflow-hidden border border-slate-200/50 dark:border-slate-800 shadow-inner flex items-center justify-center transition-all duration-200 ${
+                  capturedPhoto ? 'border-emerald-500' : 'cursor-pointer group hover:border-emerald-500/80'
+                }`}
+                title={capturedPhoto ? undefined : "Click anywhere inside the live feed to capture instantly"}
               >
-                {isLoading && (
+                {isLoading && !capturedPhoto && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center space-y-3 z-10 bg-slate-950">
                     <RefreshCw className="text-emerald-500 animate-spin" size={24} />
                     <span className="text-[10px] uppercase font-black tracking-widest text-emerald-400/80">Initializing Lens...</span>
@@ -244,66 +247,110 @@ export default function CameraCapture({ onCapture, onClose, isDarkMode }: Camera
                   </div>
                 )}
 
-                {/* Live Video Feed */}
+                {/* Snapped Static Photo Preview */}
+                {capturedPhoto && (
+                  <img 
+                    src={capturedPhoto} 
+                    alt="Snapped preview" 
+                    className="w-full h-full object-cover animate-fade-in" 
+                  />
+                )}
+
+                {/* Live Video Feed (kept mounted to keep camera active) */}
                 <video
                   ref={videoRef}
-                  className="w-full h-full object-cover scale-x-[-1]"
+                  className={`w-full h-full object-cover scale-x-[-1] ${capturedPhoto ? 'hidden' : ''}`}
                   playsInline
                   muted
                 />
 
-                {/* Face Alignment Overlay Guidelines */}
-                <div className="absolute inset-0 pointer-events-none border-2 border-dashed border-emerald-500/25 rounded-full m-8 flex items-center justify-center group-hover:border-emerald-500/45 transition-colors">
-                  <div className="absolute bottom-6 bg-slate-900/85 border border-emerald-500/30 text-[9px] text-emerald-400 font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full backdrop-blur-xs flex items-center gap-1 group-hover:bg-emerald-950 group-hover:text-emerald-300 group-hover:border-emerald-400 transition-all">
-                    <Camera size={9} className="animate-pulse" />
-                    <span>Click Feed to Snap</span>
+                {/* Face Alignment Overlay Guidelines (live only) */}
+                {!capturedPhoto && (
+                  <div className="absolute inset-0 pointer-events-none border-2 border-dashed border-emerald-500/25 rounded-full m-8 flex items-center justify-center group-hover:border-emerald-500/45 transition-colors">
+                    <div className="absolute bottom-6 bg-slate-900/85 border border-emerald-500/30 text-[9px] text-emerald-400 font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full backdrop-blur-xs flex items-center gap-1 group-hover:bg-emerald-950 group-hover:text-emerald-300 group-hover:border-emerald-400 transition-all">
+                      <Camera size={9} className="animate-pulse" />
+                      <span>Click Feed to Snap</span>
+                    </div>
                   </div>
+                )}
+              </div>
+
+              {/* Advanced Controls Options / Success message */}
+              {capturedPhoto ? (
+                <div className="flex items-center justify-between border-t border-slate-200/40 dark:border-slate-800/80 pt-3">
+                  <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 animate-pulse">
+                    <CheckCircle size={13} />
+                    <span>Photo snapped successfully!</span>
+                  </span>
+                  <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                    Ready to Save
+                  </span>
                 </div>
-              </div>
+              ) : (
+                <div className="flex items-center justify-between border-t border-slate-200/40 dark:border-slate-800/80 pt-3">
+                  <button
+                    onClick={() => setUseTimer(!useTimer)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      useTimer 
+                        ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
+                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                    title="Enable 3-second self-timer"
+                    disabled={isCountdownActive}
+                  >
+                    <Timer size={13} className={useTimer ? 'animate-bounce' : ''} />
+                    <span>{useTimer ? '3s Timer Active' : 'Self-Timer'}</span>
+                  </button>
 
-              {/* Advanced Controls Options */}
-              <div className="flex items-center justify-between border-t border-slate-200/40 dark:border-slate-800/80 pt-3">
-                <button
-                  onClick={() => setUseTimer(!useTimer)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    useTimer 
-                      ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' 
-                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                  title="Enable 3-second self-timer"
-                  disabled={isCountdownActive}
-                >
-                  <Timer size={13} className={useTimer ? 'animate-bounce' : ''} />
-                  <span>{useTimer ? '3s Timer Active' : 'Self-Timer'}</span>
-                </button>
-
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Selfie Mirror Enabled
-                </span>
-              </div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Selfie Mirror Enabled
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {/* Modal Action Buttons */}
         <div className="flex gap-3 justify-end px-5 py-4 border-t border-slate-200/50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30">
-          <button
-            onClick={onClose}
-            className="text-xs font-black uppercase tracking-wider text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 rounded-xl transition-all cursor-pointer"
-          >
-            Cancel
-          </button>
-          {!error && (
-            <button
-              onClick={handleCaptureClick}
-              disabled={isCountdownActive || isLoading}
-              className={`text-xs font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 px-5 py-2 rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer ${
-                isCountdownActive || isLoading ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'
-              }`}
-            >
-              <Camera size={14} />
-              <span>{isCountdownActive ? 'Snapping...' : 'Snap Photo'}</span>
-            </button>
+          {capturedPhoto ? (
+            <>
+              <button
+                onClick={() => setCapturedPhoto(null)}
+                className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <RotateCcw size={13} />
+                <span>Retake</span>
+              </button>
+              <button
+                onClick={() => onCapture(capturedPhoto)}
+                className="text-xs font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 px-5 py-2 rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+              >
+                <Check size={14} />
+                <span>Use This Photo</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={onClose}
+                className="text-xs font-black uppercase tracking-wider text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 rounded-xl transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              {!error && (
+                <button
+                  onClick={handleCaptureClick}
+                  disabled={isCountdownActive || isLoading}
+                  className={`text-xs font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 px-5 py-2 rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer ${
+                    isCountdownActive || isLoading ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'
+                  }`}
+                >
+                  <Camera size={14} />
+                  <span>{isCountdownActive ? 'Snapping...' : 'Snap Photo'}</span>
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
