@@ -831,13 +831,13 @@ export default function AdminDashboard({
           {/* Welcome Card Banner */}
           <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-800 to-emerald-950 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-md border border-emerald-500/10">
             <div className="space-y-1 text-center md:text-left">
-              <span className="text-xs bg-emerald-700/60 px-3 py-1 rounded-full text-amber-300 font-bold border border-amber-400/20">Edweso Administrative Dashboard</span>
-              <h1 className="text-xl sm:text-2xl font-extrabold font-sans mt-2">Welcome Back, Principal J. K. Appiah</h1>
+              <span className="text-[10px] bg-emerald-700/60 px-3 py-1 rounded-full text-amber-300 font-bold border border-amber-400/20 uppercase tracking-widest">Edweso Administrative Dashboard</span>
+              <h1 className="text-xl sm:text-2xl font-black font-display mt-2 tracking-tight">Welcome Back, Principal J. K. Appiah</h1>
               <p className="text-xs text-emerald-200">Manage students, process staff payroll trackers, review academic scores, and monitor GHS school fees balances.</p>
             </div>
             <div className="bg-emerald-900/60 p-3 rounded-xl border border-emerald-700 text-center shrink-0">
-              <span className="text-[10px] text-emerald-300 uppercase font-bold tracking-wider block">Terminal Revenue</span>
-              <span className="text-lg font-extrabold font-mono text-amber-400">GHS {totalRevenue.toFixed(2)}</span>
+              <span className="text-[9px] text-emerald-300 uppercase font-black tracking-widest block">Terminal Revenue</span>
+              <span className="text-lg font-black font-mono text-amber-400">GHS {totalRevenue.toFixed(2)}</span>
             </div>
           </div>
 
@@ -882,8 +882,8 @@ export default function AdminDashboard({
                 <Users size={20} />
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block leading-none">Total Students</span>
-                <span className="text-lg font-extrabold text-slate-900 dark:text-white leading-none mt-1 block">{totalStudents}</span>
+                <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block leading-none">Total Students</span>
+                <span className="text-xl font-display font-black text-slate-900 dark:text-white leading-none mt-1.5 block">{totalStudents}</span>
               </div>
             </div>
 
@@ -892,8 +892,8 @@ export default function AdminDashboard({
                 <UserCheck size={20} />
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block leading-none">Cert. Teachers</span>
-                <span className="text-lg font-extrabold text-slate-900 dark:text-white leading-none mt-1 block">{totalTeachers}</span>
+                <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block leading-none">Cert. Teachers</span>
+                <span className="text-xl font-display font-black text-slate-900 dark:text-white leading-none mt-1.5 block">{totalTeachers}</span>
               </div>
             </div>
 
@@ -902,8 +902,8 @@ export default function AdminDashboard({
                 <BookOpen size={20} />
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block leading-none">Active Classes</span>
-                <span className="text-lg font-extrabold text-slate-900 dark:text-white leading-none mt-1 block">{totalClasses}</span>
+                <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block leading-none">Active Classes</span>
+                <span className="text-xl font-display font-black text-slate-900 dark:text-white leading-none mt-1.5 block">{totalClasses}</span>
               </div>
             </div>
 
@@ -912,8 +912,8 @@ export default function AdminDashboard({
                 <CreditCard size={20} />
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block leading-none">Pending Fees</span>
-                <span className="text-xs sm:text-base font-extrabold font-mono text-rose-600 leading-none mt-1.5 block">GHS {outstandingFees.toLocaleString()}</span>
+                <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block leading-none">Pending Fees</span>
+                <span className="text-xs sm:text-sm font-black font-mono text-rose-600 leading-none mt-1.5 block">GHS {outstandingFees.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -1228,7 +1228,7 @@ export default function AdminDashboard({
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Student Enrollment Ledger</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Student Enrollment Ledger</h2>
               <p className="text-xs text-slate-400">Total {students.length} active registered pupils.</p>
             </div>
             <button
@@ -1380,7 +1380,7 @@ export default function AdminDashboard({
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Academic Faculty Registry</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Academic Faculty Registry</h2>
               <p className="text-xs text-slate-400">Total {teachers.length} certified teachers.</p>
             </div>
             <button
@@ -1485,7 +1485,7 @@ export default function AdminDashboard({
         <div className="space-y-6 animate-fade-in">
           
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Ghana Curriculum Class Divisions</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Ghana Curriculum Class Divisions</h2>
             <p className="text-xs text-slate-400">Review Form Teachers and syllabus subject lines mapped to academic levels.</p>
           </div>
 
@@ -1547,7 +1547,7 @@ export default function AdminDashboard({
         <div className="space-y-4 animate-fade-in">
           
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Daily Attendance Registers</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Daily Attendance Registers</h2>
             <p className="text-xs text-slate-400">Review roll call records logged by classroom Form Teachers.</p>
           </div>
 
@@ -1602,7 +1602,7 @@ export default function AdminDashboard({
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Terminal Examinations & Continual Assessments</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Terminal Examinations & Continual Assessments</h2>
               <p className="text-xs text-slate-400">GES Class Score (30%) & Exam Score (70%) record collation sheets.</p>
             </div>
             <button
@@ -1706,7 +1706,7 @@ export default function AdminDashboard({
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Daily Subject Block Calendars</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Daily Subject Block Calendars</h2>
               <p className="text-xs text-slate-400">Establish and modify lesson hour tracks for different classrooms.</p>
             </div>
             <button
@@ -1773,7 +1773,7 @@ export default function AdminDashboard({
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Announcements & Bulletins</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Announcements & Bulletins</h2>
               <p className="text-xs text-slate-400">Broadcast official school bulletins to parents, teachers, and students.</p>
             </div>
             <button
@@ -1831,7 +1831,7 @@ export default function AdminDashboard({
         <div className="space-y-6 animate-fade-in">
           
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Paystack Fees Transaction Ledger</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Paystack Fees Transaction Ledger</h2>
             <p className="text-xs text-slate-400">Detailed historical receipts of online school fees collections in Ghanaian Cedis (GHS).</p>
           </div>
 
@@ -1980,7 +1980,7 @@ export default function AdminDashboard({
         <div className="space-y-6 animate-fade-in">
           
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Public Web Inquiries Ledger</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Public Web Inquiries Ledger</h2>
             <p className="text-xs text-slate-400">Directly captures admissions applications and parent feedback submitted from the multipage school website.</p>
           </div>
 
@@ -2165,7 +2165,7 @@ export default function AdminDashboard({
         <div className="space-y-6 animate-fade-in">
           
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Email Dispatch Control</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Email Dispatch Control</h2>
             <p className="text-xs text-slate-400">Compose custom emails, review logs, and broadcast simulated academic and financial announcements to student guardians.</p>
           </div>
 
@@ -2423,7 +2423,7 @@ export default function AdminDashboard({
           
           <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
                 <span className="p-1 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400">
                   <ShieldAlert size={18} />
                 </span>
@@ -3004,7 +3004,7 @@ export default function AdminDashboard({
             {/* Header section */}
             <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
+                <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
                   <span className="p-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                     <History size={18} />
                   </span>

@@ -183,8 +183,8 @@ export default function DashboardLayout({
             E
           </div>
           <div>
-            <span className="font-extrabold text-sm tracking-tight text-emerald-600 block leading-tight">Edweso Royal</span>
-            <span className={`text-[10px] uppercase font-bold tracking-widest block leading-none ${
+            <span className="font-display font-black text-sm tracking-tight text-emerald-600 block leading-tight">Edweso Royal</span>
+            <span className={`text-[10px] uppercase font-display font-black tracking-widest block leading-none ${
               isDarkMode ? 'text-amber-400' : 'text-amber-600'
             }`}>Academy</span>
           </div>
@@ -266,7 +266,7 @@ export default function DashboardLayout({
                 <div className="w-8 h-8 rounded bg-emerald-700 flex items-center justify-center text-amber-400 font-extrabold text-sm">
                   E
                 </div>
-                <span className="font-extrabold text-xs tracking-tight text-emerald-700">Edweso Academy</span>
+                <span className="font-display font-black text-xs tracking-tight text-emerald-700">Edweso Academy</span>
               </div>
               <button 
                 onClick={() => setIsMobileMenuOpen(false)}

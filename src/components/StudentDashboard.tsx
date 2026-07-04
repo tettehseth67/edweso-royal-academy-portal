@@ -339,7 +339,7 @@ export default function StudentDashboard({
 
             <div className="flex-1 text-center md:text-left space-y-4">
               <div>
-                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white leading-tight">{student.name}</h2>
+                <h2 className="text-xl font-display font-black text-slate-900 dark:text-white leading-tight">{student.name}</h2>
                 <span className="text-xs bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 px-2.5 py-1 rounded font-bold mt-2 inline-block">
                   {sClass ? sClass.name : 'Not Enrolled'} Division
                 </span>
@@ -400,7 +400,7 @@ export default function StudentDashboard({
       {activeTab === 'subjects' && (
         <div className="space-y-4 animate-fade-in">
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Active Curriculum Courses</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Active Curriculum Courses</h2>
             <p className="text-xs text-slate-400">Class subjects assigned for {sClass ? sClass.name : 'Unknown'} syllabus.</p>
           </div>
 
@@ -431,7 +431,7 @@ export default function StudentDashboard({
         <div className="space-y-4 animate-fade-in">
           <div className="pb-2 border-b border-slate-200/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Terminal Grade sheet</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Terminal Grade sheet</h2>
               <p className="text-xs text-slate-400">Continuous assessments class scores (30%) & written exam scores (70%) report.</p>
             </div>
             <button
@@ -565,7 +565,7 @@ export default function StudentDashboard({
       {activeTab === 'attendance' && (
         <div className="space-y-4 animate-fade-in">
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Roll Call Ledger</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Roll Call Ledger</h2>
             <p className="text-xs text-slate-400">Daily presence audit for {student.name}.</p>
           </div>
 
@@ -625,7 +625,7 @@ export default function StudentDashboard({
       {activeTab === 'timetable' && (
         <div className="space-y-4 animate-fade-in">
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">My Lesson Calendar</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">My Lesson Calendar</h2>
             <p className="text-xs text-slate-400">Your class division weekly hour blocks.</p>
           </div>
 
@@ -666,7 +666,7 @@ export default function StudentDashboard({
       {activeTab === 'announcements' && (
         <div className="space-y-4 animate-fade-in">
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">General Bulletins Feed</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">General Bulletins Feed</h2>
             <p className="text-xs text-slate-400">Official directives compiled for student body review.</p>
           </div>
 
@@ -700,7 +700,7 @@ export default function StudentDashboard({
       {activeTab === 'payments' && (
         <div className="space-y-6 animate-fade-in">
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Fees Settlement & Receipts</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Fees Settlement & Receipts</h2>
             <p className="text-xs text-slate-400">Authorize secure, instant payments via Paystack in Ghanaian Cedis (GHS).</p>
           </div>
 
@@ -812,7 +812,7 @@ export default function StudentDashboard({
         <div className="space-y-6 animate-fade-in">
           <div className="pb-2 border-b border-slate-200/40 flex justify-between items-center flex-wrap gap-2">
             <div>
-              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Financial Statement & Ledger Timeline</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Financial Statement & Ledger Timeline</h2>
               <p className="text-xs text-slate-400">Chronological history of all processed school fee payments and invoices.</p>
             </div>
             {onTabChange && (
@@ -1023,7 +1023,7 @@ export default function StudentDashboard({
       {activeTab === 'emails' && (
         <div className="space-y-6 animate-fade-in">
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Guardian Simulated Email Inbox</h2>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Guardian Simulated Email Inbox</h2>
             <p className="text-xs text-slate-400">View official school letters, circulars, and outstanding balance alerts dispatched directly to your guardian email address.</p>
           </div>
 
