@@ -1,0 +1,6 @@
+{
+  "name": "Edweso Royal Academy Portal",
+  "description": "Official portal and landing page for Edweso Royal Academy in Edweso, Ghana, featuring complete SaaS dashboards for Admins, Teachers, and Students, complete with student fees payments via a custom-simulated Paystack interface.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
