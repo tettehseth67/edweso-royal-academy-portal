@@ -11,6 +11,7 @@ import {
   PaymentTransaction, SimulatedEmail 
 } from '../types';
 import PaystackModal from './PaystackModal';
+import CameraCapture from './CameraCapture';
 
 interface StudentDashboardProps {
   session: UserSession;
@@ -58,12 +59,10 @@ export default function StudentDashboard({
   const [payAmount, setPayAmount] = useState<number>(0);
   const [selectedTxForReceipt, setSelectedTxForReceipt] = useState<PaymentTransaction | null>(null);
   const [viewingEmail, setViewingEmail] = useState<SimulatedEmail | null>(null);
+  const [isReportCardOpen, setIsReportCardOpen] = useState(false);
 
   // Profile Photo Upload & Capture States
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const [cameraError, setCameraError] = useState<string>('');
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleUpdatePhoto = (newPhotoUrl: string | undefined) => {
@@ -75,48 +74,6 @@ export default function StudentDashboard({
         return s;
       });
       onUpdateStudents(updatedStudents);
-    }
-  };
-
-  const startCamera = async () => {
-    setCameraError('');
-    setIsCameraActive(true);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { width: { ideal: 400 }, height: { ideal: 400 }, facingMode: 'user' } 
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
-    } catch (err: any) {
-      console.error('Camera access error:', err);
-      setCameraError('Unable to access device camera. Please check your system permissions or browser settings.');
-    }
-  };
-
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setIsCameraActive(false);
-  };
-
-  const capturePhoto = () => {
-    if (videoRef.current) {
-      const video = videoRef.current;
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth || 400;
-      canvas.height = video.videoHeight || 400;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        handleUpdatePhoto(dataUrl);
-        stopCamera();
-      }
     }
   };
 
@@ -138,19 +95,8 @@ export default function StudentDashboard({
   };
 
   const handleRemovePhoto = () => {
-    if (window.confirm('Are you sure you want to remove your profile photo?')) {
-      handleUpdatePhoto(undefined);
-    }
+    handleUpdatePhoto(undefined);
   };
-
-  // Ensure camera streams are stopped if the component is unmounted
-  useEffect(() => {
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
 
   // AI Counselling States
   const [aiFeedback, setAiFeedback] = useState<string>('');
@@ -317,14 +263,14 @@ export default function StudentDashboard({
                   <button 
                     onClick={() => fileInputRef.current?.click()}
                     title="Upload Photo"
-                    className="p-1.5 bg-white hover:bg-slate-100 text-slate-800 rounded-full shadow hover:scale-110 transition-all"
+                    className="p-1.5 bg-white hover:bg-slate-100 text-slate-800 rounded-full shadow hover:scale-110 transition-all cursor-pointer"
                   >
                     <Upload size={12} />
                   </button>
                   <button 
-                    onClick={startCamera}
+                    onClick={() => setIsCameraActive(true)}
                     title="Capture from Camera"
-                    className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow hover:scale-110 transition-all"
+                    className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow hover:scale-110 transition-all cursor-pointer"
                   >
                     <Camera size={12} />
                   </button>
@@ -332,7 +278,7 @@ export default function StudentDashboard({
                     <button 
                       onClick={handleRemovePhoto}
                       title="Remove Photo"
-                      className="p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow hover:scale-110 transition-all"
+                      className="p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow hover:scale-110 transition-all cursor-pointer"
                     >
                       <Trash2 size={12} />
                     </button>
@@ -345,14 +291,14 @@ export default function StudentDashboard({
                 <div className="flex gap-1.5">
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="text-[10px] font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded flex items-center gap-1 transition-all"
+                    className="text-[10px] font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
                   >
                     <Upload size={10} />
                     Upload
                   </button>
                   <button 
-                    onClick={startCamera}
-                    className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded flex items-center gap-1 transition-all"
+                    onClick={() => setIsCameraActive(true)}
+                    className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
                   >
                     <Camera size={10} />
                     Camera
@@ -361,7 +307,7 @@ export default function StudentDashboard({
                 {student.profilePhoto && (
                   <button 
                     onClick={handleRemovePhoto}
-                    className="text-[9px] font-bold text-rose-500 hover:text-rose-600 hover:underline flex items-center gap-0.5"
+                    className="text-[9px] font-bold text-rose-500 hover:text-rose-600 hover:underline flex items-center gap-0.5 cursor-pointer"
                   >
                     <Trash2 size={9} />
                     Remove photo
@@ -381,61 +327,14 @@ export default function StudentDashboard({
 
             {/* Active Camera Preview Panel Overlay */}
             {isCameraActive && (
-              <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" id="camera-capture-overlay">
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl p-6 space-y-4">
-                  <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <h3 className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                      <Camera className="text-emerald-500" size={14} />
-                      Capture Profile Photo
-                    </h3>
-                    <button 
-                      onClick={stopCamera}
-                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-black"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {cameraError ? (
-                    <div className="p-4 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-xl text-[11px] space-y-2 leading-relaxed">
-                      <p className="font-bold">{cameraError}</p>
-                      <p>Please ensure you've allowed camera permissions in your browser settings and that no other application is using the camera.</p>
-                    </div>
-                  ) : (
-                    <div className="relative w-full aspect-square bg-black rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800">
-                      <video 
-                        ref={videoRef} 
-                        className="w-full h-full object-cover scale-x-[-1]" 
-                        playsInline 
-                        muted 
-                      />
-                      <div className="absolute inset-0 border-2 border-dashed border-emerald-500/50 rounded-full m-8 pointer-events-none flex items-center justify-center">
-                        <span className="text-[9px] text-white font-black uppercase tracking-widest bg-emerald-950/80 px-2 py-1 rounded-full border border-emerald-500/20">
-                          Frame Face Here
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex gap-2.5 justify-end pt-2">
-                    <button
-                      onClick={stopCamera}
-                      className="text-xs font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    {!cameraError && (
-                      <button
-                        onClick={capturePhoto}
-                        className="text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-lg shadow-md flex items-center gap-1.5 transition-all"
-                      >
-                        <Camera size={14} />
-                        Capture
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <CameraCapture
+                onCapture={(dataUrl) => {
+                  handleUpdatePhoto(dataUrl);
+                  setIsCameraActive(false);
+                }}
+                onClose={() => setIsCameraActive(false)}
+                isDarkMode={isDarkMode}
+              />
             )}
 
             <div className="flex-1 text-center md:text-left space-y-4">
@@ -469,7 +368,7 @@ export default function StudentDashboard({
             {/* Quick Balance Status card */}
             <div className="w-full md:w-64 p-5 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 text-center space-y-3 shrink-0">
               <span className="text-[10px] text-slate-400 uppercase font-extrabold tracking-wider block">Fees Outstanding</span>
-              <span className={`text-2xl font-extrabold block ${student.balanceGHS > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+              <span className={`text-2xl font-extrabold font-mono block ${student.balanceGHS > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 GHS {student.balanceGHS.toFixed(2)}
               </span>
               <span className="text-[10px] text-slate-400 block font-semibold leading-relaxed">
@@ -530,9 +429,18 @@ export default function StudentDashboard({
       {/* ==================== 3. GRADES OVERVIEW ==================== */}
       {activeTab === 'grades' && (
         <div className="space-y-4 animate-fade-in">
-          <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Terminal Grade sheet</h2>
-            <p className="text-xs text-slate-400">Continuous assessments class scores (30%) & written exam scores (70%) report.</p>
+          <div className="pb-2 border-b border-slate-200/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Terminal Grade sheet</h2>
+              <p className="text-xs text-slate-400">Continuous assessments class scores (30%) & written exam scores (70%) report.</p>
+            </div>
+            <button
+              onClick={() => setIsReportCardOpen(true)}
+              className="px-3.5 py-2 bg-emerald-750 hover:bg-emerald-700 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl border border-emerald-600/30 flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs transition-all shrink-0 self-start sm:self-center"
+            >
+              <Printer size={13} />
+              <span>Official Report Card</span>
+            </button>
           </div>
 
           <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
@@ -1354,6 +1262,231 @@ export default function StudentDashboard({
         onSuccess={handlePaystackSuccess}
         onFailure={handlePaystackFailure}
       />
+
+      {/* ==================== OFFICIAL PRINTABLE REPORT CARD MODAL ==================== */}
+      {isReportCardOpen && (() => {
+        const gradesList = studentSubjects.map(sub => {
+          const subGrade = studentGrades.find(g => g.subjectId === sub.id);
+          return {
+            subject: sub.name,
+            code: sub.code,
+            classScore: subGrade ? subGrade.classScore : 0,
+            examScore: subGrade ? subGrade.examScore : 0,
+            totalScore: subGrade ? subGrade.totalScore : 0,
+            grade: subGrade ? subGrade.grade : '—',
+            remarks: subGrade ? subGrade.remarks : 'Evaluation Pending'
+          };
+        });
+
+        const totalScore = gradesList.reduce((acc, curr) => acc + curr.totalScore, 0);
+        const averageScore = gradesList.length > 0 ? (totalScore / gradesList.length).toFixed(1) : '0';
+        
+        let principalRemarks = 'An excellent academic performance. Keep up the high standards!';
+        const avg = parseFloat(averageScore);
+        if (avg < 50) {
+          principalRemarks = 'Performance is below average. Remedial attention and hard work required next term.';
+        } else if (avg < 65) {
+          principalRemarks = 'Satisfactory performance, but has the potential to improve. Focus on core areas.';
+        } else if (avg < 80) {
+          principalRemarks = 'A very good terminal record. Keep striving for the highest honors!';
+        }
+
+        return (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto animate-fade-in print:bg-white print:p-0">
+            <style>{`
+              @media print {
+                body * {
+                  visibility: hidden !important;
+                }
+                #printable-report-card, #printable-report-card * {
+                  visibility: visible !important;
+                }
+                #printable-report-card {
+                  position: absolute !important;
+                  left: 0 !important;
+                  top: 0 !important;
+                  width: 100% !important;
+                  background: white !important;
+                  color: black !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  padding: 0 !important;
+                  margin: 0 !important;
+                }
+                .no-print {
+                  display: none !important;
+                }
+              }
+            `}</style>
+            
+            <div 
+              id="printable-report-card" 
+              className={`w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border p-8 space-y-6 max-h-[90vh] overflow-y-auto ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              } print:max-h-none print:shadow-none print:border-none print:overflow-visible`}
+            >
+              {/* Header Letterhead */}
+              <div className="flex justify-between items-center border-b border-double border-slate-300 dark:border-slate-800 pb-5">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center text-white font-extrabold text-lg shadow-md shrink-0">
+                      ERA
+                    </div>
+                    <div>
+                      <h1 className="text-xl font-extrabold tracking-tight uppercase text-emerald-800 dark:text-emerald-400">EDWESO ROYAL ACADEMY</h1>
+                      <p className="text-[10px] uppercase font-black tracking-widest text-slate-400">WISDOM • DISCIPLINE • EXCELLENCE</p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-semibold leading-none mt-1">
+                    P.O. Box KS 185, Ejisu-Juaben, Ashanti Region, Ghana | Info@edweso.edu.gh
+                  </p>
+                </div>
+                
+                <div className="text-right space-y-1">
+                  <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider rounded-full">
+                    Official Transcript
+                  </span>
+                  <p className="text-[10px] font-mono text-slate-400 font-bold">DATE: {new Date().toLocaleDateString('en-GB')}</p>
+                </div>
+              </div>
+
+              {/* Title Banner */}
+              <div className="text-center py-2 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                  Terminal Assessment Report Card — Term III
+                </h3>
+              </div>
+
+              {/* Student Demographics Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Student Name</span>
+                  <p className="font-extrabold text-slate-800 dark:text-white">{student.name}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Admission ID</span>
+                  <p className="font-bold font-mono text-slate-800 dark:text-white">{student.admissionNumber}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Academic Grade</span>
+                  <p className="font-bold text-slate-800 dark:text-white">{sClass ? sClass.name : 'Not Assigned'}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Attendance Profile</span>
+                  <p className="font-bold text-slate-800 dark:text-white">{attendanceRate}% Presence</p>
+                </div>
+              </div>
+
+              {/* Academic Performance Table */}
+              <div className="border rounded-xl overflow-hidden border-slate-200 dark:border-slate-800">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase tracking-wider font-black text-slate-400">
+                      <th className="p-3">Course / Curriculum Subject</th>
+                      <th className="p-3 text-center">Class Assessment (30%)</th>
+                      <th className="p-3 text-center">Exam Score (70%)</th>
+                      <th className="p-3 text-center">Combined Score (100%)</th>
+                      <th className="p-3 text-center">Letter Grade</th>
+                      <th className="p-3">Teacher Evaluations / Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/40">
+                    {gradesList.map((g, i) => (
+                      <tr key={i} className="font-medium text-slate-700 dark:text-slate-300">
+                        <td className="p-3 font-extrabold text-slate-900 dark:text-white">
+                          <span>{g.subject}</span>
+                          <span className="text-[9px] font-mono text-slate-400 block mt-0.5">{g.code}</span>
+                        </td>
+                        <td className="p-3 text-center font-mono">{g.classScore > 0 ? `${g.classScore} / 30` : '—'}</td>
+                        <td className="p-3 text-center font-mono">{g.examScore > 0 ? `${g.examScore} / 70` : '—'}</td>
+                        <td className="p-3 text-center font-bold text-emerald-600 font-mono">{g.totalScore > 0 ? `${g.totalScore}%` : '—'}</td>
+                        <td className="p-3 text-center">
+                          {g.grade !== '—' ? (
+                            <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
+                              {g.grade}
+                            </span>
+                          ) : '—'}
+                        </td>
+                        <td className="p-3 text-slate-500 dark:text-slate-400 text-[11px] max-w-xs truncate">{g.remarks}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Assessment Metrics Ribbon */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Cumulative Average</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xl font-black font-mono text-emerald-600">{averageScore}%</span>
+                    <span className="text-[10px] text-slate-400">weighted grade</span>
+                  </div>
+                </div>
+                
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Grading Metric Standard</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">West African Exams Council</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Division Standing</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200">1st Division Pass</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Principal Remarks section */}
+              <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15 space-y-1">
+                <span className="text-[9px] text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-wider block">Principal Teacher\'s Advisory Summary</span>
+                <p className="text-xs font-semibold leading-relaxed text-slate-700 dark:text-slate-300">
+                  "{principalRemarks}"
+                </p>
+              </div>
+
+              {/* Signatures Row */}
+              <div className="pt-8 border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-between gap-12 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <div className="space-y-1">
+                  <div className="h-6 flex items-end justify-center">
+                    <span className="font-mono text-xs italic font-bold text-slate-500 dark:text-slate-400">Appiah-Kuby</span>
+                  </div>
+                  <div className="w-40 border-t border-slate-300 dark:border-slate-700 mx-auto"></div>
+                  <span>Principal / Head Teacher</span>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="h-6 flex items-end justify-center">
+                    <span className="font-mono text-xs italic font-bold text-slate-500 dark:text-slate-400">ERA Registrar</span>
+                  </div>
+                  <div className="w-40 border-t border-slate-300 dark:border-slate-700 mx-auto"></div>
+                  <span>Office of the Registrar</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="no-print flex space-x-2 pt-4 border-t border-slate-100 dark:border-slate-800 justify-end">
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-colors cursor-pointer flex items-center space-x-1.5"
+                >
+                  <Printer size={13} />
+                  <span>Print Transcript</span>
+                </button>
+                <button
+                  onClick={() => setIsReportCardOpen(false)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl transition-colors cursor-pointer"
+                >
+                  Close View
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );

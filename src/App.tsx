@@ -1,42 +1,27 @@
-import React, { useState, useEffect } from "react";
-import {
-  UserRole,
-  UserSession,
-  Student,
-  Teacher,
-  SchoolClass,
-  Subject,
-  Attendance,
-  ExamGrade,
-  TimetableEntry,
-  Announcement,
-  PaymentTransaction,
-  SimulatedEmail,
-  ClassNote,
-} from "./types";
-import { SchoolDatabase } from "./mockData";
+import React, { useState, useEffect } from 'react';
+import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote } from './types';
+import { SchoolDatabase } from './mockData';
 
 // Component Imports
-import LandingPage from "./components/LandingPage";
-import AuthPage from "./components/AuthPage";
-import DashboardLayout from "./components/DashboardLayout";
-import AdminDashboard from "./components/AdminDashboard";
-import StudentDashboard from "./components/StudentDashboard";
-import TeacherDashboard from "./components/TeacherDashboard";
+import LandingPage from './components/LandingPage';
+import AuthPage from './components/AuthPage';
+import DashboardLayout from './components/DashboardLayout';
+import AdminDashboard from './components/AdminDashboard';
+import StudentDashboard from './components/StudentDashboard';
+import TeacherDashboard from './components/TeacherDashboard';
 
 export default function App() {
   // Page Routing State: 'landing' | 'auth' | 'dashboard'
-  const [page, setPage] = useState<"landing" | "auth" | "dashboard">("landing");
-
+  const [page, setPage] = useState<'landing' | 'auth' | 'dashboard'>('landing');
+  
   // User Session State
   const [session, setSession] = useState<UserSession | null>(null);
-
+  
   // Selected tab in the active dashboard
-  const [activeTab, setActiveTab] = useState<string>("overview");
+  const [activeTab, setActiveTab] = useState<string>('overview');
 
   // Selected role for pre-configuring Auth Page
-  const [authPageInitialRole, setAuthPageInitialRole] =
-    useState<UserRole>("student");
+  const [authPageInitialRole, setAuthPageInitialRole] = useState<UserRole>('student');
 
   // Light/Dark Mode State - Defaults to professional light mode
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -55,21 +40,19 @@ export default function App() {
   const [classNotes, setClassNotes] = useState<ClassNote[]>([]);
 
   // Helper to save database state to Node.js backend
-  const syncAndSave = async (
-    updatedFields: Partial<{
-      students: Student[];
-      teachers: Teacher[];
-      classes: SchoolClass[];
-      subjects: Subject[];
-      attendance: Attendance[];
-      grades: ExamGrade[];
-      timetable: TimetableEntry[];
-      announcements: Announcement[];
-      transactions: PaymentTransaction[];
-      emails: SimulatedEmail[];
-      classNotes: ClassNote[];
-    }>,
-  ) => {
+  const syncAndSave = async (updatedFields: Partial<{
+    students: Student[];
+    teachers: Teacher[];
+    classes: SchoolClass[];
+    subjects: Subject[];
+    attendance: Attendance[];
+    grades: ExamGrade[];
+    timetable: TimetableEntry[];
+    announcements: Announcement[];
+    transactions: PaymentTransaction[];
+    emails: SimulatedEmail[];
+    classNotes: ClassNote[];
+  }>) => {
     const payload = {
       students: updatedFields.students ?? students,
       teachers: updatedFields.teachers ?? teachers,
@@ -84,13 +67,13 @@ export default function App() {
       classNotes: updatedFields.classNotes ?? classNotes,
     };
     try {
-      await fetch("/api/school-data", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      await fetch('/api/school-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
     } catch (e) {
-      console.error("Failed to sync to server database:", e);
+      console.error('Failed to sync to server database:', e);
     }
   };
 
@@ -99,9 +82,9 @@ export default function App() {
     const initData = async () => {
       let loadedFromBackend = false;
       try {
-        const res = await fetch("/api/school-data");
+        const res = await fetch('/api/school-data');
         const json = await res.json();
-        if (json.status === "success" && json.data) {
+        if (json.status === 'success' && json.data) {
           const db = json.data;
           setStudents(db.students || []);
           setTeachers(db.teachers || []);
@@ -115,7 +98,7 @@ export default function App() {
           setEmails(db.emails || []);
           setClassNotes(db.classNotes || []);
           loadedFromBackend = true;
-
+          
           // Keep LocalStorage fallback updated
           SchoolDatabase.saveStudents(db.students || []);
           SchoolDatabase.saveTeachers(db.teachers || []);
@@ -130,10 +113,7 @@ export default function App() {
           SchoolDatabase.saveClassNotes(db.classNotes || []);
         }
       } catch (e) {
-        console.warn(
-          "Failed to fetch from backend, utilizing local storage fallback:",
-          e,
-        );
+        console.warn('Failed to fetch from backend, utilizing local storage fallback:', e);
       }
 
       if (!loadedFromBackend) {
@@ -163,9 +143,9 @@ export default function App() {
 
         // Bootstrap backend with initial mock data
         try {
-          await fetch("/api/school-data", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+          await fetch('/api/school-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               students: localStudents,
               teachers: localTeachers,
@@ -177,11 +157,11 @@ export default function App() {
               announcements: localAnnouncements,
               transactions: localTransactions,
               emails: localEmails,
-              classNotes: localClassNotes,
-            }),
+              classNotes: localClassNotes
+            })
           });
         } catch (err) {
-          console.warn("Could not bootstrap server database:", err);
+          console.warn('Could not bootstrap server database:', err);
         }
       }
     };
@@ -193,9 +173,9 @@ export default function App() {
   useEffect(() => {
     const root = window.document.documentElement;
     if (isDarkMode) {
-      root.classList.add("dark");
+      root.classList.add('dark');
     } else {
-      root.classList.remove("dark");
+      root.classList.remove('dark');
     }
   }, [isDarkMode]);
 
@@ -207,35 +187,23 @@ export default function App() {
 
     const resetTimer = () => {
       if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(
-        () => {
-          handleLogout();
-          alert(
-            "You have been logged out automatically due to 15 minutes of inactivity for enhanced security.",
-          );
-        },
-        15 * 60 * 1000,
-      );
+      timeoutId = setTimeout(() => {
+        handleLogout();
+        alert('You have been logged out automatically due to 15 minutes of inactivity for enhanced security.');
+      }, 15 * 60 * 1000);
     };
 
-    const events = [
-      "mousemove",
-      "keydown",
-      "mousedown",
-      "click",
-      "scroll",
-      "touchstart",
-    ];
+    const events = ['mousemove', 'keydown', 'mousedown', 'click', 'scroll', 'touchstart'];
 
     resetTimer();
 
-    events.forEach((event) => {
+    events.forEach(event => {
       window.addEventListener(event, resetTimer);
     });
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
-      events.forEach((event) => {
+      events.forEach(event => {
         window.removeEventListener(event, resetTimer);
       });
     };
@@ -244,35 +212,34 @@ export default function App() {
   // Auth Handlers
   const handleLoginSuccess = (userSession: UserSession) => {
     setSession(userSession);
-    setPage("dashboard");
-
+    setPage('dashboard');
+    
     // Log system activity
-    const roleLabel =
-      userSession.role.charAt(0).toUpperCase() + userSession.role.slice(1);
+    const roleLabel = userSession.role.charAt(0).toUpperCase() + userSession.role.slice(1);
     SchoolDatabase.addSystemActivity(
-      "login",
-      userSession.name,
-      `Authenticated successfully into ${roleLabel} Portal`,
+      'login', 
+      userSession.name, 
+      `Authenticated successfully into ${roleLabel} Portal`
     );
-
+    
     // Set default tab based on logged-in role
-    if (userSession.role === "admin") {
-      setActiveTab("overview");
-    } else if (userSession.role === "teacher") {
-      setActiveTab("classes");
+    if (userSession.role === 'admin') {
+      setActiveTab('overview');
+    } else if (userSession.role === 'teacher') {
+      setActiveTab('classes');
     } else {
-      setActiveTab("profile");
+      setActiveTab('profile');
     }
   };
 
   const handleLogout = () => {
     setSession(null);
-    setPage("landing");
+    setPage('landing');
   };
 
   const handleNavigateToLogin = (role?: UserRole) => {
     if (role) setAuthPageInitialRole(role);
-    setPage("auth");
+    setPage('auth');
   };
 
   const handleToggleTheme = () => {
@@ -300,17 +267,13 @@ export default function App() {
     if (updatedAnnouncements.length > announcements.length) {
       const newAnn = updatedAnnouncements[0];
       let targetStudents: Student[] = [];
-      if (
-        newAnn.targetAudience === "All" ||
-        newAnn.targetAudience === "Students"
-      ) {
+      if (newAnn.targetAudience === 'All' || newAnn.targetAudience === 'Students') {
         targetStudents = students;
       }
 
       const newSimulatedEmails: SimulatedEmail[] = [];
-      targetStudents.forEach((st) => {
-        const emailId =
-          "em-auto-" + Date.now() + "-" + Math.floor(Math.random() * 100000);
+      targetStudents.forEach(st => {
+        const emailId = 'em-auto-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
         const emailSubject = `Edweso Royal Academy Notice: ${newAnn.title}`;
         const emailBody = `Dear ${st.parentName},
 
@@ -338,26 +301,23 @@ Edweso Royal Academy`;
           recipientName: st.parentName,
           subject: emailSubject,
           body: emailBody,
-          sentAt: new Date().toISOString().replace("T", " ").substring(0, 16),
-          type: "Announcement",
-          status: "Sent",
+          sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+          type: 'Announcement',
+          status: 'Sent'
         });
       });
 
       const updatedEmailsList = [...newSimulatedEmails, ...emails];
       setEmails(updatedEmailsList);
       SchoolDatabase.saveEmails(updatedEmailsList);
-      syncAndSave({
-        announcements: updatedAnnouncements,
-        emails: updatedEmailsList,
-      });
+      syncAndSave({ announcements: updatedAnnouncements, emails: updatedEmailsList });
     } else {
       syncAndSave({ announcements: updatedAnnouncements });
     }
   };
 
   const handleTriggerFeeAlerts = (studentIds?: string[]) => {
-    const recipients = students.filter((s) => {
+    const recipients = students.filter(s => {
       if (studentIds) {
         return studentIds.includes(s.id) && s.balanceGHS > 0;
       }
@@ -367,9 +327,8 @@ Edweso Royal Academy`;
     if (recipients.length === 0) return 0;
 
     const newSimulatedEmails: SimulatedEmail[] = [];
-    recipients.forEach((st) => {
-      const emailId =
-        "em-fee-" + Date.now() + "-" + Math.floor(Math.random() * 100000);
+    recipients.forEach(st => {
+      const emailId = 'em-fee-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
       const emailSubject = `URGENT Fee Reminder: Outstanding Balance for ${st.name}`;
       const emailBody = `Dear ${st.parentName},
 
@@ -396,9 +355,9 @@ Edweso Royal Academy`;
         recipientName: st.parentName,
         subject: emailSubject,
         body: emailBody,
-        sentAt: new Date().toISOString().replace("T", " ").substring(0, 16),
-        type: "FeeDeadline",
-        status: "Sent",
+        sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        type: 'FeeDeadline',
+        status: 'Sent'
       });
     });
 
@@ -410,28 +369,22 @@ Edweso Royal Academy`;
   };
 
   const handleDeleteEmail = (id: string) => {
-    const updated = emails.filter((em) => em.id !== id);
+    const updated = emails.filter(em => em.id !== id);
     setEmails(updated);
     SchoolDatabase.saveEmails(updated);
     syncAndSave({ emails: updated });
   };
 
-  const handleSendSimulatedEmail = (
-    recipientEmail: string,
-    recipientName: string,
-    subject: string,
-    body: string,
-    type: "Announcement" | "FeeDeadline" | "MorningReport",
-  ) => {
+  const handleSendSimulatedEmail = (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline' | 'MorningReport') => {
     const newEmail: SimulatedEmail = {
-      id: "em-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
+      id: 'em-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
       recipientEmail,
       recipientName,
       subject,
       body,
-      sentAt: new Date().toISOString().replace("T", " ").substring(0, 16),
+      sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
       type,
-      status: "Sent",
+      status: 'Sent'
     };
     const updatedEmails = [newEmail, ...emails];
     setEmails(updatedEmails);
@@ -443,13 +396,13 @@ Edweso Royal Academy`;
     setAttendance(updatedAttendance);
     SchoolDatabase.saveAttendance(updatedAttendance);
     syncAndSave({ attendance: updatedAttendance });
-
+    
     // Log system activity
     if (session) {
       SchoolDatabase.addSystemActivity(
-        "attendance",
-        session.name,
-        `Submitted daily roll-call attendance record update`,
+        'attendance', 
+        session.name, 
+        `Submitted daily roll-call attendance record update`
       );
     }
   };
@@ -458,13 +411,13 @@ Edweso Royal Academy`;
     setGrades(updatedGrades);
     SchoolDatabase.saveGrades(updatedGrades);
     syncAndSave({ grades: updatedGrades });
-
+    
     // Log system activity
     if (session) {
       SchoolDatabase.addSystemActivity(
-        "grade",
-        session.name,
-        `Updated student evaluation terminal grade book`,
+        'grade', 
+        session.name, 
+        `Updated student evaluation terminal grade book`
       );
     }
   };
@@ -482,21 +435,16 @@ Edweso Royal Academy`;
   };
 
   // Payment Callback (When Paystack checkout is successful)
-  const handlePaymentSuccess = (
-    amount: number,
-    method: string,
-    ref: string,
-    paystackRef: string,
-  ) => {
-    if (!session || session.role !== "student") return;
+  const handlePaymentSuccess = (amount: number, method: string, ref: string, paystackRef: string) => {
+    if (!session || session.role !== 'student') return;
 
     // 1. Deduct paid amount from matching student's balance
-    const updatedStudents = students.map((s) => {
+    const updatedStudents = students.map(s => {
       if (s.id === session.id) {
         const newBal = Math.max(0, s.balanceGHS - amount);
         return {
           ...s,
-          balanceGHS: newBal,
+          balanceGHS: newBal
         };
       }
       return s;
@@ -506,17 +454,17 @@ Edweso Royal Academy`;
 
     // 2. Add Successful transaction record to the ledger
     const newTx: PaymentTransaction = {
-      id: "tx-new-" + Date.now(),
+      id: 'tx-new-' + Date.now(),
       studentId: session.id,
       studentName: session.name,
       amountGHS: amount,
-      date: new Date().toISOString().replace("T", " ").substring(0, 16),
-      status: "Successful",
+      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'Successful',
       reference: ref,
       paystackRef: paystackRef,
       paymentMethod: method as any,
       email: session.email,
-      term: "Term 1",
+      term: 'Term 1'
     };
 
     const updatedTx = [newTx, ...transactions];
@@ -529,26 +477,20 @@ Edweso Royal Academy`;
 
   // Render Page Route Router
   return (
-    <div
-      className={
-        isDarkMode
-          ? "dark bg-slate-950 text-slate-100"
-          : "bg-slate-50 text-slate-800"
-      }
-    >
-      {page === "landing" && (
+    <div className={isDarkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}>
+      {page === 'landing' && (
         <LandingPage onNavigateToLogin={handleNavigateToLogin} />
       )}
 
-      {page === "auth" && (
-        <AuthPage
-          onLoginSuccess={handleLoginSuccess}
-          onBackToLanding={() => setPage("landing")}
+      {page === 'auth' && (
+        <AuthPage 
+          onLoginSuccess={handleLoginSuccess} 
+          onBackToLanding={() => setPage('landing')} 
           initialRole={authPageInitialRole}
         />
       )}
 
-      {page === "dashboard" && session && (
+      {page === 'dashboard' && session && (
         <DashboardLayout
           session={session}
           activeTab={activeTab}
@@ -557,7 +499,7 @@ Edweso Royal Academy`;
           isDarkMode={isDarkMode}
           onToggleTheme={handleToggleTheme}
         >
-          {session.role === "admin" && (
+          {session.role === 'admin' && (
             <AdminDashboard
               activeTab={activeTab}
               students={students}
@@ -582,7 +524,7 @@ Edweso Royal Academy`;
             />
           )}
 
-          {session.role === "student" && (
+          {session.role === 'student' && (
             <StudentDashboard
               session={session}
               activeTab={activeTab}
@@ -605,7 +547,7 @@ Edweso Royal Academy`;
             />
           )}
 
-          {session.role === "teacher" && (
+          {session.role === 'teacher' && (
             <TeacherDashboard
               session={session}
               activeTab={activeTab}
@@ -622,6 +564,7 @@ Edweso Royal Academy`;
               onUpdateGrades={handleUpdateGrades}
               onUpdateAnnouncements={handleUpdateAnnouncements}
               onUpdateClassNotes={handleUpdateClassNotes}
+              onUpdateTeachers={handleUpdateTeachers}
               emails={emails}
               onSendEmail={handleSendSimulatedEmail}
               isDarkMode={isDarkMode}

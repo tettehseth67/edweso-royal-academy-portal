@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, UserCheck, BookOpen, CheckSquare, Award, 
   Calendar, Megaphone, CreditCard, Search, Plus, 
   Trash2, Edit, Check, AlertTriangle, Eye, RefreshCw, Filter, ShieldCheck, Download,
-  ShieldAlert, X
+  ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer
 } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, 
@@ -68,6 +68,20 @@ export default function AdminDashboard({
   const [teacherSearch, setTeacherSearch] = useState('');
   const [gradeClassFilter, setGradeClassFilter] = useState('c4'); // Default JHS 2
   const [gradeSubjectFilter, setGradeSubjectFilter] = useState('s1'); // Math
+  const [selectedReportCardStudent, setSelectedReportCardStudent] = useState<Student | null>(null);
+
+  // System Activity states
+  const [activitySearch, setActivitySearch] = useState('');
+  const [activityTypeFilter, setActivityTypeFilter] = useState<'all' | 'login' | 'grade' | 'attendance'>('all');
+  const [activityPage, setActivityPage] = useState(1);
+  const [activitiesList, setActivitiesList] = useState(() => SchoolDatabase.getSystemActivities());
+
+  useEffect(() => {
+    if (activeTab === 'activities') {
+      setActivitiesList(SchoolDatabase.getSystemActivities());
+      setActivityPage(1);
+    }
+  }, [activeTab]);
 
   // ==================== SYSTEM DIAGNOSTIC NOTIFICATION ENGINE ====================
   interface DiagnosticAlert {
@@ -233,6 +247,70 @@ export default function AdminDashboard({
     alert(`Simulation active: Outstanding tuition spike anomaly flagged! check the alerts below.`);
   };
 
+  const handleExportDatabase = () => {
+    const payload = {
+      students,
+      teachers,
+      classes,
+      subjects,
+      attendance,
+      grades,
+      timetable,
+      announcements,
+      transactions,
+      emails
+    };
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+      JSON.stringify(payload, null, 2)
+    )}`;
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', jsonString);
+    downloadAnchor.setAttribute('download', 'edweso-royal-db-backup.json');
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleImportDatabase = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!window.confirm('WARNING: Restoring a database backup will overwrite all existing student files, teacher listings, financial transactions, and grades on this server. Proceed?')) {
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        
+        // Simple verification that the backup matches school data structure
+        if (!parsed.students || !parsed.teachers || !parsed.classes) {
+          alert('Invalid backup structure: Ensure the uploaded JSON file contains school records.');
+          return;
+        }
+
+        const res = await fetch('/api/school-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(parsed)
+        });
+
+        const json = await res.json();
+        if (json.status === 'success') {
+          alert('System snapshot restored successfully! Reloading portal to refresh all local and remote states...');
+          window.location.reload();
+        } else {
+          alert('Failed to save the restored state onto the cloud server.');
+        }
+      } catch (err) {
+        alert('Error parsing backup file: Ensure the uploaded file is valid JSON.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleResolveAlert = (id: string) => {
     if (!resolvedAlertIds.includes(id)) {
       setResolvedAlertIds(prev => [...prev, id]);
@@ -368,7 +446,8 @@ export default function AdminDashboard({
     gender: 'Male' as 'Male' | 'Female',
     balanceGHS: 1200,
     dob: '2012-01-01',
-    status: 'Active' as 'Active' | 'Suspended' | 'Alumni'
+    status: 'Active' as 'Active' | 'Suspended' | 'Alumni',
+    profilePhoto: undefined as string | undefined
   });
 
   // Add/Edit Teacher Modal State
@@ -381,7 +460,8 @@ export default function AdminDashboard({
     phone: '',
     subjectId: 'Mathematics',
     status: 'Active' as 'Active' | 'On Leave',
-    gender: 'Male' as 'Male' | 'Female'
+    gender: 'Male' as 'Male' | 'Female',
+    profilePhoto: undefined as string | undefined
   });
 
   // Add Notice Modal State
@@ -557,7 +637,8 @@ export default function AdminDashboard({
       gender: 'Male',
       balanceGHS: 1200,
       dob: '2012-01-01',
-      status: 'Active'
+      status: 'Active',
+      profilePhoto: undefined
     });
     setIsStudentModalOpen(true);
   };
@@ -573,7 +654,8 @@ export default function AdminDashboard({
       gender: st.gender,
       balanceGHS: st.balanceGHS,
       dob: st.dob,
-      status: st.status
+      status: st.status,
+      profilePhoto: st.profilePhoto
     });
     setIsStudentModalOpen(true);
   };
@@ -623,7 +705,8 @@ export default function AdminDashboard({
       phone: '',
       subjectId: 'Mathematics',
       status: 'Active',
-      gender: 'Male'
+      gender: 'Male',
+      profilePhoto: undefined
     });
     setIsTeacherModalOpen(true);
   };
@@ -637,7 +720,8 @@ export default function AdminDashboard({
       phone: t.phone,
       subjectId: t.subjectId,
       status: t.status,
-      gender: t.gender
+      gender: t.gender,
+      profilePhoto: t.profilePhoto
     });
     setIsTeacherModalOpen(true);
   };
@@ -753,7 +837,7 @@ export default function AdminDashboard({
             </div>
             <div className="bg-emerald-900/60 p-3 rounded-xl border border-emerald-700 text-center shrink-0">
               <span className="text-[10px] text-emerald-300 uppercase font-bold tracking-wider block">Terminal Revenue</span>
-              <span className="text-lg font-extrabold text-amber-400">GHS {totalRevenue.toFixed(2)}</span>
+              <span className="text-lg font-extrabold font-mono text-amber-400">GHS {totalRevenue.toFixed(2)}</span>
             </div>
           </div>
 
@@ -829,7 +913,7 @@ export default function AdminDashboard({
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 font-bold uppercase block leading-none">Pending Fees</span>
-                <span className="text-xs sm:text-base font-extrabold text-rose-600 leading-none mt-1.5 block">GHS {outstandingFees.toLocaleString()}</span>
+                <span className="text-xs sm:text-base font-extrabold font-mono text-rose-600 leading-none mt-1.5 block">GHS {outstandingFees.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -1215,8 +1299,12 @@ export default function AdminDashboard({
                         <tr key={st.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
                           <td className="p-3">
                             <div className="flex items-center space-x-2.5">
-                              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-[10px] text-emerald-800">
-                                {st.name.substring(0, 2).toUpperCase()}
+                              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-[10px] text-emerald-800 overflow-hidden border border-slate-200/50 dark:border-slate-800 shrink-0">
+                                {st.profilePhoto ? (
+                                  <img src={st.profilePhoto} alt={st.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                ) : (
+                                  st.name.substring(0, 2).toUpperCase()
+                                )}
                               </div>
                               <div>
                                 <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">{st.name}</p>
@@ -1252,6 +1340,13 @@ export default function AdminDashboard({
                           </td>
                           <td className="p-3 text-right">
                             <div className="flex items-center justify-end space-x-1.5">
+                              <button
+                                onClick={() => setSelectedReportCardStudent(st)}
+                                className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                                title="Print Report Card"
+                              >
+                                <Printer size={14} />
+                              </button>
                               <button
                                 onClick={() => openEditStudent(st)}
                                 className="p-1 text-slate-400 hover:text-emerald-600 transition-colors"
@@ -1330,8 +1425,19 @@ export default function AdminDashboard({
                     .map((teach) => (
                       <tr key={teach.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
                         <td className="p-3">
-                          <p className="font-extrabold text-xs text-slate-900 dark:text-white">{teach.name}</p>
-                          <span className="text-[10px] text-slate-400">{teach.gender}</span>
+                          <div className="flex items-center space-x-2.5">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-[10px] text-emerald-800 overflow-hidden border border-slate-200/50 dark:border-slate-800 shrink-0">
+                              {teach.profilePhoto ? (
+                                <img src={teach.profilePhoto} alt={teach.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                              ) : (
+                                teach.name.substring(0, 2).toUpperCase()
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">{teach.name}</p>
+                              <span className="text-[10px] text-slate-400 leading-none mt-0.5 inline-block">{teach.gender}</span>
+                            </div>
+                          </div>
                         </td>
                         <td className="p-3 font-mono text-[10px] text-slate-400">{teach.staffNumber}</td>
                         <td className="p-3">
@@ -2432,6 +2538,47 @@ export default function AdminDashboard({
                 </div>
               </div>
 
+              {/* Card 3: Disaster Recovery & Database Backups */}
+              <div className={`p-5 rounded-2xl border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-sm'
+              }`}>
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-3 flex items-center space-x-2">
+                  <span className="w-1.5 h-3 rounded bg-emerald-500"></span>
+                  <span>Disaster Recovery & Backups</span>
+                </h3>
+                <p className="text-[10px] text-slate-400 leading-relaxed mb-4">
+                  Download a secure backup of the entire school register state, or restore a previous snapshot to instantly synchronize student files and records.
+                </p>
+
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={handleExportDatabase}
+                    className="w-full py-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all flex items-center justify-center space-x-1.5"
+                  >
+                    <Download size={12} />
+                    <span>Export System Backup</span>
+                  </button>
+
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={handleImportDatabase}
+                      className="hidden"
+                      id="database-restore-upload"
+                    />
+                    <label
+                      htmlFor="database-restore-upload"
+                      className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center space-x-1.5 transition-all text-center block"
+                    >
+                      <RefreshCw size={12} />
+                      <span>Restore from JSON</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Right Columns: Live Alerts List & Resolution Log */}
@@ -2806,6 +2953,342 @@ export default function AdminDashboard({
       )}
 
 
+      {/* ==================== 13. SYSTEM ACTIVITY EVENT LOGS ==================== */}
+      {activeTab === 'activities' && (() => {
+        // Calculations for filtering & pagination
+        const filteredActivities = activitiesList.filter(act => {
+          const matchesSearch = 
+            act.user.toLowerCase().includes(activitySearch.toLowerCase()) || 
+            act.details.toLowerCase().includes(activitySearch.toLowerCase()) ||
+            act.type.toLowerCase().includes(activitySearch.toLowerCase());
+          const matchesType = activityTypeFilter === 'all' || act.type === activityTypeFilter;
+          return matchesSearch && matchesType;
+        });
+
+        const ITEMS_PER_PAGE = 10;
+        const totalActivityPages = Math.ceil(filteredActivities.length / ITEMS_PER_PAGE) || 1;
+        const currentActivityPage = Math.min(activityPage, totalActivityPages);
+        const startIndex = (currentActivityPage - 1) * ITEMS_PER_PAGE;
+        const paginatedActivities = filteredActivities.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+        // Stats counts
+        const countLogin = activitiesList.filter(a => a.type === 'login').length;
+        const countGrade = activitiesList.filter(a => a.type === 'grade').length;
+        const countAttendance = activitiesList.filter(a => a.type === 'attendance').length;
+
+        const handleAddSimulatedActivity = (type: 'login' | 'grade' | 'attendance') => {
+          let user = 'Admin (Principal Appiah)';
+          let details = '';
+          if (type === 'login') {
+            details = 'Logged in securely to manage school system logs';
+          } else if (type === 'grade') {
+            details = 'Updated terminal assessment ledger scores JHS 2 English';
+          } else if (type === 'attendance') {
+            details = 'Approved terminal attendance summary sheet JHS 3';
+          }
+          SchoolDatabase.addSystemActivity(type, user, details);
+          setActivitiesList(SchoolDatabase.getSystemActivities());
+          setActivityPage(1);
+        };
+
+        const handleClearAllActivities = () => {
+          if (window.confirm('Are you sure you want to clear system activity history?')) {
+            SchoolDatabase.saveSystemActivities([]);
+            setActivitiesList([]);
+            setActivityPage(1);
+          }
+        };
+
+        return (
+          <div className="space-y-6 animate-fade-in">
+            {/* Header section */}
+            <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
+                  <span className="p-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <History size={18} />
+                  </span>
+                  <span>System Activity Logs</span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">Real-time audit trailing of all portal authentication, term academic score updates, and classroom roll-call submissions.</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setActivitiesList(SchoolDatabase.getSystemActivities());
+                  }}
+                  className={`px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl border border-slate-200/50 dark:border-slate-700 flex items-center space-x-1 cursor-pointer transition-all`}
+                >
+                  <RefreshCw size={12} />
+                  <span>Refresh Feed</span>
+                </button>
+                <button
+                  onClick={handleClearAllActivities}
+                  className={`px-3 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] uppercase tracking-wider rounded-xl border border-rose-200/40 dark:border-rose-900 flex items-center space-x-1 cursor-pointer transition-all`}
+                >
+                  <Trash2 size={12} />
+                  <span>Clear Logs</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Event Type Counters */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block mb-1">Total Logs</span>
+                <div className="flex items-baseline space-x-1.5">
+                  <span className="text-lg font-extrabold font-mono text-slate-950 dark:text-white">{activitiesList.length}</span>
+                  <span className="text-[10px] text-slate-400">events recorded</span>
+                </div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                <span className="text-[10px] text-emerald-500 uppercase font-black tracking-widest block mb-1">Logins</span>
+                <div className="flex items-baseline space-x-1.5">
+                  <span className="text-lg font-extrabold font-mono text-emerald-600 dark:text-emerald-400">{countLogin}</span>
+                  <span className="text-[10px] text-slate-400">auth sessions</span>
+                </div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                <span className="text-[10px] text-amber-500 uppercase font-black tracking-widest block mb-1">Grades Uploaded</span>
+                <div className="flex items-baseline space-x-1.5">
+                  <span className="text-lg font-extrabold font-mono text-amber-600 dark:text-amber-400">{countGrade}</span>
+                  <span className="text-[10px] text-slate-400">ledger updates</span>
+                </div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                <span className="text-[10px] text-purple-500 uppercase font-black tracking-widest block mb-1">Attendance Roll</span>
+                <div className="flex items-baseline space-x-1.5">
+                  <span className="text-lg font-extrabold font-mono text-purple-600 dark:text-purple-400">{countAttendance}</span>
+                  <span className="text-[10px] text-slate-400">roll submissions</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Testing Simulation & Tools Grid */}
+            <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'} grid grid-cols-1 md:grid-cols-3 gap-4 items-center`}>
+              <div className="md:col-span-1">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                  <Activity size={14} className="text-emerald-500 animate-pulse" />
+                  <span>Interactive Audit Simulator</span>
+                </h4>
+                <p className="text-[10px] text-slate-400 mt-1 leading-normal">
+                  Inject live simulated school activities to verify search queries, page routing, and filter configurations instantly.
+                </p>
+              </div>
+              <div className="md:col-span-2 flex flex-wrap gap-2 md:justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleAddSimulatedActivity('login')}
+                  className="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all flex items-center gap-1.5"
+                >
+                  <LogIn size={12} />
+                  <span>Simulate Login</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddSimulatedActivity('grade')}
+                  className="px-3.5 py-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all flex items-center gap-1.5"
+                >
+                  <Award size={12} />
+                  <span>Simulate Score Upload</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddSimulatedActivity('attendance')}
+                  className="px-3.5 py-2 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900 text-purple-800 dark:text-purple-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-all flex items-center gap-1.5"
+                >
+                  <CheckSquare size={12} />
+                  <span>Simulate Roll Call</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filter and Search controls */}
+            <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'} flex flex-col sm:flex-row items-center justify-between gap-4 text-xs`}>
+              <div className="relative w-full sm:w-72">
+                <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search Operator, Details..."
+                  value={activitySearch}
+                  onChange={(e) => {
+                    setActivitySearch(e.target.value);
+                    setActivityPage(1);
+                  }}
+                  className={`w-full pl-9 pr-8 py-2 border rounded-xl font-medium focus:outline-hidden focus:ring-1 transition-all ${
+                    isDarkMode 
+                      ? 'bg-slate-950 border-slate-800 focus:border-emerald-700 focus:ring-emerald-700/50 text-white' 
+                      : 'bg-white border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/50 text-slate-800'
+                  }`}
+                />
+                {activitySearch && (
+                  <button
+                    onClick={() => {
+                      setActivitySearch('');
+                      setActivityPage(1);
+                    }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+
+              {/* Event Type Tabs Filter */}
+              <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/40 dark:border-slate-800 w-full sm:w-auto shrink-0 overflow-x-auto gap-0.5">
+                {(['all', 'login', 'grade', 'attendance'] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setActivityTypeFilter(type);
+                      setActivityPage(1);
+                    }}
+                    className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                      activityTypeFilter === type
+                        ? 'bg-white dark:bg-slate-850 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Paginated Results Table */}
+            <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className={`border-b font-black uppercase text-[10px] tracking-wider text-slate-400 ${
+                      isDarkMode ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200/60 bg-slate-50/55'
+                    }`}>
+                      <th className="p-3.5 w-32">Event Type</th>
+                      <th className="p-3.5 w-48">Operator</th>
+                      <th className="p-3.5">Details</th>
+                      <th className="p-3.5 w-36 text-right">Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200/40 dark:divide-slate-800/40">
+                    {paginatedActivities.length > 0 ? (
+                      paginatedActivities.map((act) => (
+                        <tr key={act.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
+                          <td className="p-3.5">
+                            {act.type === 'login' && (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                <LogIn size={10} />
+                                <span>LOGIN</span>
+                              </span>
+                            )}
+                            {act.type === 'grade' && (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                <Award size={10} />
+                                <span>GRADE</span>
+                              </span>
+                            )}
+                            {act.type === 'attendance' && (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                <CheckSquare size={10} />
+                                <span>ATTENDANCE</span>
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3.5 font-bold text-slate-900 dark:text-white">
+                            {act.user}
+                          </td>
+                          <td className="p-3.5">
+                            {act.details}
+                          </td>
+                          <td className="p-3.5 text-right font-mono text-[10px] text-slate-400">
+                            {act.timestamp}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="p-8 text-center">
+                          <div className="flex flex-col items-center justify-center space-y-2">
+                            <History size={24} className="text-slate-300 animate-pulse" />
+                            <p className="text-slate-400 font-bold">No system activities found</p>
+                            <p className="text-[11px] text-slate-400 leading-normal max-w-xs mx-auto">
+                              Try clearing search parameters, selecting another event type filter, or injecting simulated audit feeds above.
+                            </p>
+                            {(activitySearch || activityTypeFilter !== 'all') && (
+                              <button
+                                onClick={() => {
+                                  setActivitySearch('');
+                                  setActivityTypeFilter('all');
+                                  setActivityPage(1);
+                                }}
+                                className="px-3 py-1.5 mt-2 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-xs"
+                              >
+                                Reset Search Filters
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Controls */}
+              {filteredActivities.length > 0 && (
+                <div className={`p-3.5 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 font-semibold ${
+                  isDarkMode ? 'border-slate-800 bg-slate-950/25' : 'border-slate-200/60 bg-slate-50/20'
+                }`}>
+                  <div>
+                    Showing <span className="text-slate-700 dark:text-white font-extrabold">{startIndex + 1}</span> to{' '}
+                    <span className="text-slate-700 dark:text-white font-extrabold">
+                      {Math.min(startIndex + ITEMS_PER_PAGE, filteredActivities.length)}
+                    </span>{' '}
+                    of <span className="text-slate-700 dark:text-white font-extrabold">{filteredActivities.length}</span> entries
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    <button
+                      type="button"
+                      disabled={currentActivityPage === 1}
+                      onClick={() => setActivityPage(currentActivityPage - 1)}
+                      className={`p-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-all ${
+                        isDarkMode 
+                          ? 'border-slate-800 hover:bg-slate-800 disabled:opacity-30' 
+                          : 'border-slate-200 hover:bg-slate-100 disabled:opacity-30'
+                      }`}
+                      title="Previous Page"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+
+                    <div className="font-bold">
+                      Page <span className="text-slate-700 dark:text-white font-extrabold">{currentActivityPage}</span> of{' '}
+                      <span className="text-slate-700 dark:text-white font-extrabold">{totalActivityPages}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={currentActivityPage === totalActivityPages}
+                      onClick={() => setActivityPage(currentActivityPage + 1)}
+                      className={`p-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-all ${
+                        isDarkMode 
+                          ? 'border-slate-800 hover:bg-slate-800 disabled:opacity-30' 
+                          : 'border-slate-200 hover:bg-slate-100 disabled:opacity-30'
+                      }`}
+                      title="Next Page"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
+
       {/* ========================================================
           ==================== CRUD MODALS AREA ====================
           ======================================================== */}
@@ -2821,6 +3304,55 @@ export default function AdminDashboard({
             </h4>
 
             <form onSubmit={handleStudentSubmit} className="space-y-3.5 text-xs">
+              {/* Photo Management */}
+              <div className="flex items-center space-x-3.5 p-3 rounded-lg border border-slate-200/40 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-850 flex items-center justify-center overflow-hidden border border-slate-200/50 dark:border-slate-700 shrink-0">
+                  {studentForm.profilePhoto ? (
+                    <img src={studentForm.profilePhoto} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  ) : (
+                    <span className="text-[9px] font-bold text-slate-400">NO PHOTO</span>
+                  )}
+                </div>
+                <div className="flex-1 space-y-1">
+                  <p className="font-bold text-[10px] text-slate-400 uppercase">Profile Photo</p>
+                  <div className="flex items-center gap-2">
+                    <label className="px-2 py-1 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors shadow-xs">
+                      <span>Upload</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 2 * 1024 * 1024) {
+                              alert('File size exceeds 2MB limit. Please upload a smaller image.');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              if (event.target?.result) {
+                                setStudentForm({ ...studentForm, profilePhoto: event.target.result as string });
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    {studentForm.profilePhoto && (
+                      <button
+                        type="button"
+                        onClick={() => setStudentForm({ ...studentForm, profilePhoto: undefined })}
+                        className="px-2 py-1 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-all"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Full Pupil Name</label>
                 <input
@@ -2963,6 +3495,55 @@ export default function AdminDashboard({
             </h4>
 
             <form onSubmit={handleTeacherSubmit} className="space-y-3.5 text-xs">
+              {/* Photo Management */}
+              <div className="flex items-center space-x-3.5 p-3 rounded-lg border border-slate-200/40 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-850 flex items-center justify-center overflow-hidden border border-slate-200/50 dark:border-slate-700 shrink-0">
+                  {teacherForm.profilePhoto ? (
+                    <img src={teacherForm.profilePhoto} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  ) : (
+                    <span className="text-[9px] font-bold text-slate-400">NO PHOTO</span>
+                  )}
+                </div>
+                <div className="flex-1 space-y-1">
+                  <p className="font-bold text-[10px] text-slate-400 uppercase">Profile Photo</p>
+                  <div className="flex items-center gap-2">
+                    <label className="px-2 py-1 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors shadow-xs">
+                      <span>Upload</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 2 * 1024 * 1024) {
+                              alert('File size exceeds 2MB limit. Please upload a smaller image.');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              if (event.target?.result) {
+                                setTeacherForm({ ...teacherForm, profilePhoto: event.target.result as string });
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    {teacherForm.profilePhoto && (
+                      <button
+                        type="button"
+                        onClick={() => setTeacherForm({ ...teacherForm, profilePhoto: undefined })}
+                        className="px-2 py-1 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-all"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Teacher Full Name</label>
                 <input
@@ -3402,6 +3983,238 @@ export default function AdminDashboard({
           </div>
         </div>
       )}
+
+      {/* ==================== OFFICIAL PRINTABLE REPORT CARD MODAL (ADMIN VIEW) ==================== */}
+      {selectedReportCardStudent && (() => {
+        const studentAttendance = attendance.filter(a => a.studentId === selectedReportCardStudent.id);
+        const presentCount = studentAttendance.filter(a => a.status === 'Present' || a.status === 'Late').length;
+        const attendanceRate = studentAttendance.length > 0 ? Math.round((presentCount / studentAttendance.length) * 100) : 100;
+        const sClass = classes.find(c => c.id === selectedReportCardStudent.classId);
+        const studentSubjects = sClass ? subjects.filter(sub => sub.classId === sClass.id) : [];
+        const studentGrades = grades.filter(g => g.studentId === selectedReportCardStudent.id);
+
+        const gradesList = studentSubjects.map(sub => {
+          const subGrade = studentGrades.find(g => g.subjectId === sub.id);
+          return {
+            subject: sub.name,
+            code: sub.code,
+            classScore: subGrade ? subGrade.classScore : 0,
+            examScore: subGrade ? subGrade.examScore : 0,
+            totalScore: subGrade ? subGrade.totalScore : 0,
+            grade: subGrade ? subGrade.grade : '—',
+            remarks: subGrade ? subGrade.remarks : 'Evaluation Pending'
+          };
+        });
+
+        const totalScore = gradesList.reduce((acc, curr) => acc + curr.totalScore, 0);
+        const averageScore = gradesList.length > 0 ? (totalScore / gradesList.length).toFixed(1) : '0';
+        
+        let principalRemarks = 'An excellent academic performance. Keep up the high standards!';
+        const avg = parseFloat(averageScore);
+        if (avg < 50) {
+          principalRemarks = 'Performance is below average. Remedial attention and hard work required next term.';
+        } else if (avg < 65) {
+          principalRemarks = 'Satisfactory performance, but has the potential to improve. Focus on core areas.';
+        } else if (avg < 80) {
+          principalRemarks = 'A very good terminal record. Keep striving for the highest honors!';
+        }
+
+        return (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto animate-fade-in print:bg-white print:p-0">
+            <style>{`
+              @media print {
+                body * {
+                  visibility: hidden !important;
+                }
+                #printable-admin-report, #printable-admin-report * {
+                  visibility: visible !important;
+                }
+                #printable-admin-report {
+                  position: absolute !important;
+                  left: 0 !important;
+                  top: 0 !important;
+                  width: 100% !important;
+                  background: white !important;
+                  color: black !important;
+                  box-shadow: none !important;
+                  border: none !important;
+                  padding: 0 !important;
+                  margin: 0 !important;
+                }
+                .no-print {
+                  display: none !important;
+                }
+              }
+            `}</style>
+            
+            <div 
+              id="printable-admin-report" 
+              className={`w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border p-8 space-y-6 max-h-[90vh] overflow-y-auto ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              } print:max-h-none print:shadow-none print:border-none print:overflow-visible`}
+            >
+              {/* Header Letterhead */}
+              <div className="flex justify-between items-center border-b border-double border-slate-300 dark:border-slate-800 pb-5">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center text-white font-extrabold text-lg shadow-md shrink-0">
+                      ERA
+                    </div>
+                    <div>
+                      <h1 className="text-xl font-extrabold tracking-tight uppercase text-emerald-800 dark:text-emerald-400">EDWESO ROYAL ACADEMY</h1>
+                      <p className="text-[10px] uppercase font-black tracking-widest text-slate-400">WISDOM • DISCIPLINE • EXCELLENCE</p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-semibold leading-none mt-1">
+                    P.O. Box KS 185, Ejisu-Juaben, Ashanti Region, Ghana | Info@edweso.edu.gh
+                  </p>
+                </div>
+                
+                <div className="text-right space-y-1">
+                  <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider rounded-full">
+                    Official Transcript
+                  </span>
+                  <p className="text-[10px] font-mono text-slate-400 font-bold">DATE: {new Date().toLocaleDateString('en-GB')}</p>
+                </div>
+              </div>
+
+              {/* Title Banner */}
+              <div className="text-center py-2 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                  Terminal Assessment Report Card — Term III
+                </h3>
+              </div>
+
+              {/* Student Demographics Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Student Name</span>
+                  <p className="font-extrabold text-slate-800 dark:text-white">{selectedReportCardStudent.name}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Admission ID</span>
+                  <p className="font-bold font-mono text-slate-800 dark:text-white">{selectedReportCardStudent.admissionNumber}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Academic Grade</span>
+                  <p className="font-bold text-slate-800 dark:text-white">{sClass ? sClass.name : 'Not Assigned'}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Attendance Profile</span>
+                  <p className="font-bold text-slate-800 dark:text-white">{attendanceRate}% Presence</p>
+                </div>
+              </div>
+
+              {/* Academic Performance Table */}
+              <div className="border rounded-xl overflow-hidden border-slate-200 dark:border-slate-800">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase tracking-wider font-black text-slate-400">
+                      <th className="p-3">Course / Curriculum Subject</th>
+                      <th className="p-3 text-center">Class Assessment (30%)</th>
+                      <th className="p-3 text-center">Exam Score (70%)</th>
+                      <th className="p-3 text-center">Combined Score (100%)</th>
+                      <th className="p-3 text-center">Letter Grade</th>
+                      <th className="p-3">Teacher Evaluations / Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/40">
+                    {gradesList.map((g, i) => (
+                      <tr key={i} className="font-medium text-slate-700 dark:text-slate-300">
+                        <td className="p-3 font-extrabold text-slate-900 dark:text-white">
+                          <span>{g.subject}</span>
+                          <span className="text-[9px] font-mono text-slate-400 block mt-0.5">{g.code}</span>
+                        </td>
+                        <td className="p-3 text-center font-mono">{g.classScore > 0 ? `${g.classScore} / 30` : '—'}</td>
+                        <td className="p-3 text-center font-mono">{g.examScore > 0 ? `${g.examScore} / 70` : '—'}</td>
+                        <td className="p-3 text-center font-bold text-emerald-600 font-mono">{g.totalScore > 0 ? `${g.totalScore}%` : '—'}</td>
+                        <td className="p-3 text-center">
+                          {g.grade !== '—' ? (
+                            <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
+                              {g.grade}
+                            </span>
+                          ) : '—'}
+                        </td>
+                        <td className="p-3 text-slate-500 dark:text-slate-400 text-[11px] max-w-xs truncate">{g.remarks}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Assessment Metrics Ribbon */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Cumulative Average</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xl font-black font-mono text-emerald-600">{averageScore}%</span>
+                    <span className="text-[10px] text-slate-400">weighted grade</span>
+                  </div>
+                </div>
+                
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Grading Metric Standard</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">West African Exams Council</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Division Standing</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200">1st Division Pass</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Principal Remarks section */}
+              <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15 space-y-1">
+                <span className="text-[9px] text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-wider block">Principal Teacher\'s Advisory Summary</span>
+                <p className="text-xs font-semibold leading-relaxed text-slate-700 dark:text-slate-300">
+                  "{principalRemarks}"
+                </p>
+              </div>
+
+              {/* Signatures Row */}
+              <div className="pt-8 border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-between gap-12 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <div className="space-y-1">
+                  <div className="h-6 flex items-end justify-center">
+                    <span className="font-mono text-xs italic font-bold text-slate-500 dark:text-slate-400">Appiah-Kuby</span>
+                  </div>
+                  <div className="w-40 border-t border-slate-300 dark:border-slate-700 mx-auto"></div>
+                  <span>Principal / Head Teacher</span>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="h-6 flex items-end justify-center">
+                    <span className="font-mono text-xs italic font-bold text-slate-500 dark:text-slate-400">ERA Registrar</span>
+                  </div>
+                  <div className="w-40 border-t border-slate-300 dark:border-slate-700 mx-auto"></div>
+                  <span>Office of the Registrar</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="no-print flex space-x-2 pt-4 border-t border-slate-100 dark:border-slate-800 justify-end">
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-colors cursor-pointer flex items-center space-x-1.5"
+                >
+                  <Printer size={13} />
+                  <span>Print Transcript</span>
+                </button>
+                <button
+                  onClick={() => setSelectedReportCardStudent(null)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl transition-colors cursor-pointer"
+                >
+                  Close View
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );

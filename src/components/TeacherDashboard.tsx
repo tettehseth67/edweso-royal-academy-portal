@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { 
   BookOpen, CheckSquare, Award, Megaphone, Plus, 
   Trash2, Search, Check, X, Clock, HelpCircle, ShieldAlert,
-  Edit, Save, FileText, Sunrise, Send, Calendar, Mail, Phone, Users, User
+  Edit, Save, FileText, Sunrise, Send, Calendar, Mail, Phone, Users, User,
+  Camera, Upload
 } from 'lucide-react';
 import { 
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
@@ -13,6 +14,7 @@ import {
   Attendance, ExamGrade, Announcement, ClassNote, TimetableEntry, SimulatedEmail
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark } from '../mockData';
+import CameraCapture from './CameraCapture';
 
 interface TeacherDashboardProps {
   session: UserSession;
@@ -32,6 +34,7 @@ interface TeacherDashboardProps {
   onUpdateGrades: (g: ExamGrade[]) => void;
   onUpdateAnnouncements: (a: Announcement[]) => void;
   onUpdateClassNotes?: (notes: ClassNote[]) => void;
+  onUpdateTeachers?: (teachers: Teacher[]) => void;
   isDarkMode: boolean;
 }
 
@@ -53,10 +56,48 @@ export default function TeacherDashboard({
   onUpdateGrades,
   onUpdateAnnouncements,
   onUpdateClassNotes,
+  onUpdateTeachers,
   isDarkMode
 }: TeacherDashboardProps) {
 
   const teacher = teachers.find(t => t.id === session.id) || teachers[0];
+
+  // Profile Photo Upload & Capture States
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const handleUpdatePhoto = (newPhotoUrl: string | undefined) => {
+    if (onUpdateTeachers) {
+      const updatedTeachers = teachers.map(t => {
+        if (t.id === teacher.id) {
+          return { ...t, profilePhoto: newPhotoUrl };
+        }
+        return t;
+      });
+      onUpdateTeachers(updatedTeachers);
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File size exceeds 2MB limit. Please upload a smaller image.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          handleUpdatePhoto(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    handleUpdatePhoto(undefined);
+  };
 
   // Assigned classes: Mr Kwame Boateng teaches JHS 2 (c4) Mathematics
   const assignedClassId = 'c4'; // JHS 2
@@ -377,6 +418,159 @@ Edweso Royal Academy Administration Portal Dispatch`;
   return (
     <div className="space-y-6">
       
+      {/* ==================== 0. TEACHER PROFILE SECTION ==================== */}
+      {activeTab === 'profile' && (
+        <div className="space-y-6 animate-fade-in" id="teacher-profile-section">
+          
+          {/* Main profile layout */}
+          <div className={`p-6 rounded-2xl border ${
+            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+          } flex flex-col md:flex-row items-center md:items-start gap-6`}>
+            
+            {/* Profile Photo with upload and capture capability */}
+            <div className="flex flex-col items-center gap-3 shrink-0" id="teacher-avatar-interactive-container">
+              <div className="relative group w-24 h-24">
+                {teacher.profilePhoto ? (
+                  <img 
+                    src={teacher.profilePhoto} 
+                    alt={teacher.name} 
+                    referrerPolicy="no-referrer"
+                    className="w-24 h-24 rounded-full object-cover border-2 border-emerald-500 shadow-md" 
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-2 border-emerald-500/20 flex items-center justify-center font-extrabold text-3xl shadow-sm">
+                    {teacher.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+                
+                {/* Camera/Upload hover overlay */}
+                <div className="absolute inset-0 bg-slate-950/60 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity gap-2 duration-200">
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Upload Photo"
+                    className="p-1.5 bg-white hover:bg-slate-100 text-slate-800 rounded-full shadow hover:scale-110 transition-all cursor-pointer"
+                  >
+                    <Upload size={12} />
+                  </button>
+                  <button 
+                    onClick={() => setIsCameraActive(true)}
+                    title="Capture from Camera"
+                    className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow hover:scale-110 transition-all cursor-pointer"
+                  >
+                    <Camera size={12} />
+                  </button>
+                  {teacher.profilePhoto && (
+                    <button 
+                      onClick={handleRemovePhoto}
+                      title="Remove Photo"
+                      className="p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow hover:scale-110 transition-all cursor-pointer"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons beneath photo */}
+              <div className="flex flex-col gap-1 items-center">
+                <div className="flex gap-1.5">
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-[10px] font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
+                  >
+                    <Upload size={10} />
+                    Upload
+                  </button>
+                  <button 
+                    onClick={() => setIsCameraActive(true)}
+                    className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
+                  >
+                    <Camera size={10} />
+                    Camera
+                  </button>
+                </div>
+                {teacher.profilePhoto && (
+                  <button 
+                    onClick={handleRemovePhoto}
+                    className="text-[9px] font-bold text-rose-500 hover:text-rose-600 hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <Trash2 size={9} />
+                    Remove photo
+                  </button>
+                )}
+              </div>
+
+              {/* Hidden file input */}
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileUpload} 
+                accept="image/*" 
+                className="hidden" 
+              />
+            </div>
+
+            {/* Active Camera Capture component */}
+            {isCameraActive && (
+              <CameraCapture
+                onCapture={(dataUrl) => {
+                  handleUpdatePhoto(dataUrl);
+                  setIsCameraActive(false);
+                }}
+                onClose={() => setIsCameraActive(false)}
+                isDarkMode={isDarkMode}
+              />
+            )}
+
+            <div className="flex-1 text-center md:text-left space-y-4 w-full">
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white leading-tight">{teacher.name}</h2>
+                <span className="text-xs bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 px-2.5 py-1 rounded font-bold mt-2 inline-block">
+                  Academic Faculty Member
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase font-bold text-slate-400">Staff Registration ID</p>
+                  <p className="font-mono text-slate-700 dark:text-slate-300 font-bold">{teacher.staffNumber}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase font-bold text-slate-400">Primary Discipline</p>
+                  <p className="font-bold text-slate-700 dark:text-slate-300">{teacher.subjectId}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase font-bold text-slate-400">Assigned Form Division</p>
+                  <p className="font-bold text-slate-700 dark:text-slate-300">{assignedClass ? assignedClass.name : 'None'}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase font-bold text-slate-400">Staff Account Status</p>
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    teacher.status === 'Active' 
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400' 
+                      : 'bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400'
+                  }`}>
+                    ● {teacher.status}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase font-bold text-slate-400">Official Email</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">{teacher.email}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase font-bold text-slate-400">Telephone Contact</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">{teacher.phone || 'N/A'}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] uppercase font-bold text-slate-400">Gender Identity</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">{teacher.gender}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ==================== 1. ASSIGNED CLASSES ==================== */}
       {activeTab === 'classes' && (
         <div className="space-y-6 animate-fade-in">
@@ -1349,18 +1543,30 @@ Edweso Royal Academy Administration Portal Dispatch`;
                     >
                       <div className="p-5 space-y-4">
                         {/* Title Row */}
-                        <div className="flex justify-between items-start gap-2">
-                          <div className="space-y-1">
-                            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <div className="flex items-start gap-3">
+                          {/* Avatar or custom photo */}
+                          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-200/50 dark:border-slate-800 flex items-center justify-center">
+                            {t.profilePhoto ? (
+                              <img src={t.profilePhoto} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            ) : (
+                              <div className="w-full h-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 flex items-center justify-center font-extrabold text-sm">
+                                {t.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-1 flex-1 min-w-0">
+                            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5 truncate">
                               {t.name}
                               {isCurrentUser && (
-                                <span className="text-[8px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-extrabold uppercase">
+                                <span className="text-[8px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-extrabold uppercase shrink-0">
                                   You
                                 </span>
                               )}
                             </h3>
                             <p className="text-[10px] font-mono text-slate-400 font-bold tracking-wider">{t.staffNumber}</p>
                           </div>
+                          
                           <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase shrink-0 ${
                             t.status === 'Active'
                               ? 'bg-emerald-500/10 text-emerald-600'

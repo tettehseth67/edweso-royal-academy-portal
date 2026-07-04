@@ -37,6 +37,7 @@ export default function DashboardLayout({
   const adminNav = [
     { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
     { id: 'diagnostics', label: 'System Diagnostics', icon: <ShieldAlert size={18} /> },
+    { id: 'activities', label: 'System Activity', icon: <History size={18} /> },
     { id: 'students', label: 'Students List', icon: <Users size={18} /> },
     { id: 'teachers', label: 'Teachers List', icon: <UserCheck size={18} /> },
     { id: 'classes', label: 'Classes & Subjects', icon: <BookOpen size={18} /> },
@@ -50,6 +51,7 @@ export default function DashboardLayout({
   ];
 
   const teacherNav = [
+    { id: 'profile', label: 'My Profile', icon: <User size={18} /> },
     { id: 'classes', label: 'Assigned Classes', icon: <BookOpen size={18} /> },
     { id: 'attendance', label: 'Mark Attendance', icon: <CheckSquare size={18} /> },
     { id: 'grades', label: 'Upload Grades', icon: <Award size={18} /> },
@@ -86,6 +88,20 @@ export default function DashboardLayout({
   const allAnnouncements = SchoolDatabase.getAnnouncements();
   const allTransactions = SchoolDatabase.getTransactions();
   const allStudents = SchoolDatabase.getStudents();
+
+  let currentUserPhoto: string | undefined = undefined;
+  if (session.role === 'student') {
+    const studentUser = allStudents.find(s => s.id === session.id);
+    if (studentUser) {
+      currentUserPhoto = studentUser.profilePhoto;
+    }
+  } else if (session.role === 'teacher') {
+    const allTeachers = SchoolDatabase.getTeachers();
+    const teacherUser = allTeachers.find(t => t.id === session.id);
+    if (teacherUser) {
+      currentUserPhoto = teacherUser.profilePhoto;
+    }
+  }
 
   const [readAnnouncements, setReadAnnouncements] = useState<string[]>(() => {
     try {
@@ -208,8 +224,12 @@ export default function DashboardLayout({
         <div className={`p-4 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 min-w-0">
-              <div className="w-9 h-9 rounded-full bg-emerald-100 border border-emerald-500/10 flex items-center justify-center font-extrabold text-emerald-800 text-xs shrink-0">
-                {session.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+              <div className="w-9 h-9 rounded-full bg-emerald-100 border border-emerald-500/10 flex items-center justify-center font-extrabold text-emerald-800 text-xs shrink-0 overflow-hidden">
+                {currentUserPhoto ? (
+                  <img src={currentUserPhoto} alt={session.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  session.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                )}
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-extrabold truncate leading-tight">{session.name}</p>
@@ -471,8 +491,12 @@ export default function DashboardLayout({
                 id="profile-trigger-btn"
                 className="flex items-center space-x-2 cursor-pointer focus:outline-hidden"
               >
-                <div className="w-8 h-8 rounded-full bg-emerald-700 text-amber-300 border border-amber-400/10 flex items-center justify-center font-extrabold text-[11px]">
-                  {session.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+                <div className="w-8 h-8 rounded-full bg-emerald-700 text-amber-300 border border-amber-400/10 flex items-center justify-center font-extrabold text-[11px] overflow-hidden">
+                  {currentUserPhoto ? (
+                    <img src={currentUserPhoto} alt={session.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  ) : (
+                    session.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                  )}
                 </div>
               </button>
 
@@ -488,7 +512,7 @@ export default function DashboardLayout({
                     </div>
                     <button
                       onClick={() => {
-                        handleTabClick(session.role === 'student' ? 'profile' : 'classes');
+                        handleTabClick((session.role === 'student' || session.role === 'teacher') ? 'profile' : 'classes');
                         setIsProfileDropdownOpen(false);
                       }}
                       className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 font-bold"

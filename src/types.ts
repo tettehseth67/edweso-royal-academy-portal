@@ -38,6 +38,7 @@ export interface Teacher {
   subjectId: string; // References Subject.id or name
   status: 'Active' | 'On Leave';
   gender: 'Male' | 'Female';
+  profilePhoto?: string;
 }
 
 export interface SchoolClass {
