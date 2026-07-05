@@ -17,6 +17,7 @@ import {
 import { calculateGhanaGrade, getGradeRemark, SchoolDatabase } from '../mockData';
 import SyllabusBoard from './SyllabusBoard';
 import SubstitutionAssistant from './SubstitutionAssistant';
+import { FeaturedAnnouncementsCarousel } from './FeaturedCarouselComponents';
 
 interface AdminDashboardProps {
   activeTab: string;
@@ -1343,18 +1344,11 @@ export default function AdminDashboard({
           {/* Quick announcements overview */}
           <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
             <h4 className="font-extrabold text-xs uppercase tracking-wider pb-3 border-b border-slate-100 dark:border-slate-800 mb-3">Live Bulletins Feed</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {announcements.slice(0, 2).map(a => (
-                <div key={a.id} className="p-3 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-800">
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold px-2 py-0.5 rounded">To: {a.targetAudience}</span>
-                    <span className="text-[10px] text-slate-400 font-semibold">{a.date}</span>
-                  </div>
-                  <h5 className="font-bold text-xs mt-2 text-slate-900 dark:text-white">{a.title}</h5>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">{a.content}</p>
-                </div>
-              ))}
-            </div>
+            <FeaturedAnnouncementsCarousel 
+              announcements={announcements} 
+              onDeleteNotice={handleDeleteNotice}
+              isAdmin={true}
+            />
           </div>
 
         </div>
@@ -1922,6 +1916,19 @@ export default function AdminDashboard({
               <Plus size={14} />
               <span>Broadcast Notice</span>
             </button>
+          </div>
+
+          {/* Featured swipeable bulletins carousel */}
+          <div className="mb-6">
+            <FeaturedAnnouncementsCarousel 
+              announcements={announcements} 
+              onDeleteNotice={handleDeleteNotice}
+              isAdmin={true}
+            />
+          </div>
+
+          <div className="pt-2 border-t border-slate-200/40">
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3">All Active Dispatches</h3>
           </div>
 
           <div className="space-y-4">

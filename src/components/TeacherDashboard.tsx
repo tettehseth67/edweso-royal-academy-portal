@@ -16,6 +16,7 @@ import {
 import { calculateGhanaGrade, getGradeRemark } from '../mockData';
 import CameraCapture from './CameraCapture';
 import SyllabusBoard from './SyllabusBoard';
+import { FeaturedAnnouncementsCarousel, TeachingResourcesCarousel } from './FeaturedCarouselComponents';
 
 interface TeacherDashboardProps {
   session: UserSession;
@@ -574,6 +575,14 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Academic Deck / Teaching Resources Carousel */}
+          <div className="pt-2">
+            <TeachingResourcesCarousel
+              syllabusPlans={syllabusPlans || []}
+              classNotes={classNotes || []}
+            />
           </div>
         </div>
       )}
@@ -1814,6 +1823,15 @@ Edweso Royal Academy Administration Portal Dispatch`;
             )}
           </div>
 
+          {/* Featured school-wide bulletins carousel */}
+          <div className="mb-6">
+            <FeaturedAnnouncementsCarousel 
+              announcements={announcements} 
+              onDeleteNotice={onUpdateAnnouncements ? (id) => onUpdateAnnouncements(announcements.filter(a => a.id !== id)) : undefined}
+              isAdmin={false}
+            />
+          </div>
+
           {/* Compose Form */}
           {isNoticeFormOpen && (
             <div className={`p-5 rounded-xl border ${
@@ -1891,13 +1909,19 @@ Edweso Royal Academy Administration Portal Dispatch`;
 
       {/* ==================== DIGITAL SYLLABUS PLANNER ==================== */}
       {activeTab === 'syllabus' && (
-        <SyllabusBoard
-          session={session}
-          subjects={subjects}
-          syllabusPlans={syllabusPlans}
-          onUpdateSyllabusPlans={onUpdateSyllabusPlans || (() => {})}
-          isDarkMode={isDarkMode}
-        />
+        <div className="space-y-6 animate-fade-in">
+          <TeachingResourcesCarousel
+            syllabusPlans={syllabusPlans || []}
+            classNotes={classNotes || []}
+          />
+          <SyllabusBoard
+            session={session}
+            subjects={subjects}
+            syllabusPlans={syllabusPlans}
+            onUpdateSyllabusPlans={onUpdateSyllabusPlans || (() => {})}
+            isDarkMode={isDarkMode}
+          />
+        </div>
       )}
 
     </div>

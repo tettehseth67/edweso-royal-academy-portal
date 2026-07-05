@@ -14,6 +14,7 @@ import PaystackModal from './PaystackModal';
 import CameraCapture from './CameraCapture';
 import GradeProjectionTool from './GradeProjectionTool';
 import SyllabusBoard from './SyllabusBoard';
+import { StudentPhotoGalleryCarousel } from './FeaturedCarouselComponents';
 
 interface StudentDashboardProps {
   session: UserSession;
@@ -400,6 +401,13 @@ export default function StudentDashboard({
               <span className="text-lg font-extrabold block mt-1">{studentGrades.length} Records</span>
             </div>
           </div>
+
+          {/* Student Photo Gallery & Profile Capture History Carousel */}
+          <StudentPhotoGalleryCarousel
+            currentProfilePhoto={student.profilePhoto}
+            onSelectProfilePhoto={handleUpdatePhoto}
+            isDarkMode={isDarkMode}
+          />
 
         </div>
       )}
