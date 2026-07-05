@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
-=======
-import React, { useState } from 'react';
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 import { 
   BookOpen, Award, CheckCircle2, Star, Phone, Mail, MapPin, ArrowRight, 
   UserCheck, Calendar, ShieldAlert, GraduationCap, ChevronRight, Send, 
@@ -11,10 +7,7 @@ import {
 } from 'lucide-react';
 import { SchoolDatabase } from '../mockData';
 import { PublicInquiry } from '../types';
-<<<<<<< HEAD
 import HeroCarousel from './HeroCarousel';
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
 interface LandingPageProps {
   onNavigateToLogin: (role?: 'admin' | 'teacher' | 'student') => void;
@@ -25,14 +18,11 @@ type ActivePage = 'home' | 'about' | 'academics' | 'admissions' | 'contact' | 'c
 export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
   const [activePage, setActivePage] = useState<ActivePage>('home');
 
-<<<<<<< HEAD
   // Automatically scroll to the top of the page when the active sub-page changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [activePage]);
 
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   // Form States
   const [admissionForm, setAdmissionForm] = useState({
     parentName: '',
@@ -360,7 +350,6 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
         {/* ==================== PAGE 1: HOME ==================== */}
         {activePage === 'home' && (
           <div className="animate-fade-in">
-<<<<<<< HEAD
             {/* Dynamic Interactive Hero Carousel */}
             <HeroCarousel 
               onNavigateToAdmissions={() => setActivePage('admissions')} 
@@ -420,87 +409,19 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                     <div>
                       <span className="text-xs sm:text-sm font-black text-emerald-950 block">Fully Digital</span>
                       <span className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest">Paystack Synced</span>
-=======
-            {/* Hero Section */}
-            <section id="landing-hero" className="relative bg-gradient-to-br from-emerald-900 via-emerald-950 to-slate-950 text-white py-16 lg:py-24 px-4 overflow-hidden border-b-4 border-amber-400">
-              <div className="absolute inset-0 opacity-15">
-                <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
-                <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500 rounded-full blur-3xl opacity-20"></div>
-                <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-amber-500 rounded-full blur-3xl opacity-10"></div>
-              </div>
-              
-              <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                {/* Left Column: Hero Copy */}
-                <div className="lg:col-span-7 space-y-6 text-left">
-                  <div className="inline-flex items-center space-x-2 px-3 py-1 bg-emerald-800/60 border border-emerald-600/50 rounded-full text-[11px] font-bold text-amber-300">
-                    <Sparkles size={12} className="animate-pulse" />
-                    <span>Edweso Royal Academy &bull; Raised to Lead</span>
-                  </div>
-
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans leading-tight">
-                    Nurturing Future Leaders with <span className="text-amber-400 block sm:inline">Knowledge, Discipline & Excellence</span>
-                  </h1>
-
-                  <p className="text-emerald-100/90 text-sm sm:text-base leading-relaxed max-w-2xl font-medium">
-                    Edweso Royal Academy offers an ultra-modern educational environment in Edweso, Ghana, combining the national GES curriculum with advanced computing, moral discipline, and direct Paystack integrations.
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
-                    <button
-                      onClick={() => setActivePage('admissions')}
-                      id="hero-apply-btn"
-                      className="w-full sm:w-auto bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black px-6 py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center space-x-2 text-xs uppercase tracking-widest cursor-pointer"
-                    >
-                      <span>Apply For Admission</span>
-                      <ArrowRight size={14} />
-                    </button>
-                    <button
-                      onClick={() => onNavigateToLogin()}
-                      id="hero-portal-btn"
-                      className="w-full sm:w-auto bg-emerald-800/60 hover:bg-emerald-800 border border-emerald-600 text-white font-extrabold px-6 py-3.5 rounded-xl transition-all flex items-center justify-center space-x-2 text-xs uppercase tracking-wider cursor-pointer"
-                    >
-                      <span>Enter Portal Login</span>
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-
-                  {/* Trust markers */}
-                  <div className="pt-6 border-t border-emerald-800/60 grid grid-cols-3 gap-4 text-emerald-300">
-                    <div>
-                      <span className="text-lg font-bold text-white block">★ 4.9/5</span>
-                      <span className="text-[10px] text-emerald-400/80 font-bold uppercase tracking-wider">Parent Rating</span>
-                    </div>
-                    <div>
-                      <span className="text-lg font-bold text-white block">NaCCA</span>
-                      <span className="text-[10px] text-emerald-400/80 font-bold uppercase tracking-wider">GES Approved</span>
-                    </div>
-                    <div>
-                      <span className="text-lg font-bold text-white block">100%</span>
-                      <span className="text-[10px] text-emerald-400/80 font-bold uppercase tracking-wider">BECE Success</span>
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     </div>
                   </div>
                 </div>
 
-<<<<<<< HEAD
                 {/* Right Side: Campus Notice Board & Broadcasts (5 columns) */}
                 <div className="lg:col-span-5">
                   <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-6 space-y-4">
-=======
-                {/* Right Column: Dynamic Notice Board / Information Card */}
-                <div className="lg:col-span-5">
-                  <div className="bg-slate-900/95 border border-slate-800/85 rounded-2xl shadow-2xl p-6 space-y-4 backdrop-blur-xs">
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Live Campus Broadcast</span>
                       </div>
-<<<<<<< HEAD
                       <span className="text-[9px] font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">Term III Active</span>
-=======
-                      <span className="text-[9px] font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">Term III In Progress</span>
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     </div>
 
                     <div className="space-y-3.5">
@@ -543,43 +464,14 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
                     <button
                       onClick={() => setActivePage('contact')}
-<<<<<<< HEAD
                       className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
-=======
-                      className="w-full py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     >
                       <Mail size={12} />
                       <span>Inquire About Enrollment</span>
                     </button>
                   </div>
                 </div>
-<<<<<<< HEAD
 
-=======
-              </div>
-            </section>
-
-            {/* Quick Stats Banner */}
-            <section className="bg-white py-6 border-b border-slate-100">
-              <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                <div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-emerald-800 animate-pulse">450+</div>
-                  <div className="text-xs text-slate-500 font-bold uppercase mt-1">Active Pupils</div>
-                </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-emerald-800">25+</div>
-                  <div className="text-xs text-slate-500 font-bold uppercase mt-1">Professional Teachers</div>
-                </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-emerald-800">100%</div>
-                  <div className="text-xs text-slate-500 font-bold uppercase mt-1">BECE Pass Rate</div>
-                </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-emerald-800">GHS 0</div>
-                  <div className="text-xs text-slate-500 font-bold uppercase mt-1">Hidden Charges</div>
-                </div>
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
               </div>
             </section>
 

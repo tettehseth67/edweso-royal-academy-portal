@@ -11,18 +11,11 @@ import {
 } from 'recharts';
 import { 
   UserSession, Student, Teacher, SchoolClass, Subject, 
-<<<<<<< HEAD
   Attendance, ExamGrade, Announcement, ClassNote, TimetableEntry, SimulatedEmail, SyllabusPlan
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark } from '../mockData';
 import CameraCapture from './CameraCapture';
 import SyllabusBoard from './SyllabusBoard';
-=======
-  Attendance, ExamGrade, Announcement, ClassNote, TimetableEntry, SimulatedEmail
-} from '../types';
-import { calculateGhanaGrade, getGradeRemark } from '../mockData';
-import CameraCapture from './CameraCapture';
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
 interface TeacherDashboardProps {
   session: UserSession;
@@ -36,10 +29,7 @@ interface TeacherDashboardProps {
   announcements: Announcement[];
   classNotes?: ClassNote[];
   timetable?: TimetableEntry[];
-<<<<<<< HEAD
   syllabusPlans?: SyllabusPlan[];
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   emails?: SimulatedEmail[];
   onSendEmail?: (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline' | 'MorningReport') => void;
   onUpdateAttendance: (att: Attendance[]) => void;
@@ -47,10 +37,7 @@ interface TeacherDashboardProps {
   onUpdateAnnouncements: (a: Announcement[]) => void;
   onUpdateClassNotes?: (notes: ClassNote[]) => void;
   onUpdateTeachers?: (teachers: Teacher[]) => void;
-<<<<<<< HEAD
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   isDarkMode: boolean;
 }
 
@@ -66,10 +53,7 @@ export default function TeacherDashboard({
   announcements,
   classNotes = [],
   timetable = [],
-<<<<<<< HEAD
   syllabusPlans = [],
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   emails = [],
   onSendEmail,
   onUpdateAttendance,
@@ -77,10 +61,7 @@ export default function TeacherDashboard({
   onUpdateAnnouncements,
   onUpdateClassNotes,
   onUpdateTeachers,
-<<<<<<< HEAD
   onUpdateSyllabusPlans,
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   isDarkMode
 }: TeacherDashboardProps) {
 
@@ -478,10 +459,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                   </button>
                   <button 
                     onClick={() => setIsCameraActive(true)}
-<<<<<<< HEAD
                     id="profile-camera-btn-icon"
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     title="Capture from Camera"
                     className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow hover:scale-110 transition-all cursor-pointer"
                   >
@@ -511,10 +489,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                   </button>
                   <button 
                     onClick={() => setIsCameraActive(true)}
-<<<<<<< HEAD
                     id="profile-camera-btn"
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
                   >
                     <Camera size={10} />
@@ -1914,7 +1889,6 @@ Edweso Royal Academy Administration Portal Dispatch`;
         </div>
       )}
 
-<<<<<<< HEAD
       {/* ==================== DIGITAL SYLLABUS PLANNER ==================== */}
       {activeTab === 'syllabus' && (
         <SyllabusBoard
@@ -1926,8 +1900,6 @@ Edweso Royal Academy Administration Portal Dispatch`;
         />
       )}
 
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
     </div>
   );
 }

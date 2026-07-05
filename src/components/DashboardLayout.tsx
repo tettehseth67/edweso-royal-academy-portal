@@ -4,11 +4,7 @@ import {
   LayoutDashboard, Users, UserCheck, BookOpen, 
   CheckSquare, Award, Calendar, Megaphone, CreditCard, User, Mail,
   AlertCircle, Check, CheckCircle, History, Send, FileText, Sunrise,
-<<<<<<< HEAD
   ShieldAlert, HelpCircle, ChevronUp, UserX, FileSpreadsheet
-=======
-  ShieldAlert
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 } from 'lucide-react';
 import { UserSession, Announcement } from '../types';
 import { SchoolDatabase } from '../mockData';
@@ -22,10 +18,7 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   isDarkMode: boolean;
   onToggleTheme: () => void;
-<<<<<<< HEAD
   onStartTour?: () => void;
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 }
 
 export default function DashboardLayout({
@@ -35,18 +28,13 @@ export default function DashboardLayout({
   onLogout,
   children,
   isDarkMode,
-<<<<<<< HEAD
   onToggleTheme,
   onStartTour
-=======
-  onToggleTheme
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 }: DashboardLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
-<<<<<<< HEAD
   // Scroll to Top States & Refs
   const [showScrollTop, setShowScrollTop] = useState(false);
   const mainRef = React.useRef<HTMLDivElement | null>(null);
@@ -68,28 +56,19 @@ export default function DashboardLayout({
     mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
   }, [activeTab]);
 
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   // Define sidebar navigation options based on User Role
   const adminNav = [
     { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
     { id: 'diagnostics', label: 'System Diagnostics', icon: <ShieldAlert size={18} /> },
-<<<<<<< HEAD
     { id: 'activities', label: 'Activity Logs', icon: <History size={18} /> },
-=======
-    { id: 'activities', label: 'System Activity', icon: <History size={18} /> },
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
     { id: 'students', label: 'Students List', icon: <Users size={18} /> },
     { id: 'teachers', label: 'Teachers List', icon: <UserCheck size={18} /> },
     { id: 'classes', label: 'Classes & Subjects', icon: <BookOpen size={18} /> },
     { id: 'attendance', label: 'Attendance Roll', icon: <CheckSquare size={18} /> },
     { id: 'grades', label: 'Exams & Grades', icon: <Award size={18} /> },
     { id: 'timetable', label: 'Timetable Blocks', icon: <Calendar size={18} /> },
-<<<<<<< HEAD
     { id: 'substitution', label: 'Cover Assistant', icon: <UserX size={18} /> },
     { id: 'syllabus', label: 'Syllabus Boards', icon: <FileSpreadsheet size={18} /> },
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
     { id: 'announcements', label: 'Announcements', icon: <Megaphone size={18} /> },
     { id: 'payments', label: 'Paystack Ledger', icon: <CreditCard size={18} /> },
     { id: 'inquiries', label: 'Web Inquiries', icon: <Mail size={18} /> },
@@ -101,10 +80,7 @@ export default function DashboardLayout({
     { id: 'classes', label: 'Assigned Classes', icon: <BookOpen size={18} /> },
     { id: 'attendance', label: 'Mark Attendance', icon: <CheckSquare size={18} /> },
     { id: 'grades', label: 'Upload Grades', icon: <Award size={18} /> },
-<<<<<<< HEAD
     { id: 'syllabus', label: 'Syllabus Planner', icon: <FileSpreadsheet size={18} /> },
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
     { id: 'notes', label: 'Class Notes', icon: <FileText size={18} /> },
     { id: 'morning-report', label: 'Morning Report', icon: <Sunrise size={18} /> },
     { id: 'staff', label: 'Staff Directory', icon: <Users size={18} /> },
@@ -115,10 +91,7 @@ export default function DashboardLayout({
     { id: 'profile', label: 'Student Profile', icon: <User size={18} /> },
     { id: 'subjects', label: 'My Subjects', icon: <BookOpen size={18} /> },
     { id: 'grades', label: 'Grades Overview', icon: <Award size={18} /> },
-<<<<<<< HEAD
     { id: 'syllabus', label: 'Syllabus Boards', icon: <FileSpreadsheet size={18} /> },
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
     { id: 'attendance', label: 'My Attendance', icon: <CheckSquare size={18} /> },
     { id: 'timetable', label: 'Timetable View', icon: <Calendar size={18} /> },
     { id: 'announcements', label: 'Announcements', icon: <Megaphone size={18} /> },
@@ -398,23 +371,6 @@ export default function DashboardLayout({
           {/* Right side controls */}
           <div className="flex items-center space-x-3 relative">
             
-<<<<<<< HEAD
-=======
-            {/* Dark/Light mode toggle */}
-            <button
-              onClick={onToggleTheme}
-              id="theme-toggle-btn"
-              className={`p-2 rounded-lg transition-colors border ${
-                isDarkMode 
-                  ? 'border-slate-800 hover:bg-slate-800 text-amber-400' 
-                  : 'border-slate-200 hover:bg-slate-100 text-slate-600'
-              }`}
-              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
             {/* Notifications Button */}
             <div className="relative">
               <button
@@ -541,7 +497,6 @@ export default function DashboardLayout({
               )}
             </div>
 
-<<<<<<< HEAD
             {/* Guided Tour Trigger Button */}
             {onStartTour && (
               <button
@@ -558,8 +513,6 @@ export default function DashboardLayout({
               </button>
             )}
 
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
             {/* Small Profile Dropdown trigger */}
             <div className="relative">
               <button
@@ -595,7 +548,6 @@ export default function DashboardLayout({
                     >
                       My Dashboard
                     </button>
-<<<<<<< HEAD
                     {onStartTour && (
                       <button
                         onClick={() => {
@@ -608,8 +560,6 @@ export default function DashboardLayout({
                         <span>Interactive Tour</span>
                       </button>
                     )}
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     <button
                       onClick={onLogout}
                       className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-rose-50 text-rose-600 font-bold mt-1"
@@ -626,21 +576,16 @@ export default function DashboardLayout({
 
         {/* 4. Active Dashboard Tab Content - Scrollable container */}
         <div className="flex-1 flex overflow-hidden">
-<<<<<<< HEAD
           <main 
             ref={mainRef}
             onScroll={handleScroll}
             className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
           >
-=======
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
             {children}
           </main>
           {(session.role === 'admin' || session.role === 'teacher') && (
             <ActivityFeedWidget isDarkMode={isDarkMode} />
           )}
-<<<<<<< HEAD
 
           {/* Scroll to Top Button */}
           {showScrollTop && (
@@ -652,8 +597,6 @@ export default function DashboardLayout({
               <ChevronUp size={20} className="stroke-[3px]" />
             </button>
           )}
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
         </div>
 
       </div>

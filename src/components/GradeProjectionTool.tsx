@@ -98,7 +98,7 @@ export default function GradeProjectionTool({
   // Helper: Get letter grade and visual style for any score
   const getLetterGrade = (score: number) => {
     if (score >= 80) return { char: 'A', label: 'Excellent', color: 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400 dark:bg-emerald-500/5 border-emerald-500/20' };
-    if (score >= 70) return { char: 'B', label: 'Very Good', color: 'text-teal-750 bg-teal-500/10 dark:text-teal-400 dark:bg-teal-500/5 border-teal-500/20' };
+    if (score >= 70) return { char: 'B', label: 'Very Good', color: 'text-teal-700 bg-teal-500/10 dark:text-teal-400 dark:bg-teal-500/5 border-teal-500/20' };
     if (score >= 60) return { char: 'C', label: 'Credit', color: 'text-amber-700 bg-amber-500/10 dark:text-amber-400 dark:bg-amber-500/5 border-amber-500/20' };
     if (score >= 50) return { char: 'D', label: 'Pass', color: 'text-yellow-600 bg-yellow-500/10 dark:text-yellow-500/5 border-yellow-500/20' };
     if (score >= 40) return { char: 'E', label: 'Weak Pass', color: 'text-orange-600 bg-orange-500/10 dark:text-orange-500/5 border-orange-500/20' };

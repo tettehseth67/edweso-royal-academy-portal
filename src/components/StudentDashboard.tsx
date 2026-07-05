@@ -8,19 +8,12 @@ import {
 import { 
   UserSession, Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, TimetableEntry, Announcement, 
-<<<<<<< HEAD
   PaymentTransaction, SimulatedEmail, SyllabusPlan
 } from '../types';
 import PaystackModal from './PaystackModal';
 import CameraCapture from './CameraCapture';
 import GradeProjectionTool from './GradeProjectionTool';
 import SyllabusBoard from './SyllabusBoard';
-=======
-  PaymentTransaction, SimulatedEmail 
-} from '../types';
-import PaystackModal from './PaystackModal';
-import CameraCapture from './CameraCapture';
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
 interface StudentDashboardProps {
   session: UserSession;
@@ -35,18 +28,12 @@ interface StudentDashboardProps {
   announcements: Announcement[];
   transactions: PaymentTransaction[];
   emails: SimulatedEmail[];
-<<<<<<< HEAD
   syllabusPlans?: SyllabusPlan[];
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   onPaymentSuccess: (amount: number, method: string, ref: string, paystackRef: string) => void;
   onDeleteEmail?: (id: string) => void;
   onSendEmail?: (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline') => void;
   onUpdateStudents?: (updated: Student[]) => void;
-<<<<<<< HEAD
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   isDarkMode: boolean;
   onTabChange?: (tab: string) => void;
 }
@@ -64,18 +51,12 @@ export default function StudentDashboard({
   announcements,
   transactions,
   emails,
-<<<<<<< HEAD
   syllabusPlans,
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   onPaymentSuccess,
   onDeleteEmail,
   onSendEmail,
   onUpdateStudents,
-<<<<<<< HEAD
   onUpdateSyllabusPlans,
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   isDarkMode,
   onTabChange
 }: StudentDashboardProps) {
@@ -294,10 +275,7 @@ export default function StudentDashboard({
                   </button>
                   <button 
                     onClick={() => setIsCameraActive(true)}
-<<<<<<< HEAD
                     id="profile-camera-btn-icon"
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     title="Capture from Camera"
                     className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow hover:scale-110 transition-all cursor-pointer"
                   >
@@ -327,10 +305,7 @@ export default function StudentDashboard({
                   </button>
                   <button 
                     onClick={() => setIsCameraActive(true)}
-<<<<<<< HEAD
                     id="profile-camera-btn"
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                     className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
                   >
                     <Camera size={10} />
@@ -461,11 +436,7 @@ export default function StudentDashboard({
 
       {/* ==================== 3. GRADES OVERVIEW ==================== */}
       {activeTab === 'grades' && (
-<<<<<<< HEAD
         <div className="space-y-4 animate-fade-in" id="student-grades-container">
-=======
-        <div className="space-y-4 animate-fade-in">
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
           <div className="pb-2 border-b border-slate-200/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Terminal Grade sheet</h2>
@@ -595,7 +566,6 @@ export default function StudentDashboard({
             )}
           </div>
 
-<<<<<<< HEAD
           {/* 2. Interactive Academic Performance & Grade Projection Tool */}
           <GradeProjectionTool 
             student={student} 
@@ -603,8 +573,6 @@ export default function StudentDashboard({
             studentSubjects={studentSubjects} 
           />
 
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
         </div>
       )}
 
@@ -745,11 +713,7 @@ export default function StudentDashboard({
 
       {/* ==================== 7. FEES PAYMENTS (PAYSTACK) ==================== */}
       {activeTab === 'payments' && (
-<<<<<<< HEAD
         <div className="space-y-6 animate-fade-in" id="student-payments-container">
-=======
-        <div className="space-y-6 animate-fade-in">
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
           <div className="pb-2 border-b border-slate-200/40">
             <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Fees Settlement & Receipts</h2>
             <p className="text-xs text-slate-400">Authorize secure, instant payments via Paystack in Ghanaian Cedis (GHS).</p>
@@ -1107,11 +1071,7 @@ export default function StudentDashboard({
               <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-4 text-slate-800 dark:text-slate-100">Dispatched Messages</h4>
 
               {(() => {
-<<<<<<< HEAD
                 const myMessages = emails.filter(em => (em.recipientEmail || '').toLowerCase() === (student.parentEmail || '').toLowerCase());
-=======
-                const myMessages = emails.filter(em => em.recipientEmail.toLowerCase() === student.parentEmail.toLowerCase());
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                 if (myMessages.length === 0) {
                   return (
                     <div className="text-center py-16 text-slate-400 italic text-xs font-semibold">
@@ -1229,7 +1189,6 @@ export default function StudentDashboard({
         </div>
       )}
 
-<<<<<<< HEAD
       {/* ==================== 10. LESSON PLANNER & SYLLABUS BOARDS ==================== */}
       {activeTab === 'syllabus' && (
         <SyllabusBoard
@@ -1241,8 +1200,6 @@ export default function StudentDashboard({
         />
       )}
 
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
       {/* GLOBAL PRINTABLE RECEIPT POPUP MODAL (Accessible by both payments & payment-history tabs) */}
       {selectedTxForReceipt && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
@@ -1350,7 +1307,6 @@ export default function StudentDashboard({
         const totalScore = gradesList.reduce((acc, curr) => acc + curr.totalScore, 0);
         const averageScore = gradesList.length > 0 ? (totalScore / gradesList.length).toFixed(1) : '0';
         
-<<<<<<< HEAD
         const classStudents = students.filter(s => s.classId === student.classId);
         const studentAvgScores = classStudents.map(s => {
           const sGrades = grades.filter(g => g.studentId === s.id);
@@ -1362,8 +1318,6 @@ export default function StudentDashboard({
         const positionIndex = studentAvgScores.findIndex(s => s.studentId === student.id);
         const classPositionString = positionIndex !== -1 ? `${positionIndex + 1} of ${classStudents.length}` : '—';
         
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
         let principalRemarks = 'An excellent academic performance. Keep up the high standards!';
         const avg = parseFloat(averageScore);
         if (avg < 50) {
@@ -1515,15 +1469,9 @@ export default function StudentDashboard({
                 </div>
 
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
-<<<<<<< HEAD
                   <span className="text-[9px] text-slate-400 uppercase font-black block">Academic Class Standing</span>
                   <div className="flex items-baseline space-x-1 mt-1">
                     <span className="text-xs font-mono font-black text-emerald-600">{classPositionString} Position</span>
-=======
-                  <span className="text-[9px] text-slate-400 uppercase font-black block">Division Standing</span>
-                  <div className="flex items-baseline space-x-1 mt-1">
-                    <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200">1st Division Pass</span>
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
                   </div>
                 </div>
               </div>

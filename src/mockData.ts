@@ -10,14 +10,10 @@ import {
   PaymentTransaction,
   PublicInquiry,
   SimulatedEmail,
-<<<<<<< HEAD
   ClassNote,
   SyllabusPlan,
   TeacherAbsence,
   CoverAssignment
-=======
-  ClassNote
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 } from './types';
 
 // Initial School Classes
@@ -273,7 +269,6 @@ export class SchoolDatabase {
     setStored('CLASS_NOTES', notes);
   }
 
-<<<<<<< HEAD
   static getSyllabusPlans(): SyllabusPlan[] {
     const initialSyllabusPlans: SyllabusPlan[] = [
       {
@@ -342,8 +337,6 @@ export class SchoolDatabase {
     setStored('COVER_ASSIGNMENTS', covers);
   }
 
-=======
->>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   static getSystemActivities(): { id: string; type: 'login' | 'grade' | 'attendance'; user: string; details: string; timestamp: string }[] {
     const defaultActivities = [
       { id: 'act-1', type: 'login' as const, user: 'Mr. Kwame Boateng', details: 'Authenticated successfully into Teacher Portal', timestamp: '2 mins ago' },
