@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X } from 'lucide-react';
 import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment } from './types';
+=======
+import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote } from './types';
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 import { SchoolDatabase } from './mockData';
 
 // Component Imports
@@ -10,7 +14,10 @@ import DashboardLayout from './components/DashboardLayout';
 import AdminDashboard from './components/AdminDashboard';
 import StudentDashboard from './components/StudentDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
+<<<<<<< HEAD
 import OnboardingTour from './components/OnboardingTour';
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
 export default function App() {
   // Page Routing State: 'landing' | 'auth' | 'dashboard'
@@ -22,6 +29,7 @@ export default function App() {
   // Selected tab in the active dashboard
   const [activeTab, setActiveTab] = useState<string>('overview');
 
+<<<<<<< HEAD
   // Interactive Onboarding Tour State
   const [isTourOpen, setIsTourOpen] = useState(false);
 
@@ -64,6 +72,13 @@ export default function App() {
     type: 'info',
     onConfirm: () => {}
   });
+=======
+  // Selected role for pre-configuring Auth Page
+  const [authPageInitialRole, setAuthPageInitialRole] = useState<UserRole>('student');
+
+  // Light/Dark Mode State - Defaults to professional light mode
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
   // Master Database States loaded from LocalStorage (with robust defaults)
   const [students, setStudents] = useState<Student[]>([]);
@@ -77,9 +92,12 @@ export default function App() {
   const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
   const [emails, setEmails] = useState<SimulatedEmail[]>([]);
   const [classNotes, setClassNotes] = useState<ClassNote[]>([]);
+<<<<<<< HEAD
   const [syllabusPlans, setSyllabusPlans] = useState<SyllabusPlan[]>([]);
   const [teacherAbsences, setTeacherAbsences] = useState<TeacherAbsence[]>([]);
   const [coverAssignments, setCoverAssignments] = useState<CoverAssignment[]>([]);
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
   // Helper to save database state to Node.js backend
   const syncAndSave = async (updatedFields: Partial<{
@@ -94,9 +112,12 @@ export default function App() {
     transactions: PaymentTransaction[];
     emails: SimulatedEmail[];
     classNotes: ClassNote[];
+<<<<<<< HEAD
     syllabusPlans: SyllabusPlan[];
     teacherAbsences: TeacherAbsence[];
     coverAssignments: CoverAssignment[];
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   }>) => {
     const payload = {
       students: updatedFields.students ?? students,
@@ -110,9 +131,12 @@ export default function App() {
       transactions: updatedFields.transactions ?? transactions,
       emails: updatedFields.emails ?? emails,
       classNotes: updatedFields.classNotes ?? classNotes,
+<<<<<<< HEAD
       syllabusPlans: updatedFields.syllabusPlans ?? syllabusPlans,
       teacherAbsences: updatedFields.teacherAbsences ?? teacherAbsences,
       coverAssignments: updatedFields.coverAssignments ?? coverAssignments,
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
     };
     try {
       await fetch('/api/school-data', {
@@ -145,9 +169,12 @@ export default function App() {
           setTransactions(db.transactions || []);
           setEmails(db.emails || []);
           setClassNotes(db.classNotes || []);
+<<<<<<< HEAD
           setSyllabusPlans(db.syllabusPlans || []);
           setTeacherAbsences(db.teacherAbsences || []);
           setCoverAssignments(db.coverAssignments || []);
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
           loadedFromBackend = true;
           
           // Keep LocalStorage fallback updated
@@ -162,9 +189,12 @@ export default function App() {
           SchoolDatabase.saveTransactions(db.transactions || []);
           SchoolDatabase.saveEmails(db.emails || []);
           SchoolDatabase.saveClassNotes(db.classNotes || []);
+<<<<<<< HEAD
           SchoolDatabase.saveSyllabusPlans(db.syllabusPlans || []);
           SchoolDatabase.saveTeacherAbsences(db.teacherAbsences || []);
           SchoolDatabase.saveCoverAssignments(db.coverAssignments || []);
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
         }
       } catch (e) {
         console.warn('Failed to fetch from backend, utilizing local storage fallback:', e);
@@ -182,9 +212,12 @@ export default function App() {
         const localTransactions = SchoolDatabase.getTransactions();
         const localEmails = SchoolDatabase.getEmails();
         const localClassNotes = SchoolDatabase.getClassNotes();
+<<<<<<< HEAD
         const localSyllabus = SchoolDatabase.getSyllabusPlans();
         const localAbsences = SchoolDatabase.getTeacherAbsences();
         const localCovers = SchoolDatabase.getCoverAssignments();
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
         setStudents(localStudents);
         setTeachers(localTeachers);
@@ -197,9 +230,12 @@ export default function App() {
         setTransactions(localTransactions);
         setEmails(localEmails);
         setClassNotes(localClassNotes);
+<<<<<<< HEAD
         setSyllabusPlans(localSyllabus);
         setTeacherAbsences(localAbsences);
         setCoverAssignments(localCovers);
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
         // Bootstrap backend with initial mock data
         try {
@@ -217,10 +253,14 @@ export default function App() {
               announcements: localAnnouncements,
               transactions: localTransactions,
               emails: localEmails,
+<<<<<<< HEAD
               classNotes: localClassNotes,
               syllabusPlans: localSyllabus,
               teacherAbsences: localAbsences,
               coverAssignments: localCovers
+=======
+              classNotes: localClassNotes
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
             })
           });
         } catch (err) {
@@ -432,6 +472,7 @@ Edweso Royal Academy`;
   };
 
   const handleDeleteEmail = (id: string) => {
+<<<<<<< HEAD
     setGlobalConfirm({
       isOpen: true,
       title: 'Delete Simulated Email Log',
@@ -446,6 +487,12 @@ Edweso Royal Academy`;
         setGlobalConfirm(prev => ({ ...prev, isOpen: false }));
       }
     });
+=======
+    const updated = emails.filter(em => em.id !== id);
+    setEmails(updated);
+    SchoolDatabase.saveEmails(updated);
+    syncAndSave({ emails: updated });
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   };
 
   const handleSendSimulatedEmail = (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline' | 'MorningReport') => {
@@ -481,6 +528,7 @@ Edweso Royal Academy`;
   };
 
   const handleUpdateGrades = (updatedGrades: ExamGrade[]) => {
+<<<<<<< HEAD
     setGlobalConfirm({
       isOpen: true,
       title: 'Update Student Grades',
@@ -503,6 +551,20 @@ Edweso Royal Academy`;
         setGlobalConfirm(prev => ({ ...prev, isOpen: false }));
       }
     });
+=======
+    setGrades(updatedGrades);
+    SchoolDatabase.saveGrades(updatedGrades);
+    syncAndSave({ grades: updatedGrades });
+    
+    // Log system activity
+    if (session) {
+      SchoolDatabase.addSystemActivity(
+        'grade', 
+        session.name, 
+        `Updated student evaluation terminal grade book`
+      );
+    }
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   };
 
   const handleUpdateTimetable = (updatedTimetable: TimetableEntry[]) => {
@@ -517,6 +579,7 @@ Edweso Royal Academy`;
     syncAndSave({ classNotes: updatedClassNotes });
   };
 
+<<<<<<< HEAD
   const handleUpdateSyllabusPlans = (updatedPlans: SyllabusPlan[]) => {
     setSyllabusPlans(updatedPlans);
     SchoolDatabase.saveSyllabusPlans(updatedPlans);
@@ -535,6 +598,8 @@ Edweso Royal Academy`;
     syncAndSave({ coverAssignments: updatedCovers });
   };
 
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   // Payment Callback (When Paystack checkout is successful)
   const handlePaymentSuccess = (amount: number, method: string, ref: string, paystackRef: string) => {
     if (!session || session.role !== 'student') return;
@@ -599,7 +664,10 @@ Edweso Royal Academy`;
           onLogout={handleLogout}
           isDarkMode={isDarkMode}
           onToggleTheme={handleToggleTheme}
+<<<<<<< HEAD
           onStartTour={() => setIsTourOpen(true)}
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
         >
           {session.role === 'admin' && (
             <AdminDashboard
@@ -614,9 +682,12 @@ Edweso Royal Academy`;
               announcements={announcements}
               transactions={transactions}
               emails={emails}
+<<<<<<< HEAD
               syllabusPlans={syllabusPlans}
               teacherAbsences={teacherAbsences}
               coverAssignments={coverAssignments}
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
               onUpdateStudents={handleUpdateStudents}
               onUpdateTeachers={handleUpdateTeachers}
               onUpdateAnnouncements={handleUpdateAnnouncements}
@@ -625,9 +696,12 @@ Edweso Royal Academy`;
               onTriggerFeeAlerts={handleTriggerFeeAlerts}
               onDeleteEmail={handleDeleteEmail}
               onSendEmail={handleSendSimulatedEmail}
+<<<<<<< HEAD
               onUpdateSyllabusPlans={handleUpdateSyllabusPlans}
               onUpdateTeacherAbsences={handleUpdateTeacherAbsences}
               onUpdateCoverAssignments={handleUpdateCoverAssignments}
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
               isDarkMode={isDarkMode}
             />
           )}
@@ -646,12 +720,18 @@ Edweso Royal Academy`;
               announcements={announcements}
               transactions={transactions}
               emails={emails}
+<<<<<<< HEAD
               syllabusPlans={syllabusPlans}
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
               onPaymentSuccess={handlePaymentSuccess}
               onDeleteEmail={handleDeleteEmail}
               onSendEmail={handleSendSimulatedEmail}
               onUpdateStudents={handleUpdateStudents}
+<<<<<<< HEAD
               onUpdateSyllabusPlans={handleUpdateSyllabusPlans}
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
               isDarkMode={isDarkMode}
               onTabChange={setActiveTab}
             />
@@ -670,13 +750,19 @@ Edweso Royal Academy`;
               announcements={announcements}
               classNotes={classNotes}
               timetable={timetable}
+<<<<<<< HEAD
               syllabusPlans={syllabusPlans}
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
               onUpdateAttendance={handleUpdateAttendance}
               onUpdateGrades={handleUpdateGrades}
               onUpdateAnnouncements={handleUpdateAnnouncements}
               onUpdateClassNotes={handleUpdateClassNotes}
               onUpdateTeachers={handleUpdateTeachers}
+<<<<<<< HEAD
               onUpdateSyllabusPlans={handleUpdateSyllabusPlans}
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
               emails={emails}
               onSendEmail={handleSendSimulatedEmail}
               isDarkMode={isDarkMode}
@@ -684,6 +770,7 @@ Edweso Royal Academy`;
           )}
         </DashboardLayout>
       )}
+<<<<<<< HEAD
 
       {/* ==================== GLOBAL CONFIRMATION MODAL ==================== */}
       {globalConfirm.isOpen && (
@@ -765,6 +852,8 @@ Edweso Royal Academy`;
           onClose={() => setIsTourOpen(false)}
         />
       )}
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
     </div>
   );
 }

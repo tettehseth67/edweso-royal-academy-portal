@@ -39,7 +39,10 @@ export interface Teacher {
   status: 'Active' | 'On Leave';
   gender: 'Male' | 'Female';
   profilePhoto?: string;
+<<<<<<< HEAD
   subjectSpecialization?: string; // Specialization alias
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 }
 
 export interface SchoolClass {
@@ -55,7 +58,10 @@ export interface Subject {
   name: string;
   code: string;
   classId: string; // References SchoolClass.id
+<<<<<<< HEAD
   teacherId?: string; // Optional teacherId mapping
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 }
 
 export interface Attendance {
@@ -145,6 +151,7 @@ export interface ClassNote {
   date: string;      // Date created/updated
 }
 
+<<<<<<< HEAD
 export interface SyllabusPlan {
   id: string;
   subjectId: string;
@@ -195,4 +202,6 @@ export interface CoverAssignment {
   assignedBy?: string;
 }
 
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 

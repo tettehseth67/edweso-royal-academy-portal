@@ -3,7 +3,11 @@ import {
   Users, UserCheck, BookOpen, CheckSquare, Award, 
   Calendar, Megaphone, CreditCard, Search, Plus, 
   Trash2, Edit, Check, AlertTriangle, Eye, RefreshCw, Filter, ShieldCheck, Download,
+<<<<<<< HEAD
   ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer, Cake, Gift
+=======
+  ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, 
@@ -12,11 +16,17 @@ import {
 import { 
   Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, TimetableEntry, Announcement, 
+<<<<<<< HEAD
   PaymentTransaction, PublicInquiry, SimulatedEmail, SyllabusPlan, TeacherAbsence, CoverAssignment
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark, SchoolDatabase } from '../mockData';
 import SyllabusBoard from './SyllabusBoard';
 import SubstitutionAssistant from './SubstitutionAssistant';
+=======
+  PaymentTransaction, PublicInquiry, SimulatedEmail
+} from '../types';
+import { calculateGhanaGrade, getGradeRemark, SchoolDatabase } from '../mockData';
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
 interface AdminDashboardProps {
   activeTab: string;
@@ -30,9 +40,12 @@ interface AdminDashboardProps {
   announcements: Announcement[];
   transactions: PaymentTransaction[];
   emails: SimulatedEmail[];
+<<<<<<< HEAD
   syllabusPlans?: SyllabusPlan[];
   teacherAbsences?: TeacherAbsence[];
   coverAssignments?: CoverAssignment[];
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   onUpdateStudents: (st: Student[]) => void;
   onUpdateTeachers: (t: Teacher[]) => void;
   onUpdateAnnouncements: (a: Announcement[]) => void;
@@ -41,9 +54,12 @@ interface AdminDashboardProps {
   onTriggerFeeAlerts: (studentIds?: string[]) => number;
   onDeleteEmail: (id: string) => void;
   onSendEmail: (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline') => void;
+<<<<<<< HEAD
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
   onUpdateTeacherAbsences?: (updated: TeacherAbsence[]) => void;
   onUpdateCoverAssignments?: (updated: CoverAssignment[]) => void;
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   isDarkMode: boolean;
 }
 
@@ -59,9 +75,12 @@ export default function AdminDashboard({
   announcements,
   transactions,
   emails,
+<<<<<<< HEAD
   syllabusPlans = [],
   teacherAbsences = [],
   coverAssignments = [],
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   onUpdateStudents,
   onUpdateTeachers,
   onUpdateAnnouncements,
@@ -70,9 +89,12 @@ export default function AdminDashboard({
   onTriggerFeeAlerts,
   onDeleteEmail,
   onSendEmail,
+<<<<<<< HEAD
   onUpdateSyllabusPlans,
   onUpdateTeacherAbsences,
   onUpdateCoverAssignments,
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   isDarkMode
 }: AdminDashboardProps) {
 
@@ -358,6 +380,7 @@ export default function AdminDashboard({
     }
   };
 
+<<<<<<< HEAD
   const handleSendBirthdayEmail = (student: Student, birthdayDateStr: string) => {
     onSendEmail(
       student.parentEmail,
@@ -369,6 +392,8 @@ export default function AdminDashboard({
     alert(`Birthday celebratory email sent successfully to ${student.parentName} (${student.parentEmail})!`);
   };
 
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   const handleRunDiagnosticScan = () => {
     setDiagnosticScanLoading(true);
     setTimeout(() => {
@@ -526,6 +551,7 @@ export default function AdminDashboard({
   const totalRevenue = successfulTx.reduce((acc, t) => acc + t.amountGHS, 0);
   const outstandingFees = students.reduce((acc, s) => acc + s.balanceGHS, 0);
 
+<<<<<<< HEAD
   // Helper to identify students whose birthday is within the next 7 days
   const getUpcomingBirthdays = (studentList: Student[], daysAhead: number = 7) => {
     const result: { student: Student; daysUntil: number; birthdayDateStr: string; formattedDob: string }[] = [];
@@ -573,6 +599,8 @@ export default function AdminDashboard({
 
   const upcomingBirthdays = getUpcomingBirthdays(students);
 
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
   // Recharts Dynamic Datasets
   const enrollmentChartData = classes.map(c => {
     const classStudents = students.filter(s => s.classId === c.id);
@@ -990,6 +1018,7 @@ export default function AdminDashboard({
             </div>
           </div>
 
+<<<<<<< HEAD
           {/* Upcoming Student Birthdays Alert/Suggest Block */}
           {upcomingBirthdays.length > 0 && (
             <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 shadow-xs flex flex-col items-start gap-4 animate-fade-in" id="birthday-alerts-container">
@@ -1056,6 +1085,8 @@ export default function AdminDashboard({
             </div>
           )}
 
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
           {/* ==================== ADVANCED RECHARTS ANALYTICS HUB ==================== */}
           {(() => {
             const CustomTooltip = ({ active, payload, label }: any) => {
@@ -3426,6 +3457,7 @@ export default function AdminDashboard({
         );
       })()}
 
+<<<<<<< HEAD
       {/* ==================== 10. LESSON PLANNER & SYLLABUS BOARDS ==================== */}
       {activeTab === 'syllabus' && (
         <SyllabusBoard
@@ -3452,6 +3484,8 @@ export default function AdminDashboard({
         />
       )}
 
+=======
+>>>>>>> a485efcbb0ccfceb953a607e34be37b714399fdf
 
       {/* ========================================================
           ==================== CRUD MODALS AREA ====================
