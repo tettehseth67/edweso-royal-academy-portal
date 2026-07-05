@@ -163,7 +163,8 @@ export interface SyllabusPlan {
   topicTitle?: string;
   learningObjectives?: string[];
   resources?: string[];
-  status?: 'Pending' | 'In Progress' | 'Completed';
+  status?: 'Pending' | 'In Progress' | 'Completed' | 'Scheduled' | 'Complete';
+  scheduleDates?: string;
 }
 
 export interface TeacherAbsence {

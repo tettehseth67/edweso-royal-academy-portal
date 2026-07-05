@@ -523,6 +523,8 @@ export function TeachingResourcesCarousel({
 // ==========================================
 // 3. STUDENT PHOTO GALLERY & PROFILE HISTORY CAROUSEL
 // ==========================================
+import { Maximize2 } from 'lucide-react';
+
 interface StudentPhotoGalleryCarouselProps {
   currentProfilePhoto?: string;
   onSelectProfilePhoto: (url: string) => void;
@@ -540,31 +542,31 @@ export function StudentPhotoGalleryCarousel({
       id: 'event-1',
       title: 'Academy Science & STEM Fair 2026',
       description: 'Reviewing interactive robotics modules and chemical reaction layouts in the school laboratory.',
-      url: 'https://images.unsplash.com/photo-1564069114553-7215e1ff1890?q=80&w=600&auto=format&fit=crop'
+      url: 'https://images.unsplash.com/photo-1564069114553-7215e1ff1890?q=80&w=1000&auto=format&fit=crop'
     },
     {
       id: 'event-2',
       title: 'Royal Culture & Heritage Festival',
       description: 'Students wearing rich, authentic Kente weaving and showcasing royal drums and dances.',
-      url: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=600&auto=format&fit=crop'
+      url: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1000&auto=format&fit=crop'
     },
     {
       id: 'event-3',
       title: 'Annual Inter-House Sports Gala',
       description: 'Competing on the tracks for the principal gold cups and athletic certificates.',
-      url: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=600&auto=format&fit=crop'
+      url: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1000&auto=format&fit=crop'
     },
     {
       id: 'event-4',
       title: 'High-Performance Computing Lab Block',
       description: 'Junior secondary classes designing custom websites and training interactive coding plans.',
-      url: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=600&auto=format&fit=crop'
+      url: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1000&auto=format&fit=crop'
     },
     {
       id: 'event-5',
       title: 'Interactive Math Olympiad Finals',
       description: 'Winning first place awards across general geometry and speed arithmetic.',
-      url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop'
+      url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1000&auto=format&fit=crop'
     }
   ];
 
@@ -572,8 +574,11 @@ export function StudentPhotoGalleryCarousel({
   // plus the pre-approved school event photos.
   const [photoGallery, setPhotoGallery] = useState<Array<{ id: string; title: string; description: string; url: string; isProfile?: boolean }>>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0); // -1 for left, 1 for right
   const [isPlaying, setIsPlaying] = useState(true);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const list = [];
@@ -600,24 +605,43 @@ export function StudentPhotoGalleryCarousel({
     setPhotoGallery(list);
   }, [currentProfilePhoto]);
 
-  // Autoplay effect - synchronized to exactly 5 seconds
+  // Autoplay and progress bar effect - 5 seconds cycle
   useEffect(() => {
-    if (!isPlaying || photoGallery.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % photoGallery.length);
-    }, 5000); 
-    return () => clearInterval(interval);
-  }, [isPlaying, photoGallery.length]);
+    if (!isPlaying || photoGallery.length <= 1 || isModalOpen) {
+      setProgress(0);
+      return;
+    }
+
+    const intervalTime = 50; // Update every 50ms
+    const step = (intervalTime / 5000) * 100; // Increment step
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          setDirection(1);
+          setCurrentIndex((old) => (old + 1) % photoGallery.length);
+          return 0;
+        }
+        return prev + step;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, [isPlaying, photoGallery.length, currentIndex, isModalOpen]);
 
   if (photoGallery.length === 0) {
     return null;
   }
 
   const handleNext = () => {
+    setDirection(1);
+    setProgress(0);
     setCurrentIndex((prev) => (prev + 1) % photoGallery.length);
   };
 
   const handlePrev = () => {
+    setDirection(-1);
+    setProgress(0);
     setCurrentIndex((prev) => (prev - 1 + photoGallery.length) % photoGallery.length);
   };
 
@@ -643,102 +667,388 @@ export function StudentPhotoGalleryCarousel({
   const activePhoto = photoGallery[currentIndex];
   const isCurrentlyActiveProfile = currentProfilePhoto === activePhoto.url;
 
+  // Animation variants for slider
+  const slideVariants = {
+    enter: (dir: number) => ({
+      x: dir > 0 ? '100%' : '-100%',
+      opacity: 0,
+      scale: 1.05
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1
+    },
+    exit: (dir: number) => ({
+      x: dir < 0 ? '100%' : '-100%',
+      opacity: 0,
+      scale: 0.95
+    })
+  };
+
   return (
     <div 
       onMouseEnter={() => setIsPlaying(false)}
       onMouseLeave={() => setIsPlaying(true)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className={`p-5 rounded-2xl border ${
-        isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
-      } space-y-4 select-none`} 
+      className={`p-6 rounded-2xl border shadow-lg ${
+        isDarkMode 
+          ? 'bg-slate-900 border-slate-800/80 shadow-slate-950/20' 
+          : 'bg-white border-slate-200/80 shadow-slate-100'
+      } space-y-5 select-none`} 
       id="student-gallery-carousel-widget"
     >
       
-      <div>
-        <div className="flex items-center space-x-1.5 text-emerald-700 dark:text-emerald-400">
-          <Image size={15} />
-          <h3 className="text-xs font-black uppercase tracking-wider font-mono">Royal Campus Gallery</h3>
+      {/* Header section with branding details */}
+      <div className="flex justify-between items-end pb-3 border-b border-slate-100 dark:border-slate-800/60">
+        <div>
+          <div className="flex items-center space-x-1.5 text-emerald-600 dark:text-emerald-400">
+            <Image size={15} className="animate-pulse" />
+            <h3 className="text-xs font-black uppercase tracking-wider font-mono">Royal Campus Gallery</h3>
+          </div>
+          <h4 className="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider mt-0.5">Captures & School Event Spotlights</h4>
         </div>
-        <h4 className="text-xs text-slate-400 mt-0.5 font-bold uppercase tracking-wide">History of Captures & School Event Spotlights</h4>
+        <div className="flex items-center space-x-1 bg-slate-50 dark:bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-150 dark:border-slate-800 text-[10px] font-mono font-black text-emerald-600 dark:text-emerald-400 shadow-xs">
+          <span>{currentIndex + 1}</span>
+          <span className="opacity-30">/</span>
+          <span>{photoGallery.length}</span>
+        </div>
       </div>
 
-      {/* Main Image View Panel */}
-      <div className="relative group rounded-xl overflow-hidden aspect-video bg-slate-950 border border-slate-200/10 shadow-md">
-        <img 
-          src={activePhoto.url} 
-          alt={activePhoto.title}
-          referrerPolicy="no-referrer"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+      {/* Main Image View Panel with fluid slide and hover controls */}
+      <div 
+        onClick={() => setIsModalOpen(true)}
+        className="relative rounded-2xl overflow-hidden aspect-[16/10] bg-slate-950 border border-slate-100 dark:border-slate-800 shadow-inner group cursor-zoom-in"
+      >
+        
+        {/* Animated Slide container */}
+        <div className="absolute inset-0 w-full h-full">
+          <AnimatePresence initial={false} custom={direction} mode="wait">
+            <motion.img 
+              key={activePhoto.id}
+              src={activePhoto.url} 
+              alt={activePhoto.title}
+              referrerPolicy="no-referrer"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: 'spring', stiffness: 280, damping: 28 }}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </AnimatePresence>
+        </div>
 
-        {/* Text overlay backplate */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent flex flex-col justify-end p-4 text-left space-y-1">
-          <span className="text-[8px] font-black uppercase tracking-widest bg-emerald-600 text-white px-2 py-0.5 rounded self-start leading-none mb-1 shadow-xs">
-            {activePhoto.isProfile ? 'My Profile Photo' : 'School Event Spotlight'}
-          </span>
-          <h5 className="font-extrabold text-xs text-white tracking-wide">
+        {/* Story progress indicator bar */}
+        {isPlaying && !isModalOpen && (
+          <div className="absolute top-2.5 left-2.5 right-2.5 z-25 flex space-x-1.5">
+            {photoGallery.map((_, idx) => (
+              <div 
+                key={idx} 
+                className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden backdrop-blur-xs"
+              >
+                <div 
+                  className="h-full bg-emerald-400 rounded-full transition-all duration-75"
+                  style={{ 
+                    width: idx === currentIndex 
+                      ? `${progress}%` 
+                      : idx < currentIndex 
+                        ? '100%' 
+                        : '0%' 
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Text overlay backplate with glassmorphic layout */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent p-5 pt-12 flex flex-col justify-end text-left space-y-1.5 z-10">
+          <div className="flex justify-between items-end">
+            <span className="text-[8px] font-black uppercase tracking-widest bg-emerald-500 text-white px-2.5 py-1 rounded-md self-start leading-none shadow-md">
+              {activePhoto.isProfile ? 'My Profile Photo' : 'School Event Spotlight'}
+            </span>
+            {/* Quick zoom banner hint */}
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[9px] text-emerald-300 font-mono font-bold flex items-center gap-1 bg-slate-950/60 px-2 py-0.5 rounded backdrop-blur-xs">
+              <Maximize2 size={10} /> Click to Inspect
+            </span>
+          </div>
+          <h5 className="font-extrabold text-sm text-white tracking-wide leading-tight drop-shadow-md">
             {activePhoto.title}
           </h5>
-          <p className="text-[10px] text-slate-300 leading-normal line-clamp-2 font-medium">
+          <p className="text-[11px] text-slate-200/95 leading-relaxed line-clamp-2 font-medium drop-shadow-xs">
             {activePhoto.description}
           </p>
         </div>
 
-        {/* Left / Right overlays */}
-        <button
-          onClick={handlePrev}
-          className="absolute left-2.5 top-1/2 -translate-y-1/2 p-1.5 bg-slate-950/70 hover:bg-slate-900/90 text-white rounded-full border border-white/10 shadow hover:scale-110 active:scale-95 transition-all cursor-pointer"
-        >
-          <ChevronLeft size={14} />
-        </button>
+        {/* Left / Right overlay floating arrow controls */}
+        <div className="absolute inset-x-3 top-1/2 -translate-y-1/2 flex justify-between items-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePrev();
+            }}
+            className="p-2 bg-slate-950/70 hover:bg-slate-950/90 text-white rounded-full border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-all cursor-pointer backdrop-blur-xs"
+            title="Previous Spotlight"
+          >
+            <ChevronLeft size={16} />
+          </button>
 
-        <button
-          onClick={handleNext}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 bg-slate-950/70 hover:bg-slate-900/90 text-white rounded-full border border-white/10 shadow hover:scale-110 active:scale-95 transition-all cursor-pointer"
-        >
-          <ChevronRight size={14} />
-        </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNext();
+            }}
+            className="p-2 bg-slate-950/70 hover:bg-slate-950/90 text-white rounded-full border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-all cursor-pointer backdrop-blur-xs"
+            title="Next Spotlight"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
       </div>
 
-      {/* Action buttons (e.g. set as profile photo) */}
-      <div className="flex justify-between items-center pt-1 text-xs">
-        {/* Thumbnails indicator */}
-        <div className="flex space-x-1.5 overflow-x-auto py-1">
+      {/* Pagination dots below slider viewport for explicit page navigation */}
+      <div className="flex justify-center space-x-1.5 py-1">
+        {photoGallery.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => {
+              setDirection(idx > currentIndex ? 1 : -1);
+              setProgress(0);
+              setCurrentIndex(idx);
+            }}
+            className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+              idx === currentIndex 
+                ? 'bg-emerald-600 dark:bg-emerald-500 w-5 shadow-xs' 
+                : 'bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 w-2'
+            }`}
+            title={`Slide to spotlight ${idx + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* Interactive Controls & Thumbnails & Profile set button */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+        
+        {/* Thumbnails row */}
+        <div className="flex items-center space-x-2 overflow-x-auto py-1.5">
           {photoGallery.map((p, idx) => (
             <button
               key={p.id}
-              onClick={() => setCurrentIndex(idx)}
-              className={`w-7 h-7 rounded overflow-hidden border-2 shrink-0 transition-all ${
+              onClick={() => {
+                setDirection(idx > currentIndex ? 1 : -1);
+                setProgress(0);
+                setCurrentIndex(idx);
+              }}
+              className={`w-10 h-10 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
                 idx === currentIndex 
-                  ? 'border-emerald-500 scale-110 shadow-sm' 
-                  : 'border-transparent opacity-65 hover:opacity-100'
+                  ? 'border-emerald-500 scale-110 ring-4 ring-emerald-500/10 shadow-md' 
+                  : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'
               }`}
             >
-              <img src={p.url} alt="thumbnail" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+              <img 
+                src={p.url} 
+                alt="thumbnail" 
+                referrerPolicy="no-referrer" 
+                className="w-full h-full object-cover" 
+              />
             </button>
           ))}
         </div>
 
-        {/* Set Active Profile button */}
-        {!activePhoto.isProfile && !isCurrentlyActiveProfile && (
-          <button
-            onClick={() => onSelectProfilePhoto(activePhoto.url)}
-            className="py-1.5 px-3 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 font-extrabold text-[9px] uppercase tracking-wider rounded-lg border border-emerald-500/15 flex items-center gap-1 shrink-0 transition-all cursor-pointer shadow-xs"
-            title="Set this gorgeous image as your profile photo"
-          >
-            <CheckCircle2 size={11} />
-            <span>Apply as Profile Photo</span>
-          </button>
-        )}
+        {/* Apply profile picture button */}
+        <div className="shrink-0 flex justify-end">
+          {!activePhoto.isProfile && !isCurrentlyActiveProfile && (
+            <button
+              onClick={() => onSelectProfilePhoto(activePhoto.url)}
+              className="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] uppercase tracking-widest rounded-xl flex items-center gap-1.5 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer shadow-md shadow-emerald-600/10"
+              title="Apply this high-quality event photo as your profile avatar"
+            >
+              <CheckCircle2 size={13} />
+              <span>Apply as Profile Photo</span>
+            </button>
+          )}
 
-        {isCurrentlyActiveProfile && (
-          <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wide flex items-center gap-1 py-1">
-            <CheckCircle2 size={11} />
-            Active Profile Avatar
-          </span>
-        )}
+          {(activePhoto.isProfile || isCurrentlyActiveProfile) && (
+            <div className="inline-flex items-center gap-1.5 py-2 px-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-black text-[10px] uppercase tracking-widest border border-emerald-500/15">
+              <CheckCircle2 size={13} />
+              <span>Active Avatar</span>
+            </div>
+          )}
+        </div>
+
       </div>
+
+      {/* --- EXTRA LARGE DETAILED IMAGE INSPECTOR MODAL --- */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+            {/* Backdrop blur with deep charcoal overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-slate-950/85 backdrop-blur-md"
+            />
+
+            {/* Modal Card content wrapper */}
+            <motion.div
+              initial={{ scale: 0.95, y: 15, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 15, opacity: 0 }}
+              transition={{ type: 'spring', duration: 0.35, bounce: 0.15 }}
+              className="bg-slate-900 text-white rounded-3xl border border-slate-800 max-w-4xl w-full overflow-hidden shadow-2xl relative z-10 flex flex-col md:flex-row min-h-[400px]"
+            >
+              
+              {/* Left Side: Large Gorgeous Image view with manual next/prev */}
+              <div className="md:w-3/5 bg-black relative flex items-center justify-center aspect-[16/10] md:aspect-auto select-none">
+                <AnimatePresence initial={false} custom={direction} mode="wait">
+                  <motion.img 
+                    key={activePhoto.id}
+                    src={activePhoto.url} 
+                    alt={activePhoto.title}
+                    referrerPolicy="no-referrer"
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+                    className="w-full h-full object-cover"
+                  />
+                </AnimatePresence>
+
+                {/* Left/Right Floating Navigation controls */}
+                <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between items-center z-10">
+                  <button
+                    onClick={() => handlePrev()}
+                    className="p-2.5 bg-slate-900/80 hover:bg-slate-950 text-white rounded-full border border-slate-800 shadow-xl hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
+                  <button
+                    onClick={() => handleNext()}
+                    className="p-2.5 bg-slate-900/80 hover:bg-slate-950 text-white rounded-full border border-slate-800 shadow-xl hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+
+                {/* Floating Pagination indicator dots inside image panel */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-1.5 bg-black/40 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-white/5 z-10">
+                  {photoGallery.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setDirection(idx > currentIndex ? 1 : -1);
+                        setCurrentIndex(idx);
+                      }}
+                      className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                        idx === currentIndex ? 'bg-emerald-400 w-4' : 'bg-white/40 w-1.5'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Side: Event Details & Action controls */}
+              <div className="md:w-2/5 p-6 md:p-8 flex flex-col justify-between space-y-6 bg-slate-900">
+                
+                {/* Header detail */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <span className="text-[9px] font-black uppercase tracking-widest bg-emerald-950/80 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-lg">
+                      {activePhoto.isProfile ? 'My Active Avatar' : 'Spotlight Capture'}
+                    </span>
+                    <button
+                      onClick={() => setIsModalOpen(false)}
+                      className="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl border border-slate-800 transition-colors cursor-pointer"
+                      title="Close inspector"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-extrabold text-white text-lg tracking-wide leading-tight">
+                      {activePhoto.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                      {activePhoto.description}
+                    </p>
+                  </div>
+
+                  {/* High Quality Badge specifications */}
+                  <div className="pt-3 border-t border-slate-800 text-[10px] space-y-1.5 font-mono">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Image Source</span>
+                      <span className="text-slate-300 font-bold">Unsplash Premium</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Resolution Status</span>
+                      <span className="text-emerald-400 font-bold">1000px Ultra HD</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions & Thumbnails deck */}
+                <div className="space-y-4 pt-4 border-t border-slate-800">
+                  <p className="text-[9px] uppercase tracking-widest font-mono text-slate-500 font-black">
+                    Quick Navigate Deck
+                  </p>
+                  
+                  <div className="flex gap-1.5 overflow-x-auto py-1">
+                    {photoGallery.map((p, idx) => (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          setDirection(idx > currentIndex ? 1 : -1);
+                          setCurrentIndex(idx);
+                        }}
+                        className={`w-11 h-11 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
+                          idx === currentIndex 
+                            ? 'border-emerald-400 scale-105 shadow shadow-emerald-400/20' 
+                            : 'border-transparent opacity-50 hover:opacity-100'
+                        }`}
+                      >
+                        <img src={p.url} alt="thumbnail" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Apply Profile Image button inside modal */}
+                  <div className="pt-2">
+                    {!activePhoto.isProfile && !isCurrentlyActiveProfile ? (
+                      <button
+                        onClick={() => {
+                          onSelectProfilePhoto(activePhoto.url);
+                          setIsModalOpen(false);
+                        }}
+                        className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-600/10"
+                        title="Set this gorgeous image as your profile photo"
+                      >
+                        <CheckCircle2 size={14} />
+                        <span>Apply as Profile Photo</span>
+                      </button>
+                    ) : (
+                      <div className="w-full py-3 bg-emerald-950/40 text-emerald-400 font-black text-xs uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 border border-emerald-500/15">
+                        <CheckCircle2 size={14} />
+                        <span>Active Profile Avatar</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
