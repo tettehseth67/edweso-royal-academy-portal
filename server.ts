@@ -99,6 +99,171 @@ async function startServer() {
     }
   });
 
+  // AI Syllabus Plan Generator endpoint
+  app.post("/api/ai/generate-syllabus", async (req, res) => {
+    const { subjectName, topicTitle } = req.body;
+    
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(400).json({ 
+        error: "GEMINI_API_KEY is not defined. Please add it in Settings > Secrets." 
+      });
+    }
+
+    try {
+      const ai = new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+
+      const prompt = `
+        You are an expert curriculum designer and academic coordinator in Ghana, aligned with the Ghana Education Service (GES) and West African Examinations Council (WAEC) standards.
+        Create a detailed, appropriate weekly learning plan for the subject "${subjectName}" under the topic: "${topicTitle}".
+        
+        Generate:
+        1. A set of 3-5 clear, bulleted learning objectives tailored for Ghanaian students.
+        2. A set of 2-3 specific study material filenames or resource titles (e.g., "wk_study_guide_${topicTitle.replace(/\s+/g, '_').toLowerCase()}.pdf", "WAEC Exam Revision Sheet").
+
+        Your response MUST be a valid JSON object matching this schema:
+        {
+          "learningObjectives": ["string"],
+          "resources": ["string"]
+        }
+        
+        Respond only with the raw JSON object, without any Markdown backticks or prefix blocks.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      const resultText = response.text || "{}";
+      const parsed = JSON.parse(resultText.trim());
+      res.json({ status: "success", data: parsed });
+    } catch (e: any) {
+      console.error("Gemini syllabus API error:", e);
+      res.status(500).json({ error: e.message || "An error occurred calling Gemini API" });
+    }
+  });
+
+  // AI Homework Hint Generator endpoint
+  app.post("/api/ai/homework-hint", async (req, res) => {
+    const { subjectName, assignmentTitle, assignmentDescription } = req.body;
+    
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(400).json({ 
+        error: "GEMINI_API_KEY is not defined. Please add it in Settings > Secrets." 
+      });
+    }
+
+    try {
+      const ai = new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+
+      const prompt = `
+        You are a highly supportive and engaging academic tutor at Edweso Royal Academy in Ghana.
+        A student is working on their homework assignment for "${subjectName}".
+        
+        Assignment Title: "${assignmentTitle}"
+        Assignment Description: "${assignmentDescription}"
+
+        Please write a brief, encouraging, and structured homework hint or core concept guide.
+        - DO NOT solve the entire homework or give the final direct answer.
+        - Explain the fundamental scientific or mathematical formula or analytical framework needed.
+        - Outline 2-3 structured steps the student can take to solve it on their own.
+        
+        Keep your advice positive, simple, clear, and extremely pedagogical for junior high school students.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: prompt,
+      });
+
+      const resultText = response.text || "Keep reviewing your textbooks. You've got this!";
+      res.json({ status: "success", hint: resultText });
+    } catch (e: any) {
+      console.error("Gemini homework API error:", e);
+      res.status(500).json({ error: e.message || "An error occurred calling Gemini API" });
+    }
+  });
+
+  // AI Homework Evaluator / Grading Assistant endpoint
+  app.post("/api/ai/evaluate-homework", async (req, res) => {
+    const { assignmentTitle, assignmentDescription, studentName, submissionText, maxScore } = req.body;
+    
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(400).json({ 
+        error: "GEMINI_API_KEY is not defined. Please add it in Settings > Secrets." 
+      });
+    }
+
+    try {
+      const ai = new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+
+      const prompt = `
+        You are a supportive, high-standards senior teacher at Edweso Royal Academy in Ghana.
+        Evaluate the student submission for this JHS homework:
+        
+        Assignment Title: "${assignmentTitle}"
+        Assignment Description: "${assignmentDescription}"
+        Student Name: "${studentName}"
+        Student Submission Text: "${submissionText}"
+        Maximum Score: ${maxScore}
+
+        Please analyze the student's answer thoroughly and provide:
+        1. A suggested grade score (a number between 0 and ${maxScore}).
+        2. Constructive, encouraging, and detailed feedback written in a warm Ghanaian style (highly supportive, pointing out strengths and specific areas to improve, using terms like "Well done", "Keep it up", "Excellent proof").
+
+        Your response MUST be a valid JSON object matching this schema exactly:
+        {
+          "suggestedScore": number,
+          "feedbackDraft": "string"
+        }
+        
+        Respond only with the raw JSON object, without any Markdown backticks or prefix blocks.
+      `;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      const resultText = response.text || "{}";
+      const parsed = JSON.parse(resultText.trim());
+      res.json({ status: "success", data: parsed });
+    } catch (e: any) {
+      console.error("Gemini homework grading API error:", e);
+      res.status(500).json({ error: e.message || "An error occurred calling Gemini API" });
+    }
+  });
+
   // Vite middleware integration
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

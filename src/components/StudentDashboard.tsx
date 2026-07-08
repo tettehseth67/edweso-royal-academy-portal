@@ -8,13 +8,15 @@ import {
 import { 
   UserSession, Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, TimetableEntry, Announcement, 
-  PaymentTransaction, SimulatedEmail, SyllabusPlan
+  PaymentTransaction, SimulatedEmail, SyllabusPlan,
+  HomeworkAssignment, HomeworkSubmission
 } from '../types';
 import PaystackModal from './PaystackModal';
 import CameraCapture from './CameraCapture';
 import GradeProjectionTool from './GradeProjectionTool';
 import SyllabusBoard from './SyllabusBoard';
 import { StudentPhotoGalleryCarousel } from './FeaturedCarouselComponents';
+import StudentAssignmentsView from './StudentAssignmentsView';
 
 interface StudentDashboardProps {
   session: UserSession;
@@ -30,11 +32,14 @@ interface StudentDashboardProps {
   transactions: PaymentTransaction[];
   emails: SimulatedEmail[];
   syllabusPlans?: SyllabusPlan[];
+  homeworkAssignments: HomeworkAssignment[];
+  homeworkSubmissions: HomeworkSubmission[];
   onPaymentSuccess: (amount: number, method: string, ref: string, paystackRef: string) => void;
   onDeleteEmail?: (id: string) => void;
   onSendEmail?: (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline') => void;
   onUpdateStudents?: (updated: Student[]) => void;
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
+  onUpdateHomeworkSubmissions: (subs: HomeworkSubmission[]) => void;
   isDarkMode: boolean;
   onTabChange?: (tab: string) => void;
 }
@@ -53,11 +58,14 @@ export default function StudentDashboard({
   transactions,
   emails,
   syllabusPlans,
+  homeworkAssignments,
+  homeworkSubmissions,
   onPaymentSuccess,
   onDeleteEmail,
   onSendEmail,
   onUpdateStudents,
   onUpdateSyllabusPlans,
+  onUpdateHomeworkSubmissions,
   isDarkMode,
   onTabChange
 }: StudentDashboardProps) {
@@ -440,6 +448,18 @@ export default function StudentDashboard({
             })}
           </div>
         </div>
+      )}
+
+      {/* ==================== MY HOMEWORK / ASSIGNMENTS ==================== */}
+      {activeTab === 'assignments' && (
+        <StudentAssignmentsView
+          session={session}
+          students={students}
+          subjects={subjects}
+          homeworkAssignments={homeworkAssignments}
+          homeworkSubmissions={homeworkSubmissions}
+          onUpdateHomeworkSubmissions={onUpdateHomeworkSubmissions}
+        />
       )}
 
       {/* ==================== 3. GRADES OVERVIEW ==================== */}

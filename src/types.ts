@@ -196,4 +196,32 @@ export interface CoverAssignment {
   assignedBy?: string;
 }
 
+export interface HomeworkAssignment {
+  id: string;
+  classId: string;
+  subjectId: string;
+  subjectName: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  maxScore: number;
+  dateCreated: string;
+}
+
+export interface HomeworkSubmission {
+  id: string;
+  assignmentId: string;
+  assignmentTitle: string;
+  studentId: string;
+  studentName: string;
+  submissionText: string;
+  fileAttachment?: string; // e.g., "submit_math_geometry.pdf"
+  submittedAt: string;
+  status: 'Submitted' | 'Graded';
+  score?: number;
+  feedback?: string;
+  gradedBy?: string;
+  gradedAt?: string;
+}
+
 

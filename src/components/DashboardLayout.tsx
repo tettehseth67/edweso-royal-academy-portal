@@ -78,6 +78,7 @@ export default function DashboardLayout({
   const teacherNav = [
     { id: 'profile', label: 'My Profile', icon: <User size={18} /> },
     { id: 'classes', label: 'Assigned Classes', icon: <BookOpen size={18} /> },
+    { id: 'assignments', label: 'Homework Center', icon: <FileText size={18} /> },
     { id: 'attendance', label: 'Mark Attendance', icon: <CheckSquare size={18} /> },
     { id: 'grades', label: 'Upload Grades', icon: <Award size={18} /> },
     { id: 'syllabus', label: 'Syllabus Planner', icon: <FileSpreadsheet size={18} /> },
@@ -90,6 +91,7 @@ export default function DashboardLayout({
   const studentNav = [
     { id: 'profile', label: 'Student Profile', icon: <User size={18} /> },
     { id: 'subjects', label: 'My Subjects', icon: <BookOpen size={18} /> },
+    { id: 'assignments', label: 'My Homework', icon: <FileText size={18} /> },
     { id: 'grades', label: 'Grades Overview', icon: <Award size={18} /> },
     { id: 'syllabus', label: 'Syllabus Boards', icon: <FileSpreadsheet size={18} /> },
     { id: 'attendance', label: 'My Attendance', icon: <CheckSquare size={18} /> },

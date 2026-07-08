@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X } from 'lucide-react';
-import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment } from './types';
+import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission } from './types';
 import { SchoolDatabase } from './mockData';
 
 // Component Imports
@@ -80,6 +80,8 @@ export default function App() {
   const [syllabusPlans, setSyllabusPlans] = useState<SyllabusPlan[]>([]);
   const [teacherAbsences, setTeacherAbsences] = useState<TeacherAbsence[]>([]);
   const [coverAssignments, setCoverAssignments] = useState<CoverAssignment[]>([]);
+  const [homeworkAssignments, setHomeworkAssignments] = useState<HomeworkAssignment[]>([]);
+  const [homeworkSubmissions, setHomeworkSubmissions] = useState<HomeworkSubmission[]>([]);
 
   // Helper to save database state to Node.js backend
   const syncAndSave = async (updatedFields: Partial<{
@@ -97,6 +99,8 @@ export default function App() {
     syllabusPlans: SyllabusPlan[];
     teacherAbsences: TeacherAbsence[];
     coverAssignments: CoverAssignment[];
+    homeworkAssignments: HomeworkAssignment[];
+    homeworkSubmissions: HomeworkSubmission[];
   }>) => {
     const payload = {
       students: updatedFields.students ?? students,
@@ -113,6 +117,8 @@ export default function App() {
       syllabusPlans: updatedFields.syllabusPlans ?? syllabusPlans,
       teacherAbsences: updatedFields.teacherAbsences ?? teacherAbsences,
       coverAssignments: updatedFields.coverAssignments ?? coverAssignments,
+      homeworkAssignments: updatedFields.homeworkAssignments ?? homeworkAssignments,
+      homeworkSubmissions: updatedFields.homeworkSubmissions ?? homeworkSubmissions,
     };
     try {
       await fetch('/api/school-data', {
@@ -148,6 +154,8 @@ export default function App() {
           setSyllabusPlans(db.syllabusPlans || []);
           setTeacherAbsences(db.teacherAbsences || []);
           setCoverAssignments(db.coverAssignments || []);
+          setHomeworkAssignments(db.homeworkAssignments || []);
+          setHomeworkSubmissions(db.homeworkSubmissions || []);
           loadedFromBackend = true;
           
           // Keep LocalStorage fallback updated
@@ -165,6 +173,8 @@ export default function App() {
           SchoolDatabase.saveSyllabusPlans(db.syllabusPlans || []);
           SchoolDatabase.saveTeacherAbsences(db.teacherAbsences || []);
           SchoolDatabase.saveCoverAssignments(db.coverAssignments || []);
+          SchoolDatabase.saveHomeworkAssignments(db.homeworkAssignments || []);
+          SchoolDatabase.saveHomeworkSubmissions(db.homeworkSubmissions || []);
         }
       } catch (e) {
         console.warn('Failed to fetch from backend, utilizing local storage fallback:', e);
@@ -185,6 +195,8 @@ export default function App() {
         const localSyllabus = SchoolDatabase.getSyllabusPlans();
         const localAbsences = SchoolDatabase.getTeacherAbsences();
         const localCovers = SchoolDatabase.getCoverAssignments();
+        const localHomeworkAssignments = SchoolDatabase.getHomeworkAssignments();
+        const localHomeworkSubmissions = SchoolDatabase.getHomeworkSubmissions();
 
         setStudents(localStudents);
         setTeachers(localTeachers);
@@ -200,6 +212,8 @@ export default function App() {
         setSyllabusPlans(localSyllabus);
         setTeacherAbsences(localAbsences);
         setCoverAssignments(localCovers);
+        setHomeworkAssignments(localHomeworkAssignments);
+        setHomeworkSubmissions(localHomeworkSubmissions);
 
         // Bootstrap backend with initial mock data
         try {
@@ -220,7 +234,9 @@ export default function App() {
               classNotes: localClassNotes,
               syllabusPlans: localSyllabus,
               teacherAbsences: localAbsences,
-              coverAssignments: localCovers
+              coverAssignments: localCovers,
+              homeworkAssignments: localHomeworkAssignments,
+              homeworkSubmissions: localHomeworkSubmissions
             })
           });
         } catch (err) {
@@ -535,6 +551,18 @@ Edweso Royal Academy`;
     syncAndSave({ coverAssignments: updatedCovers });
   };
 
+  const handleUpdateHomeworkAssignments = (updatedAssignments: HomeworkAssignment[]) => {
+    setHomeworkAssignments(updatedAssignments);
+    SchoolDatabase.saveHomeworkAssignments(updatedAssignments);
+    syncAndSave({ homeworkAssignments: updatedAssignments });
+  };
+
+  const handleUpdateHomeworkSubmissions = (updatedSubmissions: HomeworkSubmission[]) => {
+    setHomeworkSubmissions(updatedSubmissions);
+    SchoolDatabase.saveHomeworkSubmissions(updatedSubmissions);
+    syncAndSave({ homeworkSubmissions: updatedSubmissions });
+  };
+
   // Payment Callback (When Paystack checkout is successful)
   const handlePaymentSuccess = (amount: number, method: string, ref: string, paystackRef: string) => {
     if (!session || session.role !== 'student') return;
@@ -647,11 +675,14 @@ Edweso Royal Academy`;
               transactions={transactions}
               emails={emails}
               syllabusPlans={syllabusPlans}
+              homeworkAssignments={homeworkAssignments}
+              homeworkSubmissions={homeworkSubmissions}
               onPaymentSuccess={handlePaymentSuccess}
               onDeleteEmail={handleDeleteEmail}
               onSendEmail={handleSendSimulatedEmail}
               onUpdateStudents={handleUpdateStudents}
               onUpdateSyllabusPlans={handleUpdateSyllabusPlans}
+              onUpdateHomeworkSubmissions={handleUpdateHomeworkSubmissions}
               isDarkMode={isDarkMode}
               onTabChange={setActiveTab}
             />
@@ -671,12 +702,16 @@ Edweso Royal Academy`;
               classNotes={classNotes}
               timetable={timetable}
               syllabusPlans={syllabusPlans}
+              homeworkAssignments={homeworkAssignments}
+              homeworkSubmissions={homeworkSubmissions}
               onUpdateAttendance={handleUpdateAttendance}
               onUpdateGrades={handleUpdateGrades}
               onUpdateAnnouncements={handleUpdateAnnouncements}
               onUpdateClassNotes={handleUpdateClassNotes}
               onUpdateTeachers={handleUpdateTeachers}
               onUpdateSyllabusPlans={handleUpdateSyllabusPlans}
+              onUpdateHomeworkAssignments={handleUpdateHomeworkAssignments}
+              onUpdateHomeworkSubmissions={handleUpdateHomeworkSubmissions}
               emails={emails}
               onSendEmail={handleSendSimulatedEmail}
               isDarkMode={isDarkMode}

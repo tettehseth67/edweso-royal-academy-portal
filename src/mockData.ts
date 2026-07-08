@@ -13,7 +13,9 @@ import {
   ClassNote,
   SyllabusPlan,
   TeacherAbsence,
-  CoverAssignment
+  CoverAssignment,
+  HomeworkAssignment,
+  HomeworkSubmission
 } from './types';
 
 // Initial School Classes
@@ -148,6 +150,50 @@ export const initialTransactions: PaymentTransaction[] = [
   { id: 'tx3', studentId: 'st4', studentName: 'Esi Pokuaa Owusu', amountGHS: 2000.00, date: '2026-05-20 09:12', status: 'Successful', reference: 'ERA-TX-9873', paystackRef: 'PSTK-019348924', paymentMethod: 'Telecel Cash', email: 'owusu.bea@gmail.com', term: 'Term 1' },
   { id: 'tx4', studentId: 'st5', studentName: 'Emmanuel Tetteh', amountGHS: 2500.00, date: '2026-06-01 11:30', status: 'Successful', reference: 'ERA-TX-9874', paystackRef: 'PSTK-112348935', paymentMethod: 'MTN Mobile Money', email: 'tettehseth67@gmail.com', term: 'Term 1' },
   { id: 'tx5', studentId: 'st3', studentName: 'Kwame Boateng Jr', amountGHS: 100.00, date: '2026-06-05 16:00', status: 'Failed', reference: 'ERA-TX-9875', paystackRef: 'PSTK-224489311', paymentMethod: 'AirtelTigo Money', email: 'kboateng@outlook.com', term: 'Term 1' }
+];
+
+// Initial Homework Assignments
+export const initialHomeworkAssignments: HomeworkAssignment[] = [
+  {
+    id: 'hw1',
+    classId: 'c4', // JHS 2
+    subjectId: 's1', // Mathematics
+    subjectName: 'Mathematics',
+    title: 'Solving Linear Equations',
+    description: 'Solve equations of the form ax + b = cx + d. Write out all step-by-step calculations. Practice problems 1 to 10 on page 42 of the GES Core Mathematics textbook.',
+    dueDate: '2026-07-15',
+    maxScore: 20,
+    dateCreated: '2026-07-05'
+  },
+  {
+    id: 'hw2',
+    classId: 'c4', // JHS 2
+    subjectId: 's2', // Integrated Science
+    subjectName: 'Integrated Science',
+    title: 'Photosynthesis Experiment Reflection',
+    description: 'Write a 1-page essay explaining the role of chlorophyll in photosynthesis. Discuss the light-dependent and light-independent stages, and describe our classroom experiment results.',
+    dueDate: '2026-07-18',
+    maxScore: 10,
+    dateCreated: '2026-07-06'
+  }
+];
+
+// Initial Homework Submissions
+export const initialHomeworkSubmissions: HomeworkSubmission[] = [
+  {
+    id: 'hsub1',
+    assignmentId: 'hw1',
+    assignmentTitle: 'Solving Linear Equations',
+    studentId: 'st5', // Emmanuel Tetteh (the current active user we are testing with!)
+    studentName: 'Emmanuel Tetteh',
+    submissionText: 'For equation 1: 3x + 5 = 2x + 10 => 3x - 2x = 10 - 5 => x = 5. Verified correct! For equation 2: 5x - 3 = 2x + 9 => 3x = 12 => x = 4. Done.',
+    submittedAt: '2026-07-06 14:30',
+    status: 'Graded',
+    score: 19,
+    feedback: 'Excellent step-by-step proofs, Emmanuel! Keep up the brilliant math precision.',
+    gradedBy: 'Mr. Kwame Boateng',
+    gradedAt: '2026-07-07 10:00'
+  }
 ];
 
 // Helper to load/save state with LocalStorage
@@ -364,6 +410,22 @@ export class SchoolDatabase {
       timestamp: 'Just now'
     };
     this.saveSystemActivities([newActivity, ...current].slice(0, 50));
+  }
+
+  static getHomeworkAssignments(): HomeworkAssignment[] {
+    return getStored<HomeworkAssignment[]>('HOMEWORK_ASSIGNMENTS', initialHomeworkAssignments);
+  }
+
+  static saveHomeworkAssignments(assignments: HomeworkAssignment[]): void {
+    setStored('HOMEWORK_ASSIGNMENTS', assignments);
+  }
+
+  static getHomeworkSubmissions(): HomeworkSubmission[] {
+    return getStored<HomeworkSubmission[]>('HOMEWORK_SUBMISSIONS', initialHomeworkSubmissions);
+  }
+
+  static saveHomeworkSubmissions(submissions: HomeworkSubmission[]): void {
+    setStored('HOMEWORK_SUBMISSIONS', submissions);
   }
 }
 

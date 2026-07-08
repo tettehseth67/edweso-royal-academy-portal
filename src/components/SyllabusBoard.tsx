@@ -126,6 +126,45 @@ export default function SyllabusBoard({
   const [formStatus, setFormStatus] = useState<'Scheduled' | 'In Progress' | 'Complete'>('Scheduled');
   const [formScheduleDates, setFormScheduleDates] = useState('');
 
+  // AI syllabus helper states
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [aiSyllabusError, setAiSyllabusError] = useState('');
+
+  const handleGenerateAiSyllabus = async () => {
+    if (!formTopic.trim()) {
+      alert('Please enter an Outline Topic Title first.');
+      return;
+    }
+    setIsGeneratingAi(true);
+    setAiSyllabusError('');
+    const matchedSub = subjects.find(s => s.id === formSubjectId);
+    const subName = matchedSub ? matchedSub.name : 'General Studies';
+    try {
+      const res = await fetch('/api/ai/generate-syllabus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subjectName: subName, topicTitle: formTopic })
+      });
+      const resData = await res.json();
+      if (res.ok && resData.status === 'success' && resData.data) {
+        const { learningObjectives, resources } = resData.data;
+        if (learningObjectives && Array.isArray(learningObjectives)) {
+          setFormObjectives(learningObjectives.join('\n'));
+        }
+        if (resources && Array.isArray(resources)) {
+          setFormResources(resources.join('\n'));
+        }
+      } else {
+        setAiSyllabusError(resData.error || 'Failed to auto-generate content.');
+      }
+    } catch (err) {
+      console.error(err);
+      setAiSyllabusError('Network error connecting to Edweso AI hub.');
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
+
   // Open creation modal
   const handleOpenCreate = () => {
     setEditingPlan(null);
@@ -798,7 +837,18 @@ export default function SyllabusBoard({
 
             {/* Topic input */}
             <div className="space-y-1">
-              <label className="block text-[10px] uppercase font-black text-slate-400">Outline Topic Title</label>
+              <div className="flex justify-between items-center">
+                <label className="block text-[10px] uppercase font-black text-slate-400">Outline Topic Title</label>
+                <button
+                  type="button"
+                  onClick={handleGenerateAiSyllabus}
+                  disabled={isGeneratingAi}
+                  className="flex items-center space-x-1 text-[9px] font-black uppercase bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-300 px-2 py-1 rounded-md transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <Sparkles size={10} className={isGeneratingAi ? "animate-spin text-emerald-600" : "text-emerald-600"} />
+                  <span>{isGeneratingAi ? 'Generating...' : 'Edweso AI Gen'}</span>
+                </button>
+              </div>
               <input
                 type="text"
                 placeholder="e.g. Quadratic Equations & Graphs"
@@ -806,6 +856,9 @@ export default function SyllabusBoard({
                 onChange={(e) => setFormTopic(e.target.value)}
                 className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 p-2 rounded-lg text-xs font-bold focus:outline-hidden text-slate-800 dark:text-slate-200"
               />
+              {aiSyllabusError && (
+                <p className="text-[9px] text-rose-500 font-bold mt-0.5">{aiSyllabusError}</p>
+              )}
             </div>
 
             {/* Schedule Date Ranges Input */}

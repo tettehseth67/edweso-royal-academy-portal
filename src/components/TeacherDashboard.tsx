@@ -11,12 +11,14 @@ import {
 } from 'recharts';
 import { 
   UserSession, Student, Teacher, SchoolClass, Subject, 
-  Attendance, ExamGrade, Announcement, ClassNote, TimetableEntry, SimulatedEmail, SyllabusPlan
+  Attendance, ExamGrade, Announcement, ClassNote, TimetableEntry, SimulatedEmail, SyllabusPlan,
+  HomeworkAssignment, HomeworkSubmission
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark } from '../mockData';
 import CameraCapture from './CameraCapture';
 import SyllabusBoard from './SyllabusBoard';
 import { FeaturedAnnouncementsCarousel, TeachingResourcesCarousel } from './FeaturedCarouselComponents';
+import TeacherAssignmentsView from './TeacherAssignmentsView';
 
 interface TeacherDashboardProps {
   session: UserSession;
@@ -32,6 +34,8 @@ interface TeacherDashboardProps {
   timetable?: TimetableEntry[];
   syllabusPlans?: SyllabusPlan[];
   emails?: SimulatedEmail[];
+  homeworkAssignments: HomeworkAssignment[];
+  homeworkSubmissions: HomeworkSubmission[];
   onSendEmail?: (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline' | 'MorningReport') => void;
   onUpdateAttendance: (att: Attendance[]) => void;
   onUpdateGrades: (g: ExamGrade[]) => void;
@@ -39,6 +43,8 @@ interface TeacherDashboardProps {
   onUpdateClassNotes?: (notes: ClassNote[]) => void;
   onUpdateTeachers?: (teachers: Teacher[]) => void;
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
+  onUpdateHomeworkAssignments: (assignments: HomeworkAssignment[]) => void;
+  onUpdateHomeworkSubmissions: (submissions: HomeworkSubmission[]) => void;
   isDarkMode: boolean;
 }
 
@@ -56,6 +62,8 @@ export default function TeacherDashboard({
   timetable = [],
   syllabusPlans = [],
   emails = [],
+  homeworkAssignments = [],
+  homeworkSubmissions = [],
   onSendEmail,
   onUpdateAttendance,
   onUpdateGrades,
@@ -63,6 +71,8 @@ export default function TeacherDashboard({
   onUpdateClassNotes,
   onUpdateTeachers,
   onUpdateSyllabusPlans,
+  onUpdateHomeworkAssignments,
+  onUpdateHomeworkSubmissions,
   isDarkMode
 }: TeacherDashboardProps) {
 
@@ -704,6 +714,20 @@ Edweso Royal Academy Administration Portal Dispatch`;
           </div>
 
         </div>
+      )}
+
+      {/* ==================== HOMEWORK & GRADING WORKSPACE ==================== */}
+      {activeTab === 'assignments' && (
+        <TeacherAssignmentsView
+          session={session}
+          classes={classes}
+          subjects={subjects}
+          students={students}
+          homeworkAssignments={homeworkAssignments}
+          homeworkSubmissions={homeworkSubmissions}
+          onUpdateHomeworkAssignments={onUpdateHomeworkAssignments}
+          onUpdateHomeworkSubmissions={onUpdateHomeworkSubmissions}
+        />
       )}
 
       {/* ==================== 2. MARK ATTENDANCE ==================== */}
