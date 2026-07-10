@@ -12,7 +12,8 @@ import {
 import { 
   Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, TimetableEntry, Announcement, 
-  PaymentTransaction, PublicInquiry, SimulatedEmail, SyllabusPlan, TeacherAbsence, CoverAssignment
+  PaymentTransaction, PublicInquiry, SimulatedEmail, SyllabusPlan, TeacherAbsence, CoverAssignment,
+  StaffClockIn, StaffPayroll, StaffLeaveRequest
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark, SchoolDatabase } from '../mockData';
 import SyllabusBoard from './SyllabusBoard';
@@ -34,6 +35,9 @@ interface AdminDashboardProps {
   syllabusPlans?: SyllabusPlan[];
   teacherAbsences?: TeacherAbsence[];
   coverAssignments?: CoverAssignment[];
+  staffClockIns: StaffClockIn[];
+  staffPayrolls: StaffPayroll[];
+  staffLeaveRequests: StaffLeaveRequest[];
   onUpdateStudents: (st: Student[]) => void;
   onUpdateTeachers: (t: Teacher[]) => void;
   onUpdateAnnouncements: (a: Announcement[]) => void;
@@ -45,6 +49,9 @@ interface AdminDashboardProps {
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
   onUpdateTeacherAbsences?: (updated: TeacherAbsence[]) => void;
   onUpdateCoverAssignments?: (updated: CoverAssignment[]) => void;
+  onUpdateStaffClockIns: (clockIns: StaffClockIn[]) => void;
+  onUpdateStaffPayrolls: (payrolls: StaffPayroll[]) => void;
+  onUpdateStaffLeaves: (leaves: StaffLeaveRequest[]) => void;
   isDarkMode: boolean;
 }
 
@@ -63,6 +70,9 @@ export default function AdminDashboard({
   syllabusPlans = [],
   teacherAbsences = [],
   coverAssignments = [],
+  staffClockIns = [],
+  staffPayrolls = [],
+  staffLeaveRequests = [],
   onUpdateStudents,
   onUpdateTeachers,
   onUpdateAnnouncements,
@@ -74,6 +84,9 @@ export default function AdminDashboard({
   onUpdateSyllabusPlans,
   onUpdateTeacherAbsences,
   onUpdateCoverAssignments,
+  onUpdateStaffClockIns,
+  onUpdateStaffPayrolls,
+  onUpdateStaffLeaves,
   isDarkMode
 }: AdminDashboardProps) {
 
@@ -81,6 +94,9 @@ export default function AdminDashboard({
   const [studentSearch, setStudentSearch] = useState('');
   const [studentClassFilter, setStudentClassFilter] = useState('All');
   const [teacherSearch, setTeacherSearch] = useState('');
+  const [teachersActiveSubTab, setTeachersActiveSubTab] = useState<'list' | 'attendance' | 'leaves' | 'payroll'>('list');
+  const [selectedPayrollStaff, setSelectedPayrollStaff] = useState<StaffPayroll | null>(null);
+  const [payrollActionStatus, setPayrollActionStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
   const [gradeClassFilter, setGradeClassFilter] = useState('c4'); // Default JHS 2
   const [gradeSubjectFilter, setGradeSubjectFilter] = useState('s1'); // Math
   const [selectedReportCardStudent, setSelectedReportCardStudent] = useState<Student | null>(null);
@@ -1506,36 +1522,457 @@ export default function AdminDashboard({
         </div>
       )}
 
-      {/* ==================== 3. TEACHER REGISTER ==================== */}
+      {/* ==================== 3. FACULTY & STAFF OPERATIONS HUB ==================== */}
       {activeTab === 'teachers' && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-6 animate-fade-in">
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Academic Faculty Registry</h2>
-              <p className="text-xs text-slate-400">Total {teachers.length} certified teachers.</p>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Faculty & Staff Operations Hub</h2>
+              <p className="text-xs text-slate-400">Manage teacher register, geofenced attendance logs, leaves, and payroll ledger.</p>
             </div>
+            {teachersActiveSubTab === 'list' && (
+              <button
+                onClick={openAddTeacher}
+                id="admin-add-teacher-btn"
+                className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs flex items-center space-x-1.5 shadow-sm transition-colors"
+              >
+                <Plus size={14} />
+                <span>Onboard New Teacher</span>
+              </button>
+            )}
+          </div>
+
+          {/* Hub Sub-Tabs selection */}
+          <div className="flex border-b border-slate-200 dark:border-slate-800">
             <button
-              onClick={openAddTeacher}
-              id="admin-add-teacher-btn"
-              className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs flex items-center space-x-1.5 shadow-sm transition-colors"
+              onClick={() => {
+                setTeachersActiveSubTab('list');
+                setPayrollActionStatus({ type: null, message: '' });
+              }}
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                teachersActiveSubTab === 'list'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
             >
-              <Plus size={14} />
-              <span>Onboard New Teacher</span>
+              Faculty Registry ({teachers.length})
+            </button>
+            <button
+              onClick={() => {
+                setTeachersActiveSubTab('attendance');
+                setPayrollActionStatus({ type: null, message: '' });
+              }}
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                teachersActiveSubTab === 'attendance'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              Staff Clock-Ins ({staffClockIns.length})
+            </button>
+            <button
+              onClick={() => {
+                setTeachersActiveSubTab('leaves');
+                setPayrollActionStatus({ type: null, message: '' });
+              }}
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                teachersActiveSubTab === 'leaves'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              Leave Requests ({staffLeaveRequests.filter(l => l.status === 'Pending').length} Pending)
+            </button>
+            <button
+              onClick={() => {
+                setTeachersActiveSubTab('payroll');
+                setPayrollActionStatus({ type: null, message: '' });
+              }}
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                teachersActiveSubTab === 'payroll'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              Payroll & Salaries Ledger
             </button>
           </div>
 
-          <div className="max-w-xs relative">
-            <input
-              type="text"
-              id="search-teachers-input"
-              placeholder="Search faculty name..."
-              value={teacherSearch}
-              onChange={(e) => setTeacherSearch(e.target.value)}
-              className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 pl-9 pr-3 text-xs text-slate-800 dark:text-white focus:outline-hidden focus:border-emerald-500 font-semibold"
-            />
-            <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
-          </div>
+          {/* ==================== ATTENDANCE LOG VIEW ==================== */}
+          {teachersActiveSubTab === 'attendance' && (
+            <div className="space-y-4 animate-fade-in">
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+                <h3 className="text-sm font-bold mb-3">Live Geofenced Attendance Feed</h3>
+                {staffClockIns.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400 text-xs font-semibold">
+                    No clock-in records registered in the system yet.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                          <th className="p-3">Staff Name / Role</th>
+                          <th className="p-3">Date</th>
+                          <th className="p-3">Clock-In Time</th>
+                          <th className="p-3">Clock-Out Time</th>
+                          <th className="p-3">Geofence Location</th>
+                          <th className="p-3">Fence Status</th>
+                          <th className="p-3">Distance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {staffClockIns.map((log) => (
+                          <tr key={log.id} className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? 'border-slate-800/50 text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                            <td className="p-3">
+                              <div className="font-bold text-slate-900 dark:text-white">{log.staffName}</div>
+                              <div className="text-[10px] text-slate-400 font-medium">{log.role} (ID: {log.staffId})</div>
+                            </td>
+                            <td className="p-3 font-mono font-semibold">{log.date}</td>
+                            <td className="p-3 font-semibold text-emerald-600 dark:text-emerald-400">
+                              {log.clockInTime.split(' ')[1] || log.clockInTime}
+                            </td>
+                            <td className="p-3 font-semibold text-rose-600 dark:text-rose-400">
+                              {log.clockOutTime ? (log.clockOutTime.split(' ')[1] || log.clockOutTime) : '—'}
+                            </td>
+                            <td className="p-3 text-[11px] font-medium text-slate-500">
+                              {log.latitude.toFixed(5)}° N, {log.longitude.toFixed(5)}° W
+                            </td>
+                            <td className="p-3">
+                              <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase ${
+                                log.status === 'In-Range'
+                                  ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                                  : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
+                              }`}>
+                                {log.status}
+                              </span>
+                            </td>
+                            <td className="p-3 font-mono font-bold text-slate-500">
+                              {log.distanceFromFenceM} meters
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ==================== LEAVE REQUESTS REVIEW VIEW ==================== */}
+          {teachersActiveSubTab === 'leaves' && (
+            <div className="space-y-4 animate-fade-in">
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+                <h3 className="text-sm font-bold mb-3">Academic Faculty Leave Register</h3>
+                {staffLeaveRequests.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400 text-xs font-semibold">
+                    No leave requests found in the system.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                          <th className="p-3">Staff Member</th>
+                          <th className="p-3">Type</th>
+                          <th className="p-3">Duration</th>
+                          <th className="p-3">Applied On</th>
+                          <th className="p-3">Reason</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {staffLeaveRequests.map((req) => (
+                          <tr key={req.id} className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? 'border-slate-800/50 text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                            <td className="p-3">
+                              <div className="font-bold text-slate-900 dark:text-white">{req.staffName}</div>
+                              <div className="text-[10px] text-slate-400 font-medium">{req.role} (ID: {req.staffId})</div>
+                            </td>
+                            <td className="p-3">
+                              <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold px-2 py-0.5 rounded uppercase">
+                                {req.type}
+                              </span>
+                            </td>
+                            <td className="p-3 font-semibold text-slate-800 dark:text-slate-200">
+                              {req.startDate} to {req.endDate}
+                            </td>
+                            <td className="p-3 font-mono font-medium text-slate-400">{req.appliedOn}</td>
+                            <td className="p-3 max-w-[220px] truncate font-medium" title={req.reason}>
+                              "{req.reason}"
+                            </td>
+                            <td className="p-3">
+                              <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${
+                                req.status === 'Approved'
+                                  ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                                  : req.status === 'Rejected'
+                                  ? 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                                  : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                              }`}>
+                                {req.status}
+                              </span>
+                            </td>
+                            <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
+                              {req.status === 'Pending' ? (
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      const updated = staffLeaveRequests.map(l => l.id === req.id ? { ...l, status: 'Approved' as const } : l);
+                                      onUpdateStaffLeaves(updated);
+                                    }}
+                                    className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-sm text-[10px] cursor-pointer"
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      const updated = staffLeaveRequests.map(l => l.id === req.id ? { ...l, status: 'Rejected' as const } : l);
+                                      onUpdateStaffLeaves(updated);
+                                    }}
+                                    className="px-2 py-1 bg-rose-600 hover:bg-rose-700 text-white font-extrabold rounded-sm text-[10px] cursor-pointer"
+                                  >
+                                    Reject
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="text-[10px] text-slate-400 font-medium">Reviewed</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ==================== PAYROLL & SALARIES LEDGER VIEW ==================== */}
+          {teachersActiveSubTab === 'payroll' && (
+            <div className="space-y-4 animate-fade-in">
+              {payrollActionStatus.message && (
+                <div className={`p-4 rounded-xl text-xs font-bold border ${
+                  payrollActionStatus.type === 'success'
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600'
+                    : 'bg-rose-500/10 border-rose-500/20 text-rose-600'
+                }`}>
+                  {payrollActionStatus.message}
+                </div>
+              )}
+
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h3 className="text-sm font-bold">Monthly Staff Payroll Ledger (GHS)</h3>
+                    <p className="text-[10px] text-slate-400 font-medium">Process salaries, print legal slips, and track statutory PAYE tax and SSNIT deductions.</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const updated = staffPayrolls.map(p => ({ ...p, status: 'Paid' as const, processedOn: new Date().toISOString().substring(0, 10) }));
+                      onUpdateStaffPayrolls(updated);
+                      setPayrollActionStatus({ type: 'success', message: 'All outstanding staff salaries processed successfully!' });
+                    }}
+                    className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-black rounded-lg text-xs cursor-pointer shadow-sm active:scale-95 transition-all"
+                  >
+                    Process All Payouts
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                        <th className="p-3">Staff Name</th>
+                        <th className="p-3">Basic Salary</th>
+                        <th className="p-3">Allowances</th>
+                        <th className="p-3">Deductions</th>
+                        <th className="p-3">Net Payable</th>
+                        <th className="p-3">Payout Status</th>
+                        <th className="p-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {staffPayrolls.map((pay) => (
+                        <tr key={pay.id} className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? 'border-slate-800/50 text-slate-300' : 'border-slate-100 text-slate-700'}`}>
+                          <td className="p-3">
+                            <div className="font-bold text-slate-900 dark:text-white">{pay.staffName}</div>
+                            <div className="text-[10px] text-slate-400 font-medium">Role: {pay.role} (ID: {pay.staffId})</div>
+                          </td>
+                          <td className="p-3 font-mono font-bold">GH¢ {pay.baseSalary.toLocaleString()}</td>
+                          <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">GH¢ {pay.allowances.toLocaleString()}</td>
+                          <td className="p-3 font-mono font-bold text-rose-600 dark:text-rose-400">GH¢ {pay.deductions.toLocaleString()}</td>
+                          <td className="p-3 font-mono font-extrabold text-indigo-600 dark:text-indigo-400">GH¢ {pay.netSalary.toLocaleString()}</td>
+                          <td className="p-3">
+                            <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase ${
+                              pay.status === 'Paid'
+                                ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                                : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                            }`}>
+                              {pay.status}
+                            </span>
+                            {pay.processedOn && (
+                              <span className="text-[8px] text-slate-400 block mt-0.5">Paid on {pay.processedOn}</span>
+                            )}
+                          </td>
+                          <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
+                            {pay.status === 'Pending' && (
+                              <button
+                                onClick={() => {
+                                  const updated = staffPayrolls.map(p => p.id === pay.id ? { ...p, status: 'Paid' as const, processedOn: new Date().toISOString().substring(0, 10) } : p);
+                                  onUpdateStaffPayrolls(updated);
+                                  setPayrollActionStatus({ type: 'success', message: `Salary payout for ${pay.staffName} processed successfully!` });
+                                }}
+                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded text-[10px] cursor-pointer"
+                              >
+                                Pay Salary
+                              </button>
+                            )}
+                            <button
+                              onClick={() => setSelectedPayrollStaff(pay)}
+                              className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-extrabold rounded text-[10px] cursor-pointer"
+                            >
+                              View Payslip
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ==================== VIEW PASYLIP DRAWER MODAL ==================== */}
+          {selectedPayrollStaff && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
+              <div className={`w-full max-w-2xl rounded-2xl shadow-2xl border flex flex-col overflow-hidden max-h-[90vh] ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
+                {/* Header */}
+                <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                    <Printer size={16} className="text-emerald-600" />
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">Edweso Royal Academy Payslip</span>
+                  </div>
+                  <button
+                    onClick={() => setSelectedPayrollStaff(null)}
+                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {/* Slip Content */}
+                <div className="p-6 overflow-y-auto space-y-6 text-slate-700 dark:text-slate-300">
+                  {/* Letterhead */}
+                  <div className="text-center space-y-1">
+                    <h2 className="font-display font-black text-slate-900 dark:text-white uppercase tracking-wider text-base">Edweso Royal Academy</h2>
+                    <p className="text-[10px] font-bold text-slate-400">P.O. Box 45, Ejisu-Edweso, Ashanti Region, Ghana</p>
+                    <p className="text-[9px] font-mono text-slate-500">TEL: +233 24 357 8980 • EMAIL: payroll@edwesocode.edu.gh</p>
+                    <div className="h-[2px] bg-indigo-600 w-1/3 mx-auto mt-2" />
+                  </div>
+
+                  {/* Metadata Grid */}
+                  <div className="grid grid-cols-2 gap-4 text-xs pt-4 border-t border-slate-200/50 dark:border-slate-800/50">
+                    <div>
+                      <span className="text-[9px] uppercase font-bold text-slate-400 block">Employee Information</span>
+                      <div className="font-bold text-slate-900 dark:text-white mt-0.5">{selectedPayrollStaff.staffName}</div>
+                      <div className="text-slate-500 font-medium">Role: {selectedPayrollStaff.role}</div>
+                      <div className="text-slate-500 font-mono">ID: {selectedPayrollStaff.staffId}</div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[9px] uppercase font-bold text-slate-400 block">Payment Particulars</span>
+                      <div className="font-bold text-slate-900 dark:text-white mt-0.5">Pay Period: July 2026</div>
+                      <div className="text-slate-500 font-semibold">Status: <span className="text-emerald-600">{selectedPayrollStaff.status}</span></div>
+                      {selectedPayrollStaff.processedOn && <div className="text-slate-400 font-mono text-[10px]">Processed: {selectedPayrollStaff.processedOn}</div>}
+                    </div>
+                  </div>
+
+                  {/* Financial Details Table */}
+                  <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden text-xs">
+                    <div className="grid grid-cols-2 bg-slate-50 dark:bg-slate-950/60 p-2 border-b border-slate-200 dark:border-slate-800 font-bold uppercase tracking-wider text-[9px] text-slate-400">
+                      <div>Earnings Item</div>
+                      <div className="text-right">Amount (GHS)</div>
+                    </div>
+                    
+                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                      <div className="grid grid-cols-2 p-2.5 font-medium">
+                        <div>Basic Salary</div>
+                        <div className="text-right font-mono font-bold">GH¢ {selectedPayrollStaff.basicSalary.toLocaleString()}.00</div>
+                      </div>
+                      <div className="grid grid-cols-2 p-2.5 font-medium text-emerald-600 dark:text-emerald-400">
+                        <div>Transport & Housing Allowance</div>
+                        <div className="text-right font-mono font-bold">GH¢ {selectedPayrollStaff.allowances.toLocaleString()}.00</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 bg-slate-50 dark:bg-slate-950/60 p-2 border-y border-slate-200 dark:border-slate-800 font-bold uppercase tracking-wider text-[9px] text-slate-400 mt-2">
+                      <div>Statutory Deductions</div>
+                      <div className="text-right">Amount (GHS)</div>
+                    </div>
+
+                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                      <div className="grid grid-cols-2 p-2.5 font-medium text-rose-500">
+                        <div>SSNIT Employee Contribution (5.5%)</div>
+                        <div className="text-right font-mono font-bold">GH¢ {Math.floor(selectedPayrollStaff.basicSalary * 0.055)}.00</div>
+                      </div>
+                      <div className="grid grid-cols-2 p-2.5 font-medium text-rose-500">
+                        <div>PAYE Income Tax Deduction</div>
+                        <div className="text-right font-mono font-bold">GH¢ {selectedPayrollStaff.deductions - Math.floor(selectedPayrollStaff.basicSalary * 0.055)}.00</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 bg-indigo-50 dark:bg-indigo-950/20 p-3 border-t border-slate-200 dark:border-slate-800 font-extrabold text-sm text-indigo-700 dark:text-indigo-300">
+                      <div>Net Payable Salary</div>
+                      <div className="text-right font-mono font-black">GH¢ {selectedPayrollStaff.netSalary.toLocaleString()}.00</div>
+                    </div>
+                  </div>
+
+                  {/* Legal/Compliance notice */}
+                  <div className="p-3 bg-indigo-50/40 dark:bg-slate-950/40 rounded-lg text-[10px] text-slate-500 leading-relaxed border border-indigo-100/20">
+                    <strong>Notice:</strong> This electronic payslip acts as a legal receipt of earnings paid into your registered GCB Bank / Consolidated Bank Ghana (CBG) account. Income tax deductions (PAYE) are remitted directly to the Ghana Revenue Authority (GRA) in compliance with the Income Tax Act, 2015 (Act 896).
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-end bg-slate-50/50 dark:bg-slate-950/20">
+                  <button
+                    onClick={() => {
+                      window.print();
+                    }}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs cursor-pointer mr-2"
+                  >
+                    Print Payslip
+                  </button>
+                  <button
+                    onClick={() => setSelectedPayrollStaff(null)}
+                    className="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 font-bold rounded-lg text-xs cursor-pointer text-slate-700 dark:text-slate-200"
+                  >
+                    Close Slip
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ==================== STANDARD FACULTY DIRECTORY LIST ==================== */}
+          {teachersActiveSubTab === 'list' && (
+            <>
+              <div className="max-w-xs relative">
+                <input
+                  type="text"
+                  id="search-teachers-input"
+                  placeholder="Search faculty name..."
+                  value={teacherSearch}
+                  onChange={(e) => setTeacherSearch(e.target.value)}
+                  className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 pl-9 pr-3 text-xs text-slate-800 dark:text-white focus:outline-hidden focus:border-emerald-500 font-semibold"
+                />
+                <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
+              </div>
 
           <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
             <div className="overflow-x-auto">
@@ -1608,6 +2045,8 @@ export default function AdminDashboard({
               </table>
             </div>
           </div>
+          </>
+          )}
 
         </div>
       )}

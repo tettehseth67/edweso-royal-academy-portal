@@ -34,7 +34,8 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
   const demoUsers = {
     admin: { email: 'admin@edweso.edu.gh', pass: 'admin123', name: 'Principal J. K. Appiah' },
     teacher: { email: 'kwame@edweso.edu.gh', pass: 'teacher123', name: 'Mr. Kwame Boateng' },
-    student: { email: 'kofi@edweso.edu.gh', pass: 'student123', name: 'Kofi Mensah Jnr' }
+    student: { email: 'kofi@edweso.edu.gh', pass: 'student123', name: 'Kofi Mensah Jnr' },
+    parent: { email: 'parent@gmail.com', pass: 'parent123', name: 'Isaac Mensah' }
   };
 
   const autofillDemo = (role: UserRole) => {
@@ -74,6 +75,14 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
         name: demoUsers.student.name,
         email: demoUsers.student.email,
         classId: 'c4' // JHS 2
+      });
+    } else if (selectedRole === 'parent' && trimmedEmail === demoUsers.parent.email && password === demoUsers.parent.pass) {
+      onLoginSuccess({
+        id: 'st1',
+        role: 'parent',
+        username: 'isaac_mensah',
+        name: demoUsers.parent.name,
+        email: demoUsers.parent.email
       });
     } else {
       setLoginError(`Invalid email or password for ${selectedRole} account.`);
@@ -142,45 +151,58 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
               </div>
 
               {/* Role Selectors */}
-              <div className="grid grid-cols-3 gap-2 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+              <div className="grid grid-cols-4 gap-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
                 <button
                   type="button"
                   id="role-btn-student"
                   onClick={() => autofillDemo('student')}
-                  className={`flex flex-col items-center justify-center py-2.5 rounded-md transition-all ${
+                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
                     selectedRole === 'student'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
                   }`}
                 >
-                  <GraduationCap size={16} className="mb-1" />
-                  <span className="text-[10px]">Student</span>
+                  <GraduationCap size={15} className="mb-0.5" />
+                  <span className="text-[9px]">Student</span>
+                </button>
+                <button
+                  type="button"
+                  id="role-btn-parent"
+                  onClick={() => autofillDemo('parent')}
+                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
+                    selectedRole === 'parent'
+                      ? 'bg-emerald-700 text-white font-bold shadow-xs'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                  }`}
+                >
+                  <User size={15} className="mb-0.5" />
+                  <span className="text-[9px]">Parent</span>
                 </button>
                 <button
                   type="button"
                   id="role-btn-teacher"
                   onClick={() => autofillDemo('teacher')}
-                  className={`flex flex-col items-center justify-center py-2.5 rounded-md transition-all ${
+                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
                     selectedRole === 'teacher'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
                   }`}
                 >
-                  <UserCheck size={16} className="mb-1" />
-                  <span className="text-[10px]">Teacher</span>
+                  <UserCheck size={15} className="mb-0.5" />
+                  <span className="text-[9px]">Teacher</span>
                 </button>
                 <button
                   type="button"
                   id="role-btn-admin"
                   onClick={() => autofillDemo('admin')}
-                  className={`flex flex-col items-center justify-center py-2.5 rounded-md transition-all ${
+                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
                     selectedRole === 'admin'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
                   }`}
                 >
-                  <ShieldCheck size={16} className="mb-1" />
-                  <span className="text-[10px]">Admin</span>
+                  <ShieldCheck size={15} className="mb-0.5" />
+                  <span className="text-[9px]">Admin</span>
                 </button>
               </div>
 

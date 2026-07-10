@@ -2,7 +2,7 @@
  * Types and interfaces for Edweso Royal Academy Portal
  */
 
-export type UserRole = 'admin' | 'teacher' | 'student';
+export type UserRole = 'admin' | 'teacher' | 'student' | 'parent';
 
 export interface UserSession {
   id: string;
@@ -222,6 +222,48 @@ export interface HomeworkSubmission {
   feedback?: string;
   gradedBy?: string;
   gradedAt?: string;
+}
+
+export interface StaffClockIn {
+  id: string;
+  staffId: string;
+  staffName: string;
+  role: 'Teacher' | 'Admin' | 'Security' | 'Canteen' | 'Driver';
+  clockInTime: string;
+  clockOutTime?: string;
+  date: string;
+  latitude: number;
+  longitude: number;
+  status: 'In-Range' | 'Out-Of-Range';
+  distanceFromFenceM: number;
+}
+
+export interface StaffPayroll {
+  id: string;
+  staffId: string;
+  staffName: string;
+  role: string;
+  baseSalary: number;
+  allowances: number;
+  deductions: number;
+  netSalary: number;
+  month: string;
+  status: 'Paid' | 'Processing' | 'Pending';
+  paymentDate?: string;
+  processedOn?: string;
+}
+
+export interface StaffLeaveRequest {
+  id: string;
+  staffId: string;
+  staffName: string;
+  role: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  type: 'Sick' | 'Maternity' | 'Annual' | 'Compassionate';
+  status: 'Pending' | 'Approved' | 'Rejected';
+  appliedOn: string;
 }
 
 

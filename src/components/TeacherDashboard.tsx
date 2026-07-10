@@ -12,7 +12,7 @@ import {
 import { 
   UserSession, Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, Announcement, ClassNote, TimetableEntry, SimulatedEmail, SyllabusPlan,
-  HomeworkAssignment, HomeworkSubmission
+  HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffLeaveRequest
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark } from '../mockData';
 import CameraCapture from './CameraCapture';
@@ -36,6 +36,8 @@ interface TeacherDashboardProps {
   emails?: SimulatedEmail[];
   homeworkAssignments: HomeworkAssignment[];
   homeworkSubmissions: HomeworkSubmission[];
+  staffClockIns: StaffClockIn[];
+  staffLeaveRequests: StaffLeaveRequest[];
   onSendEmail?: (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline' | 'MorningReport') => void;
   onUpdateAttendance: (att: Attendance[]) => void;
   onUpdateGrades: (g: ExamGrade[]) => void;
@@ -45,6 +47,8 @@ interface TeacherDashboardProps {
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
   onUpdateHomeworkAssignments: (assignments: HomeworkAssignment[]) => void;
   onUpdateHomeworkSubmissions: (submissions: HomeworkSubmission[]) => void;
+  onUpdateStaffClockIns: (clockIns: StaffClockIn[]) => void;
+  onUpdateStaffLeaves: (leaves: StaffLeaveRequest[]) => void;
   isDarkMode: boolean;
 }
 
@@ -64,6 +68,8 @@ export default function TeacherDashboard({
   emails = [],
   homeworkAssignments = [],
   homeworkSubmissions = [],
+  staffClockIns = [],
+  staffLeaveRequests = [],
   onSendEmail,
   onUpdateAttendance,
   onUpdateGrades,
@@ -73,6 +79,8 @@ export default function TeacherDashboard({
   onUpdateSyllabusPlans,
   onUpdateHomeworkAssignments,
   onUpdateHomeworkSubmissions,
+  onUpdateStaffClockIns,
+  onUpdateStaffLeaves,
   isDarkMode
 }: TeacherDashboardProps) {
 
@@ -232,11 +240,70 @@ export default function TeacherDashboard({
   const [selectedReportDay, setSelectedReportDay] = useState<'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday'>('Friday');
   const [selectedReportDetail, setSelectedReportDetail] = useState<SimulatedEmail | null>(null);
 
-  // 6. Staff Directory State
+  // 6. Staff Directory & Staff Desk State
+  const [staffActiveSubTab, setStaffActiveSubTab] = useState<'directory' | 'clockin' | 'leave'>('clockin');
   const [staffSearchQuery, setStaffSearchQuery] = useState('');
   const [staffStatusFilter, setStaffStatusFilter] = useState<'All' | 'Active' | 'On Leave'>('All');
   const [staffGenderFilter, setStaffGenderFilter] = useState<'All' | 'Male' | 'Female'>('All');
   const [selectedStaffDetail, setSelectedStaffDetail] = useState<Teacher | null>(null);
+
+  // Simulated GPS Locations on/off Edweso Academy campus
+  const [simulatedGPSLocation, setSimulatedGPSLocation] = useState<{
+    name: string;
+    distanceMeters: number;
+    lat: number;
+    lng: number;
+    isInRange: boolean;
+  }>({
+    name: 'Mathematics Wing Classrooms',
+    distanceMeters: 15,
+    lat: 6.70225,
+    lng: -1.49325,
+    isInRange: true
+  });
+
+  // Leave Form State
+  const [leaveStartDate, setLeaveStartDate] = useState('');
+  const [leaveEndDate, setLeaveEndDate] = useState('');
+  const [leaveType, setLeaveType] = useState<'Sick' | 'Maternity' | 'Annual' | 'Compassionate'>('Sick');
+  const [leaveReason, setLeaveReason] = useState('');
+  const [leaveRequestStatus, setLeaveRequestStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
+
+  const handleLeaveSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!leaveStartDate || !leaveEndDate || !leaveReason.trim()) {
+      setLeaveRequestStatus({
+        type: 'error',
+        message: 'All fields (Start Date, End Date, Reason) are required to file a leave of absence!'
+      });
+      return;
+    }
+
+    const newRequest: StaffLeaveRequest = {
+      id: `leave-${Date.now()}`,
+      staffId: teacher.id,
+      staffName: teacher.name,
+      role: 'Teacher',
+      startDate: leaveStartDate,
+      endDate: leaveEndDate,
+      reason: leaveReason,
+      type: leaveType,
+      status: 'Pending',
+      appliedOn: new Date().toISOString().substring(0, 10)
+    };
+
+    onUpdateStaffLeaves([newRequest, ...staffLeaveRequests]);
+    setLeaveStartDate('');
+    setLeaveEndDate('');
+    setLeaveReason('');
+    setLeaveRequestStatus({
+      type: 'success',
+      message: 'Your leave of absence request has been submitted successfully to administration for review.'
+    });
+  };
 
   // Calculate historical attendance rate for JHS 2 (c4)
   const classAttendanceRecords = attendance.filter(a => a.classId === assignedClassId);
@@ -1458,7 +1525,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
         </div>
       )}
 
-      {/* ==================== STAFF DIRECTORY ==================== */}
+      {/* ==================== STAFF DIRECTORY & DESK ==================== */}
       {activeTab === 'staff' && (
         <div className="space-y-6 animate-fade-in" id="staff-directory-section">
           {/* Header Dashboard Banner */}
@@ -1466,11 +1533,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
             <div className="space-y-1">
               <span className="text-[10px] bg-emerald-500/10 border border-emerald-400/30 px-3 py-1 rounded-full text-emerald-300 font-extrabold tracking-wider uppercase inline-flex items-center space-x-1">
                 <Users size={11} className="animate-pulse" />
-                <span>Faculty Information System</span>
+                <span>Staff Portal Desk</span>
               </span>
-              <h2 className="text-xl sm:text-2xl font-black font-sans leading-tight mt-1.5">Registered Staff Directory</h2>
+              <h2 className="text-xl sm:text-2xl font-black font-sans leading-tight mt-1.5">My Faculty Desk</h2>
               <p className="text-xs text-slate-300 font-medium max-w-xl">
-                Explore, search, and connect with other educators and faculty members at Edweso Royal Academy.
+                Clock in/out with secure Geo-Fencing, submit leave requests, and search registered school educators.
               </p>
             </div>
             <div className="bg-emerald-950/50 border border-emerald-700/50 px-4 py-3 rounded-xl text-center shrink-0 w-full md:w-auto">
@@ -1479,10 +1546,404 @@ Edweso Royal Academy Administration Portal Dispatch`;
             </div>
           </div>
 
-          {/* Search and Filters panel */}
-          <div className={`p-5 rounded-xl border space-y-4 ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-          }`}>
+          {/* Sub-tab Navigation */}
+          <div className="flex border-b border-slate-200 dark:border-slate-800">
+            <button
+              onClick={() => setStaffActiveSubTab('clockin')}
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                staffActiveSubTab === 'clockin'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              My Geo-Fenced Clock-In
+            </button>
+            <button
+              onClick={() => setStaffActiveSubTab('leave')}
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                staffActiveSubTab === 'leave'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              Submit Leave Request
+            </button>
+            <button
+              onClick={() => setStaffActiveSubTab('directory')}
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                staffActiveSubTab === 'directory'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              Faculty Directory
+            </button>
+          </div>
+
+          {/* ================= CLOCK IN TAB ================= */}
+          {staffActiveSubTab === 'clockin' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
+              {/* Geofencing panel */}
+              <div className={`lg:col-span-7 p-6 rounded-2xl border space-y-6 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <div className="space-y-0.5">
+                    <h3 className="text-sm font-bold">Dynamic Geo-Fenced Desk</h3>
+                    <p className="text-[10px] text-slate-400 font-medium">Auto-verifies your location against the school coordinate fence (200m radius).</p>
+                  </div>
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase inline-flex items-center space-x-1 ${
+                    simulatedGPSLocation.isInRange
+                      ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                      : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${simulatedGPSLocation.isInRange ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                    <span>{simulatedGPSLocation.isInRange ? 'In Range' : 'Out of Range'}</span>
+                  </span>
+                </div>
+
+                {/* Simulated coordinate details */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-950/40 rounded-xl space-y-3.5 border border-slate-100 dark:border-slate-800/40">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400 block">School Center GPS</span>
+                      <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">6.70220° N, -1.49330° W</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400 block">Your Simulated GPS</span>
+                      <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">
+                        {simulatedGPSLocation.lat.toFixed(5)}° N, {simulatedGPSLocation.lng.toFixed(5)}° W
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400 block">Fence Radius Limit</span>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">200 Meters</span>
+                    </div>
+                    <div>
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400 block">Calculated Distance</span>
+                      <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-200">
+                        {simulatedGPSLocation.distanceMeters >= 1000
+                          ? `${(simulatedGPSLocation.distanceMeters / 1000).toFixed(2)} km`
+                          : `${simulatedGPSLocation.distanceMeters} meters`}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Dropdown to change simulated coordinates to verify system */}
+                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60">
+                    <label className="text-[9px] uppercase font-black tracking-wider text-slate-400 block mb-1">
+                      [DEMO ONLY] Simulate your physical GPS location to test fence:
+                    </label>
+                    <select
+                      value={simulatedGPSLocation.name}
+                      onChange={(e) => {
+                        const sel = [
+                          { name: 'Mathematics Wing Classrooms', distanceMeters: 15, lat: 6.70225, lng: -1.49325, isInRange: true },
+                          { name: 'School Administration Office', distanceMeters: 18, lat: 6.70215, lng: -1.49335, isInRange: true },
+                          { name: 'Main Entrance / Bus Gate', distanceMeters: 55, lat: 6.70180, lng: -1.49310, isInRange: true },
+                          { name: 'Edweso Central Market Road', distanceMeters: 480, lat: 6.70610, lng: -1.49120, isInRange: false },
+                          { name: 'Kumasi Airport Access Road', distanceMeters: 3200, lat: 6.71450, lng: -1.52440, isInRange: false }
+                        ].find(x => x.name === e.target.value);
+                        if (sel) setSimulatedGPSLocation(sel);
+                      }}
+                      className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-bold focus:outline-hidden"
+                    >
+                      <option value="Mathematics Wing Classrooms">Mathematics Wing Classrooms (15m Away - IN RANGE)</option>
+                      <option value="School Administration Office">School Administration Office (18m Away - IN RANGE)</option>
+                      <option value="Main Entrance / Bus Gate">Main Entrance / Bus Gate (55m Away - IN RANGE)</option>
+                      <option value="Edweso Central Market Road">Edweso Central Market Road (480m Away - OUT OF RANGE)</option>
+                      <option value="Kumasi Airport Access Road">Kumasi Airport Access Road (3.2km Away - OUT OF RANGE)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Main Clock Action Box */}
+                <div className="p-6 rounded-xl bg-slate-950 text-white flex flex-col sm:flex-row justify-between items-center gap-6 border border-slate-800">
+                  <div className="space-y-1.5 text-center sm:text-left">
+                    <span className="text-[10px] text-emerald-400 uppercase font-black tracking-widest block">Active Desk Status</span>
+                    {(() => {
+                      const todayStr = new Date().toISOString().substring(0, 10);
+                      const myTodayLogs = staffClockIns.filter(c => c.staffId === teacher.id && c.date === todayStr);
+                      const activeIn = myTodayLogs.find(c => !c.clockOutTime);
+                      const completedIn = myTodayLogs.find(c => c.clockOutTime);
+
+                      if (activeIn) {
+                        return (
+                          <div>
+                            <h4 className="text-sm font-extrabold text-amber-400">Clocked In Successfully</h4>
+                            <p className="text-xs text-slate-300 font-medium">Clock-In Time: {activeIn.clockInTime}</p>
+                          </div>
+                        );
+                      } else if (completedIn) {
+                        return (
+                          <div>
+                            <h4 className="text-sm font-extrabold text-emerald-400">Daily Attendance Completed</h4>
+                            <p className="text-xs text-slate-300 font-medium">In: {completedIn.clockInTime} • Out: {completedIn.clockOutTime}</p>
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <div>
+                            <h4 className="text-sm font-extrabold text-slate-300">Not Clocked In Today</h4>
+                            <p className="text-xs text-slate-400 font-medium">Ready to record daily attendance.</p>
+                          </div>
+                        );
+                      }
+                    })()}
+                  </div>
+
+                  <div className="shrink-0">
+                    {(() => {
+                      const todayStr = new Date().toISOString().substring(0, 10);
+                      const myTodayLogs = staffClockIns.filter(c => c.staffId === teacher.id && c.date === todayStr);
+                      const activeIn = myTodayLogs.find(c => !c.clockOutTime);
+                      const completedIn = myTodayLogs.find(c => c.clockOutTime);
+
+                      if (activeIn) {
+                        return (
+                          <button
+                            onClick={() => {
+                              const updated = staffClockIns.map(c => {
+                                if (c.staffId === teacher.id && c.date === todayStr && !c.clockOutTime) {
+                                  return { ...c, clockOutTime: new Date().toISOString().replace('T', ' ').substring(0, 16) };
+                                }
+                                return c;
+                              });
+                              onUpdateStaffClockIns(updated);
+                            }}
+                            className="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 font-black rounded-lg text-xs cursor-pointer text-white flex items-center space-x-1.5 shadow-md active:scale-95 transition-all"
+                          >
+                            <Clock size={15} />
+                            <span>Clock Out Now</span>
+                          </button>
+                        );
+                      } else if (completedIn) {
+                        return (
+                          <button
+                            disabled
+                            className="px-6 py-2.5 bg-slate-800 text-slate-500 font-black rounded-lg text-xs cursor-not-allowed flex items-center space-x-1.5 border border-slate-700"
+                          >
+                            <Check size={15} />
+                            <span>Done for Today</span>
+                          </button>
+                        );
+                      } else {
+                        return (
+                          <button
+                            onClick={() => {
+                              if (!simulatedGPSLocation.isInRange) return;
+                              const timeStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+                              const newClockIn: StaffClockIn = {
+                                id: 'clk-' + Date.now(),
+                                staffId: teacher.id,
+                                staffName: teacher.name,
+                                role: 'Teacher',
+                                clockInTime: timeStr,
+                                date: todayStr,
+                                latitude: simulatedGPSLocation.lat,
+                                longitude: simulatedGPSLocation.lng,
+                                status: 'In-Range',
+                                distanceFromFenceM: simulatedGPSLocation.distanceMeters
+                              };
+                              onUpdateStaffClockIns([newClockIn, ...staffClockIns]);
+                            }}
+                            disabled={!simulatedGPSLocation.isInRange}
+                            className={`px-6 py-2.5 font-black rounded-lg text-xs flex items-center space-x-1.5 shadow-md active:scale-95 transition-all cursor-pointer ${
+                              simulatedGPSLocation.isInRange
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                            }`}
+                          >
+                            <Clock size={15} />
+                            <span>Clock In Now</span>
+                          </button>
+                        );
+                      }
+                    })()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Attendance history panel */}
+              <div className={`lg:col-span-5 p-6 rounded-2xl border space-y-4 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
+                <h3 className="text-sm font-bold border-b border-slate-100 dark:border-slate-800 pb-2">My Attendance Log</h3>
+                <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+                  {staffClockIns.filter(c => c.staffId === teacher.id).length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 text-xs font-medium">
+                      No clock-in logs found for your account.
+                    </div>
+                  ) : (
+                    staffClockIns.filter(c => c.staffId === teacher.id).map(log => (
+                      <div
+                        key={log.id}
+                        className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 flex justify-between items-center"
+                      >
+                        <div className="space-y-1">
+                          <span className="text-[9px] font-mono font-bold bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded">
+                            {log.date}
+                          </span>
+                          <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            In: {log.clockInTime.split(' ')[1] || log.clockInTime}
+                          </div>
+                          {log.clockOutTime && (
+                            <div className="text-xs font-medium text-slate-500">
+                              Out: {log.clockOutTime.split(' ')[1] || log.clockOutTime}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right space-y-1">
+                          <span className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/10">
+                            Verified
+                          </span>
+                          <span className="text-[8px] text-slate-400 block font-medium">
+                            Fence Dist: {log.distanceFromFenceM}m
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= LEAVE TAB ================= */}
+          {staffActiveSubTab === 'leave' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
+              {/* Form card */}
+              <form
+                onSubmit={handleLeaveSubmit}
+                className={`lg:col-span-6 p-6 rounded-2xl border space-y-4 ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                }`}
+              >
+                <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <h3 className="text-sm font-bold">Request Leave of Absence</h3>
+                  <p className="text-[10px] text-slate-400 font-medium">Submit leave start/end dates for headmaster/principal approval.</p>
+                </div>
+
+                {leaveRequestStatus.message && (
+                  <div className={`p-3 rounded-lg text-xs font-bold border ${
+                    leaveRequestStatus.type === 'success'
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600'
+                      : 'bg-rose-500/10 border-rose-500/20 text-rose-600'
+                  }`}>
+                    {leaveRequestStatus.message}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={leaveStartDate}
+                      onChange={(e) => setLeaveStartDate(e.target.value)}
+                      className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-medium focus:outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={leaveEndDate}
+                      onChange={(e) => setLeaveEndDate(e.target.value)}
+                      className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-medium focus:outline-hidden"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1">Leave Type</label>
+                  <select
+                    value={leaveType}
+                    onChange={(e) => setLeaveType(e.target.value as any)}
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold focus:outline-hidden"
+                  >
+                    <option value="Sick">Sick Leave</option>
+                    <option value="Annual">Annual Vacation</option>
+                    <option value="Maternity">Maternity/Paternity Leave</option>
+                    <option value="Compassionate">Compassionate Leave</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1">Reason for Leave</label>
+                  <textarea
+                    rows={4}
+                    value={leaveReason}
+                    onChange={(e) => setLeaveReason(e.target.value)}
+                    placeholder="Specify detailed reason for your leave request..."
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-medium focus:outline-hidden"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 font-bold rounded-lg text-xs cursor-pointer text-white transition-all shadow-md active:scale-[0.98]"
+                >
+                  Submit Request
+                </button>
+              </form>
+
+              {/* History list */}
+              <div className={`lg:col-span-6 p-6 rounded-2xl border space-y-4 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
+                <h3 className="text-sm font-bold border-b border-slate-100 dark:border-slate-800 pb-2">My Request Logs</h3>
+                <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                  {staffLeaveRequests.filter(l => l.staffId === teacher.id).length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 text-xs font-medium">
+                      No leave requests found for your account.
+                    </div>
+                  ) : (
+                    staffLeaveRequests.filter(l => l.staffId === teacher.id).map(req => (
+                      <div
+                        key={req.id}
+                        className="p-3.5 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 space-y-2.5"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <span className="text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black px-2 py-0.5 rounded-sm uppercase tracking-wide mr-2">
+                              {req.type}
+                            </span>
+                            <span className="text-[9px] text-slate-400">Applied on {req.appliedOn}</span>
+                          </div>
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${
+                            req.status === 'Approved'
+                              ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                              : req.status === 'Rejected'
+                              ? 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                              : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                          }`}>
+                            {req.status}
+                          </span>
+                        </div>
+                        <p className="text-xs font-medium text-slate-700 dark:text-slate-300 line-clamp-2">"{req.reason}"</p>
+                        <div className="text-[10px] font-bold text-slate-500 flex items-center space-x-1">
+                          <Calendar size={11} />
+                          <span>Duration: {req.startDate} to {req.endDate}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ================= DIRECTORY TAB ================= */}
+          {staffActiveSubTab === 'directory' && (
+            <>
+              {/* Search and Filters panel */}
+              <div className={`p-5 rounded-xl border space-y-4 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               {/* Search input */}
               <div className="md:col-span-6 relative">
@@ -1821,6 +2282,8 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 </div>
               </div>
             </div>
+          )}
+          </>
           )}
         </div>
       )}

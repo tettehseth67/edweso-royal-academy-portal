@@ -15,7 +15,10 @@ import {
   TeacherAbsence,
   CoverAssignment,
   HomeworkAssignment,
-  HomeworkSubmission
+  HomeworkSubmission,
+  StaffClockIn,
+  StaffPayroll,
+  StaffLeaveRequest
 } from './types';
 
 // Initial School Classes
@@ -315,6 +318,30 @@ export class SchoolDatabase {
     setStored('CLASS_NOTES', notes);
   }
 
+  static getStaffClockIns(): StaffClockIn[] {
+    return getStored<StaffClockIn[]>('STAFF_CLOCKINS', initialStaffClockIns);
+  }
+
+  static saveStaffClockIns(clockIns: StaffClockIn[]): void {
+    setStored('STAFF_CLOCKINS', clockIns);
+  }
+
+  static getStaffPayroll(): StaffPayroll[] {
+    return getStored<StaffPayroll[]>('STAFF_PAYROLL', initialStaffPayroll);
+  }
+
+  static saveStaffPayroll(payroll: StaffPayroll[]): void {
+    setStored('STAFF_PAYROLL', payroll);
+  }
+
+  static getStaffLeaves(): StaffLeaveRequest[] {
+    return getStored<StaffLeaveRequest[]>('STAFF_LEAVES', initialStaffLeaves);
+  }
+
+  static saveStaffLeaves(leaves: StaffLeaveRequest[]): void {
+    setStored('STAFF_LEAVES', leaves);
+  }
+
   static getSyllabusPlans(): SyllabusPlan[] {
     const initialSyllabusPlans: SyllabusPlan[] = [
       {
@@ -508,6 +535,126 @@ Edweso Royal Academy`,
     sentAt: '2026-07-02 16:45',
     type: 'FeeDeadline',
     status: 'Sent'
+  }
+];
+
+export const initialStaffClockIns: StaffClockIn[] = [
+  {
+    id: 'clk-1',
+    staffId: 't1',
+    staffName: 'Mr. Kwame Boateng',
+    role: 'Teacher',
+    clockInTime: '2026-07-10 07:45',
+    date: '2026-07-10',
+    latitude: 6.7022,
+    longitude: -1.4933,
+    status: 'In-Range',
+    distanceFromFenceM: 12
+  },
+  {
+    id: 'clk-2',
+    staffId: 't2',
+    staffName: 'Mrs. Ama Serwaa Addo',
+    role: 'Teacher',
+    clockInTime: '2026-07-10 07:51',
+    date: '2026-07-10',
+    latitude: 6.7025,
+    longitude: -1.4931,
+    status: 'In-Range',
+    distanceFromFenceM: 45
+  },
+  {
+    id: 'clk-3',
+    staffId: 't3',
+    staffName: 'Mr. Kofi Mensah',
+    role: 'Teacher',
+    clockInTime: '2026-07-09 07:48',
+    clockOutTime: '2026-07-09 15:45',
+    date: '2026-07-09',
+    latitude: 6.7023,
+    longitude: -1.4932,
+    status: 'In-Range',
+    distanceFromFenceM: 20
+  }
+];
+
+export const initialStaffPayroll: StaffPayroll[] = [
+  {
+    id: 'pay-1',
+    staffId: 't1',
+    staffName: 'Mr. Kwame Boateng',
+    role: 'Mathematics Lead',
+    baseSalary: 3800,
+    allowances: 350,
+    deductions: 180,
+    netSalary: 3970,
+    month: 'July 2026',
+    status: 'Processing'
+  },
+  {
+    id: 'pay-2',
+    staffId: 't2',
+    staffName: 'Mrs. Ama Serwaa Addo',
+    role: 'Science Form Teacher',
+    baseSalary: 4000,
+    allowances: 400,
+    deductions: 200,
+    netSalary: 4200,
+    month: 'July 2026',
+    status: 'Paid',
+    paymentDate: '2026-07-10'
+  },
+  {
+    id: 'pay-3',
+    staffId: 't3',
+    staffName: 'Mr. Kofi Mensah',
+    role: 'Language Instructor',
+    baseSalary: 3500,
+    allowances: 250,
+    deductions: 150,
+    netSalary: 3600,
+    month: 'July 2026',
+    status: 'Paid',
+    paymentDate: '2026-07-10'
+  },
+  {
+    id: 'pay-4',
+    staffId: 't4',
+    staffName: 'Miss Abena Osei',
+    role: 'Social Studies Teacher',
+    baseSalary: 3500,
+    allowances: 250,
+    deductions: 150,
+    netSalary: 3600,
+    month: 'July 2026',
+    status: 'Processing'
+  }
+];
+
+export const initialStaffLeaves: StaffLeaveRequest[] = [
+  {
+    id: 'lv-1',
+    staffId: 't3',
+    staffName: 'Mr. Kofi Mensah',
+    role: 'Teacher',
+    startDate: '2026-07-15',
+    endDate: '2026-07-17',
+    reason: 'Dental surgery and follow-up consultation in Kumasi',
+    type: 'Sick',
+    status: 'Pending',
+    appliedOn: '2026-07-10'
+  },
+  {
+    id: 'lv-2',
+    staffId: 't5',
+    staffName: 'Mr. Yaw Asante',
+    role: 'ICT Instructor',
+    startDate: '2026-07-01',
+    endDate: '2026-07-03',
+    reason: 'Attending regional computing educator workshop',
+    type: 'Annual',
+    status: 'Approved',
+    appliedOn: '2026-06-25'
   }
 ];
 

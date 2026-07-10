@@ -102,11 +102,19 @@ export default function DashboardLayout({
     { id: 'emails', label: 'Email Inbox', icon: <Send size={18} /> }
   ];
 
+  const parentNav = [
+    { id: 'overview', label: 'Parent Desk', icon: <User size={18} /> },
+    { id: 'announcements', label: 'PTA Circulars', icon: <Megaphone size={18} /> },
+    { id: 'emails', label: 'Email Box', icon: <Send size={18} /> }
+  ];
+
   const currentNav = session.role === 'admin' 
     ? adminNav 
     : session.role === 'teacher' 
       ? teacherNav 
-      : studentNav;
+      : session.role === 'parent'
+        ? parentNav
+        : studentNav;
 
   const handleTabClick = (tabId: string) => {
     onTabChange(tabId);
@@ -161,7 +169,7 @@ export default function DashboardLayout({
   const audienceFilter = (a: Announcement) => {
     if (session.role === 'admin') return true;
     if (session.role === 'teacher') return a.targetAudience === 'All' || a.targetAudience === 'Teachers';
-    if (session.role === 'student') return a.targetAudience === 'All' || a.targetAudience === 'Students';
+    if (session.role === 'student' || session.role === 'parent') return a.targetAudience === 'All' || a.targetAudience === 'Students';
     return false;
   };
 
@@ -543,7 +551,7 @@ export default function DashboardLayout({
                     </div>
                     <button
                       onClick={() => {
-                        handleTabClick((session.role === 'student' || session.role === 'teacher') ? 'profile' : 'classes');
+                        handleTabClick((session.role === 'student' || session.role === 'teacher') ? 'profile' : session.role === 'parent' ? 'overview' : 'classes');
                         setIsProfileDropdownOpen(false);
                       }}
                       className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 font-bold"

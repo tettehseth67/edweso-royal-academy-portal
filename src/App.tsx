@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X } from 'lucide-react';
-import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission } from './types';
+import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest } from './types';
 import { SchoolDatabase } from './mockData';
 
 // Component Imports
@@ -10,6 +10,7 @@ import DashboardLayout from './components/DashboardLayout';
 import AdminDashboard from './components/AdminDashboard';
 import StudentDashboard from './components/StudentDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
+import ParentDashboard from './components/ParentDashboard';
 import OnboardingTour from './components/OnboardingTour';
 
 export default function App() {
@@ -82,6 +83,9 @@ export default function App() {
   const [coverAssignments, setCoverAssignments] = useState<CoverAssignment[]>([]);
   const [homeworkAssignments, setHomeworkAssignments] = useState<HomeworkAssignment[]>([]);
   const [homeworkSubmissions, setHomeworkSubmissions] = useState<HomeworkSubmission[]>([]);
+  const [staffClockIns, setStaffClockIns] = useState<StaffClockIn[]>([]);
+  const [staffPayrolls, setStaffPayrolls] = useState<StaffPayroll[]>([]);
+  const [staffLeaveRequests, setStaffLeaveRequests] = useState<StaffLeaveRequest[]>([]);
 
   // Helper to save database state to Node.js backend
   const syncAndSave = async (updatedFields: Partial<{
@@ -101,6 +105,9 @@ export default function App() {
     coverAssignments: CoverAssignment[];
     homeworkAssignments: HomeworkAssignment[];
     homeworkSubmissions: HomeworkSubmission[];
+    staffClockIns: StaffClockIn[];
+    staffPayrolls: StaffPayroll[];
+    staffLeaveRequests: StaffLeaveRequest[];
   }>) => {
     const payload = {
       students: updatedFields.students ?? students,
@@ -119,6 +126,9 @@ export default function App() {
       coverAssignments: updatedFields.coverAssignments ?? coverAssignments,
       homeworkAssignments: updatedFields.homeworkAssignments ?? homeworkAssignments,
       homeworkSubmissions: updatedFields.homeworkSubmissions ?? homeworkSubmissions,
+      staffClockIns: updatedFields.staffClockIns ?? staffClockIns,
+      staffPayrolls: updatedFields.staffPayrolls ?? staffPayrolls,
+      staffLeaveRequests: updatedFields.staffLeaveRequests ?? staffLeaveRequests,
     };
     try {
       await fetch('/api/school-data', {
@@ -156,6 +166,9 @@ export default function App() {
           setCoverAssignments(db.coverAssignments || []);
           setHomeworkAssignments(db.homeworkAssignments || []);
           setHomeworkSubmissions(db.homeworkSubmissions || []);
+          setStaffClockIns(db.staffClockIns || []);
+          setStaffPayrolls(db.staffPayrolls || []);
+          setStaffLeaveRequests(db.staffLeaveRequests || []);
           loadedFromBackend = true;
           
           // Keep LocalStorage fallback updated
@@ -175,6 +188,9 @@ export default function App() {
           SchoolDatabase.saveCoverAssignments(db.coverAssignments || []);
           SchoolDatabase.saveHomeworkAssignments(db.homeworkAssignments || []);
           SchoolDatabase.saveHomeworkSubmissions(db.homeworkSubmissions || []);
+          SchoolDatabase.saveStaffClockIns(db.staffClockIns || []);
+          SchoolDatabase.saveStaffPayroll(db.staffPayrolls || []);
+          SchoolDatabase.saveStaffLeaves(db.staffLeaveRequests || []);
         }
       } catch (e) {
         console.warn('Failed to fetch from backend, utilizing local storage fallback:', e);
@@ -197,6 +213,9 @@ export default function App() {
         const localCovers = SchoolDatabase.getCoverAssignments();
         const localHomeworkAssignments = SchoolDatabase.getHomeworkAssignments();
         const localHomeworkSubmissions = SchoolDatabase.getHomeworkSubmissions();
+        const localClockIns = SchoolDatabase.getStaffClockIns();
+        const localPayroll = SchoolDatabase.getStaffPayroll();
+        const localLeaves = SchoolDatabase.getStaffLeaves();
 
         setStudents(localStudents);
         setTeachers(localTeachers);
@@ -214,6 +233,9 @@ export default function App() {
         setCoverAssignments(localCovers);
         setHomeworkAssignments(localHomeworkAssignments);
         setHomeworkSubmissions(localHomeworkSubmissions);
+        setStaffClockIns(localClockIns);
+        setStaffPayrolls(localPayroll);
+        setStaffLeaveRequests(localLeaves);
 
         // Bootstrap backend with initial mock data
         try {
@@ -236,7 +258,10 @@ export default function App() {
               teacherAbsences: localAbsences,
               coverAssignments: localCovers,
               homeworkAssignments: localHomeworkAssignments,
-              homeworkSubmissions: localHomeworkSubmissions
+              homeworkSubmissions: localHomeworkSubmissions,
+              staffClockIns: localClockIns,
+              staffPayrolls: localPayroll,
+              staffLeaveRequests: localLeaves
             })
           });
         } catch (err) {
@@ -336,6 +361,24 @@ export default function App() {
     setTeachers(updatedTeachers);
     SchoolDatabase.saveTeachers(updatedTeachers);
     syncAndSave({ teachers: updatedTeachers });
+  };
+
+  const handleUpdateStaffClockIns = (updatedClockIns: StaffClockIn[]) => {
+    setStaffClockIns(updatedClockIns);
+    SchoolDatabase.saveStaffClockIns(updatedClockIns);
+    syncAndSave({ staffClockIns: updatedClockIns });
+  };
+
+  const handleUpdateStaffPayroll = (updatedPayroll: StaffPayroll[]) => {
+    setStaffPayrolls(updatedPayroll);
+    SchoolDatabase.saveStaffPayroll(updatedPayroll);
+    syncAndSave({ staffPayrolls: updatedPayroll });
+  };
+
+  const handleUpdateStaffLeaves = (updatedLeaves: StaffLeaveRequest[]) => {
+    setStaffLeaveRequests(updatedLeaves);
+    SchoolDatabase.saveStaffLeaves(updatedLeaves);
+    syncAndSave({ staffLeaveRequests: updatedLeaves });
   };
 
   const handleUpdateAnnouncements = (updatedAnnouncements: Announcement[]) => {
@@ -645,6 +688,9 @@ Edweso Royal Academy`;
               syllabusPlans={syllabusPlans}
               teacherAbsences={teacherAbsences}
               coverAssignments={coverAssignments}
+              staffClockIns={staffClockIns}
+              staffPayrolls={staffPayrolls}
+              staffLeaveRequests={staffLeaveRequests}
               onUpdateStudents={handleUpdateStudents}
               onUpdateTeachers={handleUpdateTeachers}
               onUpdateAnnouncements={handleUpdateAnnouncements}
@@ -656,6 +702,9 @@ Edweso Royal Academy`;
               onUpdateSyllabusPlans={handleUpdateSyllabusPlans}
               onUpdateTeacherAbsences={handleUpdateTeacherAbsences}
               onUpdateCoverAssignments={handleUpdateCoverAssignments}
+              onUpdateStaffClockIns={handleUpdateStaffClockIns}
+              onUpdateStaffPayrolls={handleUpdateStaffPayroll}
+              onUpdateStaffLeaves={handleUpdateStaffLeaves}
               isDarkMode={isDarkMode}
             />
           )}
@@ -704,6 +753,8 @@ Edweso Royal Academy`;
               syllabusPlans={syllabusPlans}
               homeworkAssignments={homeworkAssignments}
               homeworkSubmissions={homeworkSubmissions}
+              staffClockIns={staffClockIns}
+              staffLeaveRequests={staffLeaveRequests}
               onUpdateAttendance={handleUpdateAttendance}
               onUpdateGrades={handleUpdateGrades}
               onUpdateAnnouncements={handleUpdateAnnouncements}
@@ -712,9 +763,30 @@ Edweso Royal Academy`;
               onUpdateSyllabusPlans={handleUpdateSyllabusPlans}
               onUpdateHomeworkAssignments={handleUpdateHomeworkAssignments}
               onUpdateHomeworkSubmissions={handleUpdateHomeworkSubmissions}
+              onUpdateStaffClockIns={handleUpdateStaffClockIns}
+              onUpdateStaffLeaves={handleUpdateStaffLeaves}
               emails={emails}
               onSendEmail={handleSendSimulatedEmail}
               isDarkMode={isDarkMode}
+            />
+          )}
+
+          {session.role === 'parent' && (
+            <ParentDashboard
+              session={session}
+              students={students}
+              teachers={teachers}
+              classes={classes}
+              subjects={subjects}
+              attendance={attendance}
+              grades={grades}
+              announcements={announcements}
+              transactions={transactions}
+              emails={emails}
+              onPaymentSuccess={handlePaymentSuccess}
+              onSendEmail={handleSendSimulatedEmail}
+              isDarkMode={isDarkMode}
+              onTabChange={setActiveTab}
             />
           )}
         </DashboardLayout>
