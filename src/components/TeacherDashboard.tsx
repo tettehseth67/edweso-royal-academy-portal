@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import {
-  BookOpen, CheckSquare, Award, Megaphone, Plus,
+import { 
+  BookOpen, CheckSquare, Award, Megaphone, Plus, 
   Trash2, Search, Check, X, Clock, HelpCircle, ShieldAlert,
   Edit, Save, FileText, Sunrise, Send, Calendar, Mail, Phone, Users, User,
-  Camera, Upload
+  Camera, Upload, TrendingUp
 } from 'lucide-react';
-import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, Cell
+import { 
+  ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, 
+  CartesianGrid, Tooltip, Legend, Cell 
 } from 'recharts';
-import {
-  UserSession, Student, Teacher, SchoolClass, Subject,
+import { 
+  UserSession, Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, Announcement, ClassNote, TimetableEntry, SimulatedEmail, SyllabusPlan,
   HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffLeaveRequest
 } from '../types';
@@ -190,6 +190,7 @@ export default function TeacherDashboard({
 
   // 2. Grade entry states
   const [selectedSubjectId, setSelectedSubjectId] = useState(teacherSubjects[0]?.id || 's1');
+  const [selectedTrendStudentId, setSelectedTrendStudentId] = useState(classStudents[0]?.id || 'st1');
   const [localGrades, setLocalGrades] = useState<{ [studentId: string]: { classScore: number; examScore: number } }>(() => {
     const initial: { [studentId: string]: { classScore: number; examScore: number } } = {};
     students.filter(s => s.classId === assignedClassId).forEach(s => {
@@ -309,8 +310,8 @@ export default function TeacherDashboard({
   const classAttendanceRecords = attendance.filter(a => a.classId === assignedClassId);
   const totalClassRecords = classAttendanceRecords.length;
   const presentClassRecords = classAttendanceRecords.filter(a => a.status === 'Present' || a.status === 'Late').length;
-  const historicalAttendanceRate = totalClassRecords > 0
-    ? Number(((presentClassRecords / totalClassRecords) * 100).toFixed(1))
+  const historicalAttendanceRate = totalClassRecords > 0 
+    ? Number(((presentClassRecords / totalClassRecords) * 100).toFixed(1)) 
     : 95.0;
 
   // Expected headcount for today
@@ -331,7 +332,7 @@ export default function TeacherDashboard({
     if (!onSendEmail) return;
 
     const dayTimetable = getDayTimetable(selectedReportDay);
-
+    
     let timetableText = '';
     if (dayTimetable.length > 0) {
       dayTimetable.forEach(t => {
@@ -414,7 +415,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
   const submitAttendanceRegister = () => {
     // Generate new attendance list, replacing matching classId/date records
     const cleanList = attendance.filter(a => !(a.classId === assignedClassId && a.date === attendanceDate));
-
+    
     const newRecords = (Object.entries(localAttendance) as [string, { status: 'Present' | 'Absent' | 'Late'; remarks: string }][]).map(([studentId, data], idx) => ({
       id: `at-teach-${Date.now()}-${idx}`,
       studentId,
@@ -500,41 +501,42 @@ Edweso Royal Academy Administration Portal Dispatch`;
 
   return (
     <div className="space-y-6">
-
+      
       {/* ==================== 0. TEACHER PROFILE SECTION ==================== */}
       {activeTab === 'profile' && (
         <div className="space-y-6 animate-fade-in" id="teacher-profile-section">
-
+          
           {/* Main profile layout */}
-          <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
-            } flex flex-col md:flex-row items-center md:items-start gap-6`}>
-
+          <div className={`p-6 rounded-2xl border ${
+            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+          } flex flex-col md:flex-row items-center md:items-start gap-6`}>
+            
             {/* Profile Photo with upload and capture capability */}
             <div className="flex flex-col items-center gap-3 shrink-0" id="teacher-avatar-interactive-container">
               <div className="relative group w-24 h-24">
                 {teacher.profilePhoto ? (
-                  <img
-                    src={teacher.profilePhoto}
-                    alt={teacher.name}
+                  <img 
+                    src={teacher.profilePhoto} 
+                    alt={teacher.name} 
                     referrerPolicy="no-referrer"
-                    className="w-24 h-24 rounded-full object-cover border-2 border-emerald-500 shadow-md"
+                    className="w-24 h-24 rounded-full object-cover border-2 border-emerald-500 shadow-md" 
                   />
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-2 border-emerald-500/20 flex items-center justify-center font-extrabold text-3xl shadow-sm">
                     {teacher.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                   </div>
                 )}
-
+                
                 {/* Camera/Upload hover overlay */}
                 <div className="absolute inset-0 bg-slate-950/60 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity gap-2 duration-200">
-                  <button
+                  <button 
                     onClick={() => fileInputRef.current?.click()}
                     title="Upload Photo"
                     className="p-1.5 bg-white hover:bg-slate-100 text-slate-800 rounded-full shadow hover:scale-110 transition-all cursor-pointer"
                   >
                     <Upload size={12} />
                   </button>
-                  <button
+                  <button 
                     onClick={() => setIsCameraActive(true)}
                     id="profile-camera-btn-icon"
                     title="Capture from Camera"
@@ -543,7 +545,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                     <Camera size={12} />
                   </button>
                   {teacher.profilePhoto && (
-                    <button
+                    <button 
                       onClick={handleRemovePhoto}
                       title="Remove Photo"
                       className="p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow hover:scale-110 transition-all cursor-pointer"
@@ -557,14 +559,14 @@ Edweso Royal Academy Administration Portal Dispatch`;
               {/* Action Buttons beneath photo */}
               <div className="flex flex-col gap-1 items-center">
                 <div className="flex gap-1.5">
-                  <button
+                  <button 
                     onClick={() => fileInputRef.current?.click()}
                     className="text-[10px] font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
                   >
                     <Upload size={10} />
                     Upload
                   </button>
-                  <button
+                  <button 
                     onClick={() => setIsCameraActive(true)}
                     id="profile-camera-btn"
                     className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
@@ -574,7 +576,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                   </button>
                 </div>
                 {teacher.profilePhoto && (
-                  <button
+                  <button 
                     onClick={handleRemovePhoto}
                     className="text-[9px] font-bold text-rose-500 hover:text-rose-600 hover:underline flex items-center gap-0.5 cursor-pointer"
                   >
@@ -585,12 +587,12 @@ Edweso Royal Academy Administration Portal Dispatch`;
               </div>
 
               {/* Hidden file input */}
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                accept="image/*"
-                className="hidden"
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileUpload} 
+                accept="image/*" 
+                className="hidden" 
               />
             </div>
 
@@ -629,10 +631,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase font-bold text-slate-400">Staff Account Status</p>
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${teacher.status === 'Active'
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400'
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    teacher.status === 'Active' 
+                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400' 
                       : 'bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400'
-                    }`}>
+                  }`}>
                     ● {teacher.status}
                   </span>
                 </div>
@@ -665,7 +668,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
       {/* ==================== 1. ASSIGNED CLASSES ==================== */}
       {activeTab === 'classes' && (
         <div className="space-y-6 animate-fade-in">
-
+          
           <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-800 to-emerald-950 text-white flex flex-col md:flex-row justify-between items-center gap-4 shadow-md">
             <div>
               <span className="text-xs bg-emerald-700/60 border border-amber-400/20 px-3 py-1 rounded-full text-amber-300 font-bold uppercase">Edweso Teacher Portal</span>
@@ -679,27 +682,59 @@ Edweso Royal Academy Administration Portal Dispatch`;
           </div>
 
           {/* Simple Performance Insights Box */}
-          <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
-            <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-3 mb-4 text-slate-900 dark:text-white">Class Academic Performance Analytics</h4>
+          <div className={`p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md ${isDarkMode ? 'bg-slate-900/60 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`}>
+            <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b pb-3.5 mb-5 flex items-center space-x-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Class Academic Performance Analytics</span>
+            </h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Card 1: Overall Average */}
+              <div className={`p-4 rounded-xl border transition-all duration-300 hover:scale-[1.01] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-950/40 border-slate-700 hover:border-indigo-500/40' : 'bg-slate-50/60 border-slate-300 hover:border-indigo-500/30'}`}>
+                <div className="p-3.5 rounded-xl bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 shrink-0">
+                  <TrendingUp size={20} />
+                </div>
+                <div className="text-left">
+                  <span className="text-[10px] text-slate-400 font-extrabold block uppercase tracking-wider">Overall Average</span>
+                  <span className="text-2xl font-black mt-0.5 block text-slate-900 dark:text-white">81.5%</span>
+                  <span className="text-[10px] text-emerald-500 font-bold flex items-center mt-0.5 gap-0.5">
+                    <span>↑ 1.2%</span> <span className="text-slate-400 font-semibold">vs last term</span>
+                  </span>
+                </div>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-              <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-100 dark:border-slate-800">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">Overall Class Average</span>
-                <span className="text-xl font-extrabold mt-1 block">81.5%</span>
+              {/* Card 2: Highest Score */}
+              <div className={`p-4 rounded-xl border transition-all duration-300 hover:scale-[1.01] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-950/40 border-slate-700 hover:border-emerald-500/40' : 'bg-slate-50/60 border-slate-300 hover:border-emerald-500/30'}`}>
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 shrink-0">
+                  <Award size={20} />
+                </div>
+                <div className="text-left">
+                  <span className="text-[10px] text-slate-400 font-extrabold block uppercase tracking-wider">Highest Score</span>
+                  <span className="text-2xl font-black mt-0.5 block text-emerald-600 dark:text-emerald-400">93%</span>
+                  <span className="text-[10px] text-slate-400 font-bold mt-0.5 block">
+                    In JHS 2 Mathematics
+                  </span>
+                </div>
               </div>
-              <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-100 dark:border-slate-800">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">Highest Assessment Score</span>
-                <span className="text-xl font-extrabold text-emerald-600 mt-1 block">93%</span>
-              </div>
-              <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-100 dark:border-slate-800">
-                <span className="text-[10px] text-slate-400 font-bold block uppercase">PTA Engagement score</span>
-                <span className="text-xl font-extrabold text-amber-500 mt-1 block">95% Contacted</span>
+
+              {/* Card 3: PTA Contact Rate */}
+              <div className={`p-4 rounded-xl border transition-all duration-300 hover:scale-[1.01] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-950/40 border-slate-700 hover:border-amber-500/40' : 'bg-slate-50/60 border-slate-300 hover:border-amber-500/30'}`}>
+                <div className="p-3.5 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 shrink-0">
+                  <Users size={20} />
+                </div>
+                <div className="text-left">
+                  <span className="text-[10px] text-slate-400 font-extrabold block uppercase tracking-wider">PTA Engagement</span>
+                  <span className="text-2xl font-black mt-0.5 block text-amber-500 dark:text-amber-400">95%</span>
+                  <span className="text-[10px] text-emerald-500 font-bold mt-0.5 block">
+                    Guardian phone verified
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Recharts Bar Chart: Subject average exam grades */}
-          <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`} id="class-performance-chart-card">
+          <div className={`p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`} id="class-performance-chart-card">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-4 border-slate-200/40 dark:border-slate-800">
               <div>
                 <h4 className="font-extrabold text-xs uppercase tracking-wide text-slate-900 dark:text-white">Subject Performance Trends</h4>
@@ -728,54 +763,199 @@ Edweso Royal Academy Administration Portal Dispatch`;
                   margin={{ top: 10, right: 10, left: -20, bottom: 5 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />
-                  <XAxis
-                    dataKey="code"
+                  <XAxis 
+                    dataKey="code" 
+                    tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }} 
+                    stroke={isDarkMode ? '#1e293b' : '#e2e8f0'}
+                  />
+                  <YAxis 
+                    domain={[0, 100]} 
                     tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }}
                     stroke={isDarkMode ? '#1e293b' : '#e2e8f0'}
                   />
-                  <YAxis
-                    domain={[0, 100]}
-                    tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }}
-                    stroke={isDarkMode ? '#1e293b' : '#e2e8f0'}
-                  />
-                  <Tooltip
+                  <Tooltip 
                     cursor={{ fill: isDarkMode ? 'rgba(30, 41, 59, 0.4)' : 'rgba(241, 245, 249, 0.6)' }}
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-                      borderColor: isDarkMode ? '#1e293b' : '#e2e8f0',
-                      borderRadius: '12px',
+                    contentStyle={{ 
+                      backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', 
+                      borderColor: isDarkMode ? '#1e293b' : '#e2e8f0', 
+                      borderRadius: '12px', 
                       fontSize: '11px',
                       color: isDarkMode ? '#f8fafc' : '#0f172a',
                       fontWeight: 'bold',
                       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-                    }}
+                    }} 
                   />
-                  <Bar
-                    dataKey="Class Assessment (Max 30)"
-                    fill="#10b981"
-                    radius={[4, 4, 0, 0]}
+                  <Bar 
+                    dataKey="Class Assessment (Max 30)" 
+                    fill="#10b981" 
+                    radius={[4, 4, 0, 0]} 
                     maxBarSize={16}
                   />
-                  <Bar
-                    dataKey="Terminal Exam (Max 70)"
-                    fill="#6366f1"
-                    radius={[4, 4, 0, 0]}
+                  <Bar 
+                    dataKey="Terminal Exam (Max 70)" 
+                    fill="#6366f1" 
+                    radius={[4, 4, 0, 0]} 
                     maxBarSize={16}
                   />
-                  <Bar
-                    dataKey="Total Grade (Max 100)"
-                    fill="#f59e0b"
-                    radius={[4, 4, 0, 0]}
+                  <Bar 
+                    dataKey="Total Grade (Max 100)" 
+                    fill="#f59e0b" 
+                    radius={[4, 4, 0, 0]} 
                     maxBarSize={16}
                   />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-
+            
             <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex flex-wrap gap-y-2 justify-between items-center text-[10px] text-slate-400 font-semibold">
               <p>📍 Core Class Division: JHS 2 (West Wing)</p>
               <p className="italic text-emerald-650 dark:text-emerald-400">Values update instantly when grades are posted</p>
             </div>
+          </div>
+
+          {/* Individual Student Grade Trend Line Chart */}
+          <div className={`p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`} id="student-trend-analytics-card">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-4 border-slate-200/40 dark:border-slate-800 gap-3">
+              <div>
+                <h4 className="font-extrabold text-xs uppercase tracking-wide text-slate-900 dark:text-white flex items-center space-x-1.5">
+                  <Award size={14} className="text-amber-500 animate-pulse" />
+                  <span>Student Multi-Term Grade Progress</span>
+                </h4>
+                <p className="text-[11px] text-slate-400 font-medium">Visualize terminal performance trends and academic progression for any student.</p>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0" htmlFor="trend-student-select">Select Student:</label>
+                <select
+                  id="trend-student-select"
+                  value={selectedTrendStudentId}
+                  onChange={(e) => setSelectedTrendStudentId(e.target.value)}
+                  className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden font-bold"
+                >
+                  {classStudents.map(stud => (
+                    <option key={stud.id} value={stud.id}>{stud.name} ({stud.admissionNumber})</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {(() => {
+              const selectedTrendStudent = students.find(s => s.id === selectedTrendStudentId) || classStudents[0];
+              const selectedStudentGrades = grades.filter(g => g.studentId === selectedTrendStudentId);
+              const studentSubjectIds = Array.from(new Set(selectedStudentGrades.map(g => g.subjectId)));
+              const studentSubjects = subjects.filter(s => studentSubjectIds.includes(s.id));
+
+              const trendTerms = ['Term 1', 'Term 2', 'Term 3'];
+              const trendData = trendTerms.map(term => {
+                const termGrades = selectedStudentGrades.filter(g => g.term === term);
+                const dataPoint: any = { term };
+                termGrades.forEach(g => {
+                  const subject = subjects.find(s => s.id === g.subjectId);
+                  if (subject) {
+                    dataPoint[subject.name] = g.totalScore;
+                  }
+                });
+                return dataPoint;
+              });
+
+              const colors = [
+                '#10b981', // Emerald
+                '#6366f1', // Indigo
+                '#f59e0b', // Amber
+                '#ec4899', // Pink
+                '#06b6d4', // Cyan
+                '#8b5cf6', // Violet
+                '#3b82f6', // Blue
+              ];
+
+              if (selectedStudentGrades.length === 0) {
+                return (
+                  <div className="py-12 text-center">
+                    <p className="text-xs text-slate-400 font-bold">No academic performance records found for {selectedTrendStudent?.name || 'this student'}.</p>
+                    <p className="text-[10px] text-slate-400 font-semibold mt-1">To view trends, please post grades in the "Upload Grades" continuous assessment panel.</p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="space-y-4">
+                  {/* Subject Legend List */}
+                  <div className="flex flex-wrap gap-3.5 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    {studentSubjects.map((sub, idx) => (
+                      <span key={sub.id} className="flex items-center space-x-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: colors[idx % colors.length] }}></span>
+                        <span>{sub.name} ({sub.code})</span>
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Recharts Line Chart */}
+                  <div className="h-72 w-full mt-2">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={trendData}
+                        margin={{ top: 15, right: 15, left: -20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#1e293b' : '#f1f5f9'} />
+                        <XAxis 
+                          dataKey="term" 
+                          tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }} 
+                          stroke={isDarkMode ? '#1e293b' : '#e2e8f0'}
+                        />
+                        <YAxis 
+                          domain={[0, 100]} 
+                          tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 'bold' }}
+                          stroke={isDarkMode ? '#1e293b' : '#e2e8f0'}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', 
+                            borderColor: isDarkMode ? '#1e293b' : '#e2e8f0', 
+                            borderRadius: '12px', 
+                            fontSize: '11px',
+                            color: isDarkMode ? '#f8fafc' : '#0f172a',
+                            fontWeight: 'bold',
+                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                          }} 
+                        />
+                        <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }} />
+                        {studentSubjects.map((sub, idx) => (
+                          <Line
+                            key={sub.id}
+                            type="monotone"
+                            dataKey={sub.name}
+                            stroke={colors[idx % colors.length]}
+                            strokeWidth={3}
+                            activeDot={{ r: 6 }}
+                            dot={{ r: 4, strokeWidth: 2 }}
+                            connectNulls
+                          />
+                        ))}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="bg-slate-50 dark:bg-slate-950/40 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/60 flex flex-col md:flex-row justify-between md:items-center gap-3.5">
+                    <div>
+                      <p className="text-[11px] font-extrabold text-slate-800 dark:text-slate-200">
+                        Analyzing: {selectedTrendStudent?.name}'s Progression
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                        Current Class Division: {assignedClass?.name} | Form Parent Contact: {selectedTrendStudent?.parentPhone}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded font-black">
+                        Term 3 Target: 85%+
+                      </span>
+                      <span className="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded font-black">
+                        Parent Registered
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
         </div>
@@ -798,13 +978,13 @@ Edweso Royal Academy Administration Portal Dispatch`;
       {/* ==================== 2. MARK ATTENDANCE ==================== */}
       {activeTab === 'attendance' && (
         <div className="space-y-4 animate-fade-in">
-
+          
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
               <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Form Attendance Register Book</h2>
               <p className="text-xs text-slate-400">Class: {assignedClass?.name} | Room: {assignedClass?.room}</p>
             </div>
-
+            
             <div className="flex items-center space-x-2">
               <label className="text-xs font-bold text-slate-400">Select Date:</label>
               <input
@@ -840,30 +1020,33 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           <button
                             type="button"
                             onClick={() => handleSetStatus(stud.id, 'Present')}
-                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${state.status === 'Present'
+                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${
+                              state.status === 'Present'
                                 ? 'bg-emerald-600 text-white shadow-xs'
                                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800'
-                              }`}
+                            }`}
                           >
                             Present
                           </button>
                           <button
                             type="button"
                             onClick={() => handleSetStatus(stud.id, 'Late')}
-                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${state.status === 'Late'
+                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${
+                              state.status === 'Late'
                                 ? 'bg-amber-500 text-white shadow-xs'
                                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800'
-                              }`}
+                            }`}
                           >
                             Late
                           </button>
                           <button
                             type="button"
                             onClick={() => handleSetStatus(stud.id, 'Absent')}
-                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${state.status === 'Absent'
+                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${
+                              state.status === 'Absent'
                                 ? 'bg-rose-500 text-white shadow-xs'
                                 : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800'
-                              }`}
+                            }`}
                           >
                             Absent
                           </button>
@@ -901,7 +1084,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
       {/* ==================== 3. UPLOAD GRADES ==================== */}
       {activeTab === 'grades' && (
         <div className="space-y-4 animate-fade-in">
-
+          
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
               <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Continuous Assessments Grade Book</h2>
@@ -968,10 +1151,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                         {total}%
                       </td>
                       <td className="p-3">
-                        <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded font-mono ${gLetter === 'A' || gLetter === 'B'
-                            ? 'bg-emerald-500/10 text-emerald-600'
+                        <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded font-mono ${
+                          gLetter === 'A' || gLetter === 'B' 
+                            ? 'bg-emerald-500/10 text-emerald-600' 
                             : 'bg-amber-500/10 text-amber-600'
-                          }`}>
+                        }`}>
                           {gLetter}
                         </span>
                       </td>
@@ -1022,8 +1206,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
               </div>
 
               {/* Student List */}
-              <div className={`rounded-xl border divide-y overflow-y-auto max-h-[450px] ${isDarkMode ? 'bg-slate-900 border-slate-800 divide-slate-800' : 'bg-white border-slate-100 divide-slate-100'
-                }`}>
+              <div className={`rounded-xl border divide-y overflow-y-auto max-h-[450px] ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 divide-slate-800' : 'bg-white border-slate-100 divide-slate-100'
+              }`}>
                 {classStudents
                   .filter(s => s.name.toLowerCase().includes(searchStudentNotesQuery.toLowerCase()))
                   .map((student) => {
@@ -1033,10 +1218,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                       <button
                         key={student.id}
                         onClick={() => setSelectedStudentIdForNotes(student.id)}
-                        className={`w-full text-left p-3.5 flex items-center justify-between transition-colors text-xs ${isSelected
-                            ? 'bg-emerald-500/10 text-emerald-600 font-bold'
+                        className={`w-full text-left p-3.5 flex items-center justify-between transition-colors text-xs ${
+                          isSelected 
+                            ? 'bg-emerald-500/10 text-emerald-600 font-bold' 
                             : 'hover:bg-slate-50 dark:hover:bg-slate-950/40'
-                          }`}
+                        }`}
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 font-extrabold text-slate-500 dark:text-slate-400 overflow-hidden">
@@ -1074,8 +1260,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 const selectedStudent = classStudents.find(s => s.id === selectedStudentIdForNotes);
                 if (!selectedStudent) {
                   return (
-                    <div className={`p-8 text-center rounded-xl border text-slate-400 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                      }`}>
+                    <div className={`p-8 text-center rounded-xl border text-slate-400 ${
+                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                    }`}>
                       <p className="font-medium">Please select a student from the list to view and manage private journals.</p>
                     </div>
                   );
@@ -1088,8 +1275,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 return (
                   <>
                     {/* Selected Student Information Header */}
-                    <div className={`p-4 rounded-xl border flex items-center justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                      }`}>
+                    <div className={`p-4 rounded-xl border flex items-center justify-between ${
+                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                    }`}>
                       <div className="flex items-center space-x-3.5">
                         <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 font-extrabold text-slate-500 dark:text-slate-400 overflow-hidden">
                           {selectedStudent.profilePhoto ? (
@@ -1111,8 +1299,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
                     </div>
 
                     {/* Compose New Observation Form */}
-                    <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                      }`}>
+                    <div className={`p-5 rounded-xl border ${
+                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                    }`}>
                       <h4 className="font-bold text-xs uppercase tracking-wider mb-3 flex items-center space-x-2 text-emerald-600">
                         <FileText size={14} />
                         <span>Log New Private Observation</span>
@@ -1141,14 +1330,15 @@ Edweso Royal Academy Administration Portal Dispatch`;
                     {/* Observation History */}
                     <div className="space-y-3">
                       <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-slate-400">Observation Ledger History ({studentSpecificNotes.length})</h4>
-
+                      
                       {studentSpecificNotes.length > 0 ? (
                         <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
                           {studentSpecificNotes.map((note) => (
                             <div
                               key={note.id}
-                              className={`p-4 rounded-xl border flex justify-between items-start space-x-4 transition-all relative overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700' : 'bg-white border-slate-100 hover:border-slate-200'
-                                }`}
+                              className={`p-4 rounded-xl border flex justify-between items-start space-x-4 transition-all relative overflow-hidden ${
+                                isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700' : 'bg-white border-slate-100 hover:border-slate-200'
+                              }`}
                             >
                               <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
                               <div className="space-y-2 text-xs flex-1 pl-2">
@@ -1171,8 +1361,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           ))}
                         </div>
                       ) : (
-                        <div className={`p-8 text-center rounded-xl border text-slate-400 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                          }`}>
+                        <div className={`p-8 text-center rounded-xl border text-slate-400 ${
+                          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                        }`}>
                           <p className="font-semibold text-xs">No private notes logged yet.</p>
                           <p className="text-[10px] text-slate-400 mt-1">Use the form above to record your first observational note for this student.</p>
                         </div>
@@ -1211,8 +1402,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
             {/* LEFT COLUMN: Live Briefing Preview Paper (8 Cols) */}
             <div className="lg:col-span-8 space-y-4">
               {/* Day Selector and Refresh Controls */}
-              <div className={`p-4 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                }`}>
+              <div className={`p-4 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
                 <div>
                   <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1">Select Timetable Reference Day</label>
                   <select
@@ -1236,11 +1428,12 @@ Edweso Royal Academy Administration Portal Dispatch`;
               </div>
 
               {/* Briefing Paper Representation */}
-              <div className={`rounded-xl border shadow-sm relative overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                }`}>
+              <div className={`rounded-xl border shadow-sm relative overflow-hidden ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
                 {/* Paper Header Ribbon */}
                 <div className="h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500"></div>
-
+                
                 <div className="p-6 sm:p-8 space-y-6">
                   {/* Letterhead */}
                   <div className="text-center pb-5 border-b border-dashed border-slate-200/50 dark:border-slate-800">
@@ -1277,7 +1470,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                       <CheckSquare size={14} />
                       <span>Attendance Alerts & Watchlist</span>
                     </h4>
-
+                    
                     {criticalStudents.length > 0 ? (
                       <div className="space-y-3">
                         <p className="text-xs text-amber-600 dark:text-amber-400 font-bold leading-relaxed flex items-center space-x-1.5">
@@ -1290,8 +1483,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
                             return (
                               <div
                                 key={student.id}
-                                className={`p-3.5 rounded-lg border text-xs leading-relaxed flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200/50'
-                                  }`}
+                                className={`p-3.5 rounded-lg border text-xs leading-relaxed flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
+                                  isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200/50'
+                                }`}
                               >
                                 <div className="space-y-1">
                                   <div className="flex items-center space-x-2">
@@ -1305,10 +1499,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                                   </p>
                                 </div>
                                 <div className="text-left sm:text-right">
-                                  <span className={`inline-block text-[9px] px-2 py-0.5 rounded font-extrabold uppercase ${lastRecord.status === 'Absent'
-                                      ? 'bg-red-500/10 text-red-600'
+                                  <span className={`inline-block text-[9px] px-2 py-0.5 rounded font-extrabold uppercase ${
+                                    lastRecord.status === 'Absent' 
+                                      ? 'bg-red-500/10 text-red-600' 
                                       : 'bg-amber-500/10 text-amber-600'
-                                    }`}>
+                                  }`}>
                                     {lastRecord.status} Yesterday
                                   </span>
                                   {lastRecord.remarks && (
@@ -1335,7 +1530,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                       <Calendar size={14} />
                       <span>Academic Milestones for {selectedReportDay}</span>
                     </h4>
-
+                    
                     {getDayTimetable(selectedReportDay).length > 0 ? (
                       <div className="divide-y divide-slate-100 dark:divide-slate-800">
                         {getDayTimetable(selectedReportDay).map((entry) => {
@@ -1391,8 +1586,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
             {/* RIGHT COLUMN: Action center and Dispatch Ledger History (4 Cols) */}
             <div className="lg:col-span-4 space-y-5">
               {/* Action Board */}
-              <div className={`p-5 rounded-xl border space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                }`}>
+              <div className={`p-5 rounded-xl border space-y-4 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
                 <h4 className="font-black text-xs uppercase tracking-wider text-slate-900 dark:text-white">Dispatch Hub</h4>
                 <p className="text-xs text-slate-400 leading-relaxed font-medium">
                   Pushing this briefing compiles the current expectations and transmits an official automated report directly to your school email (<span className="text-slate-600 dark:text-slate-300 font-bold">{teacher.email}</span>).
@@ -1414,8 +1610,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
               </div>
 
               {/* History Dispatch Logs list */}
-              <div className={`p-5 rounded-xl border space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                }`}>
+              <div className={`p-5 rounded-xl border space-y-4 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
                 <div className="flex justify-between items-center border-b pb-2.5">
                   <h4 className="font-black text-xs uppercase tracking-wider text-slate-900 dark:text-white">Dispatch Ledger ({morningReportsHistory.length})</h4>
                   <span className="text-[9px] font-mono uppercase bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded font-extrabold">Logs</span>
@@ -1427,10 +1624,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                       <div
                         key={report.id}
                         onClick={() => setSelectedReportDetail(report)}
-                        className={`p-3 rounded-lg border text-xs cursor-pointer transition-all hover:border-emerald-500/40 ${selectedReportDetail?.id === report.id
+                        className={`p-3 rounded-lg border text-xs cursor-pointer transition-all hover:border-emerald-500/40 ${
+                          selectedReportDetail?.id === report.id
                             ? 'bg-emerald-500/5 border-emerald-500'
                             : 'bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 border-slate-200/50 dark:border-slate-800'
-                          }`}
+                        }`}
                       >
                         <div className="flex justify-between items-start mb-1">
                           <span className="font-extrabold text-slate-800 dark:text-slate-200 truncate pr-2 max-w-[130px]">
@@ -1457,8 +1655,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
           {/* Report Detail Modal / View Panel */}
           {selectedReportDetail && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
-              <div className={`w-full max-w-2xl rounded-2xl border shadow-xl flex flex-col max-h-[85vh] overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-800'
-                }`}>
+              <div className={`w-full max-w-2xl rounded-2xl border shadow-xl flex flex-col max-h-[85vh] overflow-hidden ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-800'
+              }`}>
                 {/* Header */}
                 <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                   <div>
@@ -1529,28 +1728,31 @@ Edweso Royal Academy Administration Portal Dispatch`;
           <div className="flex border-b border-slate-200 dark:border-slate-800">
             <button
               onClick={() => setStaffActiveSubTab('clockin')}
-              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${staffActiveSubTab === 'clockin'
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                staffActiveSubTab === 'clockin'
                   ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                   : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
+              }`}
             >
               My Geo-Fenced Clock-In
             </button>
             <button
               onClick={() => setStaffActiveSubTab('leave')}
-              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${staffActiveSubTab === 'leave'
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                staffActiveSubTab === 'leave'
                   ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                   : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
+              }`}
             >
               Submit Leave Request
             </button>
             <button
               onClick={() => setStaffActiveSubTab('directory')}
-              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${staffActiveSubTab === 'directory'
+              className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
+                staffActiveSubTab === 'directory'
                   ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                   : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
+              }`}
             >
               Faculty Directory
             </button>
@@ -1560,17 +1762,19 @@ Edweso Royal Academy Administration Portal Dispatch`;
           {staffActiveSubTab === 'clockin' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
               {/* Geofencing panel */}
-              <div className={`lg:col-span-7 p-6 rounded-2xl border space-y-6 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                }`}>
+              <div className={`lg:col-span-7 p-6 rounded-2xl border space-y-6 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                   <div className="space-y-0.5">
                     <h3 className="text-sm font-bold">Dynamic Geo-Fenced Desk</h3>
                     <p className="text-[10px] text-slate-400 font-medium">Auto-verifies your location against the school coordinate fence (200m radius).</p>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase inline-flex items-center space-x-1 ${simulatedGPSLocation.isInRange
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase inline-flex items-center space-x-1 ${
+                    simulatedGPSLocation.isInRange
                       ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
                       : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
-                    }`}>
+                  }`}>
                     <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${simulatedGPSLocation.isInRange ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
                     <span>{simulatedGPSLocation.isInRange ? 'In Range' : 'Out of Range'}</span>
                   </span>
@@ -1725,10 +1929,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                               onUpdateStaffClockIns([newClockIn, ...staffClockIns]);
                             }}
                             disabled={!simulatedGPSLocation.isInRange}
-                            className={`px-6 py-2.5 font-black rounded-lg text-xs flex items-center space-x-1.5 shadow-md active:scale-95 transition-all cursor-pointer ${simulatedGPSLocation.isInRange
+                            className={`px-6 py-2.5 font-black rounded-lg text-xs flex items-center space-x-1.5 shadow-md active:scale-95 transition-all cursor-pointer ${
+                              simulatedGPSLocation.isInRange
                                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                                 : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                              }`}
+                            }`}
                           >
                             <Clock size={15} />
                             <span>Clock In Now</span>
@@ -1741,8 +1946,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
               </div>
 
               {/* Attendance history panel */}
-              <div className={`lg:col-span-5 p-6 rounded-2xl border space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                }`}>
+              <div className={`lg:col-span-5 p-6 rounded-2xl border space-y-4 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
                 <h3 className="text-sm font-bold border-b border-slate-100 dark:border-slate-800 pb-2">My Attendance Log</h3>
                 <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
                   {staffClockIns.filter(c => c.staffId === teacher.id).length === 0 ? (
@@ -1790,8 +1996,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
               {/* Form card */}
               <form
                 onSubmit={handleLeaveSubmit}
-                className={`lg:col-span-6 p-6 rounded-2xl border space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                  }`}
+                className={`lg:col-span-6 p-6 rounded-2xl border space-y-4 ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                }`}
               >
                 <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
                   <h3 className="text-sm font-bold">Request Leave of Absence</h3>
@@ -1799,10 +2006,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 </div>
 
                 {leaveRequestStatus.message && (
-                  <div className={`p-3 rounded-lg text-xs font-bold border ${leaveRequestStatus.type === 'success'
+                  <div className={`p-3 rounded-lg text-xs font-bold border ${
+                    leaveRequestStatus.type === 'success'
                       ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600'
                       : 'bg-rose-500/10 border-rose-500/20 text-rose-600'
-                    }`}>
+                  }`}>
                     {leaveRequestStatus.message}
                   </div>
                 )}
@@ -1862,8 +2070,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
               </form>
 
               {/* History list */}
-              <div className={`lg:col-span-6 p-6 rounded-2xl border space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                }`}>
+              <div className={`lg:col-span-6 p-6 rounded-2xl border space-y-4 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
                 <h3 className="text-sm font-bold border-b border-slate-100 dark:border-slate-800 pb-2">My Request Logs</h3>
                 <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
                   {staffLeaveRequests.filter(l => l.staffId === teacher.id).length === 0 ? (
@@ -1883,12 +2092,13 @@ Edweso Royal Academy Administration Portal Dispatch`;
                             </span>
                             <span className="text-[9px] text-slate-400">Applied on {req.appliedOn}</span>
                           </div>
-                          <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${req.status === 'Approved'
+                          <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${
+                            req.status === 'Approved'
                               ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                               : req.status === 'Rejected'
-                                ? 'bg-rose-500/10 text-rose-600 border-rose-500/20'
-                                : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
-                            }`}>
+                              ? 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                              : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                          }`}>
                             {req.status}
                           </span>
                         </div>
@@ -1909,342 +2119,349 @@ Edweso Royal Academy Administration Portal Dispatch`;
           {staffActiveSubTab === 'directory' && (
             <>
               {/* Search and Filters panel */}
-              <div className={`p-5 rounded-xl border space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                }`}>
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                  {/* Search input */}
-                  <div className="md:col-span-6 relative">
-                    <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1.5">Search Faculty</label>
-                    <div className="relative">
-                      <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="text"
-                        value={staffSearchQuery}
-                        onChange={(e) => setStaffSearchQuery(e.target.value)}
-                        placeholder="Search by name, staff ID, or primary subject..."
-                        className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg pl-9 pr-4 py-2 text-xs font-medium focus:outline-hidden focus:border-emerald-500 transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Status filter */}
-                  <div className="md:col-span-3">
-                    <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1.5">Duty Status</label>
-                    <select
-                      value={staffStatusFilter}
-                      onChange={(e) => setStaffStatusFilter(e.target.value as any)}
-                      className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold focus:outline-hidden"
-                    >
-                      <option value="All">All Statuses</option>
-                      <option value="Active">Active Duty</option>
-                      <option value="On Leave">On Leave</option>
-                    </select>
-                  </div>
-
-                  {/* Gender filter */}
-                  <div className="md:col-span-3">
-                    <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1.5">Gender</label>
-                    <select
-                      value={staffGenderFilter}
-                      onChange={(e) => setStaffGenderFilter(e.target.value as any)}
-                      className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold focus:outline-hidden"
-                    >
-                      <option value="All">All Genders</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                    </select>
-                  </div>
+              <div className={`p-5 rounded-xl border space-y-4 ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              {/* Search input */}
+              <div className="md:col-span-6 relative">
+                <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1.5">Search Faculty</label>
+                <div className="relative">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={staffSearchQuery}
+                    onChange={(e) => setStaffSearchQuery(e.target.value)}
+                    placeholder="Search by name, staff ID, or primary subject..."
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg pl-9 pr-4 py-2 text-xs font-medium focus:outline-hidden focus:border-emerald-500 transition-colors"
+                  />
                 </div>
               </div>
 
-              {/* Directory Cards Grid */}
-              {(() => {
-                const filteredTeachers = teachers.filter(t => {
-                  const matchesSearch = t.name.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
-                    t.staffNumber.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
-                    (t.subjectId || '').toLowerCase().includes(staffSearchQuery.toLowerCase());
+              {/* Status filter */}
+              <div className="md:col-span-3">
+                <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1.5">Duty Status</label>
+                <select
+                  value={staffStatusFilter}
+                  onChange={(e) => setStaffStatusFilter(e.target.value as any)}
+                  className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold focus:outline-hidden"
+                >
+                  <option value="All">All Statuses</option>
+                  <option value="Active">Active Duty</option>
+                  <option value="On Leave">On Leave</option>
+                </select>
+              </div>
 
-                  const matchesStatus = staffStatusFilter === 'All' || t.status === staffStatusFilter;
-                  const matchesGender = staffGenderFilter === 'All' || t.gender === staffGenderFilter;
+              {/* Gender filter */}
+              <div className="md:col-span-3">
+                <label className="text-[10px] uppercase font-black tracking-widest text-slate-400 block mb-1.5">Gender</label>
+                <select
+                  value={staffGenderFilter}
+                  onChange={(e) => setStaffGenderFilter(e.target.value as any)}
+                  className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-lg px-3 py-2 text-xs font-bold focus:outline-hidden"
+                >
+                  <option value="All">All Genders</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-                  return matchesSearch && matchesStatus && matchesGender;
-                });
+          {/* Directory Cards Grid */}
+          {(() => {
+            const filteredTeachers = teachers.filter(t => {
+              const matchesSearch = t.name.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
+                t.staffNumber.toLowerCase().includes(staffSearchQuery.toLowerCase()) ||
+                (t.subjectId || '').toLowerCase().includes(staffSearchQuery.toLowerCase());
+              
+              const matchesStatus = staffStatusFilter === 'All' || t.status === staffStatusFilter;
+              const matchesGender = staffGenderFilter === 'All' || t.gender === staffGenderFilter;
 
-                if (filteredTeachers.length === 0) {
+              return matchesSearch && matchesStatus && matchesGender;
+            });
+
+            if (filteredTeachers.length === 0) {
+              return (
+                <div className={`p-12 text-center rounded-xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                }`}>
+                  <Users size={36} className="mx-auto text-slate-400 mb-3" />
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No staff members match your criteria</p>
+                  <p className="text-xs text-slate-400 mt-1">Try clearing filters or adjusting your search query.</p>
+                  {(staffSearchQuery || staffStatusFilter !== 'All' || staffGenderFilter !== 'All') && (
+                    <button
+                      onClick={() => {
+                        setStaffSearchQuery('');
+                        setStaffStatusFilter('All');
+                        setStaffGenderFilter('All');
+                      }}
+                      className="mt-4 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 transition-colors"
+                    >
+                      Reset Filters
+                    </button>
+                  )}
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredTeachers.map((t) => {
+                  const managedClasses = classes.filter(c => c.teacherId === t.id);
+                  const isCurrentUser = t.email === session.email;
+
                   return (
-                    <div className={`p-12 text-center rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                    <div
+                      key={t.id}
+                      className={`rounded-xl border shadow-xs overflow-hidden flex flex-col justify-between transition-all hover:scale-[1.01] hover:shadow-md ${
+                        isDarkMode 
+                          ? 'bg-slate-900 border-slate-800' 
+                          : 'bg-white border-slate-100'
+                      } ${isCurrentUser ? 'ring-2 ring-emerald-500/40' : ''}`}
+                    >
+                      <div className="p-5 space-y-4">
+                        {/* Title Row */}
+                        <div className="flex items-start gap-3">
+                          {/* Avatar or custom photo */}
+                          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-200/50 dark:border-slate-800 flex items-center justify-center">
+                            {t.profilePhoto ? (
+                              <img src={t.profilePhoto} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            ) : (
+                              <div className="w-full h-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 flex items-center justify-center font-extrabold text-sm">
+                                {t.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-1 flex-1 min-w-0">
+                            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5 truncate">
+                              {t.name}
+                              {isCurrentUser && (
+                                <span className="text-[8px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-extrabold uppercase shrink-0">
+                                  You
+                                </span>
+                              )}
+                            </h3>
+                            <p className="text-[10px] font-mono text-slate-400 font-bold tracking-wider">{t.staffNumber}</p>
+                          </div>
+                          
+                          <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase shrink-0 ${
+                            t.status === 'Active'
+                              ? 'bg-emerald-500/10 text-emerald-600'
+                              : 'bg-amber-500/10 text-amber-600'
+                          }`}>
+                            {t.status}
+                          </span>
+                        </div>
+
+                        {/* Details Block */}
+                        <div className="space-y-2 text-xs">
+                          {/* Subject Spec */}
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] uppercase font-black text-slate-400">Primary Discipline</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                              {t.subjectId || 'Specialist'}
+                            </span>
+                          </div>
+
+                          {/* Managed Classes */}
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] uppercase font-black text-slate-400">Assigned Form</span>
+                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                              {managedClasses.length > 0 
+                                ? managedClasses.map(c => c.name).join(', ') 
+                                : 'None'
+                              }
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Contact Information (Quick view) */}
+                        <div className="pt-3 border-t border-slate-200/40 dark:border-slate-800 space-y-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                          <div className="flex items-center space-x-2">
+                            <Mail size={13} className="text-slate-400" />
+                            <span className="truncate">{t.email}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Phone size={13} className="text-slate-400" />
+                            <span>{t.phone}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div className={`px-5 py-3 border-t border-slate-200/30 dark:border-slate-800/50 flex justify-between items-center ${
+                        isDarkMode ? 'bg-slate-950/20' : 'bg-slate-50/50'
                       }`}>
-                      <Users size={36} className="mx-auto text-slate-400 mb-3" />
-                      <p className="text-sm font-bold text-slate-700 dark:text-slate-300">No staff members match your criteria</p>
-                      <p className="text-xs text-slate-400 mt-1">Try clearing filters or adjusting your search query.</p>
-                      {(staffSearchQuery || staffStatusFilter !== 'All' || staffGenderFilter !== 'All') && (
+                        <span className="text-[9px] text-slate-400 font-bold tracking-wider uppercase font-mono">
+                          {t.gender} Faculty
+                        </span>
                         <button
-                          onClick={() => {
-                            setStaffSearchQuery('');
-                            setStaffStatusFilter('All');
-                            setStaffGenderFilter('All');
-                          }}
-                          className="mt-4 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 transition-colors"
+                          onClick={() => setSelectedStaffDetail(t)}
+                          className="px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg text-[10px] transition-colors cursor-pointer"
                         >
-                          Reset Filters
+                          View Schedule & Profile
                         </button>
-                      )}
+                      </div>
                     </div>
                   );
-                }
+                })}
+              </div>
+            );
+          })()}
 
-                return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredTeachers.map((t) => {
-                      const managedClasses = classes.filter(c => c.teacherId === t.id);
-                      const isCurrentUser = t.email === session.email;
+          {/* Selected Staff Profile and Timetable Schedule Modal */}
+          {selectedStaffDetail && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+              <div className={`w-full max-w-2xl rounded-2xl border shadow-xl flex flex-col max-h-[85vh] overflow-hidden ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-800'
+              }`}>
+                {/* Header */}
+                <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-emerald-850/5">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-700/10 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                      {selectedStaffDetail.name.split(' ').pop()?.charAt(0) || 'F'}
+                    </div>
+                    <div>
+                      <h3 className="font-black text-sm text-slate-950 dark:text-white flex items-center gap-2">
+                        {selectedStaffDetail.name}
+                        <span className={`text-[8px] px-2 py-0.5 rounded font-extrabold uppercase ${
+                          selectedStaffDetail.status === 'Active' 
+                            ? 'bg-emerald-500/10 text-emerald-600' 
+                            : 'bg-amber-500/10 text-amber-600'
+                        }`}>
+                          {selectedStaffDetail.status}
+                        </span>
+                      </h3>
+                      <p className="text-[10px] text-slate-400 font-bold font-mono tracking-wider">
+                        Staff ID: {selectedStaffDetail.staffNumber} &bull; Gender: {selectedStaffDetail.gender}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedStaffDetail(null)}
+                    className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 text-slate-500 cursor-pointer"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
 
+                {/* Content */}
+                <div className="p-6 overflow-y-auto space-y-6 flex-1">
+                  {/* Grid Contact Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
+                      <span className="text-[9px] uppercase font-black tracking-wider text-slate-400 block">Work Email Address</span>
+                      <a 
+                        href={`mailto:${selectedStaffDetail.email}`}
+                        className="text-xs font-bold text-emerald-600 hover:underline flex items-center space-x-1.5"
+                      >
+                        <Mail size={12} />
+                        <span>{selectedStaffDetail.email}</span>
+                      </a>
+                    </div>
+                    <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
+                      <span className="text-[9px] uppercase font-black tracking-wider text-slate-400 block">Mobile Telephone</span>
+                      <a 
+                        href={`tel:${selectedStaffDetail.phone}`}
+                        className="text-xs font-bold text-emerald-600 hover:underline flex items-center space-x-1.5"
+                      >
+                        <Phone size={12} />
+                        <span>{selectedStaffDetail.phone}</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Curriculums and Taught classes */}
+                  <div className="space-y-3">
+                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-emerald-600 border-b pb-1.5 flex items-center space-x-2">
+                      <BookOpen size={14} />
+                      <span>Form Master Leadership</span>
+                    </h4>
+                    {(() => {
+                      const managed = classes.filter(c => c.teacherId === selectedStaffDetail.id);
+                      if (managed.length === 0) {
+                        return <p className="text-xs text-slate-400 font-medium italic">This faculty member is not currently assigned as Form Head to any specific class group.</p>;
+                      }
                       return (
-                        <div
-                          key={t.id}
-                          className={`rounded-xl border shadow-xs overflow-hidden flex flex-col justify-between transition-all hover:scale-[1.01] hover:shadow-md ${isDarkMode
-                              ? 'bg-slate-900 border-slate-800'
-                              : 'bg-white border-slate-100'
-                            } ${isCurrentUser ? 'ring-2 ring-emerald-500/40' : ''}`}
-                        >
-                          <div className="p-5 space-y-4">
-                            {/* Title Row */}
-                            <div className="flex items-start gap-3">
-                              {/* Avatar or custom photo */}
-                              <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-200/50 dark:border-slate-800 flex items-center justify-center">
-                                {t.profilePhoto ? (
-                                  <img src={t.profilePhoto} alt={t.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                                ) : (
-                                  <div className="w-full h-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 flex items-center justify-center font-extrabold text-sm">
-                                    {t.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="space-y-1 flex-1 min-w-0">
-                                <h3 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5 truncate">
-                                  {t.name}
-                                  {isCurrentUser && (
-                                    <span className="text-[8px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-extrabold uppercase shrink-0">
-                                      You
-                                    </span>
-                                  )}
-                                </h3>
-                                <p className="text-[10px] font-mono text-slate-400 font-bold tracking-wider">{t.staffNumber}</p>
-                              </div>
-
-                              <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase shrink-0 ${t.status === 'Active'
-                                  ? 'bg-emerald-500/10 text-emerald-600'
-                                  : 'bg-amber-500/10 text-amber-600'
-                                }`}>
-                                {t.status}
-                              </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {managed.map(c => (
+                            <div key={c.id} className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-lg text-xs">
+                              <p className="font-black text-slate-800 dark:text-slate-200">Class: {c.name}</p>
+                              <p className="text-[10px] text-slate-400 mt-0.5">Assigned Room: {c.room || 'Main Hall'}</p>
                             </div>
-
-                            {/* Details Block */}
-                            <div className="space-y-2 text-xs">
-                              {/* Subject Spec */}
-                              <div className="flex justify-between items-center">
-                                <span className="text-[10px] uppercase font-black text-slate-400">Primary Discipline</span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">
-                                  {t.subjectId || 'Specialist'}
-                                </span>
-                              </div>
-
-                              {/* Managed Classes */}
-                              <div className="flex justify-between items-center">
-                                <span className="text-[10px] uppercase font-black text-slate-400">Assigned Form</span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">
-                                  {managedClasses.length > 0
-                                    ? managedClasses.map(c => c.name).join(', ')
-                                    : 'None'
-                                  }
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Contact Information (Quick view) */}
-                            <div className="pt-3 border-t border-slate-200/40 dark:border-slate-800 space-y-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                              <div className="flex items-center space-x-2">
-                                <Mail size={13} className="text-slate-400" />
-                                <span className="truncate">{t.email}</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Phone size={13} className="text-slate-400" />
-                                <span>{t.phone}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Footer Actions */}
-                          <div className={`px-5 py-3 border-t border-slate-200/30 dark:border-slate-800/50 flex justify-between items-center ${isDarkMode ? 'bg-slate-950/20' : 'bg-slate-50/50'
-                            }`}>
-                            <span className="text-[9px] text-slate-400 font-bold tracking-wider uppercase font-mono">
-                              {t.gender} Faculty
-                            </span>
-                            <button
-                              onClick={() => setSelectedStaffDetail(t)}
-                              className="px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg text-[10px] transition-colors cursor-pointer"
-                            >
-                              View Schedule & Profile
-                            </button>
-                          </div>
+                          ))}
                         </div>
                       );
-                    })}
+                    })()}
                   </div>
-                );
-              })()}
 
-              {/* Selected Staff Profile and Timetable Schedule Modal */}
-              {selectedStaffDetail && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
-                  <div className={`w-full max-w-2xl rounded-2xl border shadow-xl flex flex-col max-h-[85vh] overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-800'
-                    }`}>
-                    {/* Header */}
-                    <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-emerald-850/5">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 rounded-full bg-emerald-700/10 text-emerald-600 flex items-center justify-center font-bold text-sm">
-                          {selectedStaffDetail.name.split(' ').pop()?.charAt(0) || 'F'}
-                        </div>
-                        <div>
-                          <h3 className="font-black text-sm text-slate-950 dark:text-white flex items-center gap-2">
-                            {selectedStaffDetail.name}
-                            <span className={`text-[8px] px-2 py-0.5 rounded font-extrabold uppercase ${selectedStaffDetail.status === 'Active'
-                                ? 'bg-emerald-500/10 text-emerald-600'
-                                : 'bg-amber-500/10 text-amber-600'
-                              }`}>
-                              {selectedStaffDetail.status}
-                            </span>
-                          </h3>
-                          <p className="text-[10px] text-slate-400 font-bold font-mono tracking-wider">
-                            Staff ID: {selectedStaffDetail.staffNumber} &bull; Gender: {selectedStaffDetail.gender}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setSelectedStaffDetail(null)}
-                        className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 text-slate-500 cursor-pointer"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
+                  {/* Timetable Schedule from reference state */}
+                  <div className="space-y-3">
+                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-emerald-600 border-b pb-1.5 flex items-center space-x-2">
+                      <Calendar size={14} />
+                      <span>Weekly Academic Lecture Schedule</span>
+                    </h4>
+                    {(() => {
+                      const lessons = timetable.filter(t => t.teacherId === selectedStaffDetail.id);
+                      if (lessons.length === 0) {
+                        return <p className="text-xs text-slate-400 font-medium italic">No classroom periods or timetabled lessons found in the database for this educator.</p>;
+                      }
 
-                    {/* Content */}
-                    <div className="p-6 overflow-y-auto space-y-6 flex-1">
-                      {/* Grid Contact Details */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
-                          <span className="text-[9px] uppercase font-black tracking-wider text-slate-400 block">Work Email Address</span>
-                          <a
-                            href={`mailto:${selectedStaffDetail.email}`}
-                            className="text-xs font-bold text-emerald-600 hover:underline flex items-center space-x-1.5"
-                          >
-                            <Mail size={12} />
-                            <span>{selectedStaffDetail.email}</span>
-                          </a>
-                        </div>
-                        <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
-                          <span className="text-[9px] uppercase font-black tracking-wider text-slate-400 block">Mobile Telephone</span>
-                          <a
-                            href={`tel:${selectedStaffDetail.phone}`}
-                            className="text-xs font-bold text-emerald-600 hover:underline flex items-center space-x-1.5"
-                          >
-                            <Phone size={12} />
-                            <span>{selectedStaffDetail.phone}</span>
-                          </a>
-                        </div>
-                      </div>
+                      const daysOfWeek: ('Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday')[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+                      
+                      return (
+                        <div className="space-y-3">
+                          {daysOfWeek.map(day => {
+                            const dayLessons = lessons.filter(l => l.day === day);
+                            if (dayLessons.length === 0) return null;
 
-                      {/* Curriculums and Taught classes */}
-                      <div className="space-y-3">
-                        <h4 className="font-extrabold text-xs uppercase tracking-wider text-emerald-600 border-b pb-1.5 flex items-center space-x-2">
-                          <BookOpen size={14} />
-                          <span>Form Master Leadership</span>
-                        </h4>
-                        {(() => {
-                          const managed = classes.filter(c => c.teacherId === selectedStaffDetail.id);
-                          if (managed.length === 0) {
-                            return <p className="text-xs text-slate-400 font-medium italic">This faculty member is not currently assigned as Form Head to any specific class group.</p>;
-                          }
-                          return (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              {managed.map(c => (
-                                <div key={c.id} className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-lg text-xs">
-                                  <p className="font-black text-slate-800 dark:text-slate-200">Class: {c.name}</p>
-                                  <p className="text-[10px] text-slate-400 mt-0.5">Assigned Room: {c.room || 'Main Hall'}</p>
+                            return (
+                              <div key={day} className="space-y-2">
+                                <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block">{day}</span>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  {dayLessons.map(l => {
+                                    const c = classes.find(cls => cls.id === l.classId);
+                                    const sub = subjects.find(s => s.id === l.subjectId);
+                                    return (
+                                      <div 
+                                        key={l.id} 
+                                        className="p-3 rounded-lg border border-slate-200/50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex justify-between items-center text-xs"
+                                      >
+                                        <div>
+                                          <p className="font-extrabold text-slate-800 dark:text-slate-200">{sub?.name || 'Class Subject'}</p>
+                                          <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Grade: {c?.name || 'Assigned Division'}</p>
+                                        </div>
+                                        <span className="font-mono text-[9px] font-extrabold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500">
+                                          {l.startTime} - {l.endTime}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
-                              ))}
-                            </div>
-                          );
-                        })()}
-                      </div>
-
-                      {/* Timetable Schedule from reference state */}
-                      <div className="space-y-3">
-                        <h4 className="font-extrabold text-xs uppercase tracking-wider text-emerald-600 border-b pb-1.5 flex items-center space-x-2">
-                          <Calendar size={14} />
-                          <span>Weekly Academic Lecture Schedule</span>
-                        </h4>
-                        {(() => {
-                          const lessons = timetable.filter(t => t.teacherId === selectedStaffDetail.id);
-                          if (lessons.length === 0) {
-                            return <p className="text-xs text-slate-400 font-medium italic">No classroom periods or timetabled lessons found in the database for this educator.</p>;
-                          }
-
-                          const daysOfWeek: ('Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday')[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-
-                          return (
-                            <div className="space-y-3">
-                              {daysOfWeek.map(day => {
-                                const dayLessons = lessons.filter(l => l.day === day);
-                                if (dayLessons.length === 0) return null;
-
-                                return (
-                                  <div key={day} className="space-y-2">
-                                    <span className="text-[10px] uppercase font-black text-slate-400 tracking-wider block">{day}</span>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                      {dayLessons.map(l => {
-                                        const c = classes.find(cls => cls.id === l.classId);
-                                        const sub = subjects.find(s => s.id === l.subjectId);
-                                        return (
-                                          <div
-                                            key={l.id}
-                                            className="p-3 rounded-lg border border-slate-200/50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex justify-between items-center text-xs"
-                                          >
-                                            <div>
-                                              <p className="font-extrabold text-slate-800 dark:text-slate-200">{sub?.name || 'Class Subject'}</p>
-                                              <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Grade: {c?.name || 'Assigned Division'}</p>
-                                            </div>
-                                            <span className="font-mono text-[9px] font-extrabold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500">
-                                              {l.startTime} - {l.endTime}
-                                            </span>
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          );
-                        })()}
-                      </div>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-end bg-slate-50/50 dark:bg-slate-950/20">
-                      <button
-                        onClick={() => setSelectedStaffDetail(null)}
-                        className="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 font-bold rounded-lg text-xs cursor-pointer text-slate-700 dark:text-slate-200"
-                      >
-                        Dismiss Profile
-                      </button>
-                    </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
-              )}
-            </>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-end bg-slate-50/50 dark:bg-slate-950/20">
+                  <button
+                    onClick={() => setSelectedStaffDetail(null)}
+                    className="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 font-bold rounded-lg text-xs cursor-pointer text-slate-700 dark:text-slate-200"
+                  >
+                    Dismiss Profile
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          </>
           )}
         </div>
       )}
@@ -2252,13 +2469,13 @@ Edweso Royal Academy Administration Portal Dispatch`;
       {/* ==================== 4. ANNOUNCEMENTS ==================== */}
       {activeTab === 'announcements' && (
         <div className="space-y-4 animate-fade-in">
-
+          
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
               <h2 className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">Broadcast Bulletin</h2>
               <p className="text-xs text-slate-400">Post an official class bulletin to parents and students.</p>
             </div>
-
+            
             {!isNoticeFormOpen && (
               <button
                 onClick={() => setIsNoticeFormOpen(true)}
@@ -2273,8 +2490,8 @@ Edweso Royal Academy Administration Portal Dispatch`;
 
           {/* Featured school-wide bulletins carousel */}
           <div className="mb-6">
-            <FeaturedAnnouncementsCarousel
-              announcements={announcements}
+            <FeaturedAnnouncementsCarousel 
+              announcements={announcements} 
               onDeleteNotice={onUpdateAnnouncements ? (id) => onUpdateAnnouncements(announcements.filter(a => a.id !== id)) : undefined}
               isAdmin={false}
             />
@@ -2282,10 +2499,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
 
           {/* Compose Form */}
           {isNoticeFormOpen && (
-            <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-              }`}>
+            <div className={`p-5 rounded-xl border ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+            }`}>
               <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-3">Compose Class Bulletin</h4>
-
+              
               <form onSubmit={handleNoticePost} className="space-y-3.5 text-xs">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Notice Title</label>
@@ -2336,10 +2554,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
             {announcements
               .filter(a => a.authorName === teacher.name)
               .map((ann) => (
-                <div key={ann.id} className={`p-4 rounded-xl border relative overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                  }`}>
+                <div key={ann.id} className={`p-4 rounded-xl border relative overflow-hidden ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                }`}>
                   <div className="absolute top-0 left-0 w-1 h-full bg-emerald-600"></div>
-
+                  
                   <div className="flex justify-between items-start pl-2">
                     <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">{ann.title}</h3>
                     <span className="text-[10px] text-slate-400 font-medium shrink-0 ml-4">{ann.date}</span>
@@ -2364,7 +2583,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
             session={session}
             subjects={subjects}
             syllabusPlans={syllabusPlans}
-            onUpdateSyllabusPlans={onUpdateSyllabusPlans || (() => { })}
+            onUpdateSyllabusPlans={onUpdateSyllabusPlans || (() => {})}
             isDarkMode={isDarkMode}
           />
         </div>

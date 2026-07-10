@@ -966,8 +966,8 @@ export default function AdminDashboard({
 
           {/* Quick Metrics Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className={`p-4 rounded-xl border flex items-center space-x-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
-              <div className="p-3 bg-emerald-500/10 text-emerald-600 rounded-lg shrink-0">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-3.5 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-emerald-500/30' : 'bg-white border-slate-200/50 hover:border-emerald-500/20'}`}>
+              <div className="p-3 bg-emerald-500/10 text-emerald-600 rounded-xl shrink-0">
                 <Users size={20} />
               </div>
               <div>
@@ -976,8 +976,8 @@ export default function AdminDashboard({
               </div>
             </div>
 
-            <div className={`p-4 rounded-xl border flex items-center space-x-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
-              <div className="p-3 bg-amber-500/10 text-amber-600 rounded-lg shrink-0">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-3.5 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-amber-500/30' : 'bg-white border-slate-200/50 hover:border-amber-500/20'}`}>
+              <div className="p-3 bg-amber-500/10 text-amber-600 rounded-xl shrink-0">
                 <UserCheck size={20} />
               </div>
               <div>
@@ -986,8 +986,8 @@ export default function AdminDashboard({
               </div>
             </div>
 
-            <div className={`p-4 rounded-xl border flex items-center space-x-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
-              <div className="p-3 bg-teal-500/10 text-teal-600 rounded-lg shrink-0">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-3.5 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-indigo-500/30' : 'bg-white border-slate-200/50 hover:border-indigo-500/20'}`}>
+              <div className="p-3 bg-indigo-500/10 text-indigo-600 rounded-xl shrink-0">
                 <BookOpen size={20} />
               </div>
               <div>
@@ -996,8 +996,8 @@ export default function AdminDashboard({
               </div>
             </div>
 
-            <div className={`p-4 rounded-xl border flex items-center space-x-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
-              <div className="p-3 bg-rose-500/10 text-rose-600 rounded-lg shrink-0">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-3.5 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-rose-500/30' : 'bg-white border-slate-200/50 hover:border-rose-500/20'}`}>
+              <div className="p-3 bg-rose-500/10 text-rose-600 rounded-xl shrink-0">
                 <CreditCard size={20} />
               </div>
               <div>
@@ -1358,8 +1358,8 @@ export default function AdminDashboard({
           })()}
 
           {/* Quick announcements overview */}
-          <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
-            <h4 className="font-extrabold text-xs uppercase tracking-wider pb-3 border-b border-slate-100 dark:border-slate-800 mb-3">Live Bulletins Feed</h4>
+          <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
+            <h4 className="font-extrabold text-xs uppercase tracking-wider pb-3 border-b border-slate-300 dark:border-slate-700 mb-3">Live Bulletins Feed</h4>
             <FeaturedAnnouncementsCarousel 
               announcements={announcements} 
               onDeleteNotice={handleDeleteNotice}
@@ -1602,7 +1602,7 @@ export default function AdminDashboard({
           {/* ==================== ATTENDANCE LOG VIEW ==================== */}
           {teachersActiveSubTab === 'attendance' && (
             <div className="space-y-4 animate-fade-in">
-              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
                 <h3 className="text-sm font-bold mb-3">Live Geofenced Attendance Feed</h3>
                 {staffClockIns.length === 0 ? (
                   <div className="text-center py-12 text-slate-400 text-xs font-semibold">
@@ -1664,7 +1664,7 @@ export default function AdminDashboard({
           {/* ==================== LEAVE REQUESTS REVIEW VIEW ==================== */}
           {teachersActiveSubTab === 'leaves' && (
             <div className="space-y-4 animate-fade-in">
-              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
                 <h3 className="text-sm font-bold mb-3">Academic Faculty Leave Register</h3>
                 {staffLeaveRequests.length === 0 ? (
                   <div className="text-center py-12 text-slate-400 text-xs font-semibold">
@@ -1763,7 +1763,7 @@ export default function AdminDashboard({
                 </div>
               )}
 
-              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <h3 className="text-sm font-bold">Monthly Staff Payroll Ledger (GHS)</h3>
@@ -2067,7 +2067,7 @@ export default function AdminDashboard({
               
               return (
                 <div key={cls.id} className={`p-5 rounded-xl border flex flex-col justify-between ${
-                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                  isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
                 }`}>
                   <div>
                     <div className="flex justify-between items-start pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -2373,7 +2373,7 @@ export default function AdminDashboard({
           <div className="space-y-4">
             {announcements.map((ann) => (
               <div key={ann.id} className={`p-5 rounded-xl border relative overflow-hidden ${
-                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
               }`}>
                 {/* Accent colored marker for visual appeal */}
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-600"></div>
@@ -3170,21 +3170,21 @@ export default function AdminDashboard({
               
               {/* Alert Metrics Ribbon */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-xs'}`}>
                   <span className="text-[9px] text-slate-400 uppercase font-bold block">Total Anomalies</span>
                   <span className="text-lg font-black block mt-1 text-slate-800 dark:text-white">{allDiagnosticAlerts.length}</span>
                 </div>
-                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-xs'}`}>
                   <span className="text-[9px] text-rose-500 uppercase font-black block">Active Risks</span>
                   <span className="text-lg font-black block mt-1 text-rose-600">{activeUnresolvedAlerts.length}</span>
                 </div>
-                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-xs'}`}>
                   <span className="text-[9px] text-amber-500 uppercase font-black block">High Severity</span>
                   <span className="text-lg font-black block mt-1 text-amber-500">
                     {activeUnresolvedAlerts.filter(a => a.severity === 'High').length}
                   </span>
                 </div>
-                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-xs'}`}>
                   <span className="text-[9px] text-emerald-500 uppercase font-black block">Resolved</span>
                   <span className="text-lg font-black block mt-1 text-emerald-600">{resolvedAlerts.length}</span>
                 </div>
@@ -3192,7 +3192,7 @@ export default function AdminDashboard({
 
               {/* Core Active Diagnostic Alerts Section */}
               <div className={`p-5 rounded-2xl border ${
-                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-sm'
+                isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-sm'
               }`}>
                 
                 {/* Header and Category Filters */}

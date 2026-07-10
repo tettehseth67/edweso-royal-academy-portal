@@ -114,14 +114,42 @@ export const initialGrades: ExamGrade[] = [
   { id: 'g1', studentId: 'st1', subjectId: 's1', term: 'Term 1', classScore: 24, examScore: 58, totalScore: 82, grade: 'A', remarks: 'Outstanding math conceptual understanding.', date: '2026-04-10' },
   { id: 'g2', studentId: 'st1', subjectId: 's2', term: 'Term 1', classScore: 21, examScore: 52, totalScore: 73, grade: 'B', remarks: 'Solid work in science experiments.', date: '2026-04-12' },
   { id: 'g3', studentId: 'st1', subjectId: 's3', term: 'Term 1', classScore: 25, examScore: 61, totalScore: 86, grade: 'A', remarks: 'Exceptional creative writing.', date: '2026-04-14' },
+  { id: 'g1_t2_s1', studentId: 'st1', subjectId: 's1', term: 'Term 2', classScore: 26, examScore: 60, totalScore: 86, grade: 'A', remarks: 'Improved standard math proofs.', date: '2026-08-10' },
+  { id: 'g1_t2_s2', studentId: 'st1', subjectId: 's2', term: 'Term 2', classScore: 22, examScore: 56, totalScore: 78, grade: 'B', remarks: 'Active in science labs.', date: '2026-08-12' },
+  { id: 'g1_t3_s1', studentId: 'st1', subjectId: 's1', term: 'Term 3', classScore: 28, examScore: 62, totalScore: 90, grade: 'A', remarks: 'Exceptional year-end performance.', date: '2026-11-10' },
+  { id: 'g1_t3_s2', studentId: 'st1', subjectId: 's2', term: 'Term 3', classScore: 25, examScore: 58, totalScore: 83, grade: 'A', remarks: 'Superb focus and retention.', date: '2026-11-12' },
   
   // Ama Serwaa Grades
   { id: 'g4', studentId: 'st2', subjectId: 's1', term: 'Term 1', classScore: 28, examScore: 65, totalScore: 93, grade: 'A', remarks: 'Flawless score in all algebra tests.', date: '2026-04-10' },
   { id: 'g5', studentId: 'st2', subjectId: 's2', term: 'Term 1', classScore: 27, examScore: 64, totalScore: 91, grade: 'A', remarks: 'Remarkable research on electricity circuits.', date: '2026-04-12' },
+  { id: 'g2_t2_s1', studentId: 'st2', subjectId: 's1', term: 'Term 2', classScore: 29, examScore: 67, totalScore: 96, grade: 'A', remarks: 'Top-tier analytical reasoning.', date: '2026-08-10' },
+  { id: 'g2_t2_s2', studentId: 'st2', subjectId: 's2', term: 'Term 2', classScore: 26, examScore: 63, totalScore: 89, grade: 'A', remarks: 'Splendid scientific report format.', date: '2026-08-12' },
+  { id: 'g2_t3_s1', studentId: 'st2', subjectId: 's1', term: 'Term 3', classScore: 30, examScore: 68, totalScore: 98, grade: 'A', remarks: 'Near perfect scores all year.', date: '2026-11-10' },
+  { id: 'g2_t3_s2', studentId: 'st2', subjectId: 's2', term: 'Term 3', classScore: 28, examScore: 66, totalScore: 94, grade: 'A', remarks: 'Excellent project work.', date: '2026-11-12' },
   
   // Kwame Boateng Jr Grades
   { id: 'g6', studentId: 'st3', subjectId: 's1', term: 'Term 1', classScore: 18, examScore: 42, totalScore: 60, grade: 'C', remarks: 'Good attempt, can solve complex equations with practice.', date: '2026-04-10' },
-  { id: 'g7', studentId: 'st3', subjectId: 's2', term: 'Term 1', classScore: 15, examScore: 38, totalScore: 53, grade: 'D', remarks: 'Needs more focus during biology labs.', date: '2026-04-12' }
+  { id: 'g7', studentId: 'st3', subjectId: 's2', term: 'Term 1', classScore: 15, examScore: 38, totalScore: 53, grade: 'D', remarks: 'Needs more focus during biology labs.', date: '2026-04-12' },
+  { id: 'g3_t2_s1', studentId: 'st3', subjectId: 's1', term: 'Term 2', classScore: 20, examScore: 45, totalScore: 65, grade: 'C', remarks: 'Showing positive attitude to equations.', date: '2026-08-10' },
+  { id: 'g3_t2_s2', studentId: 'st3', subjectId: 's2', term: 'Term 2', classScore: 18, examScore: 40, totalScore: 58, grade: 'D', remarks: 'Practical works are getting better.', date: '2026-08-12' },
+  { id: 'g3_t3_s1', studentId: 'st3', subjectId: 's1', term: 'Term 3', classScore: 22, examScore: 50, totalScore: 72, grade: 'B', remarks: 'A wonderful leap to B grade!', date: '2026-11-10' },
+  { id: 'g3_t3_s2', studentId: 'st3', subjectId: 's2', term: 'Term 3', classScore: 21, examScore: 49, totalScore: 70, grade: 'B', remarks: 'Significant improvement in lab work.', date: '2026-11-12' },
+
+  // Esi Pokuaa Owusu Grades
+  { id: 'g4_t1_s1', studentId: 'st4', subjectId: 's1', term: 'Term 1', classScore: 22, examScore: 50, totalScore: 72, grade: 'B', remarks: 'Consistent study routine yields results.', date: '2026-04-10' },
+  { id: 'g4_t1_s2', studentId: 'st4', subjectId: 's2', term: 'Term 1', classScore: 20, examScore: 48, totalScore: 68, grade: 'C', remarks: 'Solid passing scores.', date: '2026-04-12' },
+  { id: 'g4_t2_s1', studentId: 'st4', subjectId: 's1', term: 'Term 2', classScore: 23, examScore: 54, totalScore: 77, grade: 'B', remarks: 'Impressive effort.', date: '2026-08-10' },
+  { id: 'g4_t2_s2', studentId: 'st4', subjectId: 's2', term: 'Term 2', classScore: 22, examScore: 51, totalScore: 73, grade: 'B', remarks: 'Moving up nicely.', date: '2026-08-12' },
+  { id: 'g4_t3_s1', studentId: 'st4', subjectId: 's1', term: 'Term 3', classScore: 25, examScore: 58, totalScore: 83, grade: 'A', remarks: 'Outstanding term-end grades!', date: '2026-11-10' },
+  { id: 'g4_t3_s2', studentId: 'st4', subjectId: 's2', term: 'Term 3', classScore: 24, examScore: 56, totalScore: 80, grade: 'A', remarks: 'Superb upward growth.', date: '2026-11-12' },
+
+  // Emmanuel Tetteh Grades
+  { id: 'g5_t1_s1', studentId: 'st5', subjectId: 's1', term: 'Term 1', classScore: 25, examScore: 58, totalScore: 83, grade: 'A', remarks: 'Outstanding math solutions.', date: '2026-04-10' },
+  { id: 'g5_t1_s2', studentId: 'st5', subjectId: 's2', term: 'Term 1', classScore: 23, examScore: 55, totalScore: 78, grade: 'B', remarks: 'Strong logical analysis.', date: '2026-04-12' },
+  { id: 'g5_t2_s1', studentId: 'st5', subjectId: 's1', term: 'Term 2', classScore: 26, examScore: 61, totalScore: 87, grade: 'A', remarks: 'Brilliant algebraic calculations.', date: '2026-08-10' },
+  { id: 'g5_t2_s2', studentId: 'st5', subjectId: 's2', term: 'Term 2', classScore: 24, examScore: 58, totalScore: 82, grade: 'A', remarks: 'Remarkable research on mechanics.', date: '2026-08-12' },
+  { id: 'g5_t3_s1', studentId: 'st5', subjectId: 's1', term: 'Term 3', classScore: 28, examScore: 63, totalScore: 91, grade: 'A', remarks: 'Magnificent performance, top tier.', date: '2026-11-10' },
+  { id: 'g5_t3_s2', studentId: 'st5', subjectId: 's2', term: 'Term 3', classScore: 26, examScore: 60, totalScore: 86, grade: 'A', remarks: 'Fabulous efforts in science fair.', date: '2026-11-12' }
 ];
 
 // Initial Timetable

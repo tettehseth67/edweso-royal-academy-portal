@@ -383,7 +383,7 @@ export default function StudentDashboard({
             </div>
 
             {/* Quick Balance Status card */}
-            <div className="w-full md:w-64 p-5 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800 text-center space-y-3 shrink-0">
+            <div className={`w-full md:w-64 p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] text-center space-y-3 shrink-0 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700/60' : 'bg-slate-50/60 border-slate-200/50 hover:border-slate-300/60'}`}>
               <span className="text-[10px] text-slate-400 uppercase font-extrabold tracking-wider block">Fees Outstanding</span>
               <span className={`text-2xl font-extrabold font-mono block ${student.balanceGHS > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 GHS {student.balanceGHS.toFixed(2)}
@@ -396,15 +396,15 @@ export default function StudentDashboard({
 
           {/* Quick links summary box */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-indigo-500/30' : 'bg-white border-slate-200/50 hover:border-indigo-500/20'}`}>
               <span className="text-[10px] text-slate-400 font-bold uppercase block">Enrolled Subjects</span>
               <span className="text-lg font-extrabold block mt-1">{studentSubjects.length} Courses</span>
             </div>
-            <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-emerald-500/30' : 'bg-white border-slate-200/50 hover:border-emerald-500/20'}`}>
               <span className="text-[10px] text-slate-400 font-bold uppercase block">Attendance Rate</span>
               <span className="text-lg font-extrabold block mt-1">{attendanceRate}% Presence</span>
             </div>
-            <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-amber-500/30' : 'bg-white border-slate-200/50 hover:border-amber-500/20'}`}>
               <span className="text-[10px] text-slate-400 font-bold uppercase block">Term Grades Recorded</span>
               <span className="text-lg font-extrabold block mt-1">{studentGrades.length} Records</span>
             </div>
@@ -433,7 +433,7 @@ export default function StudentDashboard({
               const subTeacher = teachers.find(t => t.subjectId === sub.name);
               return (
                 <div key={sub.id} className={`p-4 rounded-xl border flex justify-between items-center ${
-                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                  isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
                 }`}>
                   <div>
                     <span className="text-[10px] font-bold font-mono text-slate-400 block">{sub.code}</span>
@@ -479,10 +479,10 @@ export default function StudentDashboard({
             </button>
           </div>
 
-          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
+          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
             <table id="student-grades-table" className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-700' : 'bg-slate-50 border-slate-300'}`}>
                   <th className="p-3">Subject Name</th>
                   <th className="p-3">Asses score (30%)</th>
                   <th className="p-3">Exam score (70%)</th>
@@ -527,9 +527,9 @@ export default function StudentDashboard({
 
           {/* AI Report Card counseling component */}
           <div className={`mt-6 p-6 rounded-2xl border transition-all ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-sm'
+            isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-sm'
           }`}>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-300 dark:border-slate-700 pb-4 mb-4">
               <div>
                 <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
                   <Sparkles size={16} className="animate-pulse" />
@@ -612,29 +612,29 @@ export default function StudentDashboard({
             <p className="text-xs text-slate-400">Daily presence audit for {student.name}.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className={`p-4 rounded-xl border text-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
-              <span className="text-[10px] text-slate-400 uppercase font-bold block">Total Days Tracked</span>
-              <span className="text-xl font-extrabold mt-1 block">{totalDays} Days</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] text-center ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700/60' : 'bg-white border-slate-200/50 hover:border-slate-300/60'}`}>
+              <span className="text-[10px] text-slate-400 uppercase font-extrabold tracking-wider block">Total Days Tracked</span>
+              <span className="text-xl font-black mt-1 block text-slate-800 dark:text-slate-100">{totalDays} Days</span>
             </div>
-            <div className="p-4 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-center border border-emerald-500/20">
-              <span className="text-[10px] font-bold uppercase block">Present Marks</span>
-              <span className="text-xl font-extrabold mt-1 block">{studentAttendance.filter(a => a.status === 'Present').length}</span>
+            <div className={`p-5 rounded-2xl text-center border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/60 hover:border-emerald-700/80 text-emerald-300' : 'bg-emerald-500/10 border-emerald-500/20 hover:border-emerald-550/30 text-emerald-700'}`}>
+              <span className="text-[10px] font-black uppercase tracking-wider block">Present Marks</span>
+              <span className="text-xl font-black mt-1 block">{studentAttendance.filter(a => a.status === 'Present').length}</span>
             </div>
-            <div className="p-4 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 text-center border border-amber-500/20">
-              <span className="text-[10px] font-bold uppercase block">Late Arrivals</span>
-              <span className="text-xl font-extrabold mt-1 block">{studentAttendance.filter(a => a.status === 'Late').length}</span>
+            <div className={`p-5 rounded-2xl text-center border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-amber-950/20 border-amber-900/60 hover:border-amber-700/80 text-amber-300' : 'bg-amber-500/10 border-amber-500/20 hover:border-amber-550/30 text-amber-700'}`}>
+              <span className="text-[10px] font-black uppercase tracking-wider block">Late Arrivals</span>
+              <span className="text-xl font-black mt-1 block">{studentAttendance.filter(a => a.status === 'Late').length}</span>
             </div>
-            <div className="p-4 rounded-xl bg-rose-500/10 text-rose-700 dark:text-rose-300 text-center border border-rose-500/20">
-              <span className="text-[10px] font-bold uppercase block">Absences Registered</span>
-              <span className="text-xl font-extrabold mt-1 block">{studentAttendance.filter(a => a.status === 'Absent').length}</span>
+            <div className={`p-5 rounded-2xl text-center border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-rose-950/20 border-rose-900/60 hover:border-rose-700/80 text-rose-300' : 'bg-rose-500/10 border-rose-500/20 hover:border-rose-550/30 text-rose-700'}`}>
+              <span className="text-[10px] font-black uppercase tracking-wider block">Absences Registered</span>
+              <span className="text-xl font-black mt-1 block">{studentAttendance.filter(a => a.status === 'Absent').length}</span>
             </div>
           </div>
 
-          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
+          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
             <table id="student-attendance-table" className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-700' : 'bg-slate-50 border-slate-300'}`}>
                   <th className="p-3">Attendance Date</th>
                   <th className="p-3">Status</th>
                   <th className="p-3">Syllabus Remarks / Excuses</th>
@@ -677,7 +677,7 @@ export default function StudentDashboard({
               const dayLessons = studentTimetable.filter(tt => tt.day === day);
               return (
                 <div key={day} className={`p-4 rounded-xl border flex flex-col justify-start min-h-[160px] ${
-                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                  isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
                 }`}>
                   <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-3 text-emerald-800 dark:text-emerald-300">{day}</h4>
                   
@@ -718,7 +718,7 @@ export default function StudentDashboard({
               .filter(a => a.targetAudience === 'All' || a.targetAudience === 'Students')
               .map((ann) => (
                 <div key={ann.id} className={`p-5 rounded-xl border relative overflow-hidden ${
-                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                  isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
                 }`}>
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-600"></div>
                   
@@ -750,20 +750,20 @@ export default function StudentDashboard({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* Payment Widget Form */}
-            <div className={`p-5 rounded-xl border flex flex-col justify-between ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+            <div className={`p-6 rounded-2xl border flex flex-col justify-between shadow-sm transition-all duration-300 hover:shadow-md hover:border-slate-300/60 dark:hover:border-slate-700/60 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/50'
             }`}>
               <div className="space-y-3">
-                <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2">Tuition Pay Gateway</h4>
+                <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-3">Tuition Pay Gateway</h4>
                 
-                <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-lg border border-slate-100 dark:border-slate-800 text-center space-y-1">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold">Outstanding Balance</span>
-                  <span className="text-2xl font-extrabold text-rose-600 font-mono">GHS {student.balanceGHS.toFixed(2)}</span>
+                <div className="bg-slate-50/60 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-150 dark:border-slate-800 text-center space-y-1">
+                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Outstanding Balance</span>
+                  <span className="text-2xl font-black text-rose-600 dark:text-rose-400 font-mono block">GHS {student.balanceGHS.toFixed(2)}</span>
                 </div>
-
+ 
                 <form onSubmit={handlePayClick} className="space-y-3 pt-2">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Payment Amount (GHS)</label>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Payment Amount (GHS)</label>
                     <input
                       type="number"
                       required
@@ -772,7 +772,7 @@ export default function StudentDashboard({
                       max={student.balanceGHS || 5000}
                       value={payAmount || ''}
                       onChange={(e) => setPayAmount(Number(e.target.value))}
-                      className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded font-mono font-bold text-sm focus:outline-hidden"
+                      className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded-xl font-mono font-bold text-sm focus:outline-hidden"
                     />
                   </div>
                   
@@ -780,25 +780,25 @@ export default function StudentDashboard({
                     type="submit"
                     id="trigger-paystack-btn"
                     disabled={student.balanceGHS <= 0}
-                    className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold rounded text-xs transition-colors shadow-sm flex items-center justify-center space-x-1.5"
+                    className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-extrabold rounded-xl text-xs transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-1.5 cursor-pointer hover:scale-[1.01]"
                   >
                     <CreditCard size={14} />
                     <span>Pay with paystack</span>
                   </button>
                 </form>
               </div>
-
-              <div className="mt-6 flex items-start space-x-2 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/50 rounded-lg text-[10px] text-emerald-800 dark:text-emerald-300 font-semibold leading-relaxed">
-                <ShieldCheck size={16} className="shrink-0 mt-0.5" />
+ 
+              <div className="mt-6 flex items-start space-x-2 p-3.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100/50 dark:border-emerald-800/40 rounded-xl text-[10px] text-emerald-800 dark:text-emerald-300 font-semibold leading-relaxed">
+                <ShieldCheck size={16} className="shrink-0 mt-0.5 text-emerald-600" />
                 <span>Supports Visa/Mastercard credit cards and MTN MoMo, Telecel Cash, and AirtelTigo Money mobile wallets.</span>
               </div>
             </div>
-
+ 
             {/* Paystack Transaction history list with Print Receipt option */}
-            <div className={`lg:col-span-2 p-5 rounded-xl border ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+            <div className={`lg:col-span-2 p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:border-slate-300/60 dark:hover:border-slate-700/60 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/50'
             }`}>
-              <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-3">Your Fees Receipts</h4>
+              <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-3">Your Fees Receipts</h4>
               
               <div className="overflow-x-auto">
                 <table id="student-receipts-table" className="w-full text-left text-xs border-collapse">
@@ -876,35 +876,39 @@ export default function StudentDashboard({
             const completionRate = Math.round((totalPaid / (totalInvoiced || 1)) * 100);
 
             return (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className={`p-4 rounded-xl border flex flex-col justify-between ${
-                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex flex-col justify-between ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700/60' : 'bg-white border-slate-200/50 hover:border-slate-300/60'
                 }`}>
-                  <span className="text-[10px] text-slate-400 uppercase font-extrabold tracking-wider">Total School Fees Bill</span>
-                  <div className="mt-2">
-                    <span className="text-xl font-extrabold font-mono text-slate-800 dark:text-white">GHS {totalInvoiced.toFixed(2)}</span>
-                    <p className="text-[10px] text-slate-400 mt-1 font-semibold">Tuition, STEM Labs, and development assets combined.</p>
+                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Total School Fees Bill</span>
+                  <div className="mt-2 text-left">
+                    <span className="text-xl font-black font-mono text-slate-800 dark:text-slate-100">GHS {totalInvoiced.toFixed(2)}</span>
+                    <p className="text-[10px] text-slate-400 mt-1 font-semibold leading-normal">Tuition, STEM Labs, and development assets combined.</p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider">Fees Cleared & Received</span>
-                  <div className="mt-2">
+                <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex flex-col justify-between ${
+                  isDarkMode ? 'bg-emerald-950/20 border-emerald-900/60 hover:border-emerald-700/80 text-emerald-300' : 'bg-emerald-500/10 border-emerald-500/20 hover:border-emerald-550/30 text-emerald-750'
+                }`}>
+                  <span className="text-[10px] font-black uppercase tracking-wider">Fees Cleared & Received</span>
+                  <div className="mt-2 text-left">
                     <div className="flex items-baseline space-x-1.5">
-                      <span className="text-xl font-extrabold font-mono">GHS {totalPaid.toFixed(2)}</span>
-                      <span className="text-xs font-bold font-mono">({completionRate}%)</span>
+                      <span className="text-xl font-black font-mono">GHS {totalPaid.toFixed(2)}</span>
+                      <span className="text-xs font-bold font-mono">({completionRate}% completed)</span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div className="w-full bg-slate-200/60 dark:bg-slate-800/60 h-1.5 rounded-full mt-2 overflow-hidden">
                       <div className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style={{ width: `${completionRate}%` }}></div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 flex flex-col justify-between">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider">Outstanding Balance</span>
-                  <div className="mt-2">
-                    <span className="text-xl font-extrabold font-mono text-rose-600 dark:text-rose-400">GHS {student.balanceGHS.toFixed(2)}</span>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-semibold">
+                <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex flex-col justify-between ${
+                  isDarkMode ? 'bg-rose-950/20 border-rose-900/60 hover:border-rose-700/80 text-rose-300' : 'bg-rose-500/10 border-rose-500/20 hover:border-rose-550/30 text-rose-750'
+                }`}>
+                  <span className="text-[10px] font-black uppercase tracking-wider">Outstanding Balance</span>
+                  <div className="mt-2 text-left">
+                    <span className="text-xl font-black font-mono text-rose-600 dark:text-rose-400">GHS {student.balanceGHS.toFixed(2)}</span>
+                    <p className="text-[10px] mt-1 font-semibold leading-normal text-rose-600/80 dark:text-rose-300/80">
                       {student.balanceGHS > 0 ? 'Billing outstanding. Click to settle balance.' : 'Perfect! Your financial accounts are in good standing.'}
                     </p>
                   </div>
@@ -918,7 +922,7 @@ export default function StudentDashboard({
             
             {/* Left side: Timeline Visualizer (3 cols) */}
             <div className={`lg:col-span-3 p-5 rounded-xl border space-y-4 ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
             }`}>
               <h3 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 flex items-center space-x-1.5 text-slate-800 dark:text-slate-100">
                 <Clock size={14} className="text-emerald-700" />
@@ -1007,7 +1011,7 @@ export default function StudentDashboard({
 
             {/* Right side: Detailed Invoice Records list (2 cols) */}
             <div className={`lg:col-span-2 p-5 rounded-xl border space-y-4 ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
             }`}>
               <h3 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 flex items-center space-x-1.5 text-slate-800 dark:text-slate-100">
                 <Receipt size={14} className="text-emerald-700" />
@@ -1022,7 +1026,7 @@ export default function StudentDashboard({
                     <div 
                       key={tx.id}
                       className={`p-3 rounded-lg border flex flex-col justify-between space-y-2 ${
-                        isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-100'
+                        isDarkMode ? 'bg-slate-950 border-slate-700' : 'bg-slate-50 border-slate-300'
                       }`}
                     >
                       <div className="flex justify-between items-start">
@@ -1074,7 +1078,7 @@ export default function StudentDashboard({
             
             {/* Left Box: Inbox Information */}
             <div className={`p-5 rounded-xl border space-y-4 ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
             }`}>
               <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 text-slate-800 dark:text-slate-100">Inbox configuration</h4>
               <div className="space-y-3.5 text-xs text-slate-600 dark:text-slate-300">
@@ -1094,7 +1098,7 @@ export default function StudentDashboard({
 
             {/* Right Box: Inbox Message Stream */}
             <div className={`lg:col-span-2 p-5 rounded-xl border ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
             }`}>
               <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-4 text-slate-800 dark:text-slate-100">Dispatched Messages</h4>
 

@@ -175,47 +175,46 @@ export default function ParentDashboard({
       {/* OVERVIEW HUB */}
       {activeParentTab === 'overview' && (
         <div className="space-y-6 animate-fade-in">
-          
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                   {/* Quick Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             
-            <div className="p-4 bg-slate-50 border border-slate-200/50 rounded-2xl flex items-center space-x-4">
-              <div className="p-3 bg-indigo-50 rounded-xl text-indigo-700">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-rose-500/40' : 'bg-white border-slate-300 hover:border-rose-500/30'}`}>
+              <div className="p-3.5 bg-rose-500/10 text-rose-500 rounded-xl shrink-0">
                 <Landmark size={20} />
               </div>
-              <div>
-                <div className="text-[10px] font-black uppercase text-slate-400">Current Balance</div>
-                <div className="text-base font-black text-rose-600">GHS {activeStudent.balanceGHS.toFixed(2)}</div>
+              <div className="text-left">
+                <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Current Balance</div>
+                <div className="text-lg font-black text-rose-600 dark:text-rose-400 mt-0.5">GHS {activeStudent.balanceGHS.toFixed(2)}</div>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200/50 rounded-2xl flex items-center space-x-4">
-              <div className="p-3 bg-emerald-50 rounded-xl text-emerald-700">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-emerald-500/40' : 'bg-white border-slate-300 hover:border-emerald-500/30'}`}>
+              <div className="p-3.5 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 rounded-xl shrink-0">
                 <CheckSquare size={20} />
               </div>
-              <div>
-                <div className="text-[10px] font-black uppercase text-slate-400">Attendance Rate</div>
-                <div className="text-base font-black text-emerald-700">{attendancePercentage}%</div>
+              <div className="text-left">
+                <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Attendance Rate</div>
+                <div className="text-lg font-black text-emerald-700 dark:text-emerald-400 mt-0.5">{attendancePercentage}%</div>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200/50 rounded-2xl flex items-center space-x-4">
-              <div className="p-3 bg-amber-50 rounded-xl text-amber-700">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-amber-500/40' : 'bg-white border-slate-300 hover:border-amber-500/30'}`}>
+              <div className="p-3.5 bg-amber-500/10 text-amber-500 dark:text-amber-400 rounded-xl shrink-0">
                 <Award size={20} />
               </div>
-              <div>
-                <div className="text-[10px] font-black uppercase text-slate-400">Subjects Registered</div>
-                <div className="text-base font-black text-slate-800">{childGrades.length || 6} courses</div>
+              <div className="text-left">
+                <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Subjects Registered</div>
+                <div className="text-lg font-black text-slate-800 dark:text-slate-100 mt-0.5">{childGrades.length || 6} courses</div>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200/50 rounded-2xl flex items-center space-x-4">
-              <div className="p-3 bg-indigo-50 rounded-xl text-indigo-700">
+            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-indigo-500/40' : 'bg-white border-slate-300 hover:border-indigo-500/30'}`}>
+              <div className="p-3.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-xl shrink-0">
                 <User size={20} />
               </div>
-              <div>
-                <div className="text-[10px] font-black uppercase text-slate-400">Index ID</div>
-                <div className="text-base font-mono font-black text-slate-800">{activeStudent.admissionNumber}</div>
+              <div className="text-left">
+                <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Index ID</div>
+                <div className="text-lg font-mono font-black text-slate-800 dark:text-slate-100 mt-0.5">{activeStudent.admissionNumber}</div>
               </div>
             </div>
 
@@ -225,31 +224,31 @@ export default function ParentDashboard({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Pupil Card */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 space-y-4 shadow-xs">
+            <div className={`border rounded-2xl p-6 space-y-4 shadow-sm transition-all duration-300 hover:shadow-md ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`}>
               <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Student Profile Card</h3>
               
               <div className="flex items-center space-x-4">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-700 flex items-center justify-center font-black text-xl border border-indigo-200/50 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 flex items-center justify-center font-black text-xl border border-indigo-200/50 shadow-sm shrink-0">
                   {activeStudent.name.charAt(0)}
                 </div>
                 <div>
-                  <h4 className="font-display font-extrabold text-slate-800 text-sm leading-tight">{activeStudent.name}</h4>
-                  <p className="text-xs text-slate-500 font-bold mt-1">{childClass ? childClass.name : 'Junior High 2'}</p>
+                  <h4 className="font-display font-extrabold text-slate-800 dark:text-slate-100 text-sm leading-tight">{activeStudent.name}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1">{childClass ? childClass.name : 'Junior High 2'}</p>
                 </div>
               </div>
 
-              <div className="border-t pt-3.5 space-y-2.5 text-xs text-slate-600 font-semibold">
+              <div className="border-t pt-3.5 space-y-2.5 text-xs text-slate-600 dark:text-slate-300 font-semibold">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Date of Birth:</span>
-                  <span className="font-extrabold text-slate-800">{activeStudent.dob}</span>
+                  <span className="font-extrabold text-slate-800 dark:text-slate-100">{activeStudent.dob}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Gender Identity:</span>
-                  <span className="font-extrabold text-slate-800">{activeStudent.gender}</span>
+                  <span className="font-extrabold text-slate-800 dark:text-slate-100">{activeStudent.gender}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Enrollment Status:</span>
-                  <span className="px-2 py-0.5 text-[9px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full uppercase">
+                  <span className="px-2.5 py-0.5 text-[9px] font-black bg-emerald-55 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 rounded-full uppercase">
                     {activeStudent.status}
                   </span>
                 </div>
@@ -257,48 +256,48 @@ export default function ParentDashboard({
             </div>
 
             {/* Attendance Snapshot */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 space-y-4 shadow-xs flex flex-col justify-between">
+            <div className={`border rounded-2xl p-6 space-y-4 shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`}>
               <div className="space-y-3.5">
                 <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Attendance Breakdown</h3>
                 
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <span className="text-2xl font-extrabold text-slate-800">{presentDays}</span>
-                    <span className="text-[10px] block uppercase font-bold text-slate-400">Days Present</span>
+                    <span className="text-2xl font-extrabold text-slate-800 dark:text-slate-100">{presentDays}</span>
+                    <span className="text-[10px] block uppercase font-bold text-slate-400">Present</span>
                   </div>
                   <div className="space-y-1">
                     <span className="text-2xl font-extrabold text-rose-500">{absentDays}</span>
-                    <span className="text-[10px] block uppercase font-bold text-slate-400">Days Absent</span>
+                    <span className="text-[10px] block uppercase font-bold text-slate-400">Absent</span>
                   </div>
                   <div className="space-y-1">
                     <span className="text-2xl font-extrabold text-amber-600">{lateDays}</span>
-                    <span className="text-[10px] block uppercase font-bold text-slate-400">Days Late</span>
+                    <span className="text-[10px] block uppercase font-bold text-slate-400">Late</span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-slate-50 border p-3.5 rounded-xl text-xs font-bold text-slate-500">
-                <p className="text-slate-600 italic">"Pupil's overall physical class presence index falls within the high-attendance tier ({attendancePercentage}%). Continuous discipline monitored daily."</p>
+              <div className={`border p-3.5 rounded-xl text-xs font-semibold ${isDarkMode ? 'bg-slate-950/40 border-slate-700 text-slate-400' : 'bg-slate-50/60 border-slate-300 text-slate-500'}`}>
+                <p className="italic">"Pupil's overall physical class presence index falls within the high-attendance tier ({attendancePercentage}%). Continuous discipline monitored daily."</p>
               </div>
             </div>
 
             {/* Quick Billing Checklist */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 space-y-4 shadow-xs flex flex-col justify-between">
+            <div className={`border rounded-2xl p-6 space-y-4 shadow-sm transition-all duration-300 hover:shadow-md flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`}>
               <div className="space-y-3.5">
                 <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Current Term Billing</h3>
                 
                 <div className="space-y-2 text-xs">
-                  <div className="flex justify-between font-bold text-slate-600">
+                  <div className="flex justify-between font-bold text-slate-600 dark:text-slate-300">
                     <span>Term Invoice Total:</span>
-                    <span className="text-slate-800">GHS {totalInvoiced.toFixed(2)}</span>
+                    <span className="text-slate-800 dark:text-slate-100">GHS {totalInvoiced.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-slate-600">
+                  <div className="flex justify-between font-bold text-slate-600 dark:text-slate-300">
                     <span>Total Settled:</span>
-                    <span className="text-emerald-700">GHS {totalPaid.toFixed(2)}</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">GHS {totalPaid.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between font-black text-slate-800 pt-2 border-t">
+                  <div className="flex justify-between font-black text-slate-800 dark:text-slate-100 pt-2 border-t border-slate-200/50 dark:border-slate-800">
                     <span>Outstanding Dues:</span>
-                    <span className="text-rose-600">GHS {currentBalance.toFixed(2)}</span>
+                    <span className="text-rose-600 dark:text-rose-400">GHS {currentBalance.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -309,13 +308,13 @@ export default function ParentDashboard({
                     setPayAmount(currentBalance.toString());
                     setIsPaystackOpen(true);
                   }}
-                  className="w-full text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl transition-all shadow-md flex items-center justify-center space-x-1 cursor-pointer"
+                  className="w-full text-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-1.5 cursor-pointer"
                 >
                   <CreditCard size={12} />
                   <span>Settle Outstanding GHS {currentBalance}</span>
                 </button>
               ) : (
-                <div className="w-full p-2 bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-center text-xs font-black rounded-xl">
+                <div className="w-full p-2 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/40 text-center text-xs font-black rounded-xl">
                   Fees Cleared - Fully Settled
                 </div>
               )}

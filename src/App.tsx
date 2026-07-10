@@ -27,6 +27,19 @@ export default function App() {
   const [dyslexicFont, setDyslexicFont] = useState<boolean>(() => {
     return localStorage.getItem('accessibility_dyslexic_font') === 'true';
   });
+  const [speakOnClick, setSpeakOnClick] = useState<boolean>(() => {
+    return localStorage.getItem('accessibility_speak_on_click') === 'true';
+  });
+  const [giantCursor, setGiantCursor] = useState<boolean>(() => {
+    return localStorage.getItem('accessibility_giant_cursor') === 'true';
+  });
+  const [readingRuler, setReadingRuler] = useState<boolean>(() => {
+    return localStorage.getItem('accessibility_reading_ruler') === 'true';
+  });
+  const [visionFilter, setVisionFilter] = useState<string>(() => {
+    return localStorage.getItem('accessibility_vision_filter') || 'none';
+  });
+  const [rulerY, setRulerY] = useState<number>(0);
   const [isAccessMenuOpen, setIsAccessMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -62,6 +75,80 @@ export default function App() {
     }
     localStorage.setItem('accessibility_dyslexic_font', String(dyslexicFont));
   }, [dyslexicFont]);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (giantCursor) {
+      html.classList.add('accessibility-giant-cursor');
+    } else {
+      html.classList.remove('accessibility-giant-cursor');
+    }
+    localStorage.setItem('accessibility_giant_cursor', String(giantCursor));
+  }, [giantCursor]);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    html.classList.remove(
+      'accessibility-filter-monochrome',
+      'accessibility-filter-contrast-boost',
+      'accessibility-filter-deuteranopia'
+    );
+    if (visionFilter !== 'none') {
+      html.classList.add(`accessibility-filter-${visionFilter}`);
+    }
+    localStorage.setItem('accessibility_vision_filter', visionFilter);
+  }, [visionFilter]);
+
+  // Click to Speak Narration Engine
+  useEffect(() => {
+    if (!speakOnClick) {
+      document.body.classList.remove('accessibility-click-to-speak-active');
+      return;
+    }
+    document.body.classList.add('accessibility-click-to-speak-active');
+
+    const handleTextClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target) return;
+
+      // Do not narrate clicks inside the accessibility menu elements
+      const isControlPanel = target.closest('#global-accessibility-panel') || target.closest('#global-accessibility-trigger-btn');
+      if (isControlPanel) return;
+
+      const textToSpeak = target.innerText || target.textContent;
+      if (textToSpeak && textToSpeak.trim().length > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Cancel existing readouts
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(textToSpeak.trim().substring(0, 350));
+        utterance.rate = 0.95; // Slightly slower, highly clear rate for easy hearing
+        window.speechSynthesis.speak(utterance);
+      }
+    };
+
+    window.addEventListener('click', handleTextClick, true); // Capture phase
+    return () => {
+      window.removeEventListener('click', handleTextClick, true);
+    };
+  }, [speakOnClick]);
+
+  // Reading Ruler Mouse Tracker
+  useEffect(() => {
+    if (!readingRuler) return;
+    const handleMouseMove = (e: MouseEvent) => {
+      setRulerY(e.clientY);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [readingRuler]);
+
+  localStorage.setItem('accessibility_reading_ruler', String(readingRuler));
+  localStorage.setItem('accessibility_speak_on_click', String(speakOnClick));
   // =============================================================================
 
   
@@ -921,8 +1008,19 @@ Edweso Royal Academy`;
         />
       )}
 
+      {/* ==================== READING RULER HIGH-CONTRAST OVERLAY ==================== */}
+      {readingRuler && (
+        <div 
+          className="fixed left-0 right-0 h-8 bg-amber-400/15 border-y-2 border-amber-500/70 pointer-events-none z-[99999] mix-blend-multiply dark:mix-blend-screen transition-all duration-75"
+          style={{ 
+            top: `${rulerY - 16}px`,
+            boxShadow: '0 0 12px rgba(245, 158, 11, 0.25)'
+          }}
+        />
+      )}
+
       {/* ==================== GLOBAL ACCESSIBILITY & EYE CARE PANEL ==================== */}
-      <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start font-sans">
+      <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start font-sans" id="global-accessibility-panel">
         {/* Floating Toggle Button */}
         <button
           onClick={() => setIsAccessMenuOpen(!isAccessMenuOpen)}
@@ -936,9 +1034,9 @@ Edweso Royal Academy`;
           id="global-accessibility-trigger-btn"
         >
           <Accessibility size={18} className={isAccessMenuOpen ? 'animate-spin' : 'animate-pulse text-emerald-600'} />
-          <span className="text-[10px] font-black uppercase tracking-wider">Eye Care Settings</span>
-          {fontSizeScale !== 'normal' && (
-            <span className="w-2 h-2 rounded-full bg-amber-500 border border-white" />
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">Eye Care Suite</span>
+          {(fontSizeScale !== 'normal' || highContrast || dyslexicFont || speakOnClick || giantCursor || readingRuler || visionFilter !== 'none') && (
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 border-2 border-white animate-bounce" />
           )}
         </button>
 
@@ -949,7 +1047,7 @@ Edweso Royal Academy`;
             <div className="fixed inset-0 z-40" onClick={() => setIsAccessMenuOpen(false)} />
             
             <div 
-              className="absolute bottom-16 left-0 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl p-5 z-50 text-slate-800 animate-slide-in-bottom text-left"
+              className="absolute bottom-16 left-0 w-85 bg-white border border-slate-200 rounded-2xl shadow-2xl p-5 z-50 text-slate-800 animate-slide-in-bottom text-left"
               style={{ boxShadow: '0 20px 35px -5px rgba(0, 0, 0, 0.2), 0 10px 15px -10px rgba(0, 0, 0, 0.2)' }}
             >
               {/* Header */}
@@ -957,9 +1055,9 @@ Edweso Royal Academy`;
                 <div>
                   <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 flex items-center space-x-1.5">
                     <Eye size={14} className="text-emerald-600 animate-pulse" />
-                    <span>Eye Care Support</span>
+                    <span>Eye Care & Accessibility Suite</span>
                   </h4>
-                  <p className="text-[10px] text-slate-400 font-bold mt-0.5">Customize display for easier reading</p>
+                  <p className="text-[10px] text-slate-400 font-bold mt-0.5">Comprehensive support for low-vision & fatigue</p>
                 </div>
                 <button 
                   onClick={() => setIsAccessMenuOpen(false)}
@@ -970,12 +1068,12 @@ Edweso Royal Academy`;
               </div>
 
               {/* Settings Body */}
-              <div className="space-y-4 text-xs font-semibold">
+              <div className="space-y-3.5 text-xs font-semibold max-h-[380px] overflow-y-auto pr-1">
                 
                 {/* 1. Font Size Adjustments */}
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold">Website Text Size</span>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold">Website Text Scale</span>
                     <span className="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-black">
                       {fontSizeScale === 'normal' && '100% (Regular)'}
                       {fontSizeScale === 'large' && '115% (Large)'}
@@ -992,7 +1090,7 @@ Edweso Royal Academy`;
                           : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                     >
-                      A-
+                      A- (100%)
                     </button>
                     <button
                       onClick={() => setFontSizeScale('large')}
@@ -1003,7 +1101,7 @@ Edweso Royal Academy`;
                       }`}
                       title="Recommended Default Scale"
                     >
-                      A
+                      A (115%)
                     </button>
                     <button
                       onClick={() => setFontSizeScale('xl')}
@@ -1013,7 +1111,7 @@ Edweso Royal Academy`;
                           : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                     >
-                      A+
+                      A+ (130%)
                     </button>
                     <button
                       onClick={() => setFontSizeScale('xxl')}
@@ -1023,25 +1121,112 @@ Edweso Royal Academy`;
                           : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                     >
-                      A++
+                      A++ (145%)
                     </button>
                   </div>
-                  <p className="text-[9px] text-slate-400 font-bold leading-tight">
-                    Tip: The website defaults to a 115% text scale to assist low-vision readers. Use A++ (145%) for extra large text.
-                  </p>
                 </div>
 
-                {/* 2. Custom High Contrast Toggle */}
-                <div className="pt-2 border-t border-slate-100 space-y-2">
+                {/* 2. Text to Speech (Audio Narrator) */}
+                <div className="pt-2 border-t border-slate-100">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">High Contrast & Bold</span>
-                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Increases text density & color weight</span>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Click-to-Speak Narrator</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Click any text to hear it spoken aloud</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSpeakOnClick(!speakOnClick);
+                        if (!speakOnClick) {
+                          // Play a greeting voice
+                          window.speechSynthesis.cancel();
+                          const u = new SpeechSynthesisUtterance("Click to speak mode is now activated. Simply click any text layout on the screen.");
+                          u.rate = 1.0;
+                          window.speechSynthesis.speak(u);
+                        } else {
+                          window.speechSynthesis.cancel();
+                        }
+                      }}
+                      className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
+                        speakOnClick ? 'bg-emerald-600 animate-pulse' : 'bg-slate-200'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
+                        speakOnClick ? 'right-0.5' : 'left-0.5'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. Horizontal Reading Ruler Line Toggle */}
+                <div className="pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Horizontal Reading Ruler</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Sliding horizontal highlighter guide</span>
+                    </div>
+                    <button
+                      onClick={() => setReadingRuler(!readingRuler)}
+                      className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
+                        readingRuler ? 'bg-emerald-600' : 'bg-slate-200'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
+                        readingRuler ? 'right-0.5' : 'left-0.5'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. Color Spectrum Filters */}
+                <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Color-Blindness & Vision Filters</span>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button
+                      onClick={() => setVisionFilter('none')}
+                      className={`py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                        visionFilter === 'none'
+                          ? 'bg-slate-800 border-slate-800 text-white'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      None
+                    </button>
+                    <button
+                      onClick={() => setVisionFilter('monochrome')}
+                      className={`py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                        visionFilter === 'monochrome'
+                          ? 'bg-slate-800 border-slate-800 text-white'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                      title="Grayscale high contrast"
+                    >
+                      Monochrome
+                    </button>
+                    <button
+                      onClick={() => setVisionFilter('contrast-boost')}
+                      className={`py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                        visionFilter === 'contrast-boost'
+                          ? 'bg-slate-800 border-slate-800 text-white'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                      title="Intense saturation and contrast trigger"
+                    >
+                      Contrast Boost
+                    </button>
+                  </div>
+                </div>
+
+                {/* 5. Custom High Contrast Toggle */}
+                <div className="pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Ultra-Black & Bold Text</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Forces extra high contrast weight</span>
                     </div>
                     <button
                       onClick={() => setHighContrast(!highContrast)}
                       className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
-                        highContrast ? 'bg-emerald-600 animate-pulse' : 'bg-slate-200'
+                        highContrast ? 'bg-emerald-600' : 'bg-slate-200'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
@@ -1051,17 +1236,37 @@ Edweso Royal Academy`;
                   </div>
                 </div>
 
-                {/* 3. Spaced Dyslexic & Eye Care Layout Toggle */}
-                <div className="pt-2 border-t border-slate-100 space-y-2">
+                {/* 6. Giant Accessible Cursor */}
+                <div className="pt-2 border-t border-slate-100">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Spaced Reading Font</span>
-                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Extra letter, word, & row spacing</span>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Giant Pointer Halo</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Increases mouse size with bright cursor target</span>
+                    </div>
+                    <button
+                      onClick={() => setGiantCursor(!giantCursor)}
+                      className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
+                        giantCursor ? 'bg-emerald-600' : 'bg-slate-200'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
+                        giantCursor ? 'right-0.5' : 'left-0.5'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 7. Spaced Dyslexic & Eye Care Layout Toggle */}
+                <div className="pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Comfort-Spaced Reading</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Increases row, word, & letter gap spacing</span>
                     </div>
                     <button
                       onClick={() => setDyslexicFont(!dyslexicFont)}
                       className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
-                        dyslexicFont ? 'bg-emerald-600 animate-pulse' : 'bg-slate-200'
+                        dyslexicFont ? 'bg-emerald-600' : 'bg-slate-200'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
@@ -1078,6 +1283,11 @@ Edweso Royal Academy`;
                       setFontSizeScale('large');
                       setHighContrast(false);
                       setDyslexicFont(false);
+                      setSpeakOnClick(false);
+                      setGiantCursor(false);
+                      setReadingRuler(false);
+                      setVisionFilter('none');
+                      window.speechSynthesis.cancel();
                     }}
                     className="w-full text-center py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[10px] uppercase tracking-wider font-extrabold transition-colors cursor-pointer"
                   >
