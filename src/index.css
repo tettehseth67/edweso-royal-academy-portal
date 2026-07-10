@@ -6,3 +6,47 @@
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
+
+/* ==================== EYE CARE & ACCESSIBILITY HELPER CLASSES ==================== */
+
+/* High Contrast & Bold Text Mode */
+.accessibility-high-contrast,
+.accessibility-high-contrast * {
+  border-color: #000000 !important;
+}
+
+.accessibility-high-contrast p,
+.accessibility-high-contrast span,
+.accessibility-high-contrast label,
+.accessibility-high-contrast li,
+.accessibility-high-contrast td,
+.accessibility-high-contrast th,
+.accessibility-high-contrast div:not(:empty),
+.accessibility-high-contrast a,
+.accessibility-high-contrast button,
+.accessibility-high-contrast input,
+.accessibility-high-contrast select,
+.accessibility-high-contrast textarea,
+.accessibility-high-contrast h1,
+.accessibility-high-contrast h2,
+.accessibility-high-contrast h3,
+.accessibility-high-contrast h4,
+.accessibility-high-contrast h5,
+.accessibility-high-contrast h6 {
+  color: #090d16 !important;
+  font-weight: 700 !important; /* Bold all standard elements */
+}
+
+.accessibility-high-contrast bg-white {
+  background-color: #ffffff !important;
+}
+
+/* High Legibility Layout Mode (increases spacing for visual reading ease) */
+.accessibility-dyslexic,
+.accessibility-dyslexic * {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.08em !important;
+  line-height: 1.75 !important;
+}
+

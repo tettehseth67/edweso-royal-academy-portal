@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X, Eye, Accessibility, Type, Check, ZoomIn, ZoomOut } from 'lucide-react';
 import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest } from './types';
 import { SchoolDatabase } from './mockData';
 
@@ -16,6 +16,54 @@ import OnboardingTour from './components/OnboardingTour';
 export default function App() {
   // Page Routing State: 'landing' | 'auth' | 'dashboard'
   const [page, setPage] = useState<'landing' | 'auth' | 'dashboard'>('landing');
+
+  // ==================== EYE CARE & ACCESSIBILITY CONTROLLER ====================
+  const [fontSizeScale, setFontSizeScale] = useState<string>(() => {
+    return localStorage.getItem('accessibility_font_scale') || 'large'; // Default to 'large' (115% / 18.5px) so the website is instantly larger!
+  });
+  const [highContrast, setHighContrast] = useState<boolean>(() => {
+    return localStorage.getItem('accessibility_high_contrast') === 'true';
+  });
+  const [dyslexicFont, setDyslexicFont] = useState<boolean>(() => {
+    return localStorage.getItem('accessibility_dyslexic_font') === 'true';
+  });
+  const [isAccessMenuOpen, setIsAccessMenuOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (fontSizeScale === 'normal') {
+      html.style.fontSize = '16px';
+    } else if (fontSizeScale === 'large') {
+      html.style.fontSize = '18.5px'; // default increased size (115%)
+    } else if (fontSizeScale === 'xl') {
+      html.style.fontSize = '21px'; // extra large size (130%)
+    } else if (fontSizeScale === 'xxl') {
+      html.style.fontSize = '24px'; // double extra large size (150%)
+    }
+    localStorage.setItem('accessibility_font_scale', fontSizeScale);
+  }, [fontSizeScale]);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (highContrast) {
+      html.classList.add('accessibility-high-contrast');
+    } else {
+      html.classList.remove('accessibility-high-contrast');
+    }
+    localStorage.setItem('accessibility_high_contrast', String(highContrast));
+  }, [highContrast]);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (dyslexicFont) {
+      html.classList.add('accessibility-dyslexic');
+    } else {
+      html.classList.remove('accessibility-dyslexic');
+    }
+    localStorage.setItem('accessibility_dyslexic_font', String(dyslexicFont));
+  }, [dyslexicFont]);
+  // =============================================================================
+
   
   // User Session State
   const [session, setSession] = useState<UserSession | null>(null);
@@ -872,6 +920,176 @@ Edweso Royal Academy`;
           onClose={() => setIsTourOpen(false)}
         />
       )}
+
+      {/* ==================== GLOBAL ACCESSIBILITY & EYE CARE PANEL ==================== */}
+      <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start font-sans">
+        {/* Floating Toggle Button */}
+        <button
+          onClick={() => setIsAccessMenuOpen(!isAccessMenuOpen)}
+          className={`flex items-center space-x-2.5 px-4 py-3 rounded-full shadow-2xl transition-all border transform hover:scale-105 active:scale-95 cursor-pointer ${
+            isAccessMenuOpen 
+              ? 'bg-emerald-800 border-emerald-600 text-white' 
+              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+          }`}
+          style={{ boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.15)' }}
+          title="Accessibility & Eye Care Adjustments"
+          id="global-accessibility-trigger-btn"
+        >
+          <Accessibility size={18} className={isAccessMenuOpen ? 'animate-spin' : 'animate-pulse text-emerald-600'} />
+          <span className="text-[10px] font-black uppercase tracking-wider">Eye Care Settings</span>
+          {fontSizeScale !== 'normal' && (
+            <span className="w-2 h-2 rounded-full bg-amber-500 border border-white" />
+          )}
+        </button>
+
+        {/* Adjustments Popup Card */}
+        {isAccessMenuOpen && (
+          <>
+            {/* Backdrop click closer */}
+            <div className="fixed inset-0 z-40" onClick={() => setIsAccessMenuOpen(false)} />
+            
+            <div 
+              className="absolute bottom-16 left-0 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl p-5 z-50 text-slate-800 animate-slide-in-bottom text-left"
+              style={{ boxShadow: '0 20px 35px -5px rgba(0, 0, 0, 0.2), 0 10px 15px -10px rgba(0, 0, 0, 0.2)' }}
+            >
+              {/* Header */}
+              <div className="flex justify-between items-start pb-3 border-b border-slate-100 mb-4">
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 flex items-center space-x-1.5">
+                    <Eye size={14} className="text-emerald-600 animate-pulse" />
+                    <span>Eye Care Support</span>
+                  </h4>
+                  <p className="text-[10px] text-slate-400 font-bold mt-0.5">Customize display for easier reading</p>
+                </div>
+                <button 
+                  onClick={() => setIsAccessMenuOpen(false)}
+                  className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              {/* Settings Body */}
+              <div className="space-y-4 text-xs font-semibold">
+                
+                {/* 1. Font Size Adjustments */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold">Website Text Size</span>
+                    <span className="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-black">
+                      {fontSizeScale === 'normal' && '100% (Regular)'}
+                      {fontSizeScale === 'large' && '115% (Large)'}
+                      {fontSizeScale === 'xl' && '130% (Extra Large)'}
+                      {fontSizeScale === 'xxl' && '145% (Huge)'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    <button
+                      onClick={() => setFontSizeScale('normal')}
+                      className={`py-2 rounded-xl text-[10px] font-extrabold border transition-all cursor-pointer ${
+                        fontSizeScale === 'normal'
+                          ? 'bg-emerald-700 border-emerald-700 text-white shadow-sm'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      A-
+                    </button>
+                    <button
+                      onClick={() => setFontSizeScale('large')}
+                      className={`py-2 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                        fontSizeScale === 'large'
+                          ? 'bg-emerald-700 border-emerald-700 text-white shadow-sm'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                      title="Recommended Default Scale"
+                    >
+                      A
+                    </button>
+                    <button
+                      onClick={() => setFontSizeScale('xl')}
+                      className={`py-2 rounded-xl text-sm font-extrabold border transition-all cursor-pointer ${
+                        fontSizeScale === 'xl'
+                          ? 'bg-emerald-700 border-emerald-700 text-white shadow-sm'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      A+
+                    </button>
+                    <button
+                      onClick={() => setFontSizeScale('xxl')}
+                      className={`py-2 rounded-xl text-base font-extrabold border transition-all cursor-pointer ${
+                        fontSizeScale === 'xxl'
+                          ? 'bg-emerald-700 border-emerald-700 text-white shadow-sm'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                    >
+                      A++
+                    </button>
+                  </div>
+                  <p className="text-[9px] text-slate-400 font-bold leading-tight">
+                    Tip: The website defaults to a 115% text scale to assist low-vision readers. Use A++ (145%) for extra large text.
+                  </p>
+                </div>
+
+                {/* 2. Custom High Contrast Toggle */}
+                <div className="pt-2 border-t border-slate-100 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">High Contrast & Bold</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Increases text density & color weight</span>
+                    </div>
+                    <button
+                      onClick={() => setHighContrast(!highContrast)}
+                      className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
+                        highContrast ? 'bg-emerald-600 animate-pulse' : 'bg-slate-200'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
+                        highContrast ? 'right-0.5' : 'left-0.5'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. Spaced Dyslexic & Eye Care Layout Toggle */}
+                <div className="pt-2 border-t border-slate-100 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Spaced Reading Font</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Extra letter, word, & row spacing</span>
+                    </div>
+                    <button
+                      onClick={() => setDyslexicFont(!dyslexicFont)}
+                      className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
+                        dyslexicFont ? 'bg-emerald-600 animate-pulse' : 'bg-slate-200'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
+                        dyslexicFont ? 'right-0.5' : 'left-0.5'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Reset to defaults button */}
+                <div className="pt-2.5 border-t border-slate-100 flex space-x-2">
+                  <button
+                    onClick={() => {
+                      setFontSizeScale('large');
+                      setHighContrast(false);
+                      setDyslexicFont(false);
+                    }}
+                    className="w-full text-center py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[10px] uppercase tracking-wider font-extrabold transition-colors cursor-pointer"
+                  >
+                    Reset Defaults
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
