@@ -273,8 +273,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <button
               onClick={() => setActivePage("home")}
               className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === "home"
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
-                  : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
+                ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
+                : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
                 }`}
             >
               Home
@@ -282,8 +282,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <button
               onClick={() => setActivePage("about")}
               className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === "about"
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
-                  : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
+                ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
+                : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
                 }`}
             >
               About Us
@@ -291,8 +291,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <button
               onClick={() => setActivePage("academics")}
               className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === "academics"
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
-                  : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
+                ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
+                : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
                 }`}
             >
               Academics
@@ -300,8 +300,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <button
               onClick={() => setActivePage("admissions")}
               className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === "admissions"
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
-                  : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
+                ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
+                : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
                 }`}
             >
               Admissions
@@ -309,8 +309,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <button
               onClick={() => setActivePage("contact")}
               className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === "contact"
-                  ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
-                  : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
+                ? "bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs"
+                : "text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100"
                 }`}
             >
               Contact Us
@@ -989,8 +989,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
               <button
                 onClick={() => setAcademicDept("primary")}
                 className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${academicDept === "primary"
-                    ? "bg-emerald-700 text-white shadow-xs"
-                    : "text-slate-500 hover:bg-slate-100"
+                  ? "bg-emerald-700 text-white shadow-xs"
+                  : "text-slate-500 hover:bg-slate-100"
                   }`}
               >
                 Primary School
@@ -998,8 +998,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
               <button
                 onClick={() => setAcademicDept("jhs")}
                 className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${academicDept === "jhs"
-                    ? "bg-emerald-700 text-white shadow-xs"
-                    : "text-slate-500 hover:bg-slate-100"
+                  ? "bg-emerald-700 text-white shadow-xs"
+                  : "text-slate-500 hover:bg-slate-100"
                   }`}
               >
                 Junior High (JHS)
@@ -1007,8 +1007,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
               <button
                 onClick={() => setAcademicDept("shs")}
                 className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${academicDept === "shs"
-                    ? "bg-emerald-700 text-white shadow-xs"
-                    : "text-slate-500 hover:bg-slate-100"
+                  ? "bg-emerald-700 text-white shadow-xs"
+                  : "text-slate-500 hover:bg-slate-100"
                   }`}
               >
                 Senior High (SHS)
@@ -1454,7 +1454,10 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                   <button
                     type="button"
                     className="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
-                    onClick={() => console.log("Enroll in Auto-Pay clicked")}
+                    onClick={() => window.open(
+                      "https://dashboard.paystack.com/#/plans/3889606/",
+                      "_blank"
+                    )}
                   >
                     Enroll in Auto-Pay
                   </button>
@@ -1956,8 +1959,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                       key={tab.id}
                       onClick={() => setSelectedResourceTab(tab.id as any)}
                       className={`flex-1 py-2 text-center text-[11px] font-black rounded-lg transition-all duration-300 cursor-pointer ${isActive
-                          ? "bg-emerald-600 text-white shadow-xs"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                        ? "bg-emerald-600 text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                         }`}
                     >
                       {tab.label}
