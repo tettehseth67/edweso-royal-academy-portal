@@ -208,38 +208,25 @@ export default function DashboardLayout({
   const unreadCount = unreadAnnouncements.length + paymentAlerts.length;
 
   return (
-    <div
-      className={`min-h-screen font-sans flex ${isDarkMode ? "bg-slate-950 text-slate-100" : "bg-slate-50 text-slate-800"}`}
-    >
+    <div className={`min-h-screen font-sans flex ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
+      
       {/* 1. Sidebar - Desktop */}
-      <aside
-        className={`hidden md:flex flex-col w-64 shrink-0 border-r ${
-          isDarkMode
-            ? "bg-slate-900 border-slate-800"
-            : "bg-white border-slate-200"
-        }`}
-      >
+      <aside className={`hidden md:flex flex-col w-64 shrink-0 border-r ${
+        isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+      }`}>
         {/* School Logo Area */}
-        <div
-          className={`p-5 flex items-center space-x-3 border-b ${isDarkMode ? "border-slate-800" : "border-slate-100"}`}
-        >
-          <img
-            src="/assets/images/logo.png"
-            alt="Edweso Royal Academy Logo"
+        <div className={`p-5 flex items-center space-x-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+          <img 
+            src="/assets/images/logo.png" 
+            alt="Edweso Royal Academy Logo" 
             className="w-14 h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm"
             referrerPolicy="no-referrer"
           />
           <div>
-            <span className="font-display font-black text-sm tracking-tight text-emerald-600 block leading-tight">
-              Edweso Royal
-            </span>
-            <span
-              className={`text-[10px] uppercase font-display font-black tracking-widest block leading-none ${
-                isDarkMode ? "text-amber-400" : "text-amber-600"
-              }`}
-            >
-              Academy
-            </span>
+            <span className="font-display font-black text-sm tracking-tight text-emerald-600 block leading-tight">Edweso Royal</span>
+            <span className={`text-[10px] uppercase font-display font-black tracking-widest block leading-none ${
+              isDarkMode ? 'text-amber-400' : 'text-amber-600'
+            }`}>Academy</span>
           </div>
         </div>
 
@@ -248,7 +235,7 @@ export default function DashboardLayout({
           <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
             {session.role} portal
           </div>
-
+          
           {currentNav.map((item) => {
             const isActive = activeTab === item.id;
             return (
@@ -258,13 +245,13 @@ export default function DashboardLayout({
                 onClick={() => handleTabClick(item.id)}
                 className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-bold transition-all text-left ${
                   isActive
-                    ? "bg-emerald-700 text-white shadow-sm"
+                    ? 'bg-emerald-700 text-white shadow-sm'
                     : isDarkMode
-                      ? "text-slate-400 hover:text-white hover:bg-slate-800/60"
-                      : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50"
+                      ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/50'
                 }`}
               >
-                <span className={isActive ? "text-white" : "text-slate-400"}>
+                <span className={isActive ? 'text-white' : 'text-slate-400'}>
                   {item.icon}
                 </span>
                 <span>{item.label}</span>
@@ -274,35 +261,19 @@ export default function DashboardLayout({
         </nav>
 
         {/* User Card & Logout */}
-        <div
-          className={`p-4 border-t ${isDarkMode ? "border-slate-800" : "border-slate-100"}`}
-        >
+        <div className={`p-4 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 min-w-0">
               <div className="w-9 h-9 rounded-full bg-emerald-100 border border-emerald-500/10 flex items-center justify-center font-extrabold text-emerald-800 text-xs shrink-0 overflow-hidden">
                 {currentUserPhoto ? (
-                  <img
-                    src={currentUserPhoto}
-                    alt={session.name}
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
+                  <img src={currentUserPhoto} alt={session.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
-                  session.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .substring(0, 2)
+                  session.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-extrabold truncate leading-tight">
-                  {session.name}
-                </p>
-                <p className="text-[10px] text-slate-400 truncate leading-none mt-0.5">
-                  {session.email}
-                </p>
+                <p className="text-xs font-extrabold truncate leading-tight">{session.name}</p>
+                <p className="text-[10px] text-slate-400 truncate leading-none mt-0.5">{session.email}</p>
               </div>
             </div>
             <button
@@ -318,44 +289,34 @@ export default function DashboardLayout({
       </aside>
 
       {/* 2. Sidebar - Mobile Overlay Drawer (Slide-out) */}
-      <div
-        className={`fixed inset-0 z-50 flex md:hidden transition-all duration-300 ${
-          isMobileMenuOpen
-            ? "visible pointer-events-auto"
-            : "invisible pointer-events-none"
-        }`}
-      >
+      <div className={`fixed inset-0 z-50 flex md:hidden transition-all duration-300 ${
+        isMobileMenuOpen ? 'visible pointer-events-auto' : 'invisible pointer-events-none'
+      }`}>
         {/* Backdrop */}
-        <div
-          onClick={() => setIsMobileMenuOpen(false)}
+        <div 
+          onClick={() => setIsMobileMenuOpen(false)} 
           className={`fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 ${
-            isMobileMenuOpen ? "opacity-100" : "opacity-0"
+            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
           }`}
         />
-
+        
         {/* Drawer container */}
-        <div
-          className={`relative flex flex-col w-64 max-w-xs h-full p-4 border-r transition-transform duration-300 ease-out ${
-            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-          } ${
-            isDarkMode
-              ? "bg-slate-900 border-slate-800 text-white"
-              : "bg-white border-slate-200 text-slate-800"
-          }`}
-        >
+        <div className={`relative flex flex-col w-64 max-w-xs h-full p-4 border-r transition-transform duration-300 ease-out ${
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        } ${
+          isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+        }`}>
           <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
             <div className="flex items-center space-x-2">
-              <img
-                src="/assets/images/logo.png"
-                alt="Edweso Royal Academy Logo"
+              <img 
+                src="/assets/images/logo.png" 
+                alt="Edweso Royal Academy Logo" 
                 className="w-11 h-11 rounded-lg object-contain border border-amber-400/15 shadow-xs"
                 referrerPolicy="no-referrer"
               />
-              <span className="font-display font-black text-xs tracking-tight text-emerald-700">
-                Edweso Academy
-              </span>
+              <span className="font-display font-black text-xs tracking-tight text-emerald-700">Edweso Academy</span>
             </div>
-            <button
+            <button 
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
             >
@@ -373,10 +334,10 @@ export default function DashboardLayout({
                   onClick={() => handleTabClick(item.id)}
                   className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-bold transition-all text-left ${
                     isActive
-                      ? "bg-emerald-700 text-white"
+                      ? 'bg-emerald-700 text-white'
                       : isDarkMode
-                        ? "text-slate-400 hover:text-white hover:bg-slate-800"
-                        : "text-slate-600 hover:text-emerald-700 hover:bg-emerald-50"
+                        ? 'text-slate-400 hover:text-white hover:bg-slate-800'
+                        : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50'
                   }`}
                 >
                   <span>{item.icon}</span>
@@ -400,14 +361,12 @@ export default function DashboardLayout({
 
       {/* 3. Main Dashboard Body Wrapper */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
         {/* Top Header Navigation */}
-        <header
-          className={`h-16 px-4 sm:px-6 flex items-center justify-between border-b ${
-            isDarkMode
-              ? "bg-slate-900 border-slate-800"
-              : "bg-white border-slate-100"
-          } relative z-30`}
-        >
+        <header className={`h-16 px-4 sm:px-6 flex items-center justify-between border-b ${
+          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+        } relative z-30`}>
+          
           {/* Left side search or mobile hamburger */}
           <div className="flex items-center space-x-4">
             <button
@@ -417,13 +376,13 @@ export default function DashboardLayout({
             >
               <Menu size={20} />
             </button>
-
+            
             {/* Elegant Search bar - visible on desktop */}
             <div className="hidden sm:flex items-center space-x-2 bg-slate-100 dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200/40 dark:border-slate-800 max-w-xs">
               <Search size={14} className="text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search index ledger..."
+              <input 
+                type="text" 
+                placeholder="Search index ledger..." 
                 className="bg-transparent border-0 outline-hidden text-xs text-slate-600 dark:text-slate-300 placeholder-slate-400 w-44"
               />
             </div>
@@ -431,15 +390,14 @@ export default function DashboardLayout({
 
           {/* Right side controls */}
           <div className="flex items-center space-x-3 relative">
+            
             {/* Notifications Button */}
             <div className="relative">
               <button
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                 id="notifications-btn"
                 className={`p-2 rounded-lg transition-colors border ${
-                  isDarkMode
-                    ? "border-slate-800 hover:bg-slate-800"
-                    : "border-slate-200 hover:bg-slate-100"
+                  isDarkMode ? 'border-slate-800 hover:bg-slate-800' : 'border-slate-200 hover:bg-slate-100'
                 } text-slate-500 relative`}
                 title="Open Alert Center"
               >
@@ -454,30 +412,20 @@ export default function DashboardLayout({
               {/* Notifications Dropdown */}
               {isNotificationsOpen && (
                 <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsNotificationsOpen(false)}
-                  />
-                  <div
-                    className={`absolute right-0 mt-2 w-80 sm:w-96 rounded-xl shadow-2xl p-4 border z-50 max-h-[480px] overflow-y-auto ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800"
-                        : "bg-white border-slate-100"
-                    }`}
-                  >
+                  <div className="fixed inset-0 z-40" onClick={() => setIsNotificationsOpen(false)} />
+                  <div className={`absolute right-0 mt-2 w-80 sm:w-96 rounded-xl shadow-2xl p-4 border z-50 max-h-[480px] overflow-y-auto ${
+                    isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                  }`}>
+                    
                     {/* Dropdown Header */}
                     <div className="flex justify-between items-center pb-2.5 border-b border-slate-100 dark:border-slate-800 mb-3">
                       <div>
-                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                          Alert Center
-                        </span>
-                        <span className="text-[10px] text-slate-400 block font-semibold">
-                          Real-time school status
-                        </span>
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-100">Alert Center</span>
+                        <span className="text-[10px] text-slate-400 block font-semibold">Real-time school status</span>
                       </div>
                       {unreadAnnouncements.length > 0 && (
-                        <button
-                          onClick={markAllAsRead}
+                        <button 
+                          onClick={markAllAsRead} 
                           className="text-[10px] text-emerald-600 hover:text-emerald-500 font-extrabold transition-colors cursor-pointer bg-emerald-500/10 px-2.5 py-1 rounded"
                         >
                           Mark all read
@@ -486,47 +434,39 @@ export default function DashboardLayout({
                     </div>
 
                     <div className="space-y-3">
+                      
                       {/* 1. URGENT PAYMENT ALERTS SECTION */}
-                      {paymentAlerts.map((alert) => (
-                        <div
-                          key={alert.id}
+                      {paymentAlerts.map(alert => (
+                        <div 
+                          key={alert.id} 
                           onClick={() => {
-                            handleTabClick("payments");
+                            handleTabClick('payments');
                             setIsNotificationsOpen(false);
                           }}
                           className="p-3 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 rounded-lg text-xs cursor-pointer transition-colors space-y-1 relative"
                         >
                           <div className="flex items-center space-x-1.5 text-rose-600 dark:text-rose-400 font-extrabold">
-                            <AlertCircle
-                              size={14}
-                              className="shrink-0 animate-bounce"
-                            />
+                            <AlertCircle size={14} className="shrink-0 animate-bounce" />
                             <span>{alert.title}</span>
                           </div>
-                          <p className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">
-                            {alert.message}
-                          </p>
-                          <span className="text-[9px] text-slate-400 block mt-1 font-mono">
-                            {alert.date}
-                          </span>
+                          <p className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">{alert.message}</p>
+                          <span className="text-[9px] text-slate-400 block mt-1 font-mono">{alert.date}</span>
                         </div>
                       ))}
 
                       {/* 2. UNREAD ANNOUNCEMENTS SECTION */}
-                      {unreadAnnouncements.map((ann) => (
-                        <div
-                          key={ann.id}
+                      {unreadAnnouncements.map(ann => (
+                        <div 
+                          key={ann.id} 
                           onClick={() => {
-                            handleTabClick("announcements");
+                            handleTabClick('announcements');
                             setIsNotificationsOpen(false);
                           }}
                           className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800/40 rounded-lg text-xs cursor-pointer transition-colors space-y-1 relative"
                         >
                           <div className="flex justify-between items-start">
-                            <span className="font-extrabold text-slate-800 dark:text-slate-100 truncate pr-4">
-                              {ann.title}
-                            </span>
-                            <button
+                            <span className="font-extrabold text-slate-800 dark:text-slate-100 truncate pr-4">{ann.title}</span>
+                            <button 
                               onClick={(e) => markAsRead(ann.id, e)}
                               className="p-1 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded shrink-0"
                               title="Mark as read"
@@ -534,16 +474,10 @@ export default function DashboardLayout({
                               <Check size={12} />
                             </button>
                           </div>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">
-                            {ann.content}
-                          </p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium">{ann.content}</p>
                           <div className="flex justify-between items-center text-[9px] text-slate-400 pt-1 font-semibold border-t border-slate-100 dark:border-slate-800/50 mt-1.5">
-                            <span>
-                              By: {ann.authorName} ({ann.authorRole})
-                            </span>
-                            <span className="font-mono">
-                              {ann.date.split(" ")[0]}
-                            </span>
+                            <span>By: {ann.authorName} ({ann.authorRole})</span>
+                            <span className="font-mono">{ann.date.split(' ')[0]}</span>
                           </div>
                         </div>
                       ))}
@@ -555,23 +489,21 @@ export default function DashboardLayout({
                             <CheckCircle size={20} />
                           </div>
                           <div>
-                            <h4 className="text-xs font-bold text-slate-800 dark:text-white">
-                              All Caught Up!
-                            </h4>
+                            <h4 className="text-xs font-bold text-slate-800 dark:text-white">All Caught Up!</h4>
                             <p className="text-[10px] text-slate-400 leading-relaxed max-w-[200px] mx-auto mt-1 font-semibold">
-                              You have read all school bulletins and cleared all
-                              urgent billing accounts.
+                              You have read all school bulletins and cleared all urgent billing accounts.
                             </p>
                           </div>
                         </div>
                       )}
+
                     </div>
 
                     {/* View Bulletin link */}
                     <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-center">
                       <button
                         onClick={() => {
-                          handleTabClick("announcements");
+                          handleTabClick('announcements');
                           setIsNotificationsOpen(false);
                         }}
                         className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-emerald-600 font-extrabold uppercase tracking-wider"
@@ -579,6 +511,7 @@ export default function DashboardLayout({
                         View Bulletin Board →
                       </button>
                     </div>
+
                   </div>
                 </>
               )}
@@ -590,16 +523,13 @@ export default function DashboardLayout({
                 onClick={onStartTour}
                 id="tour-start-btn"
                 className={`p-2 rounded-lg transition-all border shrink-0 flex items-center justify-center cursor-pointer ${
-                  isDarkMode
-                    ? "border-slate-800 hover:bg-slate-800 hover:text-emerald-400"
-                    : "border-slate-200 hover:bg-slate-100 hover:text-emerald-700"
+                  isDarkMode 
+                    ? 'border-slate-800 hover:bg-slate-800 hover:text-emerald-400' 
+                    : 'border-slate-200 hover:bg-slate-100 hover:text-emerald-700'
                 } text-slate-500`}
                 title="Start Interactive Guided Tour"
               >
-                <HelpCircle
-                  size={16}
-                  className="text-emerald-600 dark:text-emerald-400 animate-pulse shrink-0"
-                />
+                <HelpCircle size={16} className="text-emerald-600 dark:text-emerald-400 animate-pulse shrink-0" />
               </button>
             )}
 
@@ -612,52 +542,26 @@ export default function DashboardLayout({
               >
                 <div className="w-8 h-8 rounded-full bg-emerald-700 text-amber-300 border border-amber-400/10 flex items-center justify-center font-extrabold text-[11px] overflow-hidden">
                   {currentUserPhoto ? (
-                    <img
-                      src={currentUserPhoto}
-                      alt={session.name}
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
+                    <img src={currentUserPhoto} alt={session.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
-                    session.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()
-                      .substring(0, 2)
+                    session.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
                   )}
                 </div>
               </button>
 
               {isProfileDropdownOpen && (
                 <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsProfileDropdownOpen(false)}
-                  />
-                  <div
-                    className={`absolute right-0 mt-2 w-52 rounded-xl shadow-xl p-2 border z-50 ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800"
-                        : "bg-white border-slate-100"
-                    }`}
-                  >
+                  <div className="fixed inset-0 z-40" onClick={() => setIsProfileDropdownOpen(false)} />
+                  <div className={`absolute right-0 mt-2 w-52 rounded-xl shadow-xl p-2 border z-50 ${
+                    isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                  }`}>
                     <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
                       <p className="text-xs font-bold">{session.name}</p>
-                      <p className="text-[10px] text-slate-400">
-                        {session.role.toUpperCase()}
-                      </p>
+                      <p className="text-[10px] text-slate-400">{session.role.toUpperCase()}</p>
                     </div>
                     <button
                       onClick={() => {
-                        handleTabClick(
-                          session.role === "student" ||
-                            session.role === "teacher"
-                            ? "profile"
-                            : session.role === "parent"
-                              ? "overview"
-                              : "classes",
-                        );
+                        handleTabClick((session.role === 'student' || session.role === 'teacher') ? 'profile' : session.role === 'parent' ? 'overview' : 'classes');
                         setIsProfileDropdownOpen(false);
                       }}
                       className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 font-bold"
@@ -686,19 +590,20 @@ export default function DashboardLayout({
                 </>
               )}
             </div>
+
           </div>
         </header>
 
         {/* 4. Active Dashboard Tab Content - Scrollable container */}
         <div className="flex-1 flex overflow-hidden">
-          <main
+          <main 
             ref={mainRef}
             onScroll={handleScroll}
             className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
           >
             {children}
           </main>
-          {(session.role === "admin" || session.role === "teacher") && (
+          {(session.role === 'admin' || session.role === 'teacher') && (
             <ActivityFeedWidget isDarkMode={isDarkMode} />
           )}
 
@@ -713,7 +618,9 @@ export default function DashboardLayout({
             </button>
           )}
         </div>
+
       </div>
+
     </div>
   );
 }
