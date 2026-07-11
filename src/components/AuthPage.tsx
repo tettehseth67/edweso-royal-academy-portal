@@ -134,9 +134,12 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
         
         {/* Banner with school details */}
         <div className="bg-gradient-to-r from-emerald-800 to-emerald-950 text-white p-6 text-center border-b border-emerald-500/20">
-          <div className="inline-flex w-12 h-12 rounded-xl bg-emerald-700 items-center justify-center text-amber-300 font-extrabold text-2xl border border-amber-400/20 mb-3 shadow-md">
-            E
-          </div>
+          <img 
+            src="/src/assets/images/school_logo.jpg" 
+            alt="Edweso Royal Academy Logo" 
+            className="inline-block w-16 h-16 rounded-2xl object-contain border border-amber-400/15 mb-3 shadow-md bg-emerald-950/50 p-1.5"
+            referrerPolicy="no-referrer"
+          />
           <h2 className="text-xl font-extrabold text-white font-sans tracking-tight">Edweso Royal Academy</h2>
           <p className="text-[11px] uppercase tracking-widest text-amber-400 font-bold mt-1">Knowledge, Discipline, Excellence</p>
         </div>

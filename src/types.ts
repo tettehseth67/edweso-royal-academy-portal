@@ -40,6 +40,7 @@ export interface Teacher {
   gender: 'Male' | 'Female';
   profilePhoto?: string;
   subjectSpecialization?: string; // Specialization alias
+  department?: 'Daycare-JHS' | 'SHS'; // Separate Daycare-JHS from SHS
 }
 
 export interface SchoolClass {

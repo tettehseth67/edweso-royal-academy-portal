@@ -33,12 +33,12 @@ export const initialClasses: SchoolClass[] = [
 
 // Initial Teachers
 export const initialTeachers: Teacher[] = [
-  { id: 't1', name: 'Mr. Kwame Boateng', staffNumber: 'ERA-T-001', email: 'kwame@edweso.edu.gh', phone: '+233 24 412 3456', subjectId: 'Mathematics', status: 'Active', gender: 'Male' },
-  { id: 't2', name: 'Mrs. Ama Serwaa Addo', staffNumber: 'ERA-T-002', email: 'ama.serwaa@edweso.edu.gh', phone: '+233 27 755 8910', subjectId: 'Integrated Science', status: 'Active', gender: 'Female' },
-  { id: 't3', name: 'Mr. Kofi Mensah', staffNumber: 'ERA-T-003', email: 'kofi.mensah@edweso.edu.gh', phone: '+233 20 123 4567', subjectId: 'English Language', status: 'Active', gender: 'Male' },
-  { id: 't4', name: 'Miss Abena Osei', staffNumber: 'ERA-T-004', email: 'abena.osei@edweso.edu.gh', phone: '+233 54 876 5432', subjectId: 'Social Studies', status: 'Active', gender: 'Female' },
-  { id: 't5', name: 'Mr. Yaw Asante', staffNumber: 'ERA-T-005', email: 'yaw.asante@edweso.edu.gh', phone: '+233 24 333 4444', subjectId: 'ICT', status: 'Active', gender: 'Male' },
-  { id: 't6', name: 'Dr. Joseph Darko', staffNumber: 'ERA-T-006', email: 'j.darko@edweso.edu.gh', phone: '+233 26 999 8888', subjectId: 'RME', status: 'Active', gender: 'Male' }
+  { id: 't1', name: 'Mr. Kwame Boateng', staffNumber: 'ERA-T-001', email: 'kwame@edweso.edu.gh', phone: '+233 24 412 3456', subjectId: 'Mathematics', status: 'Active', gender: 'Male', department: 'Daycare-JHS' },
+  { id: 't2', name: 'Mrs. Ama Serwaa Addo', staffNumber: 'ERA-T-002', email: 'ama.serwaa@edweso.edu.gh', phone: '+233 27 755 8910', subjectId: 'Integrated Science', status: 'Active', gender: 'Female', department: 'Daycare-JHS' },
+  { id: 't3', name: 'Mr. Kofi Mensah', staffNumber: 'ERA-T-003', email: 'kofi.mensah@edweso.edu.gh', phone: '+233 20 123 4567', subjectId: 'English Language', status: 'Active', gender: 'Male', department: 'Daycare-JHS' },
+  { id: 't4', name: 'Miss Abena Osei', staffNumber: 'ERA-T-004', email: 'abena.osei@edweso.edu.gh', phone: '+233 54 876 5432', subjectId: 'Social Studies', status: 'Active', gender: 'Female', department: 'Daycare-JHS' },
+  { id: 't5', name: 'Mr. Yaw Asante', staffNumber: 'ERA-T-005', email: 'yaw.asante@edweso.edu.gh', phone: '+233 24 333 4444', subjectId: 'ICT', status: 'Active', gender: 'Male', department: 'Daycare-JHS' },
+  { id: 't6', name: 'Dr. Joseph Darko', staffNumber: 'ERA-T-006', email: 'j.darko@edweso.edu.gh', phone: '+233 26 999 8888', subjectId: 'RME', status: 'Active', gender: 'Male', department: 'SHS' }
 ];
 
 // Initial Subjects (curriculum aligned)

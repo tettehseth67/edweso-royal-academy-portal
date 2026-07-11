@@ -250,9 +250,12 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             onClick={() => setActivePage('home')} 
             className="flex items-center space-x-3 cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-lg bg-emerald-700 flex items-center justify-center text-amber-400 font-extrabold text-xl shadow-xs border border-amber-400/20">
-              E
-            </div>
+            <img 
+              src="/src/assets/images/school_logo.jpg" 
+              alt="Edweso Royal Academy Logo" 
+              className="w-14 h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm"
+              referrerPolicy="no-referrer"
+            />
             <div>
               <span className="font-extrabold text-lg tracking-tight text-emerald-800 block leading-tight">Edweso Royal</span>
               <span className="text-[10px] uppercase font-bold tracking-widest text-amber-600 block leading-none">Academy</span>
@@ -1795,9 +1798,12 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-700 flex items-center justify-center text-amber-400 font-extrabold text-lg">
-                  E
-                </div>
+                <img 
+                  src="/src/assets/images/school_logo.jpg" 
+                  alt="Edweso Royal Academy Logo" 
+                  className="w-12 h-12 rounded-xl object-contain border border-amber-400/15 shadow-xs"
+                  referrerPolicy="no-referrer"
+                />
                 <span className="font-extrabold text-base tracking-tight text-emerald-800">Edweso Royal Academy</span>
               </div>
               <p className="text-xs text-slate-500 leading-relaxed font-semibold">

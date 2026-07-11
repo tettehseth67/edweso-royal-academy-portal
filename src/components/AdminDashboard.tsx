@@ -94,6 +94,7 @@ export default function AdminDashboard({
   const [studentSearch, setStudentSearch] = useState('');
   const [studentClassFilter, setStudentClassFilter] = useState('All');
   const [teacherSearch, setTeacherSearch] = useState('');
+  const [teacherDeptFilter, setTeacherDeptFilter] = useState<'All' | 'Daycare-JHS' | 'SHS'>('All');
   const [teachersActiveSubTab, setTeachersActiveSubTab] = useState<'list' | 'attendance' | 'leaves' | 'payroll'>('list');
   const [selectedPayrollStaff, setSelectedPayrollStaff] = useState<StaffPayroll | null>(null);
   const [payrollActionStatus, setPayrollActionStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
@@ -503,7 +504,8 @@ export default function AdminDashboard({
     subjectId: 'Mathematics',
     status: 'Active' as 'Active' | 'On Leave',
     gender: 'Male' as 'Male' | 'Female',
-    profilePhoto: undefined as string | undefined
+    profilePhoto: undefined as string | undefined,
+    department: 'Daycare-JHS' as 'Daycare-JHS' | 'SHS'
   });
 
   // Add Notice Modal State
@@ -795,7 +797,8 @@ export default function AdminDashboard({
       subjectId: 'Mathematics',
       status: 'Active',
       gender: 'Male',
-      profilePhoto: undefined
+      profilePhoto: undefined,
+      department: 'Daycare-JHS'
     });
     setIsTeacherModalOpen(true);
   };
@@ -810,7 +813,8 @@ export default function AdminDashboard({
       subjectId: t.subjectId,
       status: t.status,
       gender: t.gender,
-      profilePhoto: t.profilePhoto
+      profilePhoto: t.profilePhoto,
+      department: t.department || 'Daycare-JHS'
     });
     setIsTeacherModalOpen(true);
   };
@@ -1954,25 +1958,45 @@ export default function AdminDashboard({
           {/* ==================== STANDARD FACULTY DIRECTORY LIST ==================== */}
           {teachersActiveSubTab === 'list' && (
             <>
-              <div className="max-w-xs relative">
-                <input
-                  type="text"
-                  id="search-teachers-input"
-                  placeholder="Search faculty name..."
-                  value={teacherSearch}
-                  onChange={(e) => setTeacherSearch(e.target.value)}
-                  className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 pl-9 pr-3 text-xs text-slate-800 dark:text-white focus:outline-hidden focus:border-emerald-500 font-semibold"
-                />
-                <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4">
+                <div className="max-w-xs w-full relative">
+                  <input
+                    type="text"
+                    id="search-teachers-input"
+                    placeholder="Search faculty name..."
+                    value={teacherSearch}
+                    onChange={(e) => setTeacherSearch(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 pl-9 pr-3 text-xs text-slate-800 dark:text-white focus:outline-hidden focus:border-emerald-500 font-semibold"
+                  />
+                  <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
+                </div>
+
+                {/* Department Filtering Toggles */}
+                <div className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200/40 dark:border-slate-800 shrink-0">
+                  {(['All', 'Daycare-JHS', 'SHS'] as const).map((dept) => (
+                    <button
+                      key={dept}
+                      onClick={() => setTeacherDeptFilter(dept)}
+                      className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
+                        teacherDeptFilter === dept
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                      }`}
+                    >
+                      {dept === 'All' ? 'All Departments' : dept}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
+          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-880' : 'bg-white border-slate-200/60'}`}>
             <div className="overflow-x-auto">
               <table id="teachers-registry-table" className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                     <th className="p-3">Faculty Details</th>
                     <th className="p-3">Staff ID</th>
+                    <th className="p-3">Department</th>
                     <th className="p-3">Subject Specialty</th>
                     <th className="p-3">Contact Email</th>
                     <th className="p-3">Mobile Contact</th>
@@ -1983,6 +2007,10 @@ export default function AdminDashboard({
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {teachers
                     .filter(t => t.name.toLowerCase().includes(teacherSearch.toLowerCase()))
+                    .filter(t => {
+                      const dept = t.department || (t.id === 't6' ? 'SHS' : 'Daycare-JHS');
+                      return teacherDeptFilter === 'All' || dept === teacherDeptFilter;
+                    })
                     .map((teach) => (
                       <tr key={teach.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
                         <td className="p-3">
@@ -2001,6 +2029,15 @@ export default function AdminDashboard({
                           </div>
                         </td>
                         <td className="p-3 font-mono text-[10px] text-slate-400">{teach.staffNumber}</td>
+                        <td className="p-3">
+                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                            (teach.department || (teach.id === 't6' ? 'SHS' : 'Daycare-JHS')) === 'SHS'
+                              ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                              : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                          }`}>
+                            {teach.department || (teach.id === 't6' ? 'SHS' : 'Daycare-JHS')}
+                          </span>
+                        </td>
                         <td className="p-3">
                           <span className="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">
                             {teach.subjectId}
@@ -4209,6 +4246,18 @@ export default function AdminDashboard({
                     <option value="On Leave">On Leave</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Department Assignment</label>
+                <select
+                  value={teacherForm.department}
+                  onChange={(e) => setTeacherForm({ ...teacherForm, department: e.target.value as any })}
+                  className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded focus:outline-hidden bg-white dark:bg-slate-950"
+                >
+                  <option value="Daycare-JHS">Daycare-JHS (Basic Education)</option>
+                  <option value="SHS">SHS (Senior High School)</option>
+                </select>
               </div>
 
               <div>

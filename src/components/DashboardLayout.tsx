@@ -216,9 +216,12 @@ export default function DashboardLayout({
       }`}>
         {/* School Logo Area */}
         <div className={`p-5 flex items-center space-x-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-          <div className="w-10 h-10 rounded-lg bg-emerald-700 flex items-center justify-center text-amber-400 font-extrabold text-xl shadow-xs border border-amber-400/20">
-            E
-          </div>
+          <img 
+            src="/src/assets/images/school_logo.jpg" 
+            alt="Edweso Royal Academy Logo" 
+            className="w-14 h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm"
+            referrerPolicy="no-referrer"
+          />
           <div>
             <span className="font-display font-black text-sm tracking-tight text-emerald-600 block leading-tight">Edweso Royal</span>
             <span className={`text-[10px] uppercase font-display font-black tracking-widest block leading-none ${
@@ -305,9 +308,12 @@ export default function DashboardLayout({
         }`}>
           <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded bg-emerald-700 flex items-center justify-center text-amber-400 font-extrabold text-sm">
-                E
-              </div>
+              <img 
+                src="/src/assets/images/school_logo.jpg" 
+                alt="Edweso Royal Academy Logo" 
+                className="w-11 h-11 rounded-lg object-contain border border-amber-400/15 shadow-xs"
+                referrerPolicy="no-referrer"
+              />
               <span className="font-display font-black text-xs tracking-tight text-emerald-700">Edweso Academy</span>
             </div>
             <button 

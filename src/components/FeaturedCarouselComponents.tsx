@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import {
-  ChevronLeft, ChevronRight, Sparkles, Clock, User,
+import { 
+  ChevronLeft, ChevronRight, Sparkles, Clock, User, 
   BookOpen, FileText, CheckCircle2, ShieldAlert, Image, Camera, Upload, Trash2,
   Eye, X
 } from 'lucide-react';
@@ -32,7 +32,7 @@ export function FeaturedAnnouncementsCarousel({
     const interval = setInterval(() => {
       setDirection(1);
       setCurrentIndex((prev) => (prev + 1) % announcements.length);
-    }, 5000);
+    }, 5000); 
     return () => clearInterval(interval);
   }, [isPlaying, announcements.length]);
 
@@ -91,7 +91,7 @@ export function FeaturedAnnouncementsCarousel({
   const activeNotice = announcements[currentIndex];
 
   return (
-    <div
+    <div 
       onMouseEnter={() => setIsPlaying(false)}
       onMouseLeave={() => setIsPlaying(true)}
       onTouchStart={handleTouchStart}
@@ -171,7 +171,7 @@ export function FeaturedAnnouncementsCarousel({
           >
             <ChevronLeft size={13} />
           </button>
-
+          
           {/* Bullet Indicators */}
           <div className="flex space-x-1 px-2">
             {announcements.map((_, idx) => (
@@ -181,10 +181,11 @@ export function FeaturedAnnouncementsCarousel({
                   setDirection(idx > currentIndex ? 1 : -1);
                   setCurrentIndex(idx);
                 }}
-                className={`w-1.5 h-1.5 rounded-full transition-all cursor-pointer ${idx === currentIndex
-                    ? 'bg-emerald-600 dark:bg-emerald-500 w-3'
+                className={`w-1.5 h-1.5 rounded-full transition-all cursor-pointer ${
+                  idx === currentIndex 
+                    ? 'bg-emerald-600 dark:bg-emerald-500 w-3' 
                     : 'bg-slate-300 dark:bg-slate-700 hover:bg-slate-400'
-                  }`}
+                }`}
               />
             ))}
           </div>
@@ -217,7 +218,7 @@ export function TeachingResourcesCarousel({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
-
+  
   // Quick View Modal States
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewItem, setPreviewItem] = useState<{
@@ -275,7 +276,7 @@ export function TeachingResourcesCarousel({
     if (!isPlaying || resourceItems.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % resourceItems.length);
-    }, 5000);
+    }, 5000); 
     return () => clearInterval(interval);
   }, [isPlaying, resourceItems.length]);
 
@@ -322,7 +323,7 @@ export function TeachingResourcesCarousel({
   };
 
   return (
-    <div
+    <div 
       onMouseEnter={() => setIsPlaying(false)}
       onMouseLeave={() => setIsPlaying(true)}
       onTouchStart={handleTouchStart}
@@ -363,10 +364,11 @@ export function TeachingResourcesCarousel({
         <div className="space-y-2">
           {/* Top category row */}
           <div className="flex justify-between items-center">
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${activeItem.type === 'Syllabus'
-                ? 'bg-blue-50 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300'
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+              activeItem.type === 'Syllabus' 
+                ? 'bg-blue-50 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300' 
                 : 'bg-purple-50 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300'
-              }`}>
+            }`}>
               {activeItem.type === 'Syllabus' ? <FileText size={10} /> : <User size={10} />}
               {activeItem.type} Plan
             </span>
@@ -386,7 +388,7 @@ export function TeachingResourcesCarousel({
                 {activeItem.subtitle}
               </p>
             </div>
-
+            
             {/* Quick View Button */}
             <button
               onClick={triggerQuickView}
@@ -413,7 +415,7 @@ export function TeachingResourcesCarousel({
 
       {/* Progress slider bar */}
       <div className="w-full h-1 bg-slate-100 dark:bg-slate-950 rounded-full overflow-hidden">
-        <div
+        <div 
           className="h-full bg-emerald-600 transition-all duration-300"
           style={{ width: `${((currentIndex + 1) / resourceItems.length) * 100}%` }}
         />
@@ -424,7 +426,7 @@ export function TeachingResourcesCarousel({
         {isPreviewOpen && previewItem && (
           <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
             {/* Backdrop Blur Overlay */}
-            <motion.div
+            <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -443,10 +445,11 @@ export function TeachingResourcesCarousel({
               {/* Header */}
               <div className="flex justify-between items-start pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="space-y-1">
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${previewItem.type === 'Syllabus'
-                      ? 'bg-blue-50 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300'
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                    previewItem.type === 'Syllabus' 
+                      ? 'bg-blue-50 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300' 
                       : 'bg-purple-50 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300'
-                    }`}>
+                  }`}>
                     {previewItem.type === 'Syllabus' ? <FileText size={11} /> : <User size={11} />}
                     {previewItem.type} Resource Preview
                   </span>
@@ -588,7 +591,7 @@ export function StudentPhotoGalleryCarousel({
         isProfile: true
       });
     }
-
+    
     campusEvents.forEach(e => {
       list.push({
         id: e.id,
@@ -684,18 +687,19 @@ export function StudentPhotoGalleryCarousel({
   };
 
   return (
-    <div
+    <div 
       onMouseEnter={() => setIsPlaying(false)}
       onMouseLeave={() => setIsPlaying(true)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className={`p-6 rounded-2xl border shadow-lg ${isDarkMode
-          ? 'bg-slate-900 border-slate-800/80 shadow-slate-950/20'
+      className={`p-6 rounded-2xl border shadow-lg ${
+        isDarkMode 
+          ? 'bg-slate-900 border-slate-800/80 shadow-slate-950/20' 
           : 'bg-white border-slate-200/80 shadow-slate-100'
-        } space-y-5 select-none`}
+      } space-y-5 select-none`} 
       id="student-gallery-carousel-widget"
     >
-
+      
       {/* Header section with branding details */}
       <div className="flex justify-between items-end pb-3 border-b border-slate-100 dark:border-slate-800/60">
         <div>
@@ -713,17 +717,17 @@ export function StudentPhotoGalleryCarousel({
       </div>
 
       {/* Main Image View Panel with fluid slide and hover controls */}
-      <div
+      <div 
         onClick={() => setIsModalOpen(true)}
         className="relative rounded-2xl overflow-hidden aspect-[16/10] bg-slate-950 border border-slate-100 dark:border-slate-800 shadow-inner group cursor-zoom-in"
       >
-
+        
         {/* Animated Slide container */}
         <div className="absolute inset-0 w-full h-full">
           <AnimatePresence initial={false} custom={direction} mode="wait">
-            <motion.img
+            <motion.img 
               key={activePhoto.id}
-              src={activePhoto.url}
+              src={activePhoto.url} 
               alt={activePhoto.title}
               referrerPolicy="no-referrer"
               custom={direction}
@@ -741,18 +745,18 @@ export function StudentPhotoGalleryCarousel({
         {isPlaying && !isModalOpen && (
           <div className="absolute top-2.5 left-2.5 right-2.5 z-25 flex space-x-1.5">
             {photoGallery.map((_, idx) => (
-              <div
-                key={idx}
+              <div 
+                key={idx} 
                 className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden backdrop-blur-xs"
               >
-                <div
+                <div 
                   className="h-full bg-emerald-400 rounded-full transition-all duration-75"
-                  style={{
-                    width: idx === currentIndex
-                      ? `${progress}%`
-                      : idx < currentIndex
-                        ? '100%'
-                        : '0%'
+                  style={{ 
+                    width: idx === currentIndex 
+                      ? `${progress}%` 
+                      : idx < currentIndex 
+                        ? '100%' 
+                        : '0%' 
                   }}
                 />
               </div>
@@ -815,10 +819,11 @@ export function StudentPhotoGalleryCarousel({
               setProgress(0);
               setCurrentIndex(idx);
             }}
-            className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentIndex
-                ? 'bg-emerald-600 dark:bg-emerald-500 w-5 shadow-xs'
+            className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+              idx === currentIndex 
+                ? 'bg-emerald-600 dark:bg-emerald-500 w-5 shadow-xs' 
                 : 'bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 w-2'
-              }`}
+            }`}
             title={`Slide to spotlight ${idx + 1}`}
           />
         ))}
@@ -826,7 +831,7 @@ export function StudentPhotoGalleryCarousel({
 
       {/* Interactive Controls & Thumbnails & Profile set button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
-
+        
         {/* Thumbnails row */}
         <div className="flex items-center space-x-2 overflow-x-auto py-1.5">
           {photoGallery.map((p, idx) => (
@@ -837,16 +842,17 @@ export function StudentPhotoGalleryCarousel({
                 setProgress(0);
                 setCurrentIndex(idx);
               }}
-              className={`w-10 h-10 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${idx === currentIndex
-                  ? 'border-emerald-500 scale-110 ring-4 ring-emerald-500/10 shadow-md'
+              className={`w-10 h-10 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
+                idx === currentIndex 
+                  ? 'border-emerald-500 scale-110 ring-4 ring-emerald-500/10 shadow-md' 
                   : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'
-                }`}
+              }`}
             >
-              <img
-                src={p.url}
-                alt="thumbnail"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+              <img 
+                src={p.url} 
+                alt="thumbnail" 
+                referrerPolicy="no-referrer" 
+                className="w-full h-full object-cover" 
               />
             </button>
           ))}
@@ -880,7 +886,7 @@ export function StudentPhotoGalleryCarousel({
         {isModalOpen && (
           <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
             {/* Backdrop blur with deep charcoal overlay */}
-            <motion.div
+            <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -896,13 +902,13 @@ export function StudentPhotoGalleryCarousel({
               transition={{ type: 'spring', duration: 0.35, bounce: 0.15 }}
               className="bg-slate-900 text-white rounded-3xl border border-slate-800 max-w-4xl w-full overflow-hidden shadow-2xl relative z-10 flex flex-col md:flex-row min-h-[400px]"
             >
-
+              
               {/* Left Side: Large Gorgeous Image view with manual next/prev */}
               <div className="md:w-3/5 bg-black relative flex items-center justify-center aspect-[16/10] md:aspect-auto select-none">
                 <AnimatePresence initial={false} custom={direction} mode="wait">
-                  <motion.img
+                  <motion.img 
                     key={activePhoto.id}
-                    src={activePhoto.url}
+                    src={activePhoto.url} 
                     alt={activePhoto.title}
                     referrerPolicy="no-referrer"
                     custom={direction}
@@ -941,8 +947,9 @@ export function StudentPhotoGalleryCarousel({
                         setDirection(idx > currentIndex ? 1 : -1);
                         setCurrentIndex(idx);
                       }}
-                      className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${idx === currentIndex ? 'bg-emerald-400 w-4' : 'bg-white/40 w-1.5'
-                        }`}
+                      className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                        idx === currentIndex ? 'bg-emerald-400 w-4' : 'bg-white/40 w-1.5'
+                      }`}
                     />
                   ))}
                 </div>
@@ -950,7 +957,7 @@ export function StudentPhotoGalleryCarousel({
 
               {/* Right Side: Event Details & Action controls */}
               <div className="md:w-2/5 p-6 md:p-8 flex flex-col justify-between space-y-6 bg-slate-900">
-
+                
                 {/* Header detail */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
@@ -993,7 +1000,7 @@ export function StudentPhotoGalleryCarousel({
                   <p className="text-[9px] uppercase tracking-widest font-mono text-slate-500 font-black">
                     Quick Navigate Deck
                   </p>
-
+                  
                   <div className="flex gap-1.5 overflow-x-auto py-1">
                     {photoGallery.map((p, idx) => (
                       <button
@@ -1002,10 +1009,11 @@ export function StudentPhotoGalleryCarousel({
                           setDirection(idx > currentIndex ? 1 : -1);
                           setCurrentIndex(idx);
                         }}
-                        className={`w-11 h-11 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${idx === currentIndex
-                            ? 'border-emerald-400 scale-105 shadow shadow-emerald-400/20'
+                        className={`w-11 h-11 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
+                          idx === currentIndex 
+                            ? 'border-emerald-400 scale-105 shadow shadow-emerald-400/20' 
                             : 'border-transparent opacity-50 hover:opacity-100'
-                          }`}
+                        }`}
                       >
                         <img src={p.url} alt="thumbnail" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                       </button>
