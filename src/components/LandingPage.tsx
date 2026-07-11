@@ -251,7 +251,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             className="flex items-center space-x-3 cursor-pointer"
           >
             <img
-              src="/src/assets/images/school_logo.jpg"
+              src="/assets/images/logo.png"
               alt="Edweso Royal Academy Logo"
               className="w-14 h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm"
               referrerPolicy="no-referrer"
