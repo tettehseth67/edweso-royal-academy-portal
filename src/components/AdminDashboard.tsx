@@ -4,7 +4,7 @@ import {
   Calendar, Megaphone, CreditCard, Search, Plus, 
   Trash2, Edit, Check, AlertTriangle, Eye, RefreshCw, Filter, ShieldCheck, Download,
   ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer, Cake, Gift,
-  Lock, Building, HelpCircle, Info, Smartphone
+  Lock, Building, HelpCircle, Info, Smartphone, FileText, Receipt
 } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, 
@@ -14,7 +14,7 @@ import {
   Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, TimetableEntry, Announcement, 
   PaymentTransaction, PublicInquiry, SimulatedEmail, SyllabusPlan, TeacherAbsence, CoverAssignment,
-  StaffClockIn, StaffPayroll, StaffLeaveRequest
+  StaffClockIn, StaffPayroll, StaffLeaveRequest, ManualPaymentRequest
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark, SchoolDatabase } from '../mockData';
 import SyllabusBoard from './SyllabusBoard';
@@ -53,6 +53,7 @@ interface AdminDashboardProps {
   onUpdateStaffClockIns: (clockIns: StaffClockIn[]) => void;
   onUpdateStaffPayrolls: (payrolls: StaffPayroll[]) => void;
   onUpdateStaffLeaves: (leaves: StaffLeaveRequest[]) => void;
+  onUpdateTransactions: (tx: PaymentTransaction[]) => void;
   isDarkMode: boolean;
 }
 
@@ -88,6 +89,7 @@ export default function AdminDashboard({
   onUpdateStaffClockIns,
   onUpdateStaffPayrolls,
   onUpdateStaffLeaves,
+  onUpdateTransactions,
   isDarkMode
 }: AdminDashboardProps) {
 
@@ -423,7 +425,87 @@ export default function AdminDashboard({
   };
 
   // Payment Gateway & Bank Account Linking Configuration
-  const [paymentsSubTab, setPaymentsSubTab] = useState<'ledger' | 'bank-setup'>('ledger');
+  const [paymentsSubTab, setPaymentsSubTab] = useState<'ledger' | 'manual-approvals' | 'bank-setup'>('ledger');
+  const [manualPayments, setManualPayments] = useState<ManualPaymentRequest[]>(() => {
+    const saved = localStorage.getItem('era_manual_payments');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+
+  const handleApproveManualPayment = (id: string) => {
+    const request = manualPayments.find(r => r.id === id);
+    if (!request) return;
+
+    // 1. Deduct paid amount from student's balance
+    const updatedStudents = students.map(s => {
+      if (s.id === request.studentId) {
+        return {
+          ...s,
+          balanceGHS: Math.max(0, s.balanceGHS - request.amountGHS)
+        };
+      }
+      return s;
+    });
+    onUpdateStudents(updatedStudents);
+
+    // 2. Log payment transaction in transaction ledger
+    const studentRecord = students.find(s => s.id === request.studentId);
+    const newTx: PaymentTransaction = {
+      id: 'tx-manual-' + Date.now(),
+      studentId: request.studentId,
+      studentName: request.studentName,
+      amountGHS: request.amountGHS,
+      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'Successful',
+      reference: request.referenceCode,
+      paystackRef: 'MANUAL-VERIFIED-' + request.id,
+      paymentMethod: request.paymentMethod as any,
+      email: studentRecord?.parentEmail || 'student@school.edu',
+      term: 'Term 1'
+    };
+    onUpdateTransactions([newTx, ...transactions]);
+
+    // 3. Update request status to Approved
+    const updatedRequests = manualPayments.map(r => {
+      if (r.id === id) {
+        return {
+          ...r,
+          status: 'Approved' as const,
+          reviewedBy: 'Bursar Administrator'
+        };
+      }
+      return r;
+    });
+    setManualPayments(updatedRequests);
+    localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
+
+    alert(`Successfully approved payment receipt. GHS ${request.amountGHS} has been credited to student ${request.studentName}'s tuition balance.`);
+  };
+
+  const handleRejectManualPayment = (id: string) => {
+    if (!rejectReason.trim()) {
+      alert('Please provide a reason for declining this receipt.');
+      return;
+    }
+    const updatedRequests = manualPayments.map(r => {
+      if (r.id === id) {
+        return {
+          ...r,
+          status: 'Rejected' as const,
+          rejectReason: rejectReason.trim(),
+          reviewedBy: 'Bursar Administrator'
+        };
+      }
+      return r;
+    });
+    setManualPayments(updatedRequests);
+    localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
+    setRejectingId(null);
+    setRejectReason('');
+
+    alert('The receipt has been marked as declined and the student has been notified with the reason.');
+  };
   const [paystackMode, setPaystackMode] = useState<'test' | 'live'>(() => {
     return (localStorage.getItem('era_paystack_mode') as 'test' | 'live') || 'test';
   });
@@ -2503,6 +2585,17 @@ export default function AdminDashboard({
                 <span>Transaction Ledger</span>
               </button>
               <button
+                onClick={() => setPaymentsSubTab('manual-approvals')}
+                className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
+                  paymentsSubTab === 'manual-approvals'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              >
+                <FileText size={12} />
+                <span>Manual Approvals ({manualPayments.filter(p => p.status === 'Pending').length})</span>
+              </button>
+              <button
                 onClick={() => setPaymentsSubTab('bank-setup')}
                 className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
                   paymentsSubTab === 'bank-setup'
@@ -2654,6 +2747,166 @@ export default function AdminDashboard({
             </div>
           </div>
           </>
+          )}
+
+          {/* ==================== MANUAL RECEIPTS APPROVAL QUEUE ==================== */}
+          {paymentsSubTab === 'manual-approvals' && (
+            <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
+              <div className={`p-5 rounded-2xl border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+              }`}>
+                <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 flex-wrap gap-3">
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
+                      <FileText className="text-emerald-500" size={16} />
+                      <span>Bursar Offline Receipt Verification Queue</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Verify uploaded mobile money and bank deposit slips. Approving will automatically deduct the student's balance and log a successful transaction.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs font-semibold text-slate-600">
+                    <thead>
+                      <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                        <th className="p-3">Student Name / ID</th>
+                        <th className="p-3">Amount (GHS)</th>
+                        <th className="p-3">Channel / Method</th>
+                        <th className="p-3">Ref Code / Slip No.</th>
+                        <th className="p-3">Uploaded Receipt</th>
+                        <th className="p-3">Status</th>
+                        <th className="p-3 text-right">Actions / Review Details</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
+                      {manualPayments.length > 0 ? (
+                        manualPayments.map((req) => (
+                          <tr key={req.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                            <td className="p-3">
+                              <div className="font-bold text-slate-900 dark:text-white">{req.studentName}</div>
+                              <div className="text-[10px] text-slate-400 font-mono">ID: {req.studentId}</div>
+                            </td>
+                            <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-200">
+                              GHS {req.amountGHS.toFixed(2)}
+                            </td>
+                            <td className="p-3 font-medium text-slate-500 dark:text-slate-400">
+                              {req.paymentMethod}
+                            </td>
+                            <td className="p-3 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                              {req.referenceCode}
+                            </td>
+                            <td className="p-3">
+                              {req.receiptImage ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const win = window.open();
+                                    if (win) {
+                                      win.document.write(`
+                                        <html>
+                                          <head><title>Receipt Slip - ${req.id}</title></head>
+                                          <body style="margin:0; background:#0f172a; display:flex; align-items:center; justify-content:center; height:100vh;">
+                                            <img src="${req.receiptImage}" style="max-width:90%; max-height:90%; border-radius:8px; border:1px solid #334155;" />
+                                          </body>
+                                        </html>
+                                      `);
+                                    } else {
+                                      alert('Could not open preview. Popups might be blocked.');
+                                    }
+                                  }}
+                                  className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20 rounded font-bold text-[10px] flex items-center space-x-1 cursor-pointer"
+                                >
+                                  <Eye size={12} />
+                                  <span>View Slip</span>
+                                </button>
+                              ) : (
+                                <span className="text-slate-400 italic font-medium text-[10px]">No image attached</span>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
+                                req.status === 'Approved'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                  : req.status === 'Rejected'
+                                  ? 'bg-rose-50 text-rose-700 border-rose-100'
+                                  : 'bg-amber-50 text-amber-700 border-amber-100'
+                              }`}>
+                                {req.status}
+                              </span>
+                            </td>
+                            <td className="p-3 text-right">
+                              {req.status === 'Pending' ? (
+                                <div className="flex items-center justify-end space-x-2">
+                                  {rejectingId === req.id ? (
+                                    <div className="flex flex-col space-y-1.5 w-48 text-left bg-slate-50 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                                      <input
+                                        type="text"
+                                        placeholder="Reason for declining..."
+                                        value={rejectReason}
+                                        onChange={(e) => setRejectReason(e.target.value)}
+                                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-750 p-1 rounded font-normal text-[10px] text-slate-800 dark:text-slate-200 focus:outline-hidden"
+                                      />
+                                      <div className="flex justify-end space-x-1">
+                                        <button
+                                          onClick={() => {
+                                            setRejectingId(null);
+                                            setRejectReason('');
+                                          }}
+                                          className="px-1.5 py-0.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-[9px] cursor-pointer"
+                                        >
+                                          Cancel
+                                        </button>
+                                        <button
+                                          onClick={() => handleRejectManualPayment(req.id)}
+                                          className="px-1.5 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-[9px] font-bold cursor-pointer"
+                                        >
+                                          Confirm Decline
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <button
+                                        onClick={() => handleApproveManualPayment(req.id)}
+                                        className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[10px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
+                                      >
+                                        Approve & Credit
+                                      </button>
+                                      <button
+                                        onClick={() => setRejectingId(req.id)}
+                                        className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-md text-[10px] font-bold transition-all cursor-pointer"
+                                      >
+                                        Decline
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="text-[10px] text-slate-400 font-medium">
+                                  {req.status === 'Approved' ? (
+                                    <span>Verified by <strong>{req.reviewedBy}</strong></span>
+                                  ) : (
+                                    <span className="text-rose-500">Reason: <strong>{req.rejectReason}</strong></span>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={7} className="text-center py-12 text-slate-400 italic">
+                            No manual payment receipt upload requests found in the system.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* ==================== BANK & GATEWAY LINK LAYOUT ==================== */}

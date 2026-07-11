@@ -115,6 +115,21 @@ export interface PaymentTransaction {
   term: 'Term 1' | 'Term 2' | 'Term 3';
 }
 
+export interface ManualPaymentRequest {
+  id: string;
+  studentId: string;
+  studentName: string;
+  amountGHS: number;
+  date: string;
+  referenceCode: string;
+  paymentMethod: 'Bank Transfer' | 'MTN Mobile Money' | 'Telecel Cash' | 'AirtelTigo Money';
+  receiptImage?: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  rejectReason?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+}
+
 export interface PublicInquiry {
   id: string;
   name: string;

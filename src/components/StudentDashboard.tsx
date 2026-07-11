@@ -9,7 +9,7 @@ import {
   UserSession, Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, TimetableEntry, Announcement, 
   PaymentTransaction, SimulatedEmail, SyllabusPlan,
-  HomeworkAssignment, HomeworkSubmission
+  HomeworkAssignment, HomeworkSubmission, ManualPaymentRequest
 } from '../types';
 import PaystackModal from './PaystackModal';
 import CameraCapture from './CameraCapture';
@@ -76,6 +76,19 @@ export default function StudentDashboard({
   const [selectedTxForReceipt, setSelectedTxForReceipt] = useState<PaymentTransaction | null>(null);
   const [viewingEmail, setViewingEmail] = useState<SimulatedEmail | null>(null);
   const [isReportCardOpen, setIsReportCardOpen] = useState(false);
+
+  // Manual / Offline Payment states
+  const [manualPayments, setManualPayments] = useState<ManualPaymentRequest[]>(() => {
+    const saved = localStorage.getItem('era_manual_payments');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [manualAmount, setManualAmount] = useState<number | ''>('');
+  const [manualRef, setManualRef] = useState('');
+  const [manualMethod, setManualMethod] = useState<'Bank Transfer' | 'MTN Mobile Money' | 'Telecel Cash' | 'AirtelTigo Money'>('Bank Transfer');
+  const [manualReceiptBase64, setManualReceiptBase64] = useState<string>('');
+  const [manualSuccess, setManualSuccess] = useState('');
+  const [manualError, setManualError] = useState('');
+  const [isSubmittingManual, setIsSubmittingManual] = useState(false);
 
   // Profile Photo Upload & Capture States
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -252,6 +265,63 @@ export default function StudentDashboard({
   const handlePaystackFailure = (err: string) => {
     setIsPaystackOpen(false);
     alert('Payment declined: ' + err);
+  };
+
+  const handleManualPaymentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setManualError('');
+    setManualSuccess('');
+
+    if (!manualAmount || Number(manualAmount) <= 0) {
+      setManualError('Please enter a valid amount.');
+      return;
+    }
+    if (!manualRef.trim()) {
+      setManualError('Please provide a reference transaction ID or receipt number.');
+      return;
+    }
+
+    setIsSubmittingManual(true);
+
+    setTimeout(() => {
+      const newRequest: ManualPaymentRequest = {
+        id: `M-${Date.now().toString().substring(6)}`,
+        studentId: student.id,
+        studentName: student.name,
+        amountGHS: Number(manualAmount),
+        date: new Date().toISOString().substring(0, 10),
+        referenceCode: manualRef.trim(),
+        paymentMethod: manualMethod,
+        receiptImage: manualReceiptBase64 || undefined,
+        status: 'Pending'
+      };
+
+      const updated = [newRequest, ...manualPayments];
+      setManualPayments(updated);
+      localStorage.setItem('era_manual_payments', JSON.stringify(updated));
+
+      // Reset fields
+      setManualAmount('');
+      setManualRef('');
+      setManualReceiptBase64('');
+      setIsSubmittingManual(false);
+      setManualSuccess('Your payment receipt has been submitted to the accounts office for review. Once verified, your tuition balance will update!');
+    }, 1200);
+  };
+
+  const handleReceiptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File size exceeds 2MB limit. Please upload a smaller receipt image.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setManualReceiptBase64(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -839,6 +909,193 @@ export default function StudentDashboard({
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+
+          {/* ==================== OFFLINE MANUAL PAYMENT SUBMISSIONS ==================== */}
+          <div className="border-t border-slate-200/60 pt-6">
+            <div className="mb-4">
+              <h3 className="font-bold text-sm text-slate-800 flex items-center space-x-2">
+                <Receipt className="text-emerald-600" size={16} />
+                <span>Offline Bank Deposit & Mobile Money Receipt Upload</span>
+              </h3>
+              <p className="text-[11px] text-slate-400 mt-0.5 leading-normal">
+                If you settled tuition via direct bank deposit (GCB/CBG) or direct mobile wallet transfer, upload your payment voucher or SMS transaction receipt below to update your ledger.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* Submission Form */}
+              <div className="lg:col-span-5">
+                <form onSubmit={handleManualPaymentSubmit} className="p-5 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-4 text-xs font-semibold text-slate-600">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Amount Deposited (GHS)</label>
+                      <input
+                        type="number"
+                        required
+                        placeholder="e.g. 1500"
+                        min={10}
+                        value={manualAmount}
+                        onChange={(e) => setManualAmount(e.target.value ? Number(e.target.value) : '')}
+                        className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-lg focus:outline-hidden font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Payment Channel</label>
+                      <select
+                        value={manualMethod}
+                        onChange={(e) => setManualMethod(e.target.value as any)}
+                        className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-lg focus:outline-hidden"
+                      >
+                        <option value="Bank Transfer">Bank Transfer (GCB/CBG)</option>
+                        <option value="MTN Mobile Money">MTN Mobile Money</option>
+                        <option value="Telecel Cash">Telecel Cash</option>
+                        <option value="AirtelTigo Money">AirtelTigo Money</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Transaction Ref / Slip No.</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. TXN-982312214 or Voucher No."
+                      value={manualRef}
+                      onChange={(e) => setManualRef(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-lg focus:outline-hidden font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-1">Upload Receipt (Voucher image / SMS Screenshot)</label>
+                    <div className="border border-dashed border-slate-300 rounded-lg p-4 text-center cursor-pointer hover:bg-slate-50 transition-all relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleReceiptFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      {manualReceiptBase64 ? (
+                        <div className="flex flex-col items-center space-y-1.5">
+                          <img src={manualReceiptBase64} className="h-14 w-auto rounded object-contain border border-slate-200" alt="Receipt preview" />
+                          <span className="text-[10px] text-emerald-600 font-bold">File loaded successfully</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center space-y-1">
+                          <Upload className="text-slate-400" size={18} />
+                          <span className="text-[11px] font-bold text-slate-500">Drag & Drop file or click to upload</span>
+                          <span className="text-[9px] text-slate-400 font-normal">JPG, PNG up to 2MB</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {manualError && (
+                    <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg text-rose-600 text-[11px] leading-relaxed">
+                      {manualError}
+                    </div>
+                  )}
+
+                  {manualSuccess && (
+                    <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 text-[11px] leading-relaxed">
+                      {manualSuccess}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSubmittingManual}
+                    className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold rounded-lg text-xs uppercase tracking-wider transition-all flex items-center justify-center space-x-1.5 cursor-pointer"
+                  >
+                    {isSubmittingManual ? (
+                      <span className="flex items-center space-x-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-ping"></span>
+                        <span>Uploading Slip...</span>
+                      </span>
+                    ) : (
+                      <>
+                        <Upload size={14} />
+                        <span>Submit Receipt to accounts</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Status & Submissions History */}
+              <div className="lg:col-span-7 p-5 rounded-2xl border border-slate-200 bg-white shadow-xs">
+                <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-3">Submitted Slip Reviews</span>
+
+                <div className="space-y-3 overflow-y-auto max-h-[310px] pr-1">
+                  {manualPayments.length > 0 ? (
+                    manualPayments.map((req) => (
+                      <div key={req.id} className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-all text-xs font-semibold text-slate-600 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-mono text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 font-bold">{req.id}</span>
+                            <span className="font-bold text-slate-800">GHS {req.amountGHS.toFixed(2)}</span>
+                            <span className="text-[10px] text-slate-400 font-normal">via {req.paymentMethod}</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 flex items-center space-x-3 font-medium">
+                            <span>Ref: <strong className="font-mono">{req.referenceCode}</strong></span>
+                            <span>Date: {req.date}</span>
+                          </div>
+                          {req.status === 'Rejected' && req.rejectReason && (
+                            <div className="text-[10px] text-rose-600 bg-rose-50/50 p-1.5 rounded border border-rose-100/50 leading-relaxed font-medium mt-1">
+                              <strong>Decline Reason:</strong> {req.rejectReason}
+                            </div>
+                          )}
+                          {req.status === 'Approved' && (
+                            <div className="text-[10px] text-emerald-700 font-bold leading-relaxed mt-1 flex items-center space-x-1">
+                              <CheckCircle size={12} className="text-emerald-600" />
+                              <span>Credited to Ledger by {req.reviewedBy || 'Bursar'}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center space-x-2 shrink-0 self-end md:self-center">
+                          {req.receiptImage && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const win = window.open();
+                                if (win) {
+                                  win.document.write(`<img src="${req.receiptImage}" style="max-width:100%; height:auto;" />`);
+                                } else {
+                                  alert('Could not open preview. Your receipt is registered in accounts.');
+                                }
+                              }}
+                              className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded text-[10px] font-bold text-slate-600 cursor-pointer"
+                            >
+                              View Slip
+                            </button>
+                          )}
+                          <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
+                            req.status === 'Approved'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                              : req.status === 'Rejected'
+                              ? 'bg-rose-50 text-rose-700 border-rose-100'
+                              : 'bg-amber-50 text-amber-700 border-amber-100'
+                          }`}>
+                            {req.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-10 text-slate-400 italic flex flex-col items-center justify-center space-y-2">
+                      <FileText size={24} className="text-slate-300" />
+                      <div className="text-[11px] font-medium leading-relaxed max-w-[240px]">
+                        No offline payment receipts submitted yet. Use the left form to upload direct deposits.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
             </div>
           </div>
 

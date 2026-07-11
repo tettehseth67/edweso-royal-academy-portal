@@ -741,6 +741,12 @@ Edweso Royal Academy`;
     syncAndSave({ homeworkSubmissions: updatedSubmissions });
   };
 
+  const handleUpdateTransactions = (updatedTx: PaymentTransaction[]) => {
+    setTransactions(updatedTx);
+    SchoolDatabase.saveTransactions(updatedTx);
+    syncAndSave({ transactions: updatedTx });
+  };
+
   // Payment Callback (When Paystack checkout is successful)
   const handlePaymentSuccess = (amount: number, method: string, ref: string, paystackRef: string) => {
     if (!session || session.role !== 'student') return;
@@ -840,6 +846,7 @@ Edweso Royal Academy`;
               onUpdateStaffClockIns={handleUpdateStaffClockIns}
               onUpdateStaffPayrolls={handleUpdateStaffPayroll}
               onUpdateStaffLeaves={handleUpdateStaffLeaves}
+              onUpdateTransactions={handleUpdateTransactions}
               isDarkMode={isDarkMode}
             />
           )}
