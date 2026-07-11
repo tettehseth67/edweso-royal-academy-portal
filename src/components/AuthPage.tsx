@@ -114,7 +114,6 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      
       {/* Visual background accents */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-700/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
@@ -130,27 +129,36 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
       </button>
 
       {/* Main card */}
-      <div id="auth-box" className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden relative z-10">
-        
+      <div
+        id="auth-box"
+        className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden relative z-10"
+      >
         {/* Banner with school details */}
         <div className="bg-gradient-to-r from-emerald-800 to-emerald-950 text-white p-6 text-center border-b border-emerald-500/20">
-          <img 
-            src="/src/assets/images/school_logo.jpg" 
-            alt="Edweso Royal Academy Logo" 
+          <img
+            src="/assets/images/logo.png"
+            alt="Edweso Royal Academy Logo"
             className="inline-block w-16 h-16 rounded-2xl object-contain border border-amber-400/15 mb-3 shadow-md bg-emerald-950/50 p-1.5"
             referrerPolicy="no-referrer"
           />
-          <h2 className="text-xl font-extrabold text-white font-sans tracking-tight">Edweso Royal Academy</h2>
-          <p className="text-[11px] uppercase tracking-widest text-amber-400 font-bold mt-1">Knowledge, Discipline, Excellence</p>
+          <h2 className="text-xl font-extrabold text-white font-sans tracking-tight">
+            Edweso Royal Academy
+          </h2>
+          <p className="text-[11px] uppercase tracking-widest text-amber-400 font-bold mt-1">
+            Knowledge, Discipline, Excellence
+          </p>
         </div>
 
         <div className="p-6">
-          
-          {activeTab === 'login' && (
+          {activeTab === "login" && (
             <div className="space-y-5 animate-fade-in">
               <div className="text-center">
-                <h3 className="text-lg font-bold text-white">Sign In to Your Portal</h3>
-                <p className="text-xs text-slate-400 mt-1">Select your account tier and enter credentials.</p>
+                <h3 className="text-lg font-bold text-white">
+                  Sign In to Your Portal
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Select your account tier and enter credentials.
+                </p>
               </div>
 
               {/* Role Selectors */}
@@ -158,11 +166,11 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 <button
                   type="button"
                   id="role-btn-student"
-                  onClick={() => autofillDemo('student')}
+                  onClick={() => autofillDemo("student")}
                   className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
-                    selectedRole === 'student'
-                      ? 'bg-emerald-700 text-white font-bold shadow-xs'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                    selectedRole === "student"
+                      ? "bg-emerald-700 text-white font-bold shadow-xs"
+                      : "text-slate-400 hover:text-white hover:bg-slate-900/50"
                   }`}
                 >
                   <GraduationCap size={15} className="mb-0.5" />
@@ -171,11 +179,11 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 <button
                   type="button"
                   id="role-btn-parent"
-                  onClick={() => autofillDemo('parent')}
+                  onClick={() => autofillDemo("parent")}
                   className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
-                    selectedRole === 'parent'
-                      ? 'bg-emerald-700 text-white font-bold shadow-xs'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                    selectedRole === "parent"
+                      ? "bg-emerald-700 text-white font-bold shadow-xs"
+                      : "text-slate-400 hover:text-white hover:bg-slate-900/50"
                   }`}
                 >
                   <User size={15} className="mb-0.5" />
@@ -184,11 +192,11 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 <button
                   type="button"
                   id="role-btn-teacher"
-                  onClick={() => autofillDemo('teacher')}
+                  onClick={() => autofillDemo("teacher")}
                   className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
-                    selectedRole === 'teacher'
-                      ? 'bg-emerald-700 text-white font-bold shadow-xs'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                    selectedRole === "teacher"
+                      ? "bg-emerald-700 text-white font-bold shadow-xs"
+                      : "text-slate-400 hover:text-white hover:bg-slate-900/50"
                   }`}
                 >
                   <UserCheck size={15} className="mb-0.5" />
@@ -197,11 +205,11 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 <button
                   type="button"
                   id="role-btn-admin"
-                  onClick={() => autofillDemo('admin')}
+                  onClick={() => autofillDemo("admin")}
                   className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
-                    selectedRole === 'admin'
-                      ? 'bg-emerald-700 text-white font-bold shadow-xs'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                    selectedRole === "admin"
+                      ? "bg-emerald-700 text-white font-bold shadow-xs"
+                      : "text-slate-400 hover:text-white hover:bg-slate-900/50"
                   }`}
                 >
                   <ShieldCheck size={15} className="mb-0.5" />
@@ -210,7 +218,11 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
               </div>
 
               {/* Login Form */}
-              <form id="login-form" onSubmit={handleLoginSubmit} className="space-y-4">
+              <form
+                id="login-form"
+                onSubmit={handleLoginSubmit}
+                className="space-y-4"
+              >
                 {loginError && (
                   <div className="p-3 bg-red-950/50 border border-red-900 rounded-lg text-red-200 text-xs text-center font-medium">
                     {loginError}
@@ -218,7 +230,9 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 )}
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-300">Email Address</label>
+                  <label className="block text-xs font-semibold text-slate-300">
+                    Email Address
+                  </label>
                   <div className="relative">
                     <input
                       type="email"
@@ -229,17 +243,22 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-hidden focus:border-emerald-500 font-medium"
                     />
-                    <Mail className="absolute left-3.5 top-3 text-slate-500" size={16} />
+                    <Mail
+                      className="absolute left-3.5 top-3 text-slate-500"
+                      size={16}
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="block text-xs font-semibold text-slate-300">Password</label>
+                    <label className="block text-xs font-semibold text-slate-300">
+                      Password
+                    </label>
                     <button
                       type="button"
                       id="forgot-pwd-link"
-                      onClick={() => setActiveTab('forgot')}
+                      onClick={() => setActiveTab("forgot")}
                       className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 transition-colors"
                     >
                       Forgot?
@@ -255,7 +274,10 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-hidden focus:border-emerald-500 font-medium"
                     />
-                    <Lock className="absolute left-3.5 top-3 text-slate-500" size={16} />
+                    <Lock
+                      className="absolute left-3.5 top-3 text-slate-500"
+                      size={16}
+                    />
                   </div>
                 </div>
 
@@ -289,19 +311,19 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 </div>
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   <button
-                    onClick={() => autofillDemo('student')}
+                    onClick={() => autofillDemo("student")}
                     className="text-[10px] bg-slate-900 border border-slate-800 text-emerald-400 font-bold px-2 py-1 rounded hover:bg-slate-800 transition-colors"
                   >
                     Student (Kofi)
                   </button>
                   <button
-                    onClick={() => autofillDemo('teacher')}
+                    onClick={() => autofillDemo("teacher")}
                     className="text-[10px] bg-slate-900 border border-slate-800 text-amber-400 font-bold px-2 py-1 rounded hover:bg-slate-800 transition-colors"
                   >
                     Teacher (Kwame)
                   </button>
                   <button
-                    onClick={() => autofillDemo('admin')}
+                    onClick={() => autofillDemo("admin")}
                     className="text-[10px] bg-slate-900 border border-slate-800 text-sky-400 font-bold px-2 py-1 rounded hover:bg-slate-800 transition-colors"
                   >
                     Admin (Principal)
@@ -312,7 +334,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
               <div className="text-center text-xs text-slate-400 border-t border-slate-800/60 pt-4">
                 <span>Looking to register a student? </span>
                 <button
-                  onClick={() => setActiveTab('register')}
+                  onClick={() => setActiveTab("register")}
                   id="register-link"
                   className="text-amber-400 hover:text-amber-300 font-bold transition-colors"
                 >
@@ -322,24 +344,36 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
             </div>
           )}
 
-          {activeTab === 'register' && (
+          {activeTab === "register" && (
             <div className="space-y-4 animate-fade-in">
               <div className="text-center">
-                <h3 className="text-lg font-bold text-white">Admission Inquiry Form</h3>
-                <p className="text-xs text-slate-400 mt-1">Pre-register your ward for enrollment review.</p>
+                <h3 className="text-lg font-bold text-white">
+                  Admission Inquiry Form
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Pre-register your ward for enrollment review.
+                </p>
               </div>
 
               {regSuccess ? (
                 <div className="p-4 bg-emerald-950/80 border border-emerald-900 text-emerald-200 text-xs rounded-lg text-center font-semibold space-y-2">
                   <p>✓ Admission inquiry filed successfully!</p>
                   <p className="font-normal text-[11px] text-emerald-300">
-                    A school administrator from Edweso Royal Academy will contact you via {regPhone} within 48 business hours. Thank you!
+                    A school administrator from Edweso Royal Academy will
+                    contact you via {regPhone} within 48 business hours. Thank
+                    you!
                   </p>
                 </div>
               ) : (
-                <form id="register-form" onSubmit={handleRegisterSubmit} className="space-y-3">
+                <form
+                  id="register-form"
+                  onSubmit={handleRegisterSubmit}
+                  className="space-y-3"
+                >
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">Student Full Name</label>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                      Student Full Name
+                    </label>
                     <div className="relative">
                       <input
                         type="text"
@@ -350,12 +384,17 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                         onChange={(e) => setRegName(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-9 text-xs text-white focus:outline-hidden focus:border-emerald-500 font-medium"
                       />
-                      <User className="absolute left-3 top-2.5 text-slate-500" size={14} />
+                      <User
+                        className="absolute left-3 top-2.5 text-slate-500"
+                        size={14}
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">Parent / Guardian Name</label>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                      Parent / Guardian Name
+                    </label>
                     <div className="relative">
                       <input
                         type="text"
@@ -366,12 +405,17 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                         onChange={(e) => setRegParent(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-9 text-xs text-white focus:outline-hidden focus:border-emerald-500 font-medium"
                       />
-                      <User className="absolute left-3 top-2.5 text-slate-500" size={14} />
+                      <User
+                        className="absolute left-3 top-2.5 text-slate-500"
+                        size={14}
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">Mobile Number (+233)</label>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                      Mobile Number (+233)
+                    </label>
                     <div className="relative">
                       <input
                         type="tel"
@@ -382,12 +426,17 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                         onChange={(e) => setRegPhone(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-9 text-xs text-white focus:outline-hidden focus:border-emerald-500 font-medium"
                       />
-                      <Phone className="absolute left-3 top-2.5 text-slate-500" size={14} />
+                      <Phone
+                        className="absolute left-3 top-2.5 text-slate-500"
+                        size={14}
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">Email Address</label>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                      Email Address
+                    </label>
                     <div className="relative">
                       <input
                         type="email"
@@ -398,12 +447,17 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                         onChange={(e) => setRegEmail(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-9 text-xs text-white focus:outline-hidden focus:border-emerald-500 font-medium"
                       />
-                      <Mail className="absolute left-3 top-2.5 text-slate-500" size={14} />
+                      <Mail
+                        className="absolute left-3 top-2.5 text-slate-500"
+                        size={14}
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">Intended Class Level</label>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                      Intended Class Level
+                    </label>
                     <select
                       id="reg-student-class"
                       value={regClass}
@@ -433,7 +487,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 <button
                   type="button"
                   id="register-back-login"
-                  onClick={() => setActiveTab('login')}
+                  onClick={() => setActiveTab("login")}
                   className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
                 >
                   Back to Sign In
@@ -442,24 +496,36 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
             </div>
           )}
 
-          {activeTab === 'forgot' && (
+          {activeTab === "forgot" && (
             <div className="space-y-4 animate-fade-in">
               <div className="text-center">
-                <h3 className="text-lg font-bold text-white">Reset Account Password</h3>
-                <p className="text-xs text-slate-400 mt-1">Provide your registered school email address.</p>
+                <h3 className="text-lg font-bold text-white">
+                  Reset Account Password
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Provide your registered school email address.
+                </p>
               </div>
 
               {forgotSuccess ? (
                 <div className="p-4 bg-emerald-950/80 border border-emerald-900 text-emerald-200 text-xs rounded-lg text-center font-semibold space-y-2">
                   <p>✓ Password Reset Request Transmitted</p>
                   <p className="font-normal text-[11px] text-emerald-300">
-                    If this email matches our student/teacher ledger, reset instructions have been dispatched via SMS and Email coordinates on file.
+                    If this email matches our student/teacher ledger, reset
+                    instructions have been dispatched via SMS and Email
+                    coordinates on file.
                   </p>
                 </div>
               ) : (
-                <form id="forgot-form" onSubmit={handleForgotSubmit} className="space-y-4">
+                <form
+                  id="forgot-form"
+                  onSubmit={handleForgotSubmit}
+                  className="space-y-4"
+                >
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-semibold text-slate-300">Registered Email</label>
+                    <label className="block text-xs font-semibold text-slate-300">
+                      Registered Email
+                    </label>
                     <div className="relative">
                       <input
                         type="email"
@@ -470,7 +536,10 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                         onChange={(e) => setForgotEmail(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-hidden focus:border-emerald-500 font-medium"
                       />
-                      <Mail className="absolute left-3.5 top-3 text-slate-500" size={16} />
+                      <Mail
+                        className="absolute left-3.5 top-3 text-slate-500"
+                        size={16}
+                      />
                     </div>
                   </div>
 
@@ -488,7 +557,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 <button
                   type="button"
                   id="forgot-back-login"
-                  onClick={() => setActiveTab('login')}
+                  onClick={() => setActiveTab("login")}
                   className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
                 >
                   Back to Sign In
@@ -496,15 +565,15 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
               </div>
             </div>
           )}
-
         </div>
 
         {/* Security assurance */}
         <div className="bg-slate-950 px-6 py-4 flex items-center justify-center space-x-2 border-t border-slate-800/60 text-[10px] text-slate-500">
           <ShieldCheck size={14} className="text-emerald-500" />
-          <span>Edweso Royal Academy official cybersecurity gateway encryption.</span>
+          <span>
+            Edweso Royal Academy official cybersecurity gateway encryption.
+          </span>
         </div>
-
       </div>
     </div>
   );
