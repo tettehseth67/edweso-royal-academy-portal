@@ -7,6 +7,7 @@ import {
   HomeworkAssignment, HomeworkSubmission, UserSession, 
   SchoolClass, Subject, Student 
 } from '../types';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 interface TeacherAssignmentsViewProps {
   session: UserSession;
@@ -48,6 +49,15 @@ export default function TeacherAssignmentsView({
   const [isGradingAi, setIsGradingAi] = useState(false);
   const [aiGradeError, setAiGradeError] = useState('');
 
+  // Delete Confirmation State
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    id: string;
+  }>({
+    isOpen: false,
+    id: ''
+  });
+
   // Handle Publish Assignment
   const handlePublishAssignment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,12 +93,19 @@ export default function TeacherAssignmentsView({
 
   // Delete an assignment
   const handleDeleteAssignment = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this assignment and its submissions?')) {
-      const filteredAssignments = homeworkAssignments.filter(hw => hw.id !== id);
-      const filteredSubmissions = homeworkSubmissions.filter(sub => sub.assignmentId !== id);
-      onUpdateHomeworkAssignments(filteredAssignments);
-      onUpdateHomeworkSubmissions(filteredSubmissions);
-    }
+    setDeleteConfirm({
+      isOpen: true,
+      id
+    });
+  };
+
+  const confirmDeleteAssignment = () => {
+    const id = deleteConfirm.id;
+    const filteredAssignments = homeworkAssignments.filter(hw => hw.id !== id);
+    const filteredSubmissions = homeworkSubmissions.filter(sub => sub.assignmentId !== id);
+    onUpdateHomeworkAssignments(filteredAssignments);
+    onUpdateHomeworkSubmissions(filteredSubmissions);
+    setDeleteConfirm({ isOpen: false, id: '' });
   };
 
   // Trigger AI Grading Assistant
@@ -579,6 +596,14 @@ export default function TeacherAssignmentsView({
           </form>
         </div>
       )}
+
+      <DeleteConfirmationModal
+        isOpen={deleteConfirm.isOpen}
+        title="Delete Homework Assignment"
+        message="Are you sure you want to permanently delete this homework assignment and purge all student evaluation submissions associated with it? This operation is irreversible."
+        onConfirm={confirmDeleteAssignment}
+        onCancel={() => setDeleteConfirm({ isOpen: false, id: '' })}
+      />
     </div>
   );
 }

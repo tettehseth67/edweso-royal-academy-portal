@@ -6,6 +6,7 @@ import {
   AlertCircle, ChevronRight, PenTool, Flame
 } from 'lucide-react';
 import { SyllabusPlan, Subject, UserSession } from '../types';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 interface SyllabusBoardProps {
   session: UserSession;
@@ -64,6 +65,15 @@ export default function SyllabusBoard({
   // State for parent submission form inside cards
   const [parentNames, setParentNames] = useState<Record<string, string>>({});
   const [parentNotes, setParentNotes] = useState<Record<string, string>>({});
+
+  // Delete Confirmation State
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    id: string;
+  }>({
+    isOpen: false,
+    id: ''
+  });
 
   const handleAddParentLog = (planId: string, e: React.FormEvent) => {
     e.preventDefault();
@@ -268,10 +278,17 @@ export default function SyllabusBoard({
 
   // Delete outline
   const handleDeleteSyllabus = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this syllabus outline? This cannot be undone.')) {
-      const filtered = syllabusPlans.filter(p => p.id !== id);
-      onUpdateSyllabusPlans(filtered);
-    }
+    setDeleteConfirm({
+      isOpen: true,
+      id
+    });
+  };
+
+  const confirmDeleteSyllabus = () => {
+    const id = deleteConfirm.id;
+    const filtered = syllabusPlans.filter(p => p.id !== id);
+    onUpdateSyllabusPlans(filtered);
+    setDeleteConfirm({ isOpen: false, id: '' });
   };
 
   // NORMALIZE PLANS list to prevent crashes on legacy mock values
@@ -933,6 +950,14 @@ export default function SyllabusBoard({
           </form>
         </div>
       )}
+
+      <DeleteConfirmationModal
+        isOpen={deleteConfirm.isOpen}
+        title="Delete Syllabus Outline"
+        message="Are you sure you want to permanently delete this syllabus planning outline topic? This will remove the block and all self-study verification logs associated with it."
+        onConfirm={confirmDeleteSyllabus}
+        onCancel={() => setDeleteConfirm({ isOpen: false, id: '' })}
+      />
 
     </div>
   );

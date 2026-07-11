@@ -18,6 +18,7 @@ import { calculateGhanaGrade, getGradeRemark } from '../mockData';
 import CameraCapture from './CameraCapture';
 import SyllabusBoard from './SyllabusBoard';
 import { FeaturedAnnouncementsCarousel, TeachingResourcesCarousel } from './FeaturedCarouselComponents';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 import TeacherAssignmentsView from './TeacherAssignmentsView';
 
 interface TeacherDashboardProps {
@@ -90,6 +91,16 @@ export default function TeacherDashboard({
   const [isCameraActive, setIsCameraActive] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
+  // Delete Confirmation State
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    type: 'photo' | 'note' | '';
+    targetId?: string;
+  }>({
+    isOpen: false,
+    type: ''
+  });
+
   const handleUpdatePhoto = (newPhotoUrl: string | undefined) => {
     if (onUpdateTeachers) {
       const updatedTeachers = teachers.map(t => {
@@ -120,7 +131,10 @@ export default function TeacherDashboard({
   };
 
   const handleRemovePhoto = () => {
-    handleUpdatePhoto(undefined);
+    setDeleteConfirm({
+      isOpen: true,
+      type: 'photo'
+    });
   };
 
   // Assigned classes: Mr Kwame Boateng teaches JHS 2 (c4) Mathematics
@@ -232,9 +246,22 @@ export default function TeacherDashboard({
   };
 
   const handleDeleteClassNote = (noteId: string) => {
-    if (onUpdateClassNotes) {
-      onUpdateClassNotes(classNotes.filter(n => n.id !== noteId));
+    setDeleteConfirm({
+      isOpen: true,
+      type: 'note',
+      targetId: noteId
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirm.type === 'photo') {
+      handleUpdatePhoto(undefined);
+    } else if (deleteConfirm.type === 'note' && deleteConfirm.targetId) {
+      if (onUpdateClassNotes) {
+        onUpdateClassNotes(classNotes.filter(n => n.id !== deleteConfirm.targetId));
+      }
     }
+    setDeleteConfirm({ isOpen: false, type: '' });
   };
 
   // 5. Morning Report State
@@ -2571,6 +2598,17 @@ Edweso Royal Academy Administration Portal Dispatch`;
         </div>
       )}
 
+      <DeleteConfirmationModal
+        isOpen={deleteConfirm.isOpen}
+        title={deleteConfirm.type === 'photo' ? 'Remove Profile Photo' : 'Delete Private Note'}
+        message={
+          deleteConfirm.type === 'photo'
+            ? 'Are you sure you want to permanently remove your profile display photo? This will revert your avatar back to the standard initials placeholder.'
+            : 'Are you sure you want to permanently delete this confidential observational student note? This record will be expunged from the pupil portfolio history.'
+        }
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteConfirm({ isOpen: false, type: '' })}
+      />
     </div>
   );
 }

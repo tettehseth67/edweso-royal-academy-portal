@@ -17,6 +17,7 @@ import GradeProjectionTool from './GradeProjectionTool';
 import SyllabusBoard from './SyllabusBoard';
 import { StudentPhotoGalleryCarousel } from './FeaturedCarouselComponents';
 import StudentAssignmentsView from './StudentAssignmentsView';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 interface StudentDashboardProps {
   session: UserSession;
@@ -80,6 +81,9 @@ export default function StudentDashboard({
   const [isCameraActive, setIsCameraActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Delete Confirmation State
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
   const handleUpdatePhoto = (newPhotoUrl: string | undefined) => {
     if (onUpdateStudents) {
       const updatedStudents = students.map(s => {
@@ -110,7 +114,12 @@ export default function StudentDashboard({
   };
 
   const handleRemovePhoto = () => {
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmRemovePhoto = () => {
     handleUpdatePhoto(undefined);
+    setDeleteConfirmOpen(false);
   };
 
   // AI Counselling States
@@ -1508,6 +1517,14 @@ export default function StudentDashboard({
           </div>
         );
       })()}
+
+      <DeleteConfirmationModal
+        isOpen={deleteConfirmOpen}
+        title="Remove Profile Photo"
+        message="Are you sure you want to permanently remove your profile display photo? This will revert your avatar back to the standard initials placeholder."
+        onConfirm={confirmRemovePhoto}
+        onCancel={() => setDeleteConfirmOpen(false)}
+      />
 
     </div>
   );

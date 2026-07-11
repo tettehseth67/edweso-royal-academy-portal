@@ -131,17 +131,17 @@ export default function HeroCarousel({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -25 }}
               transition={{ duration: 0.5, delay: 0.05 }}
-              className="space-y-3"
+              className="space-y-2 sm:space-y-3"
             >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans leading-tight">
+              <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans leading-tight">
                 {SLIDES[currentSlide].title}
               </h1>
-              <h2 className="text-lg sm:text-xl font-bold text-amber-400 font-sans tracking-wide">
+              <h2 className="text-sm sm:text-xl font-bold text-amber-400 font-sans tracking-wide">
                 {SLIDES[currentSlide].subtitle}
               </h2>
             </motion.div>
           </AnimatePresence>
-
+ 
           {/* Slide Description Paragraph */}
           <AnimatePresence mode="wait">
             <motion.p
@@ -150,12 +150,12 @@ export default function HeroCarousel({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-slate-200/90 text-sm sm:text-base leading-relaxed max-w-2xl font-medium"
+              className="text-slate-200/90 text-xs sm:text-base leading-relaxed max-w-2xl font-medium"
             >
               {SLIDES[currentSlide].description}
             </motion.p>
           </AnimatePresence>
-
+ 
           {/* Action Call to Buttons */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -164,11 +164,11 @@ export default function HeroCarousel({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4, delay: 0.15 }}
-              className="flex flex-wrap items-center gap-4 pt-4"
+              className="flex flex-wrap items-center gap-3 pt-6 sm:pt-4"
             >
               <button
                 onClick={onNavigateToAdmissions}
-                className="px-8 py-3.5 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 font-black rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all text-xs uppercase tracking-widest cursor-pointer flex items-center space-x-2"
+                className="px-5 sm:px-8 py-3 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 font-black rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all text-[10px] sm:text-xs uppercase tracking-widest cursor-pointer flex items-center space-x-2"
               >
                 <span>{SLIDES[currentSlide].ctaPrimary}</span>
                 <ArrowRight size={14} />
@@ -176,14 +176,14 @@ export default function HeroCarousel({
               
               <button
                 onClick={onNavigateToAbout}
-                className="px-8 py-3.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-bold rounded-xl border border-white/20 hover:border-white/30 backdrop-blur-xs transition-all text-xs uppercase tracking-widest cursor-pointer"
+                className="px-5 sm:px-8 py-3 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-bold rounded-xl border border-white/20 hover:border-white/30 backdrop-blur-xs transition-all text-[10px] sm:text-xs uppercase tracking-widest cursor-pointer"
               >
                 {SLIDES[currentSlide].ctaSecondary}
               </button>
-
+ 
               <button
                 onClick={onNavigateToLogin}
-                className="px-4 py-3.5 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
+                className="px-3.5 sm:px-4 py-3 bg-slate-900/60 hover:bg-slate-900 border border-slate-800 text-slate-300 hover:text-white rounded-xl text-[10px] sm:text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
               >
                 Portal Login
               </button>
@@ -191,19 +191,19 @@ export default function HeroCarousel({
           </AnimatePresence>
         </div>
       </div>
-
-      {/* Left/Right Directional Controls (Exactly matches the screenshot aesthetic) */}
+ 
+      {/* Left/Right Directional Controls (Hidden on mobile to prevent overlap with content) */}
       <button
         onClick={handlePrev}
-        className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md flex items-center justify-center border border-white/15 hover:border-white/25 transition-all shadow-lg active:scale-95 cursor-pointer z-20 group-hover:opacity-100 opacity-80"
+        className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md hidden md:flex items-center justify-center border border-white/15 hover:border-white/25 transition-all shadow-lg active:scale-95 cursor-pointer z-20 group-hover:opacity-100 opacity-80"
         aria-label="Previous Slide"
       >
         <ChevronLeft size={24} />
       </button>
-
+ 
       <button
         onClick={handleNext}
-        className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-600 text-slate-950 flex items-center justify-center transition-all shadow-lg active:scale-95 cursor-pointer z-20 group-hover:opacity-100 opacity-90"
+        className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-600 text-slate-950 hidden md:flex items-center justify-center transition-all shadow-lg active:scale-95 cursor-pointer z-20 group-hover:opacity-100 opacity-90"
         aria-label="Next Slide"
       >
         <ChevronRight size={24} />

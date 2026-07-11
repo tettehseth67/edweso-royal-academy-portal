@@ -465,7 +465,7 @@ export default function App() {
     if (userSession.role === 'admin') {
       setActiveTab('overview');
     } else if (userSession.role === 'teacher') {
-      setActiveTab('classes');
+      setActiveTab('profile');
     } else {
       setActiveTab('profile');
     }
