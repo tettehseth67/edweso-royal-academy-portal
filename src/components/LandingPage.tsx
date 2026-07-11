@@ -9,8 +9,6 @@ import {
 import { SchoolDatabase } from '../mockData';
 import { PublicInquiry } from '../types';
 import HeroCarousel from './HeroCarousel';
-import logo from "./assets/images/logo.png";
-
 
 interface LandingPageProps {
   onNavigateToLogin: (role?: 'admin' | 'teacher' | 'student') => void;
@@ -1791,7 +1789,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <img
-                  src={logo}
+                  src="/assets/images/logo.png"
                   alt="Edweso Royal Academy Logo"
                   className="w-12 h-12 rounded-xl object-contain border border-amber-400/15 shadow-xs"
                   referrerPolicy="no-referrer"
