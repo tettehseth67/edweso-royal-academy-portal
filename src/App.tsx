@@ -916,6 +916,7 @@ Edweso Royal Academy`;
           {session.role === 'parent' && (
             <ParentDashboard
               session={session}
+              activeTab={activeTab}
               students={students}
               teachers={teachers}
               classes={classes}

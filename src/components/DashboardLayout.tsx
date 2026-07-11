@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, UserCheck, BookOpen, 
   CheckSquare, Award, Calendar, Megaphone, CreditCard, User, Mail,
   AlertCircle, Check, CheckCircle, History, Send, FileText, Sunrise,
-  ShieldAlert, HelpCircle, ChevronUp, UserX, FileSpreadsheet
+  ShieldAlert, HelpCircle, ChevronUp, UserX, FileSpreadsheet, Smartphone
 } from 'lucide-react';
 import { UserSession, Announcement } from '../types';
 import { SchoolDatabase } from '../mockData';
@@ -104,6 +104,11 @@ export default function DashboardLayout({
 
   const parentNav = [
     { id: 'overview', label: 'Parent Desk', icon: <User size={18} /> },
+    { id: 'grades', label: 'Report Cards', icon: <Award size={18} /> },
+    { id: 'fees', label: 'Monitor Fees', icon: <CreditCard size={18} /> },
+    { id: 'attendance', label: 'Attendance Roll', icon: <CheckSquare size={18} /> },
+    { id: 'teachers', label: 'Teacher Messaging', icon: <Mail size={18} /> },
+    { id: 'sms', label: 'Instant SMS Alerts', icon: <Smartphone size={18} /> },
     { id: 'announcements', label: 'PTA Circulars', icon: <Megaphone size={18} /> },
     { id: 'emails', label: 'Email Box', icon: <Send size={18} /> }
   ];
