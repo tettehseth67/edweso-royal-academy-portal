@@ -11,7 +11,7 @@ interface AuthPageProps {
 export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole = 'student' }: AuthPageProps) {
   const [activeTab, setActiveTab] = useState<'login' | 'register' | 'forgot'>('login');
   const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
-  
+
   // Login Form States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -50,7 +50,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
     setLoginError('');
 
     const trimmedEmail = email.trim().toLowerCase();
-    
+
     if (selectedRole === 'admin' && trimmedEmail === demoUsers.admin.email && password === demoUsers.admin.pass) {
       onLoginSuccess({
         id: 'admin-01',
@@ -114,7 +114,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      
+
       {/* Visual background accents */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-700/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
@@ -131,12 +131,12 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
 
       {/* Main card */}
       <div id="auth-box" className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden relative z-10">
-        
+
         {/* Banner with school details */}
         <div className="bg-gradient-to-r from-emerald-800 to-emerald-950 text-white p-6 text-center border-b border-emerald-500/20">
-          <img 
-            src="/src/assets/images/school_logo.jpg" 
-            alt="Edweso Royal Academy Logo" 
+          <img
+            src="/assets/images/logo.png"
+            alt="Edweso Royal Academy Logo"
             className="inline-block w-16 h-16 rounded-2xl object-contain border border-amber-400/15 mb-3 shadow-md bg-emerald-950/50 p-1.5"
             referrerPolicy="no-referrer"
           />
@@ -145,7 +145,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
         </div>
 
         <div className="p-6">
-          
+
           {activeTab === 'login' && (
             <div className="space-y-5 animate-fade-in">
               <div className="text-center">
@@ -159,11 +159,10 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                   type="button"
                   id="role-btn-student"
                   onClick={() => autofillDemo('student')}
-                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
-                    selectedRole === 'student'
+                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${selectedRole === 'student'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                  }`}
+                    }`}
                 >
                   <GraduationCap size={15} className="mb-0.5" />
                   <span className="text-[9px]">Student</span>
@@ -172,11 +171,10 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                   type="button"
                   id="role-btn-parent"
                   onClick={() => autofillDemo('parent')}
-                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
-                    selectedRole === 'parent'
+                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${selectedRole === 'parent'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                  }`}
+                    }`}
                 >
                   <User size={15} className="mb-0.5" />
                   <span className="text-[9px]">Parent</span>
@@ -185,11 +183,10 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                   type="button"
                   id="role-btn-teacher"
                   onClick={() => autofillDemo('teacher')}
-                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
-                    selectedRole === 'teacher'
+                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${selectedRole === 'teacher'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                  }`}
+                    }`}
                 >
                   <UserCheck size={15} className="mb-0.5" />
                   <span className="text-[9px]">Teacher</span>
@@ -198,11 +195,10 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                   type="button"
                   id="role-btn-admin"
                   onClick={() => autofillDemo('admin')}
-                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
-                    selectedRole === 'admin'
+                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${selectedRole === 'admin'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
-                  }`}
+                    }`}
                 >
                   <ShieldCheck size={15} className="mb-0.5" />
                   <span className="text-[9px]">Admin</span>

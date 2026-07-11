@@ -217,7 +217,7 @@ export default function DashboardLayout({
         {/* School Logo Area */}
         <div className={`p-5 flex items-center space-x-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           <img 
-            src="/src/assets/images/school_logo.jpg" 
+            src="/assets/images/logo.png" 
             alt="Edweso Royal Academy Logo" 
             className="w-14 h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm"
             referrerPolicy="no-referrer"
@@ -309,7 +309,7 @@ export default function DashboardLayout({
           <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
             <div className="flex items-center space-x-2">
               <img 
-                src="/src/assets/images/school_logo.jpg" 
+                src="/assets/images/logo.png" 
                 alt="Edweso Royal Academy Logo" 
                 className="w-11 h-11 rounded-lg object-contain border border-amber-400/15 shadow-xs"
                 referrerPolicy="no-referrer"
