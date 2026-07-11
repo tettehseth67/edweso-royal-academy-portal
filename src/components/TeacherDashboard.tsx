@@ -507,9 +507,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
         <div className="space-y-6 animate-fade-in" id="teacher-profile-section">
           
           {/* Main profile layout */}
-          <div className={`p-6 rounded-2xl border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
-          } flex flex-col md:flex-row items-center md:items-start gap-6`}>
+          <div className="p-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row items-center md:items-start gap-6">
             
             {/* Profile Photo with upload and capture capability */}
             <div className="flex flex-col items-center gap-3 shrink-0" id="teacher-avatar-interactive-container">
@@ -519,10 +517,10 @@ Edweso Royal Academy Administration Portal Dispatch`;
                     src={teacher.profilePhoto} 
                     alt={teacher.name} 
                     referrerPolicy="no-referrer"
-                    className="w-24 h-24 rounded-full object-cover border-2 border-emerald-500 shadow-md" 
+                    className="w-24 h-24 rounded-full object-cover border border-slate-200/80 shadow-xs" 
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-2 border-emerald-500/20 flex items-center justify-center font-extrabold text-3xl shadow-sm">
+                  <div className="w-24 h-24 rounded-full bg-slate-50 text-slate-600 border border-slate-200/80 flex items-center justify-center font-bold text-3xl shadow-xs">
                     {teacher.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                   </div>
                 )}
@@ -561,7 +559,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 <div className="flex gap-1.5">
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="text-[10px] font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
+                    className="text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 px-2 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer shadow-xs hover:bg-slate-50 hover:border-slate-300"
                   >
                     <Upload size={10} />
                     Upload
@@ -569,7 +567,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                   <button 
                     onClick={() => setIsCameraActive(true)}
                     id="profile-camera-btn"
-                    className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
+                    className="text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 px-2 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer shadow-xs hover:bg-slate-50 hover:border-slate-300"
                   >
                     <Camera size={10} />
                     Camera
@@ -578,7 +576,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 {teacher.profilePhoto && (
                   <button 
                     onClick={handleRemovePhoto}
-                    className="text-[9px] font-bold text-rose-500 hover:text-rose-600 hover:underline flex items-center gap-0.5 cursor-pointer"
+                    className="text-[9px] font-semibold text-rose-500 hover:text-rose-600 hover:underline flex items-center gap-0.5 cursor-pointer"
                   >
                     <Trash2 size={9} />
                     Remove photo
@@ -610,8 +608,8 @@ Edweso Royal Academy Administration Portal Dispatch`;
 
             <div className="flex-1 text-center md:text-left space-y-4 w-full">
               <div>
-                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white leading-tight">{teacher.name}</h2>
-                <span className="text-xs bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 px-2.5 py-1 rounded font-bold mt-2 inline-block">
+                <h2 className="text-xl font-display font-extrabold text-slate-800 leading-tight">{teacher.name}</h2>
+                <span className="text-xs bg-slate-50 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-full font-bold mt-2 inline-block">
                   Academic Faculty Member
                 </span>
               </div>
@@ -619,37 +617,33 @@ Edweso Royal Academy Administration Portal Dispatch`;
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase font-bold text-slate-400">Staff Registration ID</p>
-                  <p className="font-mono text-slate-700 dark:text-slate-300 font-bold">{teacher.staffNumber}</p>
+                  <p className="font-mono text-slate-700 font-bold">{teacher.staffNumber}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase font-bold text-slate-400">Primary Discipline</p>
-                  <p className="font-bold text-slate-700 dark:text-slate-300">{teacher.subjectId}</p>
+                  <p className="font-bold text-slate-700">{teacher.subjectId}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase font-bold text-slate-400">Assigned Form Division</p>
-                  <p className="font-bold text-slate-700 dark:text-slate-300">{assignedClass ? assignedClass.name : 'None'}</p>
+                  <p className="font-bold text-slate-700">{assignedClass ? assignedClass.name : 'None'}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase font-bold text-slate-400">Staff Account Status</p>
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    teacher.status === 'Active' 
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400' 
-                      : 'bg-amber-100 text-amber-800 dark:bg-amber-950/30 dark:text-amber-400'
-                  }`}>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
                     ● {teacher.status}
                   </span>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] uppercase font-bold text-slate-400">Official Email</p>
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">{teacher.email}</p>
+                  <p className="font-semibold text-slate-700">{teacher.email}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] uppercase font-bold text-slate-400">Telephone Contact</p>
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">{teacher.phone || 'N/A'}</p>
+                  <p className="text-[10px] uppercase font-bold text-slate-950">Telephone Contact</p>
+                  <p className="font-semibold text-slate-950">{teacher.phone || 'N/A'}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] uppercase font-bold text-slate-400">Gender Identity</p>
-                  <p className="font-semibold text-slate-700 dark:text-slate-300">{teacher.gender}</p>
+                  <p className="text-[10px] uppercase font-bold text-slate-950">Gender Identity</p>
+                  <p className="font-semibold text-slate-950">{teacher.gender}</p>
                 </div>
               </div>
             </div>
@@ -682,50 +676,50 @@ Edweso Royal Academy Administration Portal Dispatch`;
           </div>
 
           {/* Simple Performance Insights Box */}
-          <div className={`p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md ${isDarkMode ? 'bg-slate-900/60 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`}>
-            <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b pb-3.5 mb-5 flex items-center space-x-2">
+          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+            <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-3.5 mb-5 flex items-center space-x-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Class Academic Performance Analytics</span>
             </h4>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Card 1: Overall Average */}
-              <div className={`p-4 rounded-xl border transition-all duration-300 hover:scale-[1.01] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-950/40 border-slate-700 hover:border-indigo-500/40' : 'bg-slate-50/60 border-slate-300 hover:border-indigo-500/30'}`}>
-                <div className="p-3.5 rounded-xl bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 shrink-0">
+              <div className="p-4 rounded-xl border border-slate-200 bg-white flex items-center space-x-4 text-slate-600 shadow-xs hover:shadow-sm transition-all duration-300">
+                <div className="p-3 rounded-xl bg-slate-50 text-slate-500 shrink-0 border border-slate-100">
                   <TrendingUp size={20} />
                 </div>
                 <div className="text-left">
-                  <span className="text-[10px] text-slate-400 font-extrabold block uppercase tracking-wider">Overall Average</span>
-                  <span className="text-2xl font-black mt-0.5 block text-slate-900 dark:text-white">81.5%</span>
-                  <span className="text-[10px] text-emerald-500 font-bold flex items-center mt-0.5 gap-0.5">
-                    <span>↑ 1.2%</span> <span className="text-slate-400 font-semibold">vs last term</span>
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Overall Average</span>
+                  <span className="text-2xl font-bold mt-0.5 block text-slate-800">81.5%</span>
+                  <span className="text-[10px] text-emerald-600 font-bold flex items-center mt-0.5 gap-0.5">
+                    <span>↑ 1.2%</span> <span className="text-slate-400 font-medium">vs last term</span>
                   </span>
                 </div>
               </div>
 
               {/* Card 2: Highest Score */}
-              <div className={`p-4 rounded-xl border transition-all duration-300 hover:scale-[1.01] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-950/40 border-slate-700 hover:border-emerald-500/40' : 'bg-slate-50/60 border-slate-300 hover:border-emerald-500/30'}`}>
-                <div className="p-3.5 rounded-xl bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 shrink-0">
+              <div className="p-4 rounded-xl border border-slate-200 bg-white flex items-center space-x-4 text-slate-600 shadow-xs hover:shadow-sm transition-all duration-300">
+                <div className="p-3 rounded-xl bg-slate-50 text-slate-500 shrink-0 border border-slate-100">
                   <Award size={20} />
                 </div>
                 <div className="text-left">
-                  <span className="text-[10px] text-slate-400 font-extrabold block uppercase tracking-wider">Highest Score</span>
-                  <span className="text-2xl font-black mt-0.5 block text-emerald-600 dark:text-emerald-400">93%</span>
-                  <span className="text-[10px] text-slate-400 font-bold mt-0.5 block">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Highest Score</span>
+                  <span className="text-2xl font-bold mt-0.5 block text-slate-800">93%</span>
+                  <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
                     In JHS 2 Mathematics
                   </span>
                 </div>
               </div>
 
               {/* Card 3: PTA Contact Rate */}
-              <div className={`p-4 rounded-xl border transition-all duration-300 hover:scale-[1.01] flex items-center space-x-4 ${isDarkMode ? 'bg-slate-950/40 border-slate-700 hover:border-amber-500/40' : 'bg-slate-50/60 border-slate-300 hover:border-amber-500/30'}`}>
-                <div className="p-3.5 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 shrink-0">
+              <div className="p-4 rounded-xl border border-slate-200 bg-white flex items-center space-x-4 text-slate-600 shadow-xs hover:shadow-sm transition-all duration-300">
+                <div className="p-3 rounded-xl bg-slate-50 text-slate-500 shrink-0 border border-slate-100">
                   <Users size={20} />
                 </div>
                 <div className="text-left">
-                  <span className="text-[10px] text-slate-400 font-extrabold block uppercase tracking-wider">PTA Engagement</span>
-                  <span className="text-2xl font-black mt-0.5 block text-amber-500 dark:text-amber-400">95%</span>
-                  <span className="text-[10px] text-emerald-500 font-bold mt-0.5 block">
+                  <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">PTA Engagement</span>
+                  <span className="text-2xl font-bold mt-0.5 block text-slate-800">95%</span>
+                  <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
                     Guardian phone verified
                   </span>
                 </div>
@@ -734,13 +728,13 @@ Edweso Royal Academy Administration Portal Dispatch`;
           </div>
 
           {/* Recharts Bar Chart: Subject average exam grades */}
-          <div className={`p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`} id="class-performance-chart-card">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-4 border-slate-200/40 dark:border-slate-800">
+          <div className="p-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700" id="class-performance-chart-card">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 mb-4">
               <div>
-                <h4 className="font-extrabold text-xs uppercase tracking-wide text-slate-900 dark:text-white">Subject Performance Trends</h4>
+                <h4 className="font-bold text-xs uppercase tracking-wide text-slate-800">Subject Performance Trends</h4>
                 <p className="text-[11px] text-slate-400 font-medium">Dynamic averages computed from Class Continuous Assessments (30%) & Terminal Exams (70%).</p>
               </div>
-              <div className="flex items-center space-x-3.5 mt-2 sm:mt-0 text-[10px] font-black uppercase tracking-wider text-slate-400">
+              <div className="flex items-center space-x-3.5 mt-2 sm:mt-0 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 <span className="flex items-center space-x-1">
                   <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
                   <span>Class (30)</span>
@@ -814,23 +808,23 @@ Edweso Royal Academy Administration Portal Dispatch`;
           </div>
 
           {/* Individual Student Grade Trend Line Chart */}
-          <div className={`p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md ${isDarkMode ? 'bg-slate-900 border-slate-700 hover:border-slate-600' : 'bg-white border-slate-300 hover:border-slate-400'}`} id="student-trend-analytics-card">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-4 border-slate-200/40 dark:border-slate-800 gap-3">
+          <div className="p-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700" id="student-trend-analytics-card">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 mb-4 gap-3">
               <div>
-                <h4 className="font-extrabold text-xs uppercase tracking-wide text-slate-900 dark:text-white flex items-center space-x-1.5">
-                  <Award size={14} className="text-amber-500 animate-pulse" />
+                <h4 className="font-bold text-xs uppercase tracking-wide text-slate-800 flex items-center space-x-1.5">
+                  <Award size={14} className="text-indigo-600" />
                   <span>Student Multi-Term Grade Progress</span>
                 </h4>
                 <p className="text-[11px] text-slate-400 font-medium">Visualize terminal performance trends and academic progression for any student.</p>
               </div>
               
               <div className="flex items-center space-x-2">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0" htmlFor="trend-student-select">Select Student:</label>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0" htmlFor="trend-student-select">Select Student:</label>
                 <select
                   id="trend-student-select"
                   value={selectedTrendStudentId}
                   onChange={(e) => setSelectedTrendStudentId(e.target.value)}
-                  className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden font-bold"
+                  className="bg-slate-50 border border-slate-200 p-2 rounded-xl text-xs focus:outline-hidden font-semibold text-slate-700"
                 >
                   {classStudents.map(stud => (
                     <option key={stud.id} value={stud.id}>{stud.name} ({stud.admissionNumber})</option>
@@ -935,20 +929,20 @@ Edweso Royal Academy Administration Portal Dispatch`;
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="bg-slate-50 dark:bg-slate-950/40 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/60 flex flex-col md:flex-row justify-between md:items-center gap-3.5">
+                  <div className="bg-slate-50/55 p-3.5 rounded-xl border border-slate-150 flex flex-col md:flex-row justify-between md:items-center gap-3.5 text-slate-600 font-medium">
                     <div>
-                      <p className="text-[11px] font-extrabold text-slate-800 dark:text-slate-200">
+                      <p className="text-[11px] font-bold text-slate-800">
                         Analyzing: {selectedTrendStudent?.name}'s Progression
                       </p>
-                      <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                      <p className="text-[10px] text-slate-400 mt-0.5">
                         Current Class Division: {assignedClass?.name} | Form Parent Contact: {selectedTrendStudent?.parentPhone}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded font-black">
+                      <span className="text-[10px] bg-white border border-slate-150 text-indigo-700 px-2.5 py-1 rounded-full font-semibold">
                         Term 3 Target: 85%+
                       </span>
-                      <span className="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded font-black">
+                      <span className="text-[10px] bg-white border border-slate-150 text-emerald-700 px-2.5 py-1 rounded-full font-semibold">
                         Parent Registered
                       </span>
                     </div>
@@ -998,32 +992,32 @@ Edweso Royal Academy Administration Portal Dispatch`;
           </div>
 
           {/* List of pupils */}
-          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
+          <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white shadow-sm">
             <table id="teacher-attendance-sheet" className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50 dark:bg-slate-950/50">
+                <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
                   <th className="p-3">Student Full Name</th>
                   <th className="p-3">Admission Code</th>
                   <th className="p-3 text-center">Status Marks</th>
                   <th className="p-3">Syllabus excuse / Remarks</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100 text-slate-600">
                 {classStudents.map((stud) => {
                   const state = localAttendance[stud.id] || { status: 'Present', remarks: '' };
                   return (
-                    <tr key={stud.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium">
-                      <td className="p-3 font-extrabold text-slate-900 dark:text-white">{stud.name}</td>
+                    <tr key={stud.id} className="hover:bg-slate-50/30 transition-colors">
+                      <td className="p-3 font-bold text-slate-800">{stud.name}</td>
                       <td className="p-3 font-mono text-[10px] text-slate-400">{stud.admissionNumber}</td>
                       <td className="p-3">
                         <div className="flex justify-center items-center space-x-1">
                           <button
                             type="button"
                             onClick={() => handleSetStatus(stud.id, 'Present')}
-                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${
+                            className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
                               state.status === 'Present'
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800'
+                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                             }`}
                           >
                             Present
@@ -1031,10 +1025,10 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           <button
                             type="button"
                             onClick={() => handleSetStatus(stud.id, 'Late')}
-                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${
+                            className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
                               state.status === 'Late'
-                                ? 'bg-amber-500 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800'
+                                ? 'bg-amber-500 border-amber-500 text-white'
+                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                             }`}
                           >
                             Late
@@ -1042,10 +1036,10 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           <button
                             type="button"
                             onClick={() => handleSetStatus(stud.id, 'Absent')}
-                            className={`px-3 py-1.5 rounded text-[10px] font-bold transition-all ${
+                            className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
                               state.status === 'Absent'
-                                ? 'bg-rose-500 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-950 dark:hover:bg-slate-800'
+                                ? 'bg-rose-500 border-rose-500 text-white'
+                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                             }`}
                           >
                             Absent
@@ -1058,7 +1052,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           placeholder="e.g. sick leave (Malaria)"
                           value={state.remarks}
                           onChange={(e) => handleSetRemarks(stud.id, e.target.value)}
-                          className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 px-2 py-1 rounded text-xs focus:outline-hidden text-slate-700 dark:text-white"
+                          className="w-full bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs focus:outline-hidden text-slate-600"
                         />
                       </td>
                     </tr>
@@ -1107,10 +1101,10 @@ Edweso Royal Academy Administration Portal Dispatch`;
           </div>
 
           {/* Interactive Class Grade Inputs */}
-          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
+          <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white shadow-sm">
             <table id="teacher-grading-sheet" className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50 dark:bg-slate-950/50">
+                <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
                   <th className="p-3">Student Name</th>
                   <th className="p-3">Class Assessment (Max 30)</th>
                   <th className="p-3">Terminal Exam (Max 70)</th>
@@ -1119,14 +1113,14 @@ Edweso Royal Academy Administration Portal Dispatch`;
                   <th className="p-3">Auto Remark / Evaluation</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100 text-slate-600">
                 {classStudents.map((stud) => {
                   const state = localGrades[stud.id] || { classScore: 0, examScore: 0 };
                   const total = state.classScore + state.examScore;
                   const gLetter = calculateGhanaGrade(total);
                   return (
-                    <tr key={stud.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium">
-                      <td className="p-3 font-extrabold text-slate-900 dark:text-white">{stud.name}</td>
+                    <tr key={stud.id} className="hover:bg-slate-50/30 transition-colors">
+                      <td className="p-3 font-bold text-slate-800">{stud.name}</td>
                       <td className="p-3">
                         <input
                           type="number"
@@ -1134,7 +1128,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           max={30}
                           value={state.classScore || ''}
                           onChange={(e) => handleClassScoreChange(stud.id, e.target.value)}
-                          className="w-20 bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 px-2.5 py-1.5 rounded text-xs focus:outline-hidden text-center font-bold font-mono"
+                          className="w-20 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl text-xs focus:outline-hidden text-center font-semibold font-mono text-slate-700"
                         />
                       </td>
                       <td className="p-3">
@@ -1144,22 +1138,18 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           max={70}
                           value={state.examScore || ''}
                           onChange={(e) => handleExamScoreChange(stud.id, e.target.value)}
-                          className="w-20 bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 px-2.5 py-1.5 rounded text-xs focus:outline-hidden text-center font-bold font-mono"
+                          className="w-20 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl text-xs focus:outline-hidden text-center font-semibold font-mono text-slate-700"
                         />
                       </td>
-                      <td className="p-3 font-extrabold text-emerald-700 dark:text-emerald-400 font-mono text-center sm:text-left">
+                      <td className="p-3 font-semibold text-slate-700 font-mono text-center sm:text-left">
                         {total}%
                       </td>
                       <td className="p-3">
-                        <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded font-mono ${
-                          gLetter === 'A' || gLetter === 'B' 
-                            ? 'bg-emerald-500/10 text-emerald-600' 
-                            : 'bg-amber-500/10 text-amber-600'
-                        }`}>
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full font-mono bg-indigo-50 text-indigo-700">
                           {gLetter}
                         </span>
                       </td>
-                      <td className="p-3 text-slate-500 dark:text-slate-400 italic">
+                      <td className="p-3 text-slate-500 italic">
                         {getGradeRemark(gLetter)}
                       </td>
                     </tr>
@@ -1206,9 +1196,7 @@ Edweso Royal Academy Administration Portal Dispatch`;
               </div>
 
               {/* Student List */}
-              <div className={`rounded-xl border divide-y overflow-y-auto max-h-[450px] ${
-                isDarkMode ? 'bg-slate-900 border-slate-800 divide-slate-800' : 'bg-white border-slate-100 divide-slate-100'
-              }`}>
+              <div className="rounded-2xl border border-slate-200/80 divide-y divide-slate-100 overflow-y-auto max-h-[450px] bg-white shadow-sm">
                 {classStudents
                   .filter(s => s.name.toLowerCase().includes(searchStudentNotesQuery.toLowerCase()))
                   .map((student) => {
@@ -1220,12 +1208,12 @@ Edweso Royal Academy Administration Portal Dispatch`;
                         onClick={() => setSelectedStudentIdForNotes(student.id)}
                         className={`w-full text-left p-3.5 flex items-center justify-between transition-colors text-xs ${
                           isSelected 
-                            ? 'bg-emerald-500/10 text-emerald-600 font-bold' 
-                            : 'hover:bg-slate-50 dark:hover:bg-slate-950/40'
+                            ? 'bg-indigo-600 text-white font-bold' 
+                            : 'hover:bg-slate-50/50 text-slate-600'
                         }`}
                       >
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 font-extrabold text-slate-500 dark:text-slate-400 overflow-hidden">
+                          <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 font-bold text-slate-700 overflow-hidden">
                             {student.profilePhoto ? (
                               <img src={student.profilePhoto} alt={student.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                             ) : (
@@ -1234,11 +1222,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           </div>
                           <div>
                             <p className="font-bold">{student.name}</p>
-                            <p className="text-[10px] text-slate-400 font-medium">{student.admissionNumber}</p>
+                            <p className={`text-[10px] ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>{student.admissionNumber}</p>
                           </div>
                         </div>
                         {count > 0 && (
-                          <span className="bg-emerald-500/10 text-emerald-600 font-extrabold text-[9px] px-2 py-0.5 rounded-full">
+                          <span className={`text-[9px] px-2.5 py-0.5 rounded-full border ${isSelected ? 'bg-indigo-700/50 border-indigo-500 text-indigo-100' : 'bg-indigo-50 border-indigo-100 text-indigo-700'}`}>
                             {count} {count === 1 ? 'note' : 'notes'}
                           </span>
                         )}
@@ -1275,11 +1263,9 @@ Edweso Royal Academy Administration Portal Dispatch`;
                 return (
                   <>
                     {/* Selected Student Information Header */}
-                    <div className={`p-4 rounded-xl border flex items-center justify-between ${
-                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                    }`}>
+                    <div className="p-4 rounded-2xl border border-slate-200/80 flex items-center justify-between bg-white shadow-sm">
                       <div className="flex items-center space-x-3.5">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 font-extrabold text-slate-500 dark:text-slate-400 overflow-hidden">
+                        <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center shrink-0 font-bold text-slate-700 overflow-hidden">
                           {selectedStudent.profilePhoto ? (
                             <img src={selectedStudent.profilePhoto} alt={selectedStudent.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
@@ -1287,23 +1273,21 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           )}
                         </div>
                         <div>
-                          <h3 className="font-extrabold text-sm text-slate-950 dark:text-white leading-tight">{selectedStudent.name}</h3>
-                          <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase mt-0.5">
+                          <h3 className="font-bold text-sm text-slate-800 leading-tight">{selectedStudent.name}</h3>
+                          <p className="text-[10px] text-slate-400 font-medium tracking-wider uppercase mt-0.5">
                             Roll: <span className="font-mono">{selectedStudent.admissionNumber}</span> &bull; Gender: {selectedStudent.gender}
                           </p>
                         </div>
                       </div>
-                      <span className="text-[10px] uppercase tracking-wide font-extrabold bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded text-slate-500">
+                      <span className="text-[10px] uppercase tracking-wide font-bold bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full text-indigo-700">
                         {assignedClass?.name} Pupil
                       </span>
                     </div>
 
                     {/* Compose New Observation Form */}
-                    <div className={`p-5 rounded-xl border ${
-                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
-                    }`}>
-                      <h4 className="font-bold text-xs uppercase tracking-wider mb-3 flex items-center space-x-2 text-emerald-600">
-                        <FileText size={14} />
+                    <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm text-slate-700">
+                      <h4 className="font-bold text-xs uppercase tracking-wider mb-3 flex items-center space-x-2 text-slate-800">
+                        <FileText size={14} className="text-indigo-600" />
                         <span>Log New Private Observation</span>
                       </h4>
                       <form onSubmit={handleAddClassNote} className="space-y-3">
@@ -1313,12 +1297,12 @@ Edweso Royal Academy Administration Portal Dispatch`;
                           placeholder={`Record a private observation for ${selectedStudent.name} (e.g., academic progress, behavior notes, or specific attention areas)...`}
                           value={noteText}
                           onChange={(e) => setNoteText(e.target.value)}
-                          className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-3 rounded-lg text-xs leading-relaxed focus:outline-hidden text-slate-800 dark:text-slate-100"
+                          className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs leading-relaxed focus:outline-hidden text-slate-600"
                         />
                         <div className="flex justify-end">
                           <button
                             type="submit"
-                            className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs flex items-center space-x-2 shadow-sm transition-colors cursor-pointer"
+                            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs flex items-center space-x-2 shadow-sm transition-colors cursor-pointer"
                           >
                             <Save size={13} />
                             <span>Save Entry</span>
@@ -1329,20 +1313,18 @@ Edweso Royal Academy Administration Portal Dispatch`;
 
                     {/* Observation History */}
                     <div className="space-y-3">
-                      <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-slate-400">Observation Ledger History ({studentSpecificNotes.length})</h4>
+                      <h4 className="font-bold text-[10px] uppercase tracking-widest text-slate-400">Observation Ledger History ({studentSpecificNotes.length})</h4>
                       
                       {studentSpecificNotes.length > 0 ? (
                         <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
                           {studentSpecificNotes.map((note) => (
                             <div
                               key={note.id}
-                              className={`p-4 rounded-xl border flex justify-between items-start space-x-4 transition-all relative overflow-hidden ${
-                                isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700' : 'bg-white border-slate-100 hover:border-slate-200'
-                              }`}
+                              className="p-4 rounded-2xl border border-slate-200/80 flex justify-between items-start space-x-4 transition-all relative overflow-hidden bg-white text-slate-700 shadow-sm"
                             >
-                              <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                              <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
                               <div className="space-y-2 text-xs flex-1 pl-2">
-                                <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium whitespace-pre-line">
+                                <p className="text-slate-600 leading-relaxed font-medium whitespace-pre-line">
                                   {note.note}
                                 </p>
                                 <div className="flex items-center space-x-2 text-[10px] text-slate-400 font-mono">

@@ -966,43 +966,43 @@ export default function AdminDashboard({
 
           {/* Quick Metrics Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-3.5 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-emerald-500/30' : 'bg-white border-slate-200/50 hover:border-emerald-500/20'}`}>
-              <div className="p-3 bg-emerald-500/10 text-emerald-600 rounded-xl shrink-0">
+            <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700 flex items-center space-x-3.5">
+              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl shrink-0 border border-emerald-100">
                 <Users size={20} />
               </div>
               <div>
-                <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block leading-none">Total Students</span>
-                <span className="text-xl font-display font-black text-slate-900 dark:text-white leading-none mt-1.5 block">{totalStudents}</span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Total Students</span>
+                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">{totalStudents}</span>
               </div>
             </div>
 
-            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-3.5 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-amber-500/30' : 'bg-white border-slate-200/50 hover:border-amber-500/20'}`}>
-              <div className="p-3 bg-amber-500/10 text-amber-600 rounded-xl shrink-0">
+            <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700 flex items-center space-x-3.5">
+              <div className="p-3 bg-amber-50 text-amber-600 rounded-xl shrink-0 border border-amber-100">
                 <UserCheck size={20} />
               </div>
               <div>
-                <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block leading-none">Cert. Teachers</span>
-                <span className="text-xl font-display font-black text-slate-900 dark:text-white leading-none mt-1.5 block">{totalTeachers}</span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Cert. Teachers</span>
+                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">{totalTeachers}</span>
               </div>
             </div>
 
-            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-3.5 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-indigo-500/30' : 'bg-white border-slate-200/50 hover:border-indigo-500/20'}`}>
-              <div className="p-3 bg-indigo-500/10 text-indigo-600 rounded-xl shrink-0">
+            <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700 flex items-center space-x-3.5">
+              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl shrink-0 border border-indigo-100">
                 <BookOpen size={20} />
               </div>
               <div>
-                <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block leading-none">Active Classes</span>
-                <span className="text-xl font-display font-black text-slate-900 dark:text-white leading-none mt-1.5 block">{totalClasses}</span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Active Classes</span>
+                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">{totalClasses}</span>
               </div>
             </div>
 
-            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex items-center space-x-3.5 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-rose-500/30' : 'bg-white border-slate-200/50 hover:border-rose-500/20'}`}>
-              <div className="p-3 bg-rose-500/10 text-rose-600 rounded-xl shrink-0">
+            <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700 flex items-center space-x-3.5">
+              <div className="p-3 bg-rose-50 text-rose-600 rounded-xl shrink-0 border border-rose-100">
                 <CreditCard size={20} />
               </div>
               <div>
-                <span className="text-[9px] text-slate-400 font-black uppercase tracking-wider block leading-none">Pending Fees</span>
-                <span className="text-xs sm:text-sm font-black font-mono text-rose-600 leading-none mt-1.5 block">GHS {outstandingFees.toLocaleString()}</span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Pending Fees</span>
+                <span className="text-xs sm:text-sm font-bold font-mono text-slate-800 leading-none mt-1.5 block">GHS {outstandingFees.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -1106,15 +1106,13 @@ export default function AdminDashboard({
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   
                   {/* Card 1: Term Billing & Financial Ledger Flow */}
-                  <div className={`lg:col-span-2 p-5 rounded-2xl border transition-all ${
-                    isDarkMode ? 'bg-slate-900 border-slate-800 shadow-slate-950/20' : 'bg-white border-slate-100 shadow-sm'
-                  }`}>
-                    <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                  <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700">
+                    <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                       <div>
-                        <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Term Billing & Collection Flow</h3>
+                        <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">Term Billing & Collection Flow</h3>
                         <p className="text-[10px] text-slate-400 mt-0.5">Collected revenue vs. outstanding invoice balances for the current term.</p>
                       </div>
-                      <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full font-bold">
+                      <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-semibold border border-emerald-100">
                         Paystack Live Sync
                       </span>
                     </div>
@@ -1132,16 +1130,16 @@ export default function AdminDashboard({
                               <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.01}/>
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                           <XAxis 
                             dataKey="month" 
-                            stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                            stroke="#0f172a" 
                             fontSize={10} 
                             fontWeight="bold"
                             tickLine={false} 
                           />
                           <YAxis 
-                            stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                            stroke="#0f172a" 
                             fontSize={10} 
                             fontWeight="bold"
                             tickLine={false}
@@ -1178,22 +1176,20 @@ export default function AdminDashboard({
                       </ResponsiveContainer>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-medium">
                       <span className="flex items-center gap-1">
-                        <ShieldCheck size={14} className="text-emerald-500" />
+                        <ShieldCheck size={14} className="text-emerald-600" />
                         <span>Real-time settlements certified by central audit node.</span>
                       </span>
-                      <span>Total Billable: GHS {financialTrendChartData.reduce((sum, f) => sum + f['Total Billed'], 0).toLocaleString()}</span>
+                      <span className="font-semibold text-slate-700">Total Billable: GHS {financialTrendChartData.reduce((sum, f) => sum + f['Total Billed'], 0).toLocaleString()}</span>
                     </div>
                   </div>
 
                   {/* Card 2: Student Enrollment by Class */}
-                  <div className={`p-5 rounded-2xl border transition-all ${
-                    isDarkMode ? 'bg-slate-900 border-slate-800 shadow-slate-950/20' : 'bg-white border-slate-100 shadow-sm'
-                  }`}>
-                    <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                  <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700">
+                    <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                       <div>
-                        <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Enrollment by Class</h3>
+                        <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">Enrollment by Class</h3>
                         <p className="text-[10px] text-slate-400 mt-0.5">Student headcount distribution broken down by gender.</p>
                       </div>
                     </div>
@@ -1201,16 +1197,16 @@ export default function AdminDashboard({
                     <div className="h-[280px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={enrollmentChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                           <XAxis 
                             dataKey="className" 
-                            stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                            stroke="#0f172a" 
                             fontSize={9} 
                             fontWeight="bold"
                             tickLine={false} 
                           />
                           <YAxis 
-                            stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                            stroke="#0f172a" 
                             fontSize={10} 
                             fontWeight="bold"
                             tickLine={false}
@@ -1230,24 +1226,22 @@ export default function AdminDashboard({
                       </ResponsiveContainer>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40 flex justify-between items-center text-[10px] text-slate-400 font-semibold">
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-medium">
                       <span>Classrooms Occupied: {classes.length}</span>
-                      <span className="font-bold text-slate-800 dark:text-slate-200">Total Registered: {totalStudents}</span>
+                      <span className="font-semibold text-slate-700">Total Registered: {totalStudents}</span>
                     </div>
                   </div>
 
                 </div>
 
                 {/* Second Row: Class Attendance Rate (3 cols) */}
-                <div className={`p-5 rounded-2xl border transition-all ${
-                  isDarkMode ? 'bg-slate-900 border-slate-800 shadow-slate-950/20' : 'bg-white border-slate-100 shadow-sm'
-                }`}>
-                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700">
+                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                     <div>
-                      <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Average Class Attendance Rate</h3>
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">Average Class Attendance Rate</h3>
                       <p className="text-[10px] text-slate-400 mt-0.5">Terminal academic attendance ratios derived from daily classroom logs.</p>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
                       <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
                       <span>Active Term</span>
                     </div>
@@ -1256,16 +1250,16 @@ export default function AdminDashboard({
                   <div className="h-[220px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={attendanceChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                         <XAxis 
                           dataKey="className" 
-                          stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                          stroke="#0f172a" 
                           fontSize={10} 
                           fontWeight="bold"
                           tickLine={false} 
                         />
                         <YAxis 
-                          stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                          stroke="#0f172a" 
                           fontSize={10} 
                           fontWeight="bold"
                           tickLine={false}
@@ -1287,26 +1281,24 @@ export default function AdminDashboard({
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40 flex justify-between items-center text-[10px] text-slate-500 font-semibold">
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-medium">
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-600"></span> Excellent (&gt;93%)
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Excellent (&gt;93%)
                       <span className="w-2 h-2 rounded-full bg-amber-500 ml-2"></span> Satisfactory (85%-93%)
-                      <span className="w-2 h-2 rounded-full bg-rose-600 ml-2"></span> Watch List (&lt;85%)
+                      <span className="w-2 h-2 rounded-full bg-rose-500 ml-2"></span> Watch List (&lt;85%)
                     </span>
-                    <span>Term Average Attendance: {Math.round(attendanceChartData.reduce((acc, c) => acc + c['Attendance %'], 0) / attendanceChartData.length)}%</span>
+                    <span className="font-semibold text-slate-700">Term Average Attendance: {Math.round(attendanceChartData.reduce((acc, c) => acc + c['Attendance %'], 0) / attendanceChartData.length)}%</span>
                   </div>
                 </div>
 
                 {/* Third Row: Academic Year Fee Collections & Cash Flow Trends */}
-                <div className={`p-5 rounded-2xl border transition-all ${
-                  isDarkMode ? 'bg-slate-900 border-slate-800 shadow-slate-950/20' : 'bg-white border-slate-100 shadow-sm'
-                }`} id="academic-year-cashflow-card">
-                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700" id="academic-year-cashflow-card">
+                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                     <div>
-                      <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Academic Year Fee Collections & Cash Flow</h3>
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">Academic Year Fee Collections & Cash Flow</h3>
                       <p className="text-[10px] text-slate-400 mt-0.5">Real-time aggregate monthly tuition & fee revenue collected dynamically throughout the academic year.</p>
                     </div>
-                    <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full font-bold">
+                    <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full font-semibold">
                       Cash Flow Trends
                     </span>
                   </div>
@@ -1314,16 +1306,16 @@ export default function AdminDashboard({
                   <div className="h-[240px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={monthlyFeeCollections} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                         <XAxis 
                           dataKey="month" 
-                          stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                          stroke="#0f172a" 
                           fontSize={10} 
                           fontWeight="bold"
                           tickLine={false} 
                         />
                         <YAxis 
-                          stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                          stroke="#0f172a" 
                           fontSize={10} 
                           fontWeight="bold"
                           tickLine={false}
@@ -1344,12 +1336,12 @@ export default function AdminDashboard({
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40 flex justify-between items-center text-[10px] text-slate-400 font-semibold">
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-medium">
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-teal-600"></span> High Collections Volume (&gt;10,000 GHS)
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span> High Collections Volume (&gt;10,000 GHS)
                       <span className="w-2 h-2 rounded-full bg-sky-500 ml-2"></span> Standard Collections Volume
                     </span>
-                    <span>Cumulative Academic Revenue: GHS {monthlyFeeCollections.reduce((sum, item) => sum + item['Fee Collections (GHS)'], 0).toLocaleString()}</span>
+                    <span className="font-semibold text-slate-700">Cumulative Academic Revenue: GHS {monthlyFeeCollections.reduce((sum, item) => sum + item['Fee Collections (GHS)'], 0).toLocaleString()}</span>
                   </div>
                 </div>
 

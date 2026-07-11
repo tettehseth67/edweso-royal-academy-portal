@@ -253,9 +253,7 @@ export default function StudentDashboard({
         <div className="space-y-6 animate-fade-in">
           
           {/* Main profile layout */}
-          <div className={`p-6 rounded-2xl border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
-          } flex flex-col md:flex-row items-center md:items-start gap-6`}>
+          <div className="p-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row items-center md:items-start gap-6 text-slate-700">
             
             {/* Student Profile Photo component with upload and capture capability */}
             <div className="flex flex-col items-center gap-3 shrink-0" id="student-avatar-interactive-container">
@@ -265,10 +263,10 @@ export default function StudentDashboard({
                     src={student.profilePhoto} 
                     alt={student.name} 
                     referrerPolicy="no-referrer"
-                    className="w-24 h-24 rounded-full object-cover border-2 border-emerald-500 shadow-md" 
+                    className="w-24 h-24 rounded-full object-cover border border-slate-200/80 shadow-sm" 
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border-2 border-emerald-500/20 flex items-center justify-center font-extrabold text-3xl shadow-sm">
+                  <div className="w-24 h-24 rounded-full bg-slate-50 text-slate-700 border border-slate-200/80 flex items-center justify-center font-bold text-3xl shadow-xs">
                     {student.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                   </div>
                 )}
@@ -307,7 +305,7 @@ export default function StudentDashboard({
                 <div className="flex gap-1.5">
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="text-[10px] font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
+                    className="text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 px-2 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer shadow-xs hover:bg-slate-50 hover:border-slate-300"
                   >
                     <Upload size={10} />
                     Upload
@@ -315,7 +313,7 @@ export default function StudentDashboard({
                   <button 
                     onClick={() => setIsCameraActive(true)}
                     id="profile-camera-btn"
-                    className="text-[10px] font-black uppercase tracking-wider bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded flex items-center gap-1 transition-all cursor-pointer"
+                    className="text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 text-slate-600 px-2 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer shadow-xs hover:bg-slate-50 hover:border-slate-300"
                   >
                     <Camera size={10} />
                     Camera
@@ -324,7 +322,7 @@ export default function StudentDashboard({
                 {student.profilePhoto && (
                   <button 
                     onClick={handleRemovePhoto}
-                    className="text-[9px] font-bold text-rose-500 hover:text-rose-600 hover:underline flex items-center gap-0.5 cursor-pointer"
+                    className="text-[9px] font-semibold text-rose-600 hover:text-rose-700 hover:underline flex items-center gap-0.5 cursor-pointer"
                   >
                     <Trash2 size={9} />
                     Remove photo
@@ -354,41 +352,41 @@ export default function StudentDashboard({
               />
             )}
 
-            <div className="flex-1 text-center md:text-left space-y-4">
+            <div className="flex-1 text-center md:text-left space-y-4 text-slate-700">
               <div>
-                <h2 className="text-xl font-display font-black text-slate-900 dark:text-white leading-tight">{student.name}</h2>
-                <span className="text-xs bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 px-2.5 py-1 rounded font-bold mt-2 inline-block">
+                <h2 className="text-xl font-display font-extrabold text-slate-800 leading-tight">{student.name}</h2>
+                <span className="text-xs bg-slate-50 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-full font-bold mt-2 inline-block">
                   {sClass ? sClass.name : 'Not Enrolled'} Division
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
                 <div className="space-y-1">
-                  <p className="text-slate-400 font-bold uppercase text-[10px]">Admission ID</p>
-                  <p className="font-bold font-mono text-slate-800 dark:text-slate-200">{student.admissionNumber}</p>
+                  <p className="text-slate-950 font-bold uppercase text-[10px]">Admission ID</p>
+                  <p className="font-extrabold font-mono text-slate-950">{student.admissionNumber}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-slate-400 font-bold uppercase text-[10px]">Gender & DOB</p>
-                  <p className="font-bold text-slate-800 dark:text-slate-200">{student.gender} | {student.dob}</p>
+                  <p className="text-slate-950 font-bold uppercase text-[10px]">Gender & DOB</p>
+                  <p className="font-extrabold text-slate-950">{student.gender} | {student.dob}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-slate-400 font-bold uppercase text-[10px]">Primary Guardian</p>
-                  <p className="font-bold text-slate-800 dark:text-slate-200">{student.parentName}</p>
+                  <p className="text-slate-950 font-bold uppercase text-[10px]">Primary Guardian</p>
+                  <p className="font-extrabold text-slate-950">{student.parentName}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-slate-400 font-bold uppercase text-[10px]">Guardian coordinates</p>
-                  <p className="font-bold text-slate-800 dark:text-slate-200">{student.parentPhone} | {student.parentEmail}</p>
+                  <p className="font-semibold text-slate-700">{student.parentPhone} | {student.parentEmail}</p>
                 </div>
               </div>
             </div>
 
             {/* Quick Balance Status card */}
-            <div className={`w-full md:w-64 p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] text-center space-y-3 shrink-0 ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700/60' : 'bg-slate-50/60 border-slate-200/50 hover:border-slate-300/60'}`}>
-              <span className="text-[10px] text-slate-400 uppercase font-extrabold tracking-wider block">Fees Outstanding</span>
-              <span className={`text-2xl font-extrabold font-mono block ${student.balanceGHS > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+            <div className="w-full md:w-64 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-center space-y-3 shrink-0 text-slate-600">
+              <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Fees Outstanding</span>
+              <span className={`text-2xl font-bold font-mono block ${student.balanceGHS > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 GHS {student.balanceGHS.toFixed(2)}
               </span>
-              <span className="text-[10px] text-slate-400 block font-semibold leading-relaxed">
+              <span className="text-[10px] text-slate-400 block font-medium leading-relaxed">
                 {student.balanceGHS > 0 ? 'Please settle fees before exam week.' : 'Academic accounts fully cleared!'}
               </span>
             </div>
@@ -396,17 +394,17 @@ export default function StudentDashboard({
 
           {/* Quick links summary box */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-indigo-500/30' : 'bg-white border-slate-200/50 hover:border-indigo-500/20'}`}>
+            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
               <span className="text-[10px] text-slate-400 font-bold uppercase block">Enrolled Subjects</span>
-              <span className="text-lg font-extrabold block mt-1">{studentSubjects.length} Courses</span>
+              <span className="text-lg font-bold block mt-1 text-slate-800">{studentSubjects.length} Courses</span>
             </div>
-            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-emerald-500/30' : 'bg-white border-slate-200/50 hover:border-emerald-500/20'}`}>
+            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
               <span className="text-[10px] text-slate-400 font-bold uppercase block">Attendance Rate</span>
-              <span className="text-lg font-extrabold block mt-1">{attendanceRate}% Presence</span>
+              <span className="text-lg font-bold block mt-1 text-slate-800">{attendanceRate}% Presence</span>
             </div>
-            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-amber-500/30' : 'bg-white border-slate-200/50 hover:border-amber-500/20'}`}>
+            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
               <span className="text-[10px] text-slate-400 font-bold uppercase block">Term Grades Recorded</span>
-              <span className="text-lg font-extrabold block mt-1">{studentGrades.length} Records</span>
+              <span className="text-lg font-bold block mt-1 text-slate-800">{studentGrades.length} Records</span>
             </div>
           </div>
 
@@ -432,15 +430,13 @@ export default function StudentDashboard({
             {studentSubjects.map(sub => {
               const subTeacher = teachers.find(t => t.subjectId === sub.name);
               return (
-                <div key={sub.id} className={`p-4 rounded-xl border flex justify-between items-center ${
-                  isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
-                }`}>
+                <div key={sub.id} className="p-4 rounded-xl border border-slate-200 bg-white flex justify-between items-center text-slate-600 shadow-sm hover:shadow-md transition-all duration-300">
                   <div>
-                    <span className="text-[10px] font-bold font-mono text-slate-400 block">{sub.code}</span>
-                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-white mt-1">{sub.name}</h4>
-                    <p className="text-xs text-slate-500 mt-2">Specialist: <strong className="text-emerald-700 dark:text-emerald-300">{subTeacher ? subTeacher.name : 'Assistant Instructor'}</strong></p>
+                    <span className="text-[10px] font-semibold font-mono text-slate-400 block">{sub.code}</span>
+                    <h4 className="font-bold text-sm text-slate-800 mt-1">{sub.name}</h4>
+                    <p className="text-xs text-slate-500 mt-2">Specialist: <strong className="text-slate-600 font-semibold">{subTeacher ? subTeacher.name : 'Assistant Instructor'}</strong></p>
                   </div>
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-700 dark:text-emerald-300 font-bold">
+                  <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100">
                     <BookOpen size={20} />
                   </div>
                 </div>
@@ -472,17 +468,17 @@ export default function StudentDashboard({
             </div>
             <button
               onClick={() => setIsReportCardOpen(true)}
-              className="px-3.5 py-2 bg-emerald-750 hover:bg-emerald-700 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-xl border border-emerald-600/30 flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs transition-all shrink-0 self-start sm:self-center"
+              className="px-3.5 py-2 bg-emerald-750 hover:bg-emerald-700 text-white font-bold text-[10px] uppercase tracking-wider rounded-xl border border-emerald-600/30 flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs transition-all shrink-0 self-start sm:self-center"
             >
               <Printer size={13} />
               <span>Official Report Card</span>
             </button>
           </div>
 
-          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
+          <div className="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
             <table id="student-grades-table" className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-700' : 'bg-slate-50 border-slate-300'}`}>
+                <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
                   <th className="p-3">Subject Name</th>
                   <th className="p-3">Asses score (30%)</th>
                   <th className="p-3">Exam score (70%)</th>
@@ -491,31 +487,27 @@ export default function StudentDashboard({
                   <th className="p-3">Teacher Evaluations</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100">
                 {studentSubjects.map(sub => {
                   const subGrade = studentGrades.find(g => g.subjectId === sub.id);
                   return (
-                    <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
-                      <td className="p-3 font-extrabold text-slate-900 dark:text-white">{sub.name}</td>
-                      <td className="p-3 font-mono">{subGrade ? `${subGrade.classScore} / 30` : '—'}</td>
-                      <td className="p-3 font-mono">{subGrade ? `${subGrade.examScore} / 70` : '—'}</td>
-                      <td className="p-3 font-bold text-emerald-700 dark:text-emerald-400 font-mono">
+                    <tr key={sub.id} className="hover:bg-slate-50/55 transition-colors text-slate-600">
+                      <td className="p-3 font-bold text-slate-800">{sub.name}</td>
+                      <td className="p-3 font-mono text-slate-500">{subGrade ? `${subGrade.classScore} / 30` : '—'}</td>
+                      <td className="p-3 font-mono text-slate-500">{subGrade ? `${subGrade.examScore} / 70` : '—'}</td>
+                      <td className="p-3 font-bold text-slate-700 font-mono">
                         {subGrade ? `${subGrade.totalScore}%` : '—'}
                       </td>
                       <td className="p-3">
                         {subGrade ? (
-                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded font-mono ${
-                            subGrade.grade === 'A' || subGrade.grade === 'B' 
-                              ? 'bg-emerald-500/10 text-emerald-600' 
-                              : 'bg-amber-500/10 text-amber-600'
-                          }`}>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded font-mono bg-slate-100 text-slate-600 border border-slate-200">
                             {subGrade.grade}
                           </span>
                         ) : (
                           <span className="text-[10px] text-slate-400 italic">Not Inputted</span>
                         )}
                       </td>
-                      <td className="p-3 text-slate-500 dark:text-slate-400">
+                      <td className="p-3 text-slate-500">
                         {subGrade ? subGrade.remarks : <span className="text-[10px] italic text-slate-400">Evaluation pending terminal audit.</span>}
                       </td>
                     </tr>
@@ -526,16 +518,14 @@ export default function StudentDashboard({
           </div>
 
           {/* AI Report Card counseling component */}
-          <div className={`mt-6 p-6 rounded-2xl border transition-all ${
-            isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-sm'
-          }`}>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-300 dark:border-slate-700 pb-4 mb-4">
+          <div className="mt-6 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
               <div>
-                <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                  <Sparkles size={16} className="animate-pulse" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Edweso Royal AI Dean Hub</span>
+                <div className="flex items-center gap-1.5 text-slate-500">
+                  <Sparkles size={16} className="animate-pulse text-emerald-600" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Edweso Royal AI Dean Hub</span>
                 </div>
-                <h3 className="text-sm font-extrabold text-slate-800 dark:text-slate-100 mt-1">AI-Powered Terminal Report Evaluation</h3>
+                <h3 className="text-sm font-bold text-slate-800 mt-1">AI-Powered Terminal Report Evaluation</h3>
                 <p className="text-[11px] text-slate-400 mt-0.5">Generate customized recommendations, study roadmaps, and counselor guidance based on your grades.</p>
               </div>
               <button 
@@ -613,49 +603,49 @@ export default function StudentDashboard({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] text-center ${isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700/60' : 'bg-white border-slate-200/50 hover:border-slate-300/60'}`}>
-              <span className="text-[10px] text-slate-400 uppercase font-extrabold tracking-wider block">Total Days Tracked</span>
-              <span className="text-xl font-black mt-1 block text-slate-800 dark:text-slate-100">{totalDays} Days</span>
+            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-center text-slate-600">
+              <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Total Days Tracked</span>
+              <span className="text-xl font-bold mt-1 block text-slate-800">{totalDays} Days</span>
             </div>
-            <div className={`p-5 rounded-2xl text-center border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/60 hover:border-emerald-700/80 text-emerald-300' : 'bg-emerald-500/10 border-emerald-500/20 hover:border-emerald-550/30 text-emerald-700'}`}>
-              <span className="text-[10px] font-black uppercase tracking-wider block">Present Marks</span>
-              <span className="text-xl font-black mt-1 block">{studentAttendance.filter(a => a.status === 'Present').length}</span>
+            <div className="p-5 rounded-2xl text-center border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400">Present Marks</span>
+              <span className="text-xl font-bold mt-1 block text-slate-800">{studentAttendance.filter(a => a.status === 'Present').length}</span>
             </div>
-            <div className={`p-5 rounded-2xl text-center border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-amber-950/20 border-amber-900/60 hover:border-amber-700/80 text-amber-300' : 'bg-amber-500/10 border-amber-500/20 hover:border-amber-550/30 text-amber-700'}`}>
-              <span className="text-[10px] font-black uppercase tracking-wider block">Late Arrivals</span>
-              <span className="text-xl font-black mt-1 block">{studentAttendance.filter(a => a.status === 'Late').length}</span>
+            <div className="p-5 rounded-2xl text-center border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400">Late Arrivals</span>
+              <span className="text-xl font-bold mt-1 block text-slate-800">{studentAttendance.filter(a => a.status === 'Late').length}</span>
             </div>
-            <div className={`p-5 rounded-2xl text-center border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] ${isDarkMode ? 'bg-rose-950/20 border-rose-900/60 hover:border-rose-700/80 text-rose-300' : 'bg-rose-500/10 border-rose-500/20 hover:border-rose-550/30 text-rose-700'}`}>
-              <span className="text-[10px] font-black uppercase tracking-wider block">Absences Registered</span>
-              <span className="text-xl font-black mt-1 block">{studentAttendance.filter(a => a.status === 'Absent').length}</span>
+            <div className="p-5 rounded-2xl text-center border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400">Absences Registered</span>
+              <span className="text-xl font-bold mt-1 block text-slate-800">{studentAttendance.filter(a => a.status === 'Absent').length}</span>
             </div>
           </div>
 
-          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
+          <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
             <table id="student-attendance-table" className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-700' : 'bg-slate-50 border-slate-300'}`}>
-                  <th className="p-3">Attendance Date</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Syllabus Remarks / Excuses</th>
+                <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
+                  <th className="p-3 text-slate-400">Attendance Date</th>
+                  <th className="p-3 text-slate-400">Status</th>
+                  <th className="p-3 text-slate-400">Syllabus Remarks / Excuses</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="divide-y divide-slate-100">
                 {studentAttendance.map(att => (
-                  <tr key={att.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300">
+                  <tr key={att.id} className="hover:bg-slate-50/55 transition-colors text-slate-600">
                     <td className="p-3 font-mono">{att.date}</td>
                     <td className="p-3">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                         att.status === 'Present' 
-                          ? 'bg-emerald-500/10 text-emerald-600' 
-                          : att.status === 'Late'
-                            ? 'bg-amber-500/10 text-amber-600'
-                            : 'bg-rose-500/10 text-rose-600'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                          : att.status === 'Late' 
+                            ? 'bg-amber-50 text-amber-700 border-amber-100' 
+                            : 'bg-rose-50 text-rose-700 border-rose-100'
                       }`}>
                         {att.status}
                       </span>
                     </td>
-                    <td className="p-3 text-slate-500 dark:text-slate-400">{att.remarks || 'Standard presence logged.'}</td>
+                    <td className="p-3 text-slate-500">{att.remarks || 'Standard presence logged.'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -676,10 +666,8 @@ export default function StudentDashboard({
             {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
               const dayLessons = studentTimetable.filter(tt => tt.day === day);
               return (
-                <div key={day} className={`p-4 rounded-xl border flex flex-col justify-start min-h-[160px] ${
-                  isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
-                }`}>
-                  <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-3 text-emerald-800 dark:text-emerald-300">{day}</h4>
+                <div key={day} className="p-4 rounded-xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 flex flex-col justify-start min-h-[160px]">
+                  <h4 className="font-bold text-xs uppercase tracking-wide border-b border-slate-100 pb-2 mb-3 text-slate-800">{day}</h4>
                   
                   <div className="space-y-2 flex-1">
                     {dayLessons.length > 0 ? (
@@ -687,10 +675,10 @@ export default function StudentDashboard({
                         const sub = studentSubjects.find(s => s.id === les.subjectId);
                         const teach = teachers.find(t => t.id === les.teacherId);
                         return (
-                          <div key={les.id} className="p-2 bg-slate-100/60 dark:bg-slate-950 rounded border border-slate-200/40 dark:border-slate-800 text-[11px]">
-                            <p className="font-bold text-slate-900 dark:text-white">{sub ? sub.name : 'Unknown'}</p>
+                          <div key={les.id} className="p-2 bg-slate-50 rounded border border-slate-100 text-[11px] text-slate-500">
+                            <p className="font-bold text-slate-800">{sub ? sub.name : 'Unknown'}</p>
                             <span className="text-[10px] text-slate-400 block mt-0.5">{les.startTime} - {les.endTime}</span>
-                            <span className="text-[9px] text-emerald-600 font-semibold block">{teach ? teach.name : 'No Teacher'}</span>
+                            <span className="text-[9px] text-slate-400 font-semibold block">{teach ? teach.name : 'No Teacher'}</span>
                           </div>
                         );
                       })
@@ -717,19 +705,17 @@ export default function StudentDashboard({
             {announcements
               .filter(a => a.targetAudience === 'All' || a.targetAudience === 'Students')
               .map((ann) => (
-                <div key={ann.id} className={`p-5 rounded-xl border relative overflow-hidden ${
-                  isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
-                }`}>
-                  <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-600"></div>
+                <div key={ann.id} className="p-5 rounded-xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden text-slate-600">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
                   
                   <div className="flex justify-between items-start pl-2">
-                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-white leading-tight">{ann.title}</h3>
+                    <h3 className="font-bold text-sm text-slate-800 leading-tight">{ann.title}</h3>
                     <span className="text-[10px] text-slate-400 font-medium shrink-0 ml-4">{ann.date}</span>
                   </div>
 
-                  <p className="text-xs text-slate-600 dark:text-slate-300 pl-2 mt-2 leading-relaxed whitespace-pre-line">{ann.content}</p>
+                  <p className="text-xs text-slate-600 pl-2 mt-2 leading-relaxed whitespace-pre-line">{ann.content}</p>
                   
-                  <div className="border-t border-slate-100 dark:border-slate-800/80 mt-4 pt-2.5 pl-2 flex justify-between items-center text-[10px] text-slate-400 font-semibold">
+                  <div className="border-t border-slate-100 mt-4 pt-2.5 pl-2 flex justify-between items-center text-[10px] text-slate-400 font-medium">
                     <span>Author: {ann.authorName} ({ann.authorRole})</span>
                     <span>Edweso Royal Dispatch</span>
                   </div>
@@ -750,20 +736,18 @@ export default function StudentDashboard({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* Payment Widget Form */}
-            <div className={`p-6 rounded-2xl border flex flex-col justify-between shadow-sm transition-all duration-300 hover:shadow-md hover:border-slate-300/60 dark:hover:border-slate-700/60 ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/50'
-            }`}>
+            <div className="p-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700 flex flex-col justify-between">
               <div className="space-y-3">
-                <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-3">Tuition Pay Gateway</h4>
+                <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2 mb-3">Tuition Pay Gateway</h4>
                 
-                <div className="bg-slate-50/60 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-150 dark:border-slate-800 text-center space-y-1">
-                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Outstanding Balance</span>
-                  <span className="text-2xl font-black text-rose-600 dark:text-rose-400 font-mono block">GHS {student.balanceGHS.toFixed(2)}</span>
+                <div className="bg-slate-50/55 p-4 rounded-xl border border-slate-100 text-center space-y-1">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Outstanding Balance</span>
+                  <span className="text-2xl font-bold text-rose-600 block">GHS {student.balanceGHS.toFixed(2)}</span>
                 </div>
  
                 <form onSubmit={handlePayClick} className="space-y-3 pt-2">
                   <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Payment Amount (GHS)</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Payment Amount (GHS)</label>
                     <input
                       type="number"
                       required
@@ -772,7 +756,7 @@ export default function StudentDashboard({
                       max={student.balanceGHS || 5000}
                       value={payAmount || ''}
                       onChange={(e) => setPayAmount(Number(e.target.value))}
-                      className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded-xl font-mono font-bold text-sm focus:outline-hidden"
+                      className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl font-mono text-sm text-slate-700 focus:outline-hidden focus:border-slate-300"
                     />
                   </div>
                   
@@ -780,7 +764,7 @@ export default function StudentDashboard({
                     type="submit"
                     id="trigger-paystack-btn"
                     disabled={student.balanceGHS <= 0}
-                    className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-extrabold rounded-xl text-xs transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-1.5 cursor-pointer hover:scale-[1.01]"
+                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs transition-all shadow-sm hover:shadow-md flex items-center justify-center space-x-1.5 cursor-pointer"
                   >
                     <CreditCard size={14} />
                     <span>Pay with paystack</span>
@@ -788,22 +772,20 @@ export default function StudentDashboard({
                 </form>
               </div>
  
-              <div className="mt-6 flex items-start space-x-2 p-3.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100/50 dark:border-emerald-800/40 rounded-xl text-[10px] text-emerald-800 dark:text-emerald-300 font-semibold leading-relaxed">
-                <ShieldCheck size={16} className="shrink-0 mt-0.5 text-emerald-600" />
+              <div className="mt-6 flex items-start space-x-2 p-3.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] text-slate-500 font-medium leading-relaxed">
+                <ShieldCheck size={16} className="shrink-0 mt-0.5 text-slate-400" />
                 <span>Supports Visa/Mastercard credit cards and MTN MoMo, Telecel Cash, and AirtelTigo Money mobile wallets.</span>
               </div>
             </div>
  
             {/* Paystack Transaction history list with Print Receipt option */}
-            <div className={`lg:col-span-2 p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:border-slate-300/60 dark:hover:border-slate-700/60 ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/50'
-            }`}>
-              <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-3">Your Fees Receipts</h4>
+            <div className="lg:col-span-2 p-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2 mb-3">Your Fees Receipts</h4>
               
               <div className="overflow-x-auto">
                 <table id="student-receipts-table" className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400">
+                    <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
                       <th className="p-2">Reference ID</th>
                       <th className="p-2">Amount Paid</th>
                       <th className="p-2">Payment Mode</th>
@@ -812,23 +794,27 @@ export default function StudentDashboard({
                       <th className="p-2 text-right">Receipt</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tbody className="divide-y divide-slate-100">
                     {studentTx.length > 0 ? (
                       studentTx.map((tx) => (
-                        <tr key={tx.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium">
+                        <tr key={tx.id} className="hover:bg-slate-50/55 transition-colors text-slate-600">
                           <td className="p-2 font-mono text-[10px]">{tx.reference}</td>
-                          <td className="p-2 font-extrabold font-mono">GHS {tx.amountGHS.toFixed(2)}</td>
-                          <td className="p-2 text-slate-500">{tx.paymentMethod}</td>
-                          <td className="p-2 text-slate-400">{tx.date.substring(0, 10)}</td>
+                          <td className="p-2 font-bold font-mono text-slate-700">GHS {tx.amountGHS.toFixed(2)}</td>
+                          <td className="p-2">{tx.paymentMethod}</td>
+                          <td className="p-2">{tx.date.substring(0, 10)}</td>
                           <td className="p-2">
-                            <span className="text-[8px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded uppercase font-bold">
+                            <span className={`text-[8px] px-1.5 py-0.5 rounded uppercase font-bold border ${
+                              tx.status === 'Successful' 
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                                : 'bg-amber-50 text-amber-700 border-amber-100'
+                            }`}>
                               {tx.status}
                             </span>
                           </td>
                           <td className="p-2 text-right">
                             <button
                               onClick={() => setSelectedTxForReceipt(tx)}
-                              className="p-1 text-emerald-600 hover:bg-emerald-50 rounded"
+                              className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
                               title="Invoice details"
                             >
                               <Printer size={13} />
@@ -845,8 +831,8 @@ export default function StudentDashboard({
                 </table>
               </div>
             </div>
-
           </div>
+
         </div>
       )}
 
@@ -867,9 +853,7 @@ export default function StudentDashboard({
                 <span>Make New Payment</span>
               </button>
             )}
-          </div>
-
-          {/* Metrics summary cards */}
+            {/* Metrics summary cards */}
           {(() => {
             const totalPaid = studentTx.filter(t => t.status === 'Successful').reduce((sum, t) => sum + t.amountGHS, 0);
             const totalInvoiced = totalPaid + student.balanceGHS;
@@ -877,38 +861,32 @@ export default function StudentDashboard({
 
             return (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex flex-col justify-between ${
-                  isDarkMode ? 'bg-slate-900 border-slate-800 hover:border-slate-700/60' : 'bg-white border-slate-200/50 hover:border-slate-300/60'
-                }`}>
-                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">Total School Fees Bill</span>
+                <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total School Fees Bill</span>
                   <div className="mt-2 text-left">
-                    <span className="text-xl font-black font-mono text-slate-800 dark:text-slate-100">GHS {totalInvoiced.toFixed(2)}</span>
-                    <p className="text-[10px] text-slate-400 mt-1 font-semibold leading-normal">Tuition, STEM Labs, and development assets combined.</p>
+                    <span className="text-xl font-bold font-mono text-slate-800">GHS {totalInvoiced.toFixed(2)}</span>
+                    <p className="text-[10px] text-slate-400 mt-1 leading-normal">Tuition, STEM Labs, and development assets combined.</p>
                   </div>
                 </div>
 
-                <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex flex-col justify-between ${
-                  isDarkMode ? 'bg-emerald-950/20 border-emerald-900/60 hover:border-emerald-700/80 text-emerald-300' : 'bg-emerald-500/10 border-emerald-500/20 hover:border-emerald-550/30 text-emerald-750'
-                }`}>
-                  <span className="text-[10px] font-black uppercase tracking-wider">Fees Cleared & Received</span>
-                  <div className="mt-2 text-left">
+                <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Fees Cleared & Received</span>
+                  <div className="mt-2 text-left text-slate-600">
                     <div className="flex items-baseline space-x-1.5">
-                      <span className="text-xl font-black font-mono">GHS {totalPaid.toFixed(2)}</span>
-                      <span className="text-xs font-bold font-mono">({completionRate}% completed)</span>
+                      <span className="text-xl font-bold font-mono text-slate-800">GHS {totalPaid.toFixed(2)}</span>
+                      <span className="text-xs font-semibold font-mono text-slate-400">({completionRate}% completed)</span>
                     </div>
-                    <div className="w-full bg-slate-200/60 dark:bg-slate-800/60 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden border border-slate-100">
                       <div className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style={{ width: `${completionRate}%` }}></div>
                     </div>
                   </div>
                 </div>
 
-                <div className={`p-5 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.015] flex flex-col justify-between ${
-                  isDarkMode ? 'bg-rose-950/20 border-rose-900/60 hover:border-rose-700/80 text-rose-300' : 'bg-rose-500/10 border-rose-500/20 hover:border-rose-550/30 text-rose-750'
-                }`}>
-                  <span className="text-[10px] font-black uppercase tracking-wider">Outstanding Balance</span>
+                <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Outstanding Balance</span>
                   <div className="mt-2 text-left">
-                    <span className="text-xl font-black font-mono text-rose-600 dark:text-rose-400">GHS {student.balanceGHS.toFixed(2)}</span>
-                    <p className="text-[10px] mt-1 font-semibold leading-normal text-rose-600/80 dark:text-rose-300/80">
+                    <span className="text-xl font-bold font-mono text-rose-600">GHS {student.balanceGHS.toFixed(2)}</span>
+                    <p className="text-[10px] mt-1 text-slate-400 leading-normal">
                       {student.balanceGHS > 0 ? 'Billing outstanding. Click to settle balance.' : 'Perfect! Your financial accounts are in good standing.'}
                     </p>
                   </div>
@@ -921,11 +899,9 @@ export default function StudentDashboard({
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             
             {/* Left side: Timeline Visualizer (3 cols) */}
-            <div className={`lg:col-span-3 p-5 rounded-xl border space-y-4 ${
-              isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
-            }`}>
-              <h3 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 flex items-center space-x-1.5 text-slate-800 dark:text-slate-100">
-                <Clock size={14} className="text-emerald-700" />
+            <div className="lg:col-span-3 p-5 rounded-xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 space-y-4">
+              <h3 className="font-bold text-xs uppercase tracking-wide border-b border-slate-100 pb-2 flex items-center space-x-1.5 text-slate-800">
+                <Clock size={14} className="text-slate-500" />
                 <span>Chronological Payment Timeline</span>
               </h3>
 
@@ -934,7 +910,7 @@ export default function StudentDashboard({
                   No payment events logged in this account's timeline.
                 </div>
               ) : (
-                <div className="relative pl-6 border-l border-slate-200 dark:border-slate-800 space-y-6 mt-4 pb-2">
+                <div className="relative pl-6 border-l-2 border-slate-100 space-y-6 mt-4 pb-2">
                   {studentTx.map((tx) => {
                     const isSuccess = tx.status === 'Successful';
                     const isPending = tx.status === 'Pending';
@@ -944,56 +920,47 @@ export default function StudentDashboard({
                       <div key={tx.id} className="relative group animate-fade-in">
                         
                         {/* Timeline visual marker node */}
-                        <div className={`absolute -left-[31px] top-1 w-4 h-4 rounded-full border border-slate-200 bg-white dark:bg-slate-900 flex items-center justify-center transition-transform group-hover:scale-110 ${
+                        <div className={`absolute -left-[31px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-white flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm ${
                           isSuccess 
-                            ? 'border-emerald-500 text-emerald-500' 
+                            ? 'bg-emerald-500' 
                             : isFailed 
-                              ? 'border-rose-500 text-rose-500' 
-                              : 'border-amber-500 text-amber-500'
+                              ? 'bg-rose-500' 
+                              : 'bg-amber-500'
                         }`}>
-                          <div className={`w-1.5 h-1.5 rounded-full ${
-                            isSuccess ? 'bg-emerald-500' : isFailed ? 'bg-rose-500' : 'bg-amber-500'
-                          }`}></div>
                         </div>
 
                         {/* Timeline Node Content Card */}
-                        <div className={`p-4 rounded-xl border transition-all hover:shadow-xs ${
-                          isDarkMode 
-                            ? 'bg-slate-950/40 border-slate-800/80 hover:border-slate-800' 
-                            : 'bg-slate-50 border-slate-200/50 hover:bg-slate-50/80 hover:border-slate-200'
-                        }`}>
+                        <div className="p-4 rounded-xl border border-slate-100 bg-white shadow-xs hover:shadow-sm transition-all text-slate-600">
                           <div className="flex justify-between items-start flex-wrap gap-2">
                             <div>
                               <div className="flex items-center space-x-2">
-                                <span className="font-extrabold font-mono text-xs text-slate-900 dark:text-white">
+                                <span className="font-bold font-mono text-xs text-slate-800">
                                   GHS {tx.amountGHS.toFixed(2)}
                                 </span>
-                                <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded tracking-wide ${
+                                <span className={`text-[8px] font-bold uppercase px-2 py-0.5 rounded tracking-wide border ${
                                   isSuccess 
-                                    ? 'bg-emerald-500/10 text-emerald-600' 
-                                    : isFailed 
-                                      ? 'bg-rose-500/10 text-rose-600' 
-                                      : 'bg-amber-500/10 text-amber-600'
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                                    : 'bg-amber-50 text-amber-700 border-amber-100'
                                 }`}>
                                   {tx.status}
                                 </span>
                               </div>
-                              <p className="text-[10px] text-slate-400 mt-1 font-semibold">
+                              <p className="text-[10px] text-slate-400 mt-1">
                                 Invoice {tx.reference} • cleared with {tx.paymentMethod}
                               </p>
                             </div>
-                            <span className="text-[9px] text-slate-400 font-mono font-bold shrink-0">{tx.date}</span>
+                            <span className="text-[9px] text-slate-400 font-mono font-medium shrink-0">{tx.date}</span>
                           </div>
 
-                          <div className="mt-3 pt-2.5 border-t border-slate-150 dark:border-slate-850 flex justify-between items-center">
+                          <div className="mt-3 pt-2.5 border-t border-slate-100 flex justify-between items-center">
                             <span className="text-[9px] text-slate-400 font-mono">
-                              Paystack Ref: <strong className="font-bold">{tx.paystackRef}</strong>
+                              Paystack Ref: <strong className="font-semibold text-slate-600">{tx.paystackRef}</strong>
                             </span>
                             
                             {isSuccess && (
                               <button
                                 onClick={() => setSelectedTxForReceipt(tx)}
-                                className="text-[10px] text-emerald-600 hover:text-emerald-500 font-extrabold flex items-center space-x-1 cursor-pointer"
+                                className="text-[10px] text-slate-500 hover:text-slate-800 hover:underline font-semibold flex items-center space-x-1 cursor-pointer"
                               >
                                 <Printer size={11} />
                                 <span>Receipt Invoice</span>
@@ -1010,47 +977,41 @@ export default function StudentDashboard({
             </div>
 
             {/* Right side: Detailed Invoice Records list (2 cols) */}
-            <div className={`lg:col-span-2 p-5 rounded-xl border space-y-4 ${
-              isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
-            }`}>
-              <h3 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 flex items-center space-x-1.5 text-slate-800 dark:text-slate-100">
-                <Receipt size={14} className="text-emerald-700" />
+            <div className="lg:col-span-2 p-5 rounded-xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 space-y-4">
+              <h3 className="font-bold text-xs uppercase tracking-wide border-b border-slate-100 pb-2 flex items-center space-x-1.5 text-slate-800">
+                <Receipt size={14} className="text-slate-500" />
                 <span>Invoice Records Ledger</span>
               </h3>
 
               <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
                 {studentTx.length === 0 ? (
-                  <p className="text-center text-slate-400 italic text-xs py-8 font-medium">No records available.</p>
+                  <p className="text-center text-slate-400 italic text-xs py-8">No records available.</p>
                 ) : (
                   studentTx.map((tx) => (
                     <div 
                       key={tx.id}
-                      className={`p-3 rounded-lg border flex flex-col justify-between space-y-2 ${
-                        isDarkMode ? 'bg-slate-950 border-slate-700' : 'bg-slate-50 border-slate-300'
-                      }`}
+                      className="p-3 rounded-lg border border-slate-100 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-200/60 transition-all flex flex-col justify-between space-y-2 text-slate-600"
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-bold text-xs text-slate-800 dark:text-white">GHS {tx.amountGHS.toFixed(2)}</p>
+                          <p className="font-bold text-xs text-slate-800">GHS {tx.amountGHS.toFixed(2)}</p>
                           <span className="text-[9px] text-slate-400 block font-mono">Invoice No: {tx.reference}</span>
                         </div>
-                        <span className={`text-[8px] px-1.5 py-0.5 rounded uppercase font-extrabold ${
+                        <span className={`text-[8px] px-1.5 py-0.5 rounded uppercase font-bold border ${
                           tx.status === 'Successful' 
-                            ? 'bg-emerald-500/10 text-emerald-600' 
-                            : tx.status === 'Failed' 
-                              ? 'bg-rose-500/10 text-rose-600' 
-                              : 'bg-amber-500/10 text-amber-600'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                            : 'bg-amber-50 text-amber-700 border-amber-100'
                         }`}>
                           {tx.status}
                         </span>
                       </div>
 
-                      <div className="flex justify-between items-center text-[10px] pt-1 border-t border-slate-200/40 dark:border-slate-850">
-                        <span className="text-slate-400 font-bold">{tx.paymentMethod}</span>
+                      <div className="flex justify-between items-center text-[10px] pt-1 border-t border-slate-100">
+                        <span className="text-slate-500 font-medium">{tx.paymentMethod}</span>
                         {tx.status === 'Successful' && (
                           <button
                             onClick={() => setSelectedTxForReceipt(tx)}
-                            className="text-emerald-700 dark:text-emerald-400 hover:underline font-bold cursor-pointer"
+                            className="text-slate-500 hover:text-slate-800 hover:underline font-semibold cursor-pointer"
                           >
                             Print Receipt
                           </button>
@@ -1060,6 +1021,7 @@ export default function StudentDashboard({
                   ))
                 )}
               </div>
+            </div>
             </div>
 
           </div>
@@ -1077,36 +1039,32 @@ export default function StudentDashboard({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* Left Box: Inbox Information */}
-            <div className={`p-5 rounded-xl border space-y-4 ${
-              isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
-            }`}>
-              <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 text-slate-800 dark:text-slate-100">Inbox configuration</h4>
-              <div className="space-y-3.5 text-xs text-slate-600 dark:text-slate-300">
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-800">
-                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-wider mb-1">Registered Guardian Email</p>
-                  <p className="font-extrabold text-slate-800 dark:text-white font-mono">{student.parentEmail}</p>
+            <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 space-y-4">
+              <h4 className="font-bold text-xs uppercase tracking-wide border-b border-slate-100 pb-2 text-slate-800">Inbox configuration</h4>
+              <div className="space-y-3.5 text-xs text-slate-500">
+                <div className="p-3.5 bg-slate-50/60 rounded-lg border border-slate-100">
+                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Registered Guardian Email</p>
+                  <p className="font-semibold text-slate-700 font-mono">{student.parentEmail}</p>
                 </div>
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-800">
-                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-wider mb-1">Guardian Contact</p>
-                  <p className="font-extrabold text-slate-800 dark:text-white font-mono">{student.parentName} ({student.parentPhone})</p>
+                <div className="p-3.5 bg-slate-50/60 rounded-lg border border-slate-100">
+                  <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Guardian Contact</p>
+                  <p className="font-semibold text-slate-700 font-mono">{student.parentName} ({student.parentPhone})</p>
                 </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">
+                <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
                   This simulated inbox routes messages dynamically sent by school administration or automated bots to your exact parent email address context.
                 </p>
               </div>
             </div>
 
             {/* Right Box: Inbox Message Stream */}
-            <div className={`lg:col-span-2 p-5 rounded-xl border ${
-              isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
-            }`}>
-              <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-4 text-slate-800 dark:text-slate-100">Dispatched Messages</h4>
+            <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
+              <h4 className="font-bold text-xs uppercase tracking-wide border-b border-slate-100 pb-2 mb-4 text-slate-800">Dispatched Messages</h4>
 
               {(() => {
                 const myMessages = emails.filter(em => (em.recipientEmail || '').toLowerCase() === (student.parentEmail || '').toLowerCase());
                 if (myMessages.length === 0) {
                   return (
-                    <div className="text-center py-16 text-slate-400 italic text-xs font-semibold">
+                    <div className="text-center py-16 text-slate-400 italic text-xs">
                       No official notices or alert logs found for {student.parentEmail}.
                     </div>
                   );
@@ -1117,44 +1075,38 @@ export default function StudentDashboard({
                     {myMessages.map(em => (
                       <div 
                         key={em.id}
-                        className={`p-4 rounded-xl border flex flex-col justify-between space-y-3 transition-colors hover:border-emerald-600/30 ${
-                          isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200/50'
-                        }`}
+                        className="p-4 rounded-xl border border-slate-100 flex flex-col justify-between space-y-3 bg-white text-slate-600 shadow-xs hover:shadow-sm transition-all"
                       >
                         <div className="flex justify-between items-start flex-wrap gap-2">
                           <div className="flex items-start space-x-3">
-                            <span className={`p-2 rounded-lg shrink-0 ${
-                              em.type === 'Announcement' ? 'bg-amber-500/10 text-amber-600' : 'bg-rose-500/10 text-rose-600'
-                            }`}>
+                            <span className="p-2 rounded-lg shrink-0 bg-slate-50 text-slate-400 border border-slate-100">
                               {em.type === 'Announcement' ? <Megaphone size={16} /> : <AlertCircle size={16} />}
                             </span>
                             <div>
-                              <p className="font-extrabold text-slate-800 dark:text-white leading-tight">{em.subject}</p>
+                              <p className="font-bold text-slate-800 leading-tight">{em.subject}</p>
                               <p className="text-[10px] text-slate-400 leading-none mt-1">
                                 Ref: {em.id} • Sent: {em.sentAt}
                               </p>
                             </div>
                           </div>
                           
-                          <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded tracking-wide ${
-                            em.type === 'Announcement' ? 'bg-amber-500/10 text-amber-600' : 'bg-rose-500/10 text-rose-600'
-                          }`}>
+                          <span className="text-[8px] font-bold uppercase px-2 py-0.5 rounded tracking-wide bg-slate-50 text-slate-500 border border-slate-100">
                             {em.type === 'Announcement' ? 'Announcement' : 'Fee Reminder'}
                           </span>
                         </div>
 
-                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-semibold line-clamp-2">
+                        <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
                           {em.body}
                         </p>
 
-                        <div className="flex justify-between items-center pt-2.5 border-t border-slate-200/40 dark:border-slate-850">
-                          <span className="text-[9px] text-emerald-600 font-bold flex items-center space-x-1">
+                        <div className="flex justify-between items-center pt-2.5 border-t border-slate-100">
+                          <span className="text-[9px] text-slate-400 font-medium flex items-center space-x-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                             <span>Simulated Verified Email Client Delivery</span>
                           </span>
                           <button
                             onClick={() => setViewingEmail(em)}
-                            className="px-3.5 py-1 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold text-[10px] uppercase tracking-wide rounded cursor-pointer"
+                            className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] uppercase tracking-wide rounded cursor-pointer transition-all shadow-sm hover:shadow"
                           >
                             Open Message
                           </button>

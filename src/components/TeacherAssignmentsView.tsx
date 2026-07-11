@@ -234,19 +234,19 @@ export default function TeacherAssignmentsView({
                 const gradedSubCount = homeworkSubmissions.filter(s => s.assignmentId === hw.id && s.status === 'Graded').length;
 
                 return (
-                  <div key={hw.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4 flex flex-col justify-between">
+                  <div key={hw.id} className="bg-white border border-slate-200/85 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 space-y-4 flex flex-col justify-between text-slate-700">
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full uppercase border border-indigo-100">
+                        <span className="text-[10px] font-bold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full uppercase">
                           {hw.subjectName}
                         </span>
                         <div className="flex space-x-1.5">
-                          <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full uppercase">
+                          <span className="text-[10px] font-bold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full uppercase">
                             {targetClass ? targetClass.name : 'Unknown'}
                           </span>
                           <button
                             onClick={() => handleDeleteAssignment(hw.id)}
-                            className="p-1 text-slate-350 hover:text-rose-600 rounded-lg transition-all cursor-pointer"
+                            className="p-1 text-slate-400 hover:text-rose-600 rounded-lg transition-all cursor-pointer"
                             title="Delete Homework"
                           >
                             <Trash2 size={13} />
@@ -255,8 +255,8 @@ export default function TeacherAssignmentsView({
                       </div>
 
                       <div>
-                        <h4 className="font-display font-extrabold text-slate-800 text-sm leading-snug">{hw.title}</h4>
-                        <div className="text-[10px] font-bold text-slate-400 mt-1 flex items-center space-x-1.5">
+                        <h4 className="font-display font-bold text-slate-800 text-sm leading-snug">{hw.title}</h4>
+                        <div className="text-[10px] font-medium text-slate-450 mt-1 flex items-center space-x-1.5">
                           <Calendar size={11} />
                           <span>Due Date: {hw.dueDate}</span>
                           <span>•</span>
@@ -264,14 +264,14 @@ export default function TeacherAssignmentsView({
                         </div>
                       </div>
 
-                      <p className="text-xs font-semibold text-slate-600 line-clamp-3 leading-relaxed">
+                      <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
                         {hw.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-xs font-bold text-slate-500">
-                      <span>Submitted: <strong className="text-slate-800">{subCount} entries</strong></span>
-                      <span>Graded: <strong className="text-emerald-700">{gradedSubCount}/{subCount} graded</strong></span>
+                    <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500 font-medium">
+                      <span>Submitted: <strong className="text-slate-700">{subCount} entries</strong></span>
+                      <span>Graded: <strong className="text-slate-700">{gradedSubCount}/{subCount} graded</strong></span>
                     </div>
                   </div>
                 );
@@ -290,10 +290,10 @@ export default function TeacherAssignmentsView({
               <p className="text-sm font-bold">Waiting for student submissions...</p>
             </div>
           ) : (
-            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+            <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-150 text-[10px] uppercase font-black text-slate-400 tracking-wider">
+                  <tr className="bg-slate-50 border-b border-slate-100 text-[10px] uppercase font-bold text-slate-400 tracking-wider">
                     <th className="p-4">Student Name</th>
                     <th className="p-4">Assignment Topic</th>
                     <th className="p-4">Date Submitted</th>
@@ -301,23 +301,23 @@ export default function TeacherAssignmentsView({
                     <th className="p-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-150 text-xs font-semibold text-slate-700">
+                <tbody className="divide-y divide-slate-100 text-xs text-slate-600">
                   {homeworkSubmissions.map(sub => {
                     const hw = homeworkAssignments.find(h => h.id === sub.assignmentId);
                     const statusColor = sub.status === 'Graded'
-                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                      : 'text-indigo-700 bg-indigo-50 border-indigo-200';
+                      ? 'text-emerald-700 bg-emerald-50 border border-emerald-100'
+                      : 'text-amber-700 bg-amber-50 border border-amber-100';
 
                     return (
-                      <tr key={sub.id} className="hover:bg-slate-50/50">
-                        <td className="p-4 font-extrabold text-slate-800">{sub.studentName}</td>
+                      <tr key={sub.id} className="hover:bg-slate-50/40">
+                        <td className="p-4 font-bold text-slate-850">{sub.studentName}</td>
                         <td className="p-4">
-                          <span className="block font-bold">{sub.assignmentTitle}</span>
-                          <span className="text-[10px] font-bold text-slate-400 mt-0.5 block">{hw ? hw.subjectName : 'General'}</span>
+                          <span className="block font-semibold text-slate-850">{sub.assignmentTitle}</span>
+                          <span className="text-[10px] font-medium text-slate-400 mt-0.5 block">{hw ? hw.subjectName : 'General'}</span>
                         </td>
                         <td className="p-4 font-mono text-slate-400">{sub.submittedAt}</td>
                         <td className="p-4">
-                          <span className={`px-2 py-0.5 border text-[10px] font-black uppercase rounded-full ${statusColor}`}>
+                          <span className={`px-2.5 py-1 border text-[10px] font-bold uppercase rounded-full ${statusColor}`}>
                             {sub.status === 'Graded' ? `Graded: ${sub.score}/${hw?.maxScore || 20}` : 'Submitted'}
                           </span>
                         </td>
@@ -342,12 +342,12 @@ export default function TeacherAssignmentsView({
 
       {/* 5. PUBLISH MODAL */}
       {isCreateOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
           <form 
             onSubmit={handlePublishAssignment}
-            className="p-6 bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full space-y-4 text-slate-800"
+            className="p-6 bg-white border border-slate-100 rounded-2xl shadow-2xl max-w-md w-full space-y-4 text-slate-700"
           >
-            <div className="flex justify-between items-center border-b pb-2.5">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <h3 className="font-display font-extrabold text-sm text-slate-800 uppercase tracking-wider flex items-center space-x-1.5">
                 <Plus size={14} className="text-indigo-600" />
                 <span>Publish Homework Sheet</span>
@@ -355,7 +355,7 @@ export default function TeacherAssignmentsView({
               <button 
                 type="button" 
                 onClick={() => setIsCreateOpen(false)}
-                className="p-1 text-slate-450 hover:text-slate-800 rounded cursor-pointer"
+                className="p-1 text-slate-400 hover:text-slate-600 rounded cursor-pointer"
               >
                 <X size={14} />
               </button>
@@ -460,14 +460,14 @@ export default function TeacherAssignmentsView({
 
       {/* 6. GRADING PANEL MODAL */}
       {selectedSubmission && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
           <form 
             onSubmit={handleSaveGrade}
-            className="p-6 bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-xl w-full space-y-4 max-h-[90vh] overflow-y-auto text-slate-800"
+            className="p-6 bg-white border border-slate-100 rounded-2xl shadow-2xl max-w-xl w-full space-y-4 max-h-[90vh] overflow-y-auto text-slate-700"
           >
-            <div className="flex justify-between items-start border-b pb-3">
+            <div className="flex justify-between items-start border-b border-slate-100 pb-3">
               <div>
-                <span className="text-[9px] font-black uppercase text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded-full border border-indigo-100">
+                <span className="text-[9px] font-bold uppercase text-indigo-600 px-2.5 py-0.5 bg-indigo-50 rounded-full">
                   Review Submission
                 </span>
                 <h3 className="font-display font-extrabold text-slate-800 text-base leading-snug mt-1.5">
@@ -477,7 +477,7 @@ export default function TeacherAssignmentsView({
               <button 
                 type="button" 
                 onClick={() => setSelectedSubmission(null)}
-                className="p-1 text-slate-450 hover:text-slate-800 rounded-lg cursor-pointer"
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
               >
                 <X size={18} />
               </button>
