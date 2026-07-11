@@ -1047,6 +1047,8 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                       <p className="text-[10px] text-slate-500 leading-relaxed mt-1">Clear termly tuition and computer fees directly via the Paystack student portal (Mobile Money MTN/Telecel) to trigger automated admission card generation.</p>
                     </div>
                   </div>
+
+                  <button type="submit">Enroll in Auto-Pay</button>
                 </div>
               </div>
 
