@@ -34,7 +34,8 @@
 .accessibility-high-contrast h5,
 .accessibility-high-contrast h6 {
   color: #090d16 !important;
-  font-weight: 700 !important; /* Bold all standard elements */
+  font-weight: 700 !important;
+  /* Bold all standard elements */
 }
 
 .accessibility-high-contrast bg-white {
@@ -87,5 +88,3 @@
   background-color: rgba(16, 185, 129, 0.08) !important;
   cursor: speak !important;
 }
-
-
