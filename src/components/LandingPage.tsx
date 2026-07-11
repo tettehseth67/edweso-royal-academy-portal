@@ -253,7 +253,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <img
               src="/assets/images/logo.png"
               alt="Edweso Royal Academy Logo"
-              className="w-14 h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm"
+              className="w-14 h-14 rounded-xl object-contain border border-amber-400/15"
               referrerPolicy="no-referrer"
             />
             <div>
@@ -1791,7 +1791,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                 <img
                   src="/assets/images/logo.png"
                   alt="Edweso Royal Academy Logo"
-                  className="w-12 h-12 rounded-xl object-contain border border-amber-400/15 shadow-xs"
+                  className="w-12 h-12 rounded-xl object-contain border border-amber-400/15"
                   referrerPolicy="no-referrer"
                 />
                 <span className="font-extrabold text-base tracking-tight text-emerald-800">Edweso Royal Academy</span>
