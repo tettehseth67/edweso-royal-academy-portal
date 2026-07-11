@@ -26,6 +26,14 @@ export default function PaystackModal({
   onSuccess,
   onFailure
 }: PaystackModalProps) {
+  // Dynamic Bank / MoMo Settlement Details configured by Admin
+  const payoutMethod = localStorage.getItem('era_payout_method') || 'bank';
+  const payoutBankName = localStorage.getItem('era_payout_bank_name') || 'GCB Bank PLC';
+  const payoutAccountNumber = localStorage.getItem('era_payout_acc_num') || '1011130004521';
+  const payoutMomoProvider = localStorage.getItem('era_payout_momo_provider') || 'MTN Mobile Money';
+  const payoutMomoNumber = localStorage.getItem('era_payout_momo_num') || '0244123456';
+  const paystackMode = localStorage.getItem('era_paystack_mode') || 'test';
+
   const [paymentMethod, setPaymentMethod] = useState<'momo' | 'card'>('momo');
   const [momoProvider, setMomoProvider] = useState<'MTN Mobile Money' | 'Telecel Cash' | 'AirtelTigo Money'>('MTN Mobile Money');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -343,8 +351,8 @@ export default function PaystackModal({
                 <CheckCircle size={48} className="animate-bounce" />
               </div>
               <h5 className="font-extrabold text-emerald-800 text-base">Payment Successful!</h5>
-              <p className="text-xs text-slate-500 mt-1 max-w-[260px]">
-                GHS {amount.toFixed(2)} has been successfully received by Edweso Royal Academy.
+              <p className="text-xs text-slate-500 mt-1 max-w-[270px] leading-relaxed">
+                GHS {amount.toFixed(2)} received via Paystack <strong className="text-emerald-600 font-bold">({paystackMode.toUpperCase()} MODE)</strong> and settled directly to our linked <strong className="text-slate-800">{payoutMethod === 'bank' ? `${payoutBankName} account (...${payoutAccountNumber.slice(-4)})` : `${payoutMomoProvider} wallet (...${payoutMomoNumber.slice(-4)})`}</strong>.
               </p>
               <div className="bg-slate-50 border border-slate-100 rounded-lg p-3 w-full mt-4 text-left font-mono text-[11px] space-y-1 text-slate-600">
                 <div className="flex justify-between">

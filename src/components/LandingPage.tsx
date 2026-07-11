@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  BookOpen, Award, CheckCircle2, Star, Phone, Mail, MapPin, ArrowRight,
-  UserCheck, Calendar, ShieldAlert, GraduationCap, ChevronRight, Send,
+import { 
+  BookOpen, Award, CheckCircle2, Star, Phone, Mail, MapPin, ArrowRight, 
+  UserCheck, Calendar, ShieldAlert, GraduationCap, ChevronRight, Send, 
   Sparkles, Building2, Map, ShieldCheck, Heart, UserSquare2, Info, Users, Clock,
   Briefcase, Download, ChevronDown, Check, FileText, HelpCircle, HeartHandshake, X,
   ChevronUp
@@ -242,18 +242,18 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
   return (
     <div className="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between">
-
+      
       {/* ==================== STICKY PUBLIC NAVBAR ==================== */}
       <nav id="landing-navbar" className="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 px-4 py-3 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div
-            onClick={() => setActivePage('home')}
+          <div 
+            onClick={() => setActivePage('home')} 
             className="flex items-center space-x-3 cursor-pointer"
           >
-            <img
-              src="/assets/images/logo.png"
-              alt="Edweso Royal Academy Logo"
-              className="w-14 h-14 rounded-xl object-contain border border-amber-400/15"
+            <img 
+              src="/src/assets/images/school_logo.jpg" 
+              alt="Edweso Royal Academy Logo" 
+              className="w-14 h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm"
               referrerPolicy="no-referrer"
             />
             <div>
@@ -264,48 +264,53 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
           {/* Desktop Public Navigation Links */}
           <div className="hidden md:flex items-center space-x-2 text-xs font-extrabold uppercase tracking-wider text-slate-500">
-            <button
+            <button 
               onClick={() => setActivePage('home')}
-              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === 'home'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs'
+              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${
+                activePage === 'home' 
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs' 
                   : 'text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100'
-                }`}
+              }`}
             >
               Home
             </button>
-            <button
+            <button 
               onClick={() => setActivePage('about')}
-              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === 'about'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs'
+              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${
+                activePage === 'about' 
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs' 
                   : 'text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100'
-                }`}
+              }`}
             >
               About Us
             </button>
-            <button
+            <button 
               onClick={() => setActivePage('academics')}
-              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === 'academics'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs'
+              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${
+                activePage === 'academics' 
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs' 
                   : 'text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100'
-                }`}
+              }`}
             >
               Academics
             </button>
-            <button
+            <button 
               onClick={() => setActivePage('admissions')}
-              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === 'admissions'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs'
+              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${
+                activePage === 'admissions' 
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs' 
                   : 'text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100'
-                }`}
+              }`}
             >
               Admissions
             </button>
-            <button
+            <button 
               onClick={() => setActivePage('contact')}
-              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${activePage === 'contact'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs'
+              className={`px-3.5 py-2 rounded-xl transition-all duration-300 cursor-pointer border ${
+                activePage === 'contact' 
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-100/80 shadow-xs' 
                   : 'text-slate-500 hover:bg-slate-50/80 hover:text-emerald-800 border-transparent hover:border-slate-100'
-                }`}
+              }`}
             >
               Contact Us
             </button>
@@ -325,31 +330,31 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
         {/* Mobile Navigation Tabs Quick Strip */}
         <div className="flex md:hidden items-center justify-around mt-2 pt-2 border-t border-slate-100 overflow-x-auto text-[10px] uppercase font-bold tracking-wider text-slate-400 gap-2 shrink-0">
-          <button
+          <button 
             onClick={() => setActivePage('home')}
             className={`px-2 py-1 rounded ${activePage === 'home' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
           >
             Home
           </button>
-          <button
+          <button 
             onClick={() => setActivePage('about')}
             className={`px-2 py-1 rounded ${activePage === 'about' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
           >
             About
           </button>
-          <button
+          <button 
             onClick={() => setActivePage('academics')}
             className={`px-2 py-1 rounded ${activePage === 'academics' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
           >
             Academics
           </button>
-          <button
+          <button 
             onClick={() => setActivePage('admissions')}
             className={`px-2 py-1 rounded ${activePage === 'admissions' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
           >
             Admissions
           </button>
-          <button
+          <button 
             onClick={() => setActivePage('contact')}
             className={`px-2 py-1 rounded ${activePage === 'contact' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
           >
@@ -359,21 +364,21 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
       </nav>
 
       <div className="flex-1">
-
+        
         {/* ==================== PAGE 1: HOME ==================== */}
         {activePage === 'home' && (
           <div className="animate-fade-in">
             {/* Dynamic Interactive Hero Carousel */}
-            <HeroCarousel
-              onNavigateToAdmissions={() => setActivePage('admissions')}
-              onNavigateToAbout={() => setActivePage('about')}
-              onNavigateToLogin={onNavigateToLogin}
+            <HeroCarousel 
+              onNavigateToAdmissions={() => setActivePage('admissions')} 
+              onNavigateToAbout={() => setActivePage('about')} 
+              onNavigateToLogin={onNavigateToLogin} 
             />
 
             {/* Bento Information Grid: Stats, Trust Markers & Live Campus Broadcast */}
             <section className="bg-slate-50 py-16 px-4 border-b border-slate-100">
               <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-
+                
                 {/* Left Side: Performance Metrics & Trust Badges (7 columns) */}
                 <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
                   <div className="space-y-4">
@@ -501,7 +506,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {features.map((feat, idx) => (
-                  <div
+                  <div 
                     key={idx}
                     className="bg-white border border-slate-100 p-6 rounded-xl shadow-xs hover:shadow-md transition-all group duration-300 hover:border-emerald-500/20"
                   >
@@ -524,7 +529,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                   <p className="text-emerald-200 text-xs sm:text-sm leading-relaxed">
                     At Edweso Royal Academy, we strictly implement the National Council for Curriculum and Assessment (NaCCA) guidelines. We combine core academic competencies with practical computing, moral character learning (RME), and physical culture development.
                   </p>
-
+                  
                   <div className="space-y-3">
                     <div className="flex items-start space-x-3">
                       <CheckCircle2 className="text-amber-400 shrink-0 mt-1" size={16} />
@@ -561,7 +566,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                       </div>
                       <span className="font-mono text-xs text-emerald-400">edweso-academy-live-terminal</span>
                     </div>
-
+                    
                     <div className="space-y-3 font-mono text-xs text-emerald-200">
                       <p className="text-emerald-400">// Collation of JHS 2 Terminal Results</p>
                       <div className="p-3 bg-emerald-950/80 rounded border border-emerald-800/50 space-y-1 text-[11px]">
@@ -622,7 +627,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
         {/* ==================== PAGE 2: ABOUT US ==================== */}
         {activePage === 'about' && (
           <div className="animate-fade-in space-y-12 py-12 px-4 max-w-7xl mx-auto">
-
+            
             {/* Header Section */}
             <div className="text-center space-y-3 max-w-3xl mx-auto">
               <span className="text-xs font-extrabold uppercase bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-500/15">Who We Are</span>
@@ -639,11 +644,11 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                   <span className="font-mono text-emerald-700 text-xs font-bold uppercase tracking-widest block">// A Humble Genesis</span>
                   <h2 className="text-2xl font-bold text-slate-900 leading-snug">From 15 Pupils to Ashanti's Educational Pillar</h2>
                 </div>
-
+                
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Established in September 2012 with a pioneer cohort of only 15 primary children, our goal was simple yet profound: to build an educational hub that does not force rote learning, but rather inspires holistic comprehension, high discipline, and technological mastery.
                 </p>
-
+                
                 <p className="text-xs text-slate-600 leading-relaxed">
                   Today, Edweso Royal Academy houses over 450 active students spanning primary levels up to Senior High School. Equipped with modern computing, scientific labs, and a fully accredited National Council for Curriculum and Assessment (NaCCA) syllabus, our graduates consistently excel in BECE and regional STEM competitions.
                 </p>
@@ -765,7 +770,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
         {/* ==================== PAGE 3: ACADEMICS ==================== */}
         {activePage === 'academics' && (
           <div className="animate-fade-in space-y-12 py-12 px-4 max-w-7xl mx-auto">
-
+            
             {/* Header Section */}
             <div className="text-center space-y-3 max-w-3xl mx-auto">
               <span className="text-xs font-extrabold uppercase bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-500/15">Syllabus & Curriculum</span>
@@ -777,30 +782,33 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
             {/* Department Selection Selector */}
             <div className="flex justify-center space-x-2 border-b border-slate-200/50 pb-2 max-w-md mx-auto">
-              <button
+              <button 
                 onClick={() => setAcademicDept('primary')}
-                className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${academicDept === 'primary'
-                    ? 'bg-emerald-700 text-white shadow-xs'
+                className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${
+                  academicDept === 'primary' 
+                    ? 'bg-emerald-700 text-white shadow-xs' 
                     : 'text-slate-500 hover:bg-slate-100'
-                  }`}
+                }`}
               >
                 Primary School
               </button>
-              <button
+              <button 
                 onClick={() => setAcademicDept('jhs')}
-                className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${academicDept === 'jhs'
-                    ? 'bg-emerald-700 text-white shadow-xs'
+                className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${
+                  academicDept === 'jhs' 
+                    ? 'bg-emerald-700 text-white shadow-xs' 
                     : 'text-slate-500 hover:bg-slate-100'
-                  }`}
+                }`}
               >
                 Junior High (JHS)
               </button>
-              <button
+              <button 
                 onClick={() => setAcademicDept('shs')}
-                className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${academicDept === 'shs'
-                    ? 'bg-emerald-700 text-white shadow-xs'
+                className={`px-4 py-2 text-xs font-extrabold rounded-lg uppercase tracking-wider transition-all ${
+                  academicDept === 'shs' 
+                    ? 'bg-emerald-700 text-white shadow-xs' 
                     : 'text-slate-500 hover:bg-slate-100'
-                  }`}
+                }`}
               >
                 Senior High (SHS)
               </button>
@@ -808,7 +816,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
             {/* Dept details content */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
+              
               {/* Left description */}
               <div className="lg:col-span-1 space-y-4">
                 {academicDept === 'primary' && (
@@ -934,7 +942,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
         {/* ==================== PAGE 4: ADMISSIONS ==================== */}
         {activePage === 'admissions' && (
           <div className="animate-fade-in py-12 px-4 max-w-7xl mx-auto space-y-12">
-
+            
             {/* Header */}
             <div className="text-center space-y-3 max-w-3xl mx-auto">
               <span className="text-xs font-extrabold uppercase bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-500/15">Enrollment 2026/2027</span>
@@ -946,7 +954,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
             {/* Fee Schedule Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
+              
               <div className="bg-white p-5 rounded-2xl border border-slate-100 flex flex-col justify-between text-center relative overflow-hidden group hover:border-emerald-500/25 transition-colors">
                 <div className="space-y-3">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Preschool</span>
@@ -1008,7 +1016,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
             {/* Admission Inquiry interactive Form */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start bg-white border border-slate-200/50 p-6 sm:p-8 rounded-2xl shadow-xs">
-
+              
               <div className="lg:col-span-5 space-y-6">
                 <div>
                   <span className="text-xs font-bold text-emerald-700 uppercase block tracking-wider">// Enrollment Pipeline</span>
@@ -1056,7 +1064,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                     <p className="text-[11px] text-slate-600 leading-relaxed max-w-md mx-auto">
                       Thank you for applying to Edweso Royal Academy! We have recorded your admissions interest inside our admin database dashboard. Our Registrar will call your phone coordinate shortly.
                     </p>
-                    <button
+                    <button 
                       onClick={() => setIsAdmissionSubmitted(false)}
                       className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded transition-colors"
                     >
@@ -1073,7 +1081,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                           required
                           placeholder="e.g. Seth Tetteh"
                           value={admissionForm.parentName}
-                          onChange={(e) => setAdmissionForm({ ...admissionForm, parentName: e.target.value })}
+                          onChange={(e) => setAdmissionForm({...admissionForm, parentName: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
@@ -1084,7 +1092,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                           required
                           placeholder="e.g. +233 24 777 6666"
                           value={admissionForm.parentPhone}
-                          onChange={(e) => setAdmissionForm({ ...admissionForm, parentPhone: e.target.value })}
+                          onChange={(e) => setAdmissionForm({...admissionForm, parentPhone: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
@@ -1098,7 +1106,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                           required
                           placeholder="e.g. parent@yahoo.com"
                           value={admissionForm.parentEmail}
-                          onChange={(e) => setAdmissionForm({ ...admissionForm, parentEmail: e.target.value })}
+                          onChange={(e) => setAdmissionForm({...admissionForm, parentEmail: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
@@ -1106,7 +1114,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Student Grade Interest</label>
                         <select
                           value={admissionForm.gradeLevel}
-                          onChange={(e) => setAdmissionForm({ ...admissionForm, gradeLevel: e.target.value })}
+                          onChange={(e) => setAdmissionForm({...admissionForm, gradeLevel: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden text-xs"
                         >
                           <option value="Primary 5">Primary 5</option>
@@ -1126,7 +1134,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         required
                         placeholder="e.g. Samuel Kofi Mensah"
                         value={admissionForm.studentName}
-                        onChange={(e) => setAdmissionForm({ ...admissionForm, studentName: e.target.value })}
+                        onChange={(e) => setAdmissionForm({...admissionForm, studentName: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                       />
                     </div>
@@ -1137,7 +1145,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         rows={3}
                         placeholder="State diagnostic remarks, previous schools, or query notes..."
                         value={admissionForm.message}
-                        onChange={(e) => setAdmissionForm({ ...admissionForm, message: e.target.value })}
+                        onChange={(e) => setAdmissionForm({...admissionForm, message: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded focus:outline-hidden text-xs"
                       />
                     </div>
@@ -1161,7 +1169,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
         {/* ==================== PAGE 5: CONTACT US ==================== */}
         {activePage === 'contact' && (
           <div className="animate-fade-in py-12 px-4 max-w-7xl mx-auto space-y-12">
-
+            
             {/* Header */}
             <div className="text-center space-y-3 max-w-3xl mx-auto">
               <span className="text-xs font-extrabold uppercase bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-500/15">Locate & Message</span>
@@ -1218,7 +1226,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
 
             {/* Simulated Google Map Map & Contact form */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
+              
               {/* Google Map Mockup */}
               <div className="lg:col-span-5 bg-white border border-slate-100 rounded-2xl p-5 shadow-xs space-y-4">
                 <div className="flex justify-between items-center border-b pb-3 border-slate-100">
@@ -1271,7 +1279,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                     <p className="text-[11px] text-slate-600 leading-relaxed max-w-sm mx-auto">
                       Thank you for contacting Edweso Royal Academy. Your general feedback/query message has been successfully logged into our live ledger. A representative will get in touch with you.
                     </p>
-                    <button
+                    <button 
                       onClick={() => setIsContactSubmitted(false)}
                       className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded transition-colors"
                     >
@@ -1281,7 +1289,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                 ) : (
                   <form onSubmit={handleContactSubmit} className="space-y-4 text-xs font-semibold">
                     <h4 className="font-extrabold text-sm text-slate-900 border-b pb-2 mb-2">Write General Feedback Desk</h4>
-
+                    
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Your Full Name</label>
@@ -1290,7 +1298,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                           required
                           placeholder="e.g. Seth Tetteh"
                           value={contactForm.name}
-                          onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                          onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
@@ -1301,7 +1309,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                           required
                           placeholder="e.g. seth@gmail.com"
                           value={contactForm.email}
-                          onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                          onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
@@ -1315,7 +1323,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                           required
                           placeholder="e.g. +233 24 777 6666"
                           value={contactForm.phone}
-                          onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                          onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
@@ -1323,7 +1331,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Query Category</label>
                         <select
                           value={contactForm.type}
-                          onChange={(e) => setContactForm({ ...contactForm, type: e.target.value as any })}
+                          onChange={(e) => setContactForm({...contactForm, type: e.target.value as any})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden text-xs"
                         >
                           <option value="General">General Inquiry</option>
@@ -1339,7 +1347,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         required
                         placeholder="State your feedback or administrative questions in detail..."
                         value={contactForm.message}
-                        onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                        onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded focus:outline-hidden text-xs leading-relaxed"
                       />
                     </div>
@@ -1405,10 +1413,11 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                     <button
                       key={tab.id}
                       onClick={() => setSelectedResourceTab(tab.id as any)}
-                      className={`flex-1 py-2 text-center text-[11px] font-black rounded-lg transition-all duration-300 cursor-pointer ${isActive
+                      className={`flex-1 py-2 text-center text-[11px] font-black rounded-lg transition-all duration-300 cursor-pointer ${
+                        isActive
                           ? 'bg-emerald-600 text-white shadow-xs'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                        }`}
+                      }`}
                     >
                       {tab.label}
                     </button>
@@ -1509,7 +1518,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                           <span>{doc.size} • {doc.format}</span>
                           <span className="text-[9px] text-slate-300 font-semibold">{doc.date}</span>
                         </div>
-                        <button
+                        <button 
                           onClick={() => alert(`Document "${doc.title}" download triggered. The PDF helper has dispatched the local ledger payload.`)}
                           className="p-2 bg-slate-50 hover:bg-emerald-600 hover:text-white rounded-lg transition-all duration-300 text-slate-500 cursor-pointer"
                         >
@@ -1533,7 +1542,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                 </p>
                 <div className="bg-slate-100 p-4 rounded-xl border border-slate-200/50 space-y-2">
                   <p className="text-[11px] text-slate-600 leading-relaxed font-bold">Need direct administrative feedback?</p>
-                  <button
+                  <button 
                     onClick={() => { setActivePage('contact'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                     className="text-[11px] text-emerald-700 hover:text-emerald-800 font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer"
                   >
@@ -1569,7 +1578,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                   const isOpen = activeParentFaq === idx;
                   return (
                     <div key={idx} className="bg-white border border-slate-200/50 rounded-xl overflow-hidden transition-all duration-200">
-                      <button
+                      <button 
                         type="button"
                         onClick={() => setActiveParentFaq(isOpen ? null : idx)}
                         className="w-full p-4 flex items-center justify-between text-left cursor-pointer hover:bg-slate-50 transition-colors"
@@ -1716,7 +1725,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                       </div>
 
                       <div className="flex justify-end pt-2">
-                        <button
+                        <button 
                           type="button"
                           onClick={() => {
                             setCareerForm({
@@ -1786,12 +1795,13 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
         {/* Contact Strip Banner */}
         <section id="contact-banner" className="py-12 bg-white border-t border-slate-200">
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <img
-                  src="/assets/images/logo.png"
-                  alt="Edweso Royal Academy Logo"
-                  className="w-12 h-12 rounded-xl object-contain border border-amber-400/15"
+                <img 
+                  src="/src/assets/images/school_logo.jpg" 
+                  alt="Edweso Royal Academy Logo" 
+                  className="w-12 h-12 rounded-xl object-contain border border-amber-400/15 shadow-xs"
                   referrerPolicy="no-referrer"
                 />
                 <span className="font-extrabold text-base tracking-tight text-emerald-800">Edweso Royal Academy</span>
@@ -1827,22 +1837,22 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <div className="space-y-3">
               <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-widest">Portal Entry Quick Links</h4>
               <div className="flex flex-col space-y-2">
-                <button
-                  onClick={() => onNavigateToLogin('student')}
+                <button 
+                  onClick={() => onNavigateToLogin('student')} 
                   className="p-3 bg-slate-50 hover:bg-emerald-500 hover:text-white text-emerald-900 border border-slate-200/50 hover:border-transparent rounded-xl text-[11px] font-black text-left transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-md flex items-center justify-between group cursor-pointer"
                 >
                   <span>Student Fees Pay</span>
                   <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transform translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300" />
                 </button>
-                <button
-                  onClick={() => onNavigateToLogin('teacher')}
+                <button 
+                  onClick={() => onNavigateToLogin('teacher')} 
                   className="p-3 bg-slate-50 hover:bg-emerald-500 hover:text-white text-emerald-900 border border-slate-200/50 hover:border-transparent rounded-xl text-[11px] font-black text-left transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-md flex items-center justify-between group cursor-pointer"
                 >
                   <span>Teacher Grades Tab</span>
                   <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transform translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300" />
                 </button>
-                <button
-                  onClick={() => onNavigateToLogin('admin')}
+                <button 
+                  onClick={() => onNavigateToLogin('admin')} 
                   className="p-3 bg-slate-50 hover:bg-emerald-500 hover:text-white text-emerald-900 border border-slate-200/50 hover:border-transparent rounded-xl text-[11px] font-black text-left transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-md flex items-center justify-between group cursor-pointer"
                 >
                   <span>Admin Center</span>
@@ -1854,7 +1864,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             <div className="space-y-3">
               <h4 className="font-extrabold text-xs text-slate-900 uppercase tracking-widest">Public Resources</h4>
               <div className="flex flex-col space-y-2">
-                <button
+                <button 
                   onClick={() => { setActivePage('parent-resources'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className="p-3 bg-slate-50 hover:bg-amber-450 hover:text-emerald-950 text-emerald-900 border border-slate-200/50 hover:border-transparent rounded-xl text-[11px] font-black text-left transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-md flex items-center justify-between group cursor-pointer animate-fade-in"
                 >
@@ -1864,7 +1874,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                   </span>
                   <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transform translate-x-[-4px] group-hover:translate-x-0 transition-all duration-300" />
                 </button>
-                <button
+                <button 
                   onClick={() => { setActivePage('careers'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className="p-3 bg-slate-50 hover:bg-emerald-500 hover:text-white text-emerald-900 border border-slate-200/50 hover:border-transparent rounded-xl text-[11px] font-black text-left transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-md flex items-center justify-between group cursor-pointer animate-fade-in"
                 >
@@ -1899,11 +1909,11 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span className="font-sans font-bold text-xs uppercase tracking-wider text-emerald-400">Faculty Recruitment Portal</span>
               </div>
-              <button
+              <button 
                 onClick={() => {
                   setIsCareerModalOpen(false);
                   setIsCareerSubmitted(false);
-                }}
+                }} 
                 className="text-slate-400 hover:text-white transition-colors cursor-pointer"
               >
                 <X size={18} />
@@ -1933,7 +1943,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                     Your candidate ledger details have been transmitted. Your registration code is <strong className="font-mono text-emerald-950 font-black">{submittedCareerId}</strong>. The Academic Board and Registrar will inspect your references within 7-10 business days.
                   </p>
                   <div className="pt-4 flex justify-center">
-                    <button
+                    <button 
                       type="button"
                       onClick={() => {
                         setIsCareerModalOpen(false);
@@ -1951,7 +1961,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                     <label className="block text-[10px] text-slate-500 font-bold uppercase mb-1">Target Position</label>
                     <select
                       value={careerForm.position}
-                      onChange={(e) => setCareerForm({ ...careerForm, position: e.target.value })}
+                      onChange={(e) => setCareerForm({...careerForm, position: e.target.value})}
                       className="w-full bg-slate-100 border border-slate-200/50 p-3 rounded-lg font-black focus:outline-hidden text-xs text-emerald-800 bg-white"
                     >
                       <option value="JHS ICT & Computing Specialist">JHS ICT & Computing Specialist</option>
@@ -1968,7 +1978,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         required
                         placeholder="e.g. Seth Tetteh"
                         value={careerForm.name}
-                        onChange={(e) => setCareerForm({ ...careerForm, name: e.target.value })}
+                        onChange={(e) => setCareerForm({...careerForm, name: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-3 rounded-lg font-bold focus:outline-hidden text-xs focus:ring-1 focus:ring-emerald-500 bg-white"
                       />
                     </div>
@@ -1980,7 +1990,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         required
                         placeholder="e.g. seth@gmail.com"
                         value={careerForm.email}
-                        onChange={(e) => setCareerForm({ ...careerForm, email: e.target.value })}
+                        onChange={(e) => setCareerForm({...careerForm, email: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-3 rounded-lg font-bold focus:outline-hidden text-xs focus:ring-1 focus:ring-emerald-500 bg-white"
                       />
                     </div>
@@ -1994,7 +2004,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         required
                         placeholder="e.g. +233 24 777 6666"
                         value={careerForm.phone}
-                        onChange={(e) => setCareerForm({ ...careerForm, phone: e.target.value })}
+                        onChange={(e) => setCareerForm({...careerForm, phone: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-3 rounded-lg font-bold focus:outline-hidden text-xs focus:ring-1 focus:ring-emerald-500 bg-white"
                       />
                     </div>
@@ -2006,7 +2016,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                         required
                         placeholder="e.g. https://drive.google.com/resume.pdf"
                         value={careerForm.portfolioUrl}
-                        onChange={(e) => setCareerForm({ ...careerForm, portfolioUrl: e.target.value })}
+                        onChange={(e) => setCareerForm({...careerForm, portfolioUrl: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-3 rounded-lg font-bold focus:outline-hidden text-xs text-emerald-800 focus:ring-1 focus:ring-emerald-500 bg-white"
                       />
                     </div>
@@ -2019,7 +2029,7 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                       required
                       placeholder="Briefly describe your academic background, past schools, subjects taught, and total years of service..."
                       value={careerForm.experience}
-                      onChange={(e) => setCareerForm({ ...careerForm, experience: e.target.value })}
+                      onChange={(e) => setCareerForm({...careerForm, experience: e.target.value})}
                       className="w-full bg-slate-100 border border-slate-200/50 p-3 rounded-lg focus:outline-hidden text-xs leading-relaxed focus:ring-1 focus:ring-emerald-500 bg-white"
                     />
                   </div>

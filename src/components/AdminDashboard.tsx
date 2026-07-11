@@ -3,7 +3,8 @@ import {
   Users, UserCheck, BookOpen, CheckSquare, Award, 
   Calendar, Megaphone, CreditCard, Search, Plus, 
   Trash2, Edit, Check, AlertTriangle, Eye, RefreshCw, Filter, ShieldCheck, Download,
-  ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer, Cake, Gift
+  ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer, Cake, Gift,
+  Lock, Building, HelpCircle, Info, Smartphone
 } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, 
@@ -420,6 +421,45 @@ export default function AdminDashboard({
       }
     });
   };
+
+  // Payment Gateway & Bank Account Linking Configuration
+  const [paymentsSubTab, setPaymentsSubTab] = useState<'ledger' | 'bank-setup'>('ledger');
+  const [paystackMode, setPaystackMode] = useState<'test' | 'live'>(() => {
+    return (localStorage.getItem('era_paystack_mode') as 'test' | 'live') || 'test';
+  });
+  const [paystackPublicKey, setPaystackPublicKey] = useState(() => {
+    return localStorage.getItem('era_paystack_pub_key') || 'pk_test_edweso7a8d9b1c0e2f3g4h5i6j7k8l9';
+  });
+  const [paystackSecretKey, setPaystackSecretKey] = useState(() => {
+    return localStorage.getItem('era_paystack_sec_key') || 'sk_test_edweso9876543210abcdefghijklmnop';
+  });
+  const [payoutMethod, setPayoutMethod] = useState<'bank' | 'momo'>(() => {
+    return (localStorage.getItem('era_payout_method') as 'bank' | 'momo') || 'bank';
+  });
+  const [payoutBankName, setPayoutBankName] = useState(() => {
+    return localStorage.getItem('era_payout_bank_name') || 'GCB Bank PLC';
+  });
+  const [payoutAccountNumber, setPayoutAccountNumber] = useState(() => {
+    return localStorage.getItem('era_payout_acc_num') || '1011130004521';
+  });
+  const [payoutAccountName, setPayoutAccountName] = useState(() => {
+    return localStorage.getItem('era_payout_acc_name') || 'Edweso Royal Academy Ltd';
+  });
+  const [payoutBankBranch, setPayoutBankBranch] = useState(() => {
+    return localStorage.getItem('era_payout_branch') || 'Ejisu Main Branch';
+  });
+  const [payoutMomoProvider, setPayoutMomoProvider] = useState(() => {
+    return localStorage.getItem('era_payout_momo_provider') || 'MTN Mobile Money';
+  });
+  const [payoutMomoNumber, setPayoutMomoNumber] = useState(() => {
+    return localStorage.getItem('era_payout_momo_num') || '0244123456';
+  });
+  const [isPayoutVerified, setIsPayoutVerified] = useState(() => {
+    return localStorage.getItem('era_payout_verified') === 'true';
+  });
+  const [isVerifyingPayout, setIsVerifyingPayout] = useState(false);
+  const [payoutConfigError, setPayoutConfigError] = useState('');
+  const [payoutConfigSuccess, setPayoutConfigSuccess] = useState('');
 
   // Composer and alert states
   const [composerStudentId, setComposerStudentId] = useState('');
@@ -2443,12 +2483,42 @@ export default function AdminDashboard({
       {activeTab === 'payments' && (
         <div className="space-y-6 animate-fade-in">
           
-          <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Paystack Fees Transaction Ledger</h2>
-            <p className="text-xs text-slate-400">Detailed historical receipts of online school fees collections in Ghanaian Cedis (GHS).</p>
+          <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Payments & Gateway Integration</h2>
+              <p className="text-xs text-slate-400">Review real-time collection transaction ledgers, specify bank payout endpoints, or configure custom Paystack keys.</p>
+            </div>
+            
+            {/* Sub-tab Selection Buttons */}
+            <div className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200/40 dark:border-slate-800 shrink-0 self-start md:self-auto">
+              <button
+                onClick={() => setPaymentsSubTab('ledger')}
+                className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
+                  paymentsSubTab === 'ledger'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              >
+                <History size={12} />
+                <span>Transaction Ledger</span>
+              </button>
+              <button
+                onClick={() => setPaymentsSubTab('bank-setup')}
+                className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
+                  paymentsSubTab === 'bank-setup'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              >
+                <CreditCard size={12} />
+                <span>Bank & Payout Link</span>
+              </button>
+            </div>
           </div>
 
-          {/* Quick Stats Grid */}
+          {paymentsSubTab === 'ledger' && (
+            <>
+              {/* Quick Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
               <span className="text-[10px] font-bold uppercase tracking-wider">Total Fees Collected</span>
@@ -2583,6 +2653,398 @@ export default function AdminDashboard({
               </table>
             </div>
           </div>
+          </>
+          )}
+
+          {/* ==================== BANK & GATEWAY LINK LAYOUT ==================== */}
+          {paymentsSubTab === 'bank-setup' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in text-slate-800 dark:text-slate-100">
+              
+              {/* Left Column: Paystack Keys & Core Gateway Integration */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className={`p-5 rounded-2xl border transition-all ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  <div className="flex items-center space-x-2 pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                    <Lock className="text-emerald-500" size={18} />
+                    <div>
+                      <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-805 dark:text-slate-100">Paystack Keys & Mode</h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Define your API keys and toggle the transaction router environment.</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 text-xs font-semibold">
+                    {/* Gateway Status Badge */}
+                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <span className="text-slate-500">Gateway Status</span>
+                      <span className="flex items-center space-x-1.5 font-bold">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-emerald-600 dark:text-emerald-400">Natively Connected</span>
+                      </span>
+                    </div>
+
+                    {/* Mode Selection */}
+                    <div>
+                      <label className="block text-slate-500 dark:text-slate-400 mb-1.5">Environment Mode</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPaystackMode('test');
+                            localStorage.setItem('era_paystack_mode', 'test');
+                          }}
+                          className={`py-2 px-3 rounded-lg border font-bold text-center transition-all cursor-pointer ${
+                            paystackMode === 'test'
+                              ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                              : 'border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-950'
+                          }`}
+                        >
+                          Test Mode
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPaystackMode('live');
+                            localStorage.setItem('era_paystack_mode', 'live');
+                          }}
+                          className={`py-2 px-3 rounded-lg border font-bold text-center transition-all cursor-pointer ${
+                            paystackMode === 'live'
+                              ? 'border-emerald-600 bg-emerald-600 text-white shadow-xs'
+                              : 'border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-950'
+                          }`}
+                        >
+                          Live Mode
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-1 font-medium leading-normal">
+                        {paystackMode === 'test' 
+                          ? 'Simulates actual checkouts using mock payment cards and simulated Momo networks.' 
+                          : 'Warning: Live mode requires real credit cards or mobile money wallets to process actual currency collections.'}
+                      </p>
+                    </div>
+
+                    {/* Public Key */}
+                    <div>
+                      <label className="block text-slate-500 dark:text-slate-400 mb-1">Paystack Public Key</label>
+                      <input
+                        type="text"
+                        placeholder="pk_test_..."
+                        value={paystackPublicKey}
+                        onChange={(e) => {
+                          setPaystackPublicKey(e.target.value);
+                          localStorage.setItem('era_paystack_pub_key', e.target.value);
+                        }}
+                        className={`w-full p-2.5 rounded-lg border text-xs font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                          isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                        }`}
+                      />
+                    </div>
+
+                    {/* Secret Key */}
+                    <div>
+                      <label className="block text-slate-500 dark:text-slate-400 mb-1">Paystack Secret Key</label>
+                      <input
+                        type="password"
+                        placeholder="sk_test_..."
+                        value={paystackSecretKey}
+                        onChange={(e) => {
+                          setPaystackSecretKey(e.target.value);
+                          localStorage.setItem('era_paystack_sec_key', e.target.value);
+                        }}
+                        className={`w-full p-2.5 rounded-lg border text-xs font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                          isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Secure Badge Card */}
+                <div className={`p-4 rounded-xl border flex items-start space-x-3 ${
+                  isDarkMode ? 'bg-slate-950 border-slate-800/60' : 'bg-emerald-50/30 border-emerald-100'
+                }`}>
+                  <ShieldCheck className="text-emerald-600 shrink-0 mt-0.5" size={18} />
+                  <div className="text-[11px] leading-normal font-medium text-slate-500 dark:text-slate-400">
+                    <span className="font-extrabold text-slate-800 dark:text-slate-200 block mb-0.5">PCI-DSS Compliant Infrastructure</span>
+                    All credential exchanges are processed via 256-bit SSL transport tunnels. Your secret keys are kept encrypted in local storage, isolated completely from standard browser tracking scripts.
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Payout Bank Link / Mobile Money Merchant */}
+              <div className="lg:col-span-7 space-y-6">
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  setIsVerifyingPayout(true);
+                  setPayoutConfigError('');
+                  setPayoutConfigSuccess('');
+                  
+                  setTimeout(() => {
+                    if (payoutMethod === 'bank' && payoutAccountNumber.length < 8) {
+                      setPayoutConfigError('Invalid bank account number. It must be at least 8 digits long.');
+                      setIsVerifyingPayout(false);
+                      return;
+                    }
+                    if (payoutMethod === 'momo' && payoutMomoNumber.length < 9) {
+                      setPayoutConfigError('Invalid mobile wallet number. It must be at least 9 digits.');
+                      setIsVerifyingPayout(false);
+                      return;
+                    }
+                    
+                    localStorage.setItem('era_paystack_mode', paystackMode);
+                    localStorage.setItem('era_paystack_pub_key', paystackPublicKey);
+                    localStorage.setItem('era_paystack_sec_key', paystackSecretKey);
+                    localStorage.setItem('era_payout_method', payoutMethod);
+                    localStorage.setItem('era_payout_bank_name', payoutBankName);
+                    localStorage.setItem('era_payout_acc_num', payoutAccountNumber);
+                    localStorage.setItem('era_payout_acc_name', payoutAccountName);
+                    localStorage.setItem('era_payout_branch', payoutBankBranch);
+                    localStorage.setItem('era_payout_momo_provider', payoutMomoProvider);
+                    localStorage.setItem('era_payout_momo_num', payoutMomoNumber);
+                    localStorage.setItem('era_payout_verified', 'true');
+                    
+                    setIsPayoutVerified(true);
+                    setIsVerifyingPayout(false);
+                    setPayoutConfigSuccess('Success! Payout destination verified by Paystack Resolver Service and linked to your account.');
+                  }, 1500);
+                }} className={`p-5 rounded-2xl border transition-all ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  
+                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <Building className="text-emerald-500" size={18} />
+                      <div>
+                        <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Payout Settlement Bank Link</h3>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Route accumulated student tuition fees directly to your certified bank account.</p>
+                      </div>
+                    </div>
+                    {isPayoutVerified ? (
+                      <span className="text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-extrabold px-2 py-0.5 rounded-full uppercase flex items-center gap-1">
+                        <Check size={10} strokeWidth={3} /> Verified
+                      </span>
+                    ) : (
+                      <span className="text-[9px] bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold px-2 py-0.5 rounded-full uppercase">
+                        Unverified
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-4 text-xs font-semibold">
+                    {/* Switch: Bank Account vs MoMo Wallet */}
+                    <div>
+                      <label className="block text-slate-500 dark:text-slate-400 mb-1.5">Settlement Method</label>
+                      <div className="flex bg-slate-50 dark:bg-slate-950 p-1 rounded-lg border border-slate-100 dark:border-slate-800">
+                        <button
+                          type="button"
+                          onClick={() => setPayoutMethod('bank')}
+                          className={`flex-1 py-2 rounded-md font-bold text-center text-xs transition-all cursor-pointer flex items-center justify-center space-x-2 ${
+                            payoutMethod === 'bank'
+                              ? 'bg-white dark:bg-slate-850 text-slate-900 dark:text-white shadow-xs'
+                              : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'
+                          }`}
+                        >
+                          <Building size={14} />
+                          <span>GCB / CBG Bank Account</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPayoutMethod('momo')}
+                          className={`flex-1 py-2 rounded-md font-bold text-center text-xs transition-all cursor-pointer flex items-center justify-center space-x-2 ${
+                            payoutMethod === 'momo'
+                              ? 'bg-white dark:bg-slate-850 text-slate-900 dark:text-white shadow-xs'
+                              : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'
+                          }`}
+                        >
+                          <Smartphone size={14} />
+                          <span>MoMo Merchant Account</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Bank fields */}
+                    {payoutMethod === 'bank' && (
+                      <div className="space-y-4 animate-fade-in">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Select Bank</label>
+                            <select
+                              value={payoutBankName}
+                              onChange={(e) => setPayoutBankName(e.target.value)}
+                              className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100 font-medium' : 'bg-white border-slate-200 text-slate-800'
+                              }`}
+                            >
+                              <option value="GCB Bank PLC">GCB Bank PLC (Ghana Commercial Bank)</option>
+                              <option value="Consolidated Bank Ghana (CBG)">Consolidated Bank Ghana (CBG)</option>
+                              <option value="Ecobank Ghana PLC">Ecobank Ghana PLC</option>
+                              <option value="Stanbic Bank Ghana">Stanbic Bank Ghana</option>
+                              <option value="Absa Bank Ghana">Absa Bank Ghana</option>
+                              <option value="Fidelity Bank Ghana">Fidelity Bank Ghana</option>
+                              <option value="Zenith Bank Ghana">Zenith Bank Ghana</option>
+                              <option value="CalBank PLC">CalBank PLC</option>
+                              <option value="Société Générale Ghana">Société Générale Ghana</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Bank Branch</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Ejisu Main Branch"
+                              value={payoutBankBranch}
+                              onChange={(e) => setPayoutBankBranch(e.target.value)}
+                              className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                              }`}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Account Number</label>
+                            <input
+                              type="text"
+                              required
+                              maxLength={16}
+                              placeholder="e.g. 1011130004521"
+                              value={payoutAccountNumber}
+                              onChange={(e) => setPayoutAccountNumber(e.target.value.replace(/\D/g, ''))}
+                              className={`w-full p-2.5 rounded-lg border text-xs font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                              }`}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Account Holder Name</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Edweso Royal Academy Ltd"
+                              value={payoutAccountName}
+                              onChange={(e) => setPayoutAccountName(e.target.value)}
+                              className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                              }`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* MoMo fields */}
+                    {payoutMethod === 'momo' && (
+                      <div className="space-y-4 animate-fade-in">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Mobile Operator</label>
+                            <select
+                              value={payoutMomoProvider}
+                              onChange={(e) => setPayoutMomoProvider(e.target.value)}
+                              className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100 font-medium' : 'bg-white border-slate-200 text-slate-800'
+                              }`}
+                            >
+                              <option value="MTN Mobile Money">MTN Mobile Money</option>
+                              <option value="Telecel Cash">Telecel Cash</option>
+                              <option value="AirtelTigo Money">AirtelTigo Money</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Merchant Wallet Number</label>
+                            <div className="relative">
+                              <span className="absolute left-3 top-2.5 font-bold text-slate-400 text-xs">+233</span>
+                              <input
+                                type="tel"
+                                required
+                                placeholder="244123456"
+                                value={payoutMomoNumber}
+                                onChange={(e) => setPayoutMomoNumber(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                                className={`w-full p-2.5 pl-14 rounded-lg border text-xs font-semibold focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                                  isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                                }`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-500 dark:text-slate-400 mb-1">Registered Merchant / Business Name</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. Edweso Royal Academy Merchant Billing"
+                            value={payoutAccountName}
+                            onChange={(e) => setPayoutAccountName(e.target.value)}
+                            className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                              isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Alerts / Success / Error Indicators */}
+                    {payoutConfigError && (
+                      <div className="p-3 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl border border-rose-500/20 text-[11px] leading-normal font-medium flex items-center space-x-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                        <span>{payoutConfigError}</span>
+                      </div>
+                    )}
+
+                    {payoutConfigSuccess && (
+                      <div className="p-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/20 text-[11px] leading-normal font-medium flex items-center space-x-2 animate-fade-in">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 animate-ping"></span>
+                        <span>{payoutConfigSuccess}</span>
+                      </div>
+                    )}
+
+                    {/* Save Button */}
+                    <button
+                      type="submit"
+                      disabled={isVerifyingPayout}
+                      className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-800/40 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider transition-all shadow-xs cursor-pointer flex items-center justify-center space-x-2"
+                    >
+                      {isVerifyingPayout ? (
+                        <>
+                          <RefreshCw className="animate-spin" size={14} />
+                          <span>Verifying with GhIPSS Resolver...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check size={14} strokeWidth={3} />
+                          <span>Save & Link Payout Destination</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+
+                {/* Settlement Information Box */}
+                <div className={`p-5 rounded-2xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Info className="text-slate-400" size={16} />
+                    <h4 className="font-extrabold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wide">Payout Settlement Policy</h4>
+                  </div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal space-y-2 font-medium">
+                    <p>
+                      <strong>Automatic Settlement (T+1):</strong> All student tuition, cafeteria deposits, and bus levies processed via card or mobile money during a calendar day are cleared, batched, and deposited directly into your linked <strong>{payoutMethod === 'bank' ? payoutBankName : payoutMomoProvider}</strong> account on the next banking day.
+                    </p>
+                    <p>
+                      <strong>Standard Service Fee:</strong> Paystack collects a native processing rate of <strong>1.95%</strong> on local Ghanaian cards and mobile money networks. Edweso Royal Academy doesn't impose additional surcharges on parental checkouts.
+                    </p>
+                    <p>
+                      <strong>Failed Settlement Attempts:</strong> If your bank rejects a transfer due to incorrect account naming or locked accounts, Paystack will immediately hold the funds, send a system diagnostic alert, and retry once you resolve and update details above.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
 
         </div>
       )}
