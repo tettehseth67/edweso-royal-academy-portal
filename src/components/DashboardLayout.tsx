@@ -72,7 +72,8 @@ export default function DashboardLayout({
     { id: 'announcements', label: 'Announcements', icon: <Megaphone size={18} /> },
     { id: 'payments', label: 'Paystack Ledger', icon: <CreditCard size={18} /> },
     { id: 'inquiries', label: 'Web Inquiries', icon: <Mail size={18} /> },
-    { id: 'emails', label: 'Email Dispatch', icon: <Send size={18} /> }
+    { id: 'emails', label: 'Email Dispatch', icon: <Send size={18} /> },
+    { id: 'sms', label: 'SMS Dispatch', icon: <Smartphone size={18} /> }
   ];
 
   const teacherNav = [

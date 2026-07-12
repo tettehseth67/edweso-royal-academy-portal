@@ -2442,10 +2442,11 @@ Edweso Royal Academy Administration Portal Dispatch`;
                                     return (
                                       <div 
                                         key={l.id} 
-                                        className="p-3 rounded-lg border border-slate-200/50 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex justify-between items-center text-xs"
+                                        onClick={() => setSelectedTimetableEntry(l)}
+                                        className="p-3 rounded-xl border border-slate-200/50 dark:border-slate-800 bg-slate-50/50 hover:bg-emerald-50/50 dark:bg-slate-950/50 dark:hover:bg-slate-900/60 cursor-pointer flex justify-between items-center text-xs transition-all hover:-translate-y-0.5 hover:shadow-xs group"
                                       >
                                         <div>
-                                          <p className="font-extrabold text-slate-800 dark:text-slate-200">{sub?.name || 'Class Subject'}</p>
+                                          <p className="font-extrabold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 transition-colors">{sub?.name || 'Class Subject'}</p>
                                           <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Grade: {c?.name || 'Assigned Division'}</p>
                                         </div>
                                         <span className="font-mono text-[9px] font-extrabold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500">

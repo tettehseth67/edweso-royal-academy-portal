@@ -13,13 +13,15 @@ import {
 import { 
   Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, TimetableEntry, Announcement, 
-  PaymentTransaction, PublicInquiry, SimulatedEmail, SyllabusPlan, TeacherAbsence, CoverAssignment,
-  StaffClockIn, StaffPayroll, StaffLeaveRequest, ManualPaymentRequest
+  PaymentTransaction, PublicInquiry, SimulatedEmail, SimulatedSMS, SyllabusPlan, TeacherAbsence, CoverAssignment,
+  StaffClockIn, StaffPayroll, StaffLeaveRequest, ManualPaymentRequest, UserSession
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark, SchoolDatabase } from '../mockData';
 import SyllabusBoard from './SyllabusBoard';
 import SubstitutionAssistant from './SubstitutionAssistant';
 import { FeaturedAnnouncementsCarousel } from './FeaturedCarouselComponents';
+import TimetableDetailView from './TimetableDetailView';
+import { HomeworkAssignment } from '../types';
 
 interface AdminDashboardProps {
   activeTab: string;
@@ -33,12 +35,14 @@ interface AdminDashboardProps {
   announcements: Announcement[];
   transactions: PaymentTransaction[];
   emails: SimulatedEmail[];
+  sms: SimulatedSMS[];
   syllabusPlans?: SyllabusPlan[];
   teacherAbsences?: TeacherAbsence[];
   coverAssignments?: CoverAssignment[];
   staffClockIns: StaffClockIn[];
   staffPayrolls: StaffPayroll[];
   staffLeaveRequests: StaffLeaveRequest[];
+  homeworkAssignments?: HomeworkAssignment[];
   onUpdateStudents: (st: Student[]) => void;
   onUpdateTeachers: (t: Teacher[]) => void;
   onUpdateAnnouncements: (a: Announcement[]) => void;
@@ -47,6 +51,8 @@ interface AdminDashboardProps {
   onTriggerFeeAlerts: (studentIds?: string[]) => number;
   onDeleteEmail: (id: string) => void;
   onSendEmail: (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline') => void;
+  onSendSMS: (recipientPhone: string, recipientName: string, message: string, type: 'Announcement' | 'FeeDeadline' | 'Attendance' | 'MorningReport') => void;
+  onDeleteSMS: (id: string) => void;
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
   onUpdateTeacherAbsences?: (updated: TeacherAbsence[]) => void;
   onUpdateCoverAssignments?: (updated: CoverAssignment[]) => void;
@@ -54,6 +60,7 @@ interface AdminDashboardProps {
   onUpdateStaffPayrolls: (payrolls: StaffPayroll[]) => void;
   onUpdateStaffLeaves: (leaves: StaffLeaveRequest[]) => void;
   onUpdateTransactions: (tx: PaymentTransaction[]) => void;
+  session: UserSession;
   isDarkMode: boolean;
 }
 
@@ -69,12 +76,14 @@ export default function AdminDashboard({
   announcements,
   transactions,
   emails,
+  sms = [],
   syllabusPlans = [],
   teacherAbsences = [],
   coverAssignments = [],
   staffClockIns = [],
   staffPayrolls = [],
   staffLeaveRequests = [],
+  homeworkAssignments = [],
   onUpdateStudents,
   onUpdateTeachers,
   onUpdateAnnouncements,
@@ -83,6 +92,8 @@ export default function AdminDashboard({
   onTriggerFeeAlerts,
   onDeleteEmail,
   onSendEmail,
+  onSendSMS,
+  onDeleteSMS,
   onUpdateSyllabusPlans,
   onUpdateTeacherAbsences,
   onUpdateCoverAssignments,
@@ -90,6 +101,7 @@ export default function AdminDashboard({
   onUpdateStaffPayrolls,
   onUpdateStaffLeaves,
   onUpdateTransactions,
+  session,
   isDarkMode
 }: AdminDashboardProps) {
 
@@ -104,6 +116,7 @@ export default function AdminDashboard({
   const [gradeClassFilter, setGradeClassFilter] = useState('c4'); // Default JHS 2
   const [gradeSubjectFilter, setGradeSubjectFilter] = useState('s1'); // Math
   const [selectedReportCardStudent, setSelectedReportCardStudent] = useState<Student | null>(null);
+  const [selectedTimetableEntry, setSelectedTimetableEntry] = useState<TimetableEntry | null>(null);
 
   // System Activity states
   const [activitySearch, setActivitySearch] = useState('');
@@ -696,10 +709,42 @@ export default function AdminDashboard({
     setTimeout(() => setComposerNotification(null), 5000);
   };
 
+  // Simulated SMS state hooks
+  const [smsComposerStudentId, setSmsComposerStudentId] = useState('');
+  const [smsComposerMessage, setSmsComposerMessage] = useState('');
+  const [smsComposerType, setSmsComposerType] = useState<'Announcement' | 'FeeDeadline' | 'Attendance' | 'MorningReport'>('Announcement');
+  const [smsComposerNotification, setSmsComposerNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [selectedSMSDetails, setSelectedSMSDetails] = useState<SimulatedSMS | null>(null);
+
+  const handleComposeSMSSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!smsComposerStudentId) {
+      setSmsComposerNotification({ message: 'Please select a student/guardian first.', type: 'error' });
+      return;
+    }
+    const targetStudent = students.find(s => s.id === smsComposerStudentId);
+    if (!targetStudent) {
+      setSmsComposerNotification({ message: 'Student record not found.', type: 'error' });
+      return;
+    }
+
+    onSendSMS(
+      targetStudent.parentPhone,
+      targetStudent.parentName,
+      smsComposerMessage || `[NOTICE] Edweso Royal Academy: Update regarding ward ${targetStudent.name}. Check school portal or contact office.`,
+      smsComposerType
+    );
+
+    setSmsComposerNotification({ message: `Simulated custom SMS dispatched successfully to ${targetStudent.parentPhone}!`, type: 'success' });
+    setSmsComposerMessage('');
+    setSmsComposerStudentId('');
+    setTimeout(() => setSmsComposerNotification(null), 5000);
+  };
+
   const triggerBulkFeeAlerts = () => {
     const sentCount = onTriggerFeeAlerts();
     if (sentCount > 0) {
-      alert(`Successfully sent simulated fee reminder emails to ${sentCount} guardians of students with outstanding balances!`);
+      alert(`Successfully sent simulated fee reminder emails & SMS messages to ${sentCount} guardians of students with outstanding balances!`);
     } else {
       alert('No students currently have outstanding fee balances to notify.');
     }
@@ -2589,10 +2634,14 @@ export default function AdminDashboard({
                         const sub = subjects.find(s => s.id === les.subjectId);
                         const teach = teachers.find(t => t.id === les.teacherId);
                         return (
-                          <div key={les.id} className="p-2.5 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-800 text-[11px]">
-                            <p className="font-bold text-slate-900 dark:text-white">{sub ? sub.name : 'Unknown'}</p>
-                            <span className="text-[10px] text-slate-400 block mt-0.5">{les.startTime} - {les.endTime}</span>
-                            <span className="text-[9px] text-emerald-600 font-semibold block">{teach ? teach.name : 'No Teacher'}</span>
+                          <div 
+                            key={les.id} 
+                            onClick={() => setSelectedTimetableEntry(les)}
+                            className="p-2.5 bg-slate-55/40 hover:bg-emerald-50/50 dark:bg-slate-900/20 dark:hover:bg-slate-900/60 rounded-xl border border-slate-100/80 dark:border-slate-800 text-[11px] text-slate-500 cursor-pointer hover:shadow-xs transition-all hover:-translate-y-0.5"
+                          >
+                            <p className="font-bold text-slate-850 dark:text-slate-100">{sub ? sub.name : 'Unknown'}</p>
+                            <span className="text-[10px] text-slate-400 block mt-1">{les.startTime} - {les.endTime}</span>
+                            <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">{teach ? teach.name : 'No Teacher'}</span>
                           </div>
                         );
                       })
@@ -4171,6 +4220,274 @@ export default function AdminDashboard({
                     </div>
                     <button
                       onClick={() => setSelectedEmailDetails(null)}
+                      className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase rounded"
+                    >
+                      Close Payload
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+      )}
+
+
+      {/* ==================== SIMULATED SMS LOGS & COMPOSER ==================== */}
+      {activeTab === 'sms' && (
+        <div className="space-y-6 animate-fade-in" id="sms-dispatch-control-panel">
+          
+          <div className="pb-2 border-b border-slate-200/40">
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">SMS Dispatch Control</h2>
+            <p className="text-xs text-slate-400">Compose custom SMS messages, trigger automated notifications, and review simulated carrier dispatches to parents.</p>
+          </div>
+
+          {/* Quick Metrics & Actions Banner */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Outbox Volume</span>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">{sms.length} Dispatched SMS</h3>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">Simulated cellular SMS gateways are fully operational. Dispatched messages are immediately visible in Parent Dashboards.</p>
+              </div>
+              <div className="pt-2">
+                <span className="text-xs font-bold text-emerald-600 flex items-center space-x-1">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>MTN/Vodafone Ghana Gateway Active</span>
+                </span>
+              </div>
+            </div>
+
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 lg:col-span-2 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Automated SMS Reminders</span>
+                <h3 className="text-sm font-extrabold text-slate-800 dark:text-white mt-2">Trigger Simulated Fee Alerts (SMS + Email)</h3>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Queries student ledgers for pupils with unpaid fees, compiles precise outstanding balances, and broadcasts simulated SMS alerts to parent phone lines with online pay links.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={triggerBulkFeeAlerts}
+                  className="px-4 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-extrabold text-[11px] uppercase tracking-wide rounded-lg shadow-xs flex items-center space-x-1"
+                >
+                  <Smartphone size={14} className="mr-1" />
+                  <span>Send Fee Reminders ({students.filter(s => s.balanceGHS > 0).length})</span>
+                </button>
+                <div className="text-[10px] text-slate-400 flex items-center">
+                  <span>* Sends high-priority SMS alerts to guardian cellular numbers.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* COMPOSER PANEL */}
+            <div className={`p-5 rounded-2xl border h-fit space-y-4 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
+              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2">Simulated SMS Composer</h3>
+
+              {smsComposerNotification && (
+                <div className={`p-3 rounded-lg text-xs font-semibold ${
+                  smsComposerNotification.type === 'success' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-rose-500/10 text-rose-600'
+                }`}>
+                  {smsComposerNotification.message}
+                </div>
+              )}
+
+              <form onSubmit={handleComposeSMSSubmit} className="space-y-4 text-xs font-bold">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Recipient Student & Parent</label>
+                  <select
+                    required
+                    value={smsComposerStudentId}
+                    onChange={(e) => setSmsComposerStudentId(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
+                  >
+                    <option value="">-- Select Parent Recipient --</option>
+                    {students.map(st => (
+                      <option key={st.id} value={st.id}>
+                        {st.name} ({st.parentName} - {st.parentPhone})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">SMS Notification Category</label>
+                  <select
+                    required
+                    value={smsComposerType}
+                    onChange={(e) => setSmsComposerType(e.target.value as any)}
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
+                  >
+                    <option value="Announcement">Announcement / Urgent Notice</option>
+                    <option value="FeeDeadline">Fee Collection Deadline</option>
+                    <option value="Attendance">Attendance / Safety Alert</option>
+                    <option value="MorningReport">Academic Progress / Morning Report</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">SMS Message Text (Max 200 chars)</label>
+                  <textarea
+                    rows={4}
+                    required
+                    maxLength={200}
+                    placeholder="e.g. [ALERT] Edweso Royal Academy: School reopens tomorrow Monday at 7:30am. Please ensure pupils are in complete uniform."
+                    value={smsComposerMessage}
+                    onChange={(e) => setSmsComposerMessage(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden leading-relaxed bg-white dark:bg-slate-950"
+                  />
+                  <div className="text-[10px] text-slate-400 text-right mt-1 font-mono">
+                    {smsComposerMessage.length}/200 characters
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg uppercase tracking-wider text-[11px]"
+                >
+                  Broadcast Simulated SMS
+                </button>
+              </form>
+            </div>
+
+            {/* OUTBOX DISPATCH LOG */}
+            <div className={`p-5 rounded-2xl border lg:col-span-2 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
+              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-4">Simulated SMS Ledger</h3>
+
+              <div className="overflow-x-auto">
+                <table id="simulated-sms-table" className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                      <th className="p-3">Ref ID</th>
+                      <th className="p-3">Category</th>
+                      <th className="p-3">Recipient Parent</th>
+                      <th className="p-3">Message Snippet</th>
+                      <th className="p-3">Sent At</th>
+                      <th className="p-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {sms.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-8 text-center text-slate-400 italic font-semibold">
+                          No simulated SMS messages sent yet in this session.
+                        </td>
+                      </tr>
+                    ) : (
+                      sms.map((s) => (
+                        <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300 font-mono">
+                          <td className="p-3 font-mono text-[10px] text-emerald-600">{s.id}</td>
+                          <td className="p-3">
+                            <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                              s.type === 'Announcement' 
+                                ? 'bg-amber-500/10 text-amber-600' 
+                                : s.type === 'FeeDeadline'
+                                ? 'bg-rose-500/10 text-rose-600'
+                                : s.type === 'Attendance'
+                                ? 'bg-emerald-500/10 text-emerald-600'
+                                : 'bg-sky-500/10 text-sky-600'
+                            }`}>
+                              {s.type}
+                            </span>
+                          </td>
+                          <td className="p-3 font-sans">
+                            <p className="font-bold text-slate-800 dark:text-white leading-tight">{s.recipientName}</p>
+                            <p className="text-[10px] text-slate-400 leading-none mt-0.5">{s.recipientPhone}</p>
+                          </td>
+                          <td className="p-3 max-w-xs truncate">{s.message}</td>
+                          <td className="p-3 text-slate-400 text-[10px]">{s.sentAt}</td>
+                          <td className="p-3 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <button
+                                onClick={() => setSelectedSMSDetails(s)}
+                                className="p-1 text-slate-400 hover:text-emerald-600 transition-colors"
+                                title="View SMS Body"
+                              >
+                                <Eye size={14} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDeleteConfirm({
+                                    isOpen: true,
+                                    title: 'Delete SMS Log',
+                                    message: 'Are you sure you want to delete this simulated SMS dispatch record? This will permanently remove the log entry.',
+                                    onConfirm: () => {
+                                      onDeleteSMS(s.id);
+                                      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+                                    }
+                                  });
+                                }}
+                                className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
+                                title="Remove Log"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          {/* VIEW SMS DETAILS MODAL */}
+          {selectedSMSDetails && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in" id="sms-view-details-modal">
+              <div className={`p-6 rounded-xl shadow-2xl max-w-md w-full border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+              }`}>
+                <div className="flex justify-between items-center border-b pb-2 mb-4 border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-mono font-bold text-emerald-600">[{selectedSMSDetails.id}]</span>
+                    <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Gateway Cellular Payload</span>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedSMSDetails(null)}
+                    className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-slate-400 hover:text-slate-950 dark:hover:text-white text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="space-y-4 text-xs font-medium">
+                  <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-lg border border-slate-100 dark:border-slate-800 space-y-1.5 leading-tight text-slate-500 dark:text-slate-400">
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300 font-sans">From Carrier ID:</span> ERA_SMS_GATEWAY</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300 font-sans">To Mobile:</span> {selectedSMSDetails.recipientPhone} ({selectedSMSDetails.recipientName})</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300 font-sans">Timestamp:</span> {selectedSMSDetails.sentAt}</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300 font-sans">Type Category:</span> {selectedSMSDetails.type}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">Dispatched SMS Message</p>
+                    <div className="p-4 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-800 leading-relaxed text-slate-700 dark:text-slate-300 font-mono text-[11px] whitespace-pre-wrap">
+                      {selectedSMSDetails.message}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <div className="flex items-center space-x-1.5 text-emerald-600 font-bold">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
+                      <span className="font-sans">Delivered Successfully</span>
+                    </div>
+                    <button
+                      onClick={() => setSelectedSMSDetails(null)}
                       className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase rounded"
                     >
                       Close Payload
@@ -6021,6 +6338,36 @@ export default function AdminDashboard({
           </div>
         );
       })()}
+
+      {selectedTimetableEntry && (
+        <TimetableDetailView
+          isOpen={!!selectedTimetableEntry}
+          onClose={() => setSelectedTimetableEntry(null)}
+          entry={selectedTimetableEntry}
+          subjects={subjects}
+          teachers={teachers}
+          classes={classes}
+          homeworkAssignments={homeworkAssignments}
+          syllabusPlans={syllabusPlans}
+          session={session}
+          isDarkMode={isDarkMode}
+          onSendMessage={(teacher, subject) => {
+            if (onSendEmail) {
+              onSendEmail(
+                teacher.email, 
+                teacher.name, 
+                `Admin query regarding ${subject}`, 
+                `Hello Staff Member ${teacher.name},\n\nWe have a registration or syllabus audit inquiry regarding your active lesson for ${subject}...`, 
+                'Announcement'
+              );
+              alert(`Draft inquiry email sent to teacher ${teacher.name} successfully!`);
+            } else {
+              alert(`Draft message created for ${teacher.name}`);
+            }
+          }}
+          onUpdateSyllabusPlans={onUpdateSyllabusPlans}
+        />
+      )}
 
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X, Eye, Accessibility, Type, Check, ZoomIn, ZoomOut } from 'lucide-react';
-import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest } from './types';
+import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, SimulatedSMS, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest } from './types';
 import { SchoolDatabase } from './mockData';
 
 // Component Imports
@@ -212,6 +212,7 @@ export default function App() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
   const [emails, setEmails] = useState<SimulatedEmail[]>([]);
+  const [sms, setSms] = useState<SimulatedSMS[]>([]);
   const [classNotes, setClassNotes] = useState<ClassNote[]>([]);
   const [syllabusPlans, setSyllabusPlans] = useState<SyllabusPlan[]>([]);
   const [teacherAbsences, setTeacherAbsences] = useState<TeacherAbsence[]>([]);
@@ -234,6 +235,7 @@ export default function App() {
     announcements: Announcement[];
     transactions: PaymentTransaction[];
     emails: SimulatedEmail[];
+    sms: SimulatedSMS[];
     classNotes: ClassNote[];
     syllabusPlans: SyllabusPlan[];
     teacherAbsences: TeacherAbsence[];
@@ -255,6 +257,7 @@ export default function App() {
       announcements: updatedFields.announcements ?? announcements,
       transactions: updatedFields.transactions ?? transactions,
       emails: updatedFields.emails ?? emails,
+      sms: updatedFields.sms ?? sms,
       classNotes: updatedFields.classNotes ?? classNotes,
       syllabusPlans: updatedFields.syllabusPlans ?? syllabusPlans,
       teacherAbsences: updatedFields.teacherAbsences ?? teacherAbsences,
@@ -295,6 +298,7 @@ export default function App() {
           setAnnouncements(db.announcements || []);
           setTransactions(db.transactions || []);
           setEmails(db.emails || []);
+          setSms(db.sms || []);
           setClassNotes(db.classNotes || []);
           setSyllabusPlans(db.syllabusPlans || []);
           setTeacherAbsences(db.teacherAbsences || []);
@@ -317,6 +321,7 @@ export default function App() {
           SchoolDatabase.saveAnnouncements(db.announcements || []);
           SchoolDatabase.saveTransactions(db.transactions || []);
           SchoolDatabase.saveEmails(db.emails || []);
+          SchoolDatabase.saveSMS(db.sms || []);
           SchoolDatabase.saveClassNotes(db.classNotes || []);
           SchoolDatabase.saveSyllabusPlans(db.syllabusPlans || []);
           SchoolDatabase.saveTeacherAbsences(db.teacherAbsences || []);
@@ -342,6 +347,7 @@ export default function App() {
         const localAnnouncements = SchoolDatabase.getAnnouncements();
         const localTransactions = SchoolDatabase.getTransactions();
         const localEmails = SchoolDatabase.getEmails();
+        const localSMS = SchoolDatabase.getSMS();
         const localClassNotes = SchoolDatabase.getClassNotes();
         const localSyllabus = SchoolDatabase.getSyllabusPlans();
         const localAbsences = SchoolDatabase.getTeacherAbsences();
@@ -362,6 +368,7 @@ export default function App() {
         setAnnouncements(localAnnouncements);
         setTransactions(localTransactions);
         setEmails(localEmails);
+        setSms(localSMS);
         setClassNotes(localClassNotes);
         setSyllabusPlans(localSyllabus);
         setTeacherAbsences(localAbsences);
@@ -388,6 +395,7 @@ export default function App() {
               announcements: localAnnouncements,
               transactions: localTransactions,
               emails: localEmails,
+              sms: localSMS,
               classNotes: localClassNotes,
               syllabusPlans: localSyllabus,
               teacherAbsences: localAbsences,
@@ -520,7 +528,7 @@ export default function App() {
     setAnnouncements(updatedAnnouncements);
     SchoolDatabase.saveAnnouncements(updatedAnnouncements);
 
-    // Auto-trigger simulated emails if a new announcement is posted
+    // Auto-trigger simulated emails and SMS if a new announcement is posted
     if (updatedAnnouncements.length > announcements.length) {
       const newAnn = updatedAnnouncements[0];
       let targetStudents: Student[] = [];
@@ -529,8 +537,11 @@ export default function App() {
       }
 
       const newSimulatedEmails: SimulatedEmail[] = [];
+      const newSimulatedSMS: SimulatedSMS[] = [];
+      
       targetStudents.forEach(st => {
         const emailId = 'em-auto-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
+        const smsId = 'sms-auto-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
         const emailSubject = `Edweso Royal Academy Notice: ${newAnn.title}`;
         const emailBody = `Dear ${st.parentName},
 
@@ -562,12 +573,31 @@ Edweso Royal Academy`;
           type: 'Announcement',
           status: 'Sent'
         });
+
+        newSimulatedSMS.push({
+          id: smsId,
+          recipientPhone: st.parentPhone,
+          recipientName: st.parentName,
+          message: `[ALERT] Edweso Royal Academy: Urgent Notice - "${newAnn.title}". Msg: ${newAnn.content.substring(0, 100)}${newAnn.content.length > 100 ? '...' : ''} Check portal for full bulletin.`,
+          sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+          type: 'Announcement',
+          status: 'Sent'
+        });
       });
 
       const updatedEmailsList = [...newSimulatedEmails, ...emails];
+      const updatedSMSList = [...newSimulatedSMS, ...sms];
+      
       setEmails(updatedEmailsList);
       SchoolDatabase.saveEmails(updatedEmailsList);
-      syncAndSave({ announcements: updatedAnnouncements, emails: updatedEmailsList });
+      setSms(updatedSMSList);
+      SchoolDatabase.saveSMS(updatedSMSList);
+      
+      syncAndSave({ 
+        announcements: updatedAnnouncements, 
+        emails: updatedEmailsList,
+        sms: updatedSMSList 
+      });
     } else {
       syncAndSave({ announcements: updatedAnnouncements });
     }
@@ -584,8 +614,11 @@ Edweso Royal Academy`;
     if (recipients.length === 0) return 0;
 
     const newSimulatedEmails: SimulatedEmail[] = [];
+    const newSimulatedSMS: SimulatedSMS[] = [];
+    
     recipients.forEach(st => {
       const emailId = 'em-fee-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
+      const smsId = 'sms-fee-' + Date.now() + '-' + Math.floor(Math.random() * 100000);
       const emailSubject = `URGENT Fee Reminder: Outstanding Balance for ${st.name}`;
       const emailBody = `Dear ${st.parentName},
 
@@ -616,12 +649,27 @@ Edweso Royal Academy`;
         type: 'FeeDeadline',
         status: 'Sent'
       });
+
+      newSimulatedSMS.push({
+        id: smsId,
+        recipientPhone: st.parentPhone,
+        recipientName: st.parentName,
+        message: `[ALERT] Edweso Royal Finance: School fee billing reminder. Ward ${st.name} has an outstanding balance of GHS ${st.balanceGHS.toFixed(2)}. Pay online via portal instantly or contact Bursar.`,
+        sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        type: 'FeeDeadline',
+        status: 'Sent'
+      });
     });
 
     const updatedEmailsList = [...newSimulatedEmails, ...emails];
+    const updatedSMSList = [...newSimulatedSMS, ...sms];
+    
     setEmails(updatedEmailsList);
     SchoolDatabase.saveEmails(updatedEmailsList);
-    syncAndSave({ emails: updatedEmailsList });
+    setSms(updatedSMSList);
+    SchoolDatabase.saveSMS(updatedSMSList);
+    
+    syncAndSave({ emails: updatedEmailsList, sms: updatedSMSList });
     return recipients.length;
   };
 
@@ -657,6 +705,39 @@ Edweso Royal Academy`;
     setEmails(updatedEmails);
     SchoolDatabase.saveEmails(updatedEmails);
     syncAndSave({ emails: updatedEmails });
+  };
+
+  const handleSendSimulatedSMS = (recipientPhone: string, recipientName: string, message: string, type: 'Announcement' | 'FeeDeadline' | 'Attendance' | 'MorningReport') => {
+    const newSMS: SimulatedSMS = {
+      id: 'sms-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      recipientPhone,
+      recipientName,
+      message,
+      sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      type,
+      status: 'Sent'
+    };
+    const updatedSMS = [newSMS, ...sms];
+    setSms(updatedSMS);
+    SchoolDatabase.saveSMS(updatedSMS);
+    syncAndSave({ sms: updatedSMS });
+  };
+
+  const handleDeleteSMS = (id: string) => {
+    setGlobalConfirm({
+      isOpen: true,
+      title: 'Delete Simulated SMS Log',
+      message: 'Are you sure you want to permanently delete this simulated SMS dispatch record? This action cannot be undone.',
+      confirmText: 'Confirm Deletion',
+      type: 'danger',
+      onConfirm: () => {
+        const updated = sms.filter(s => s.id !== id);
+        setSms(updated);
+        SchoolDatabase.saveSMS(updated);
+        syncAndSave({ sms: updated });
+        setGlobalConfirm(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleUpdateAttendance = (updatedAttendance: Attendance[]) => {
@@ -903,6 +984,7 @@ Principal Signoff: Approved
               announcements={announcements}
               transactions={transactions}
               emails={emails}
+              sms={sms}
               syllabusPlans={syllabusPlans}
               teacherAbsences={teacherAbsences}
               coverAssignments={coverAssignments}
@@ -917,13 +999,17 @@ Principal Signoff: Approved
               onTriggerFeeAlerts={handleTriggerFeeAlerts}
               onDeleteEmail={handleDeleteEmail}
               onSendEmail={handleSendSimulatedEmail}
+              onSendSMS={handleSendSimulatedSMS}
+              onDeleteSMS={handleDeleteSMS}
               onUpdateSyllabusPlans={handleUpdateSyllabusPlans}
               onUpdateTeacherAbsences={handleUpdateTeacherAbsences}
               onUpdateCoverAssignments={handleUpdateCoverAssignments}
               onUpdateStaffClockIns={handleUpdateStaffClockIns}
-              onUpdateStaffPayrolls={handleUpdateStaffPayroll}
+               onUpdateStaffPayrolls={handleUpdateStaffPayroll}
               onUpdateStaffLeaves={handleUpdateStaffLeaves}
               onUpdateTransactions={handleUpdateTransactions}
+              session={session}
+              homeworkAssignments={homeworkAssignments}
               isDarkMode={isDarkMode}
             />
           )}
@@ -1003,11 +1089,13 @@ Principal Signoff: Approved
               announcements={announcements}
               transactions={transactions}
               emails={emails}
+              sms={sms}
               timetable={timetable}
               syllabusPlans={syllabusPlans}
               homeworkAssignments={homeworkAssignments}
               onPaymentSuccess={handlePaymentSuccess}
               onSendEmail={handleSendSimulatedEmail}
+              onSendSMS={handleSendSimulatedSMS}
               isDarkMode={isDarkMode}
               onTabChange={setActiveTab}
             />

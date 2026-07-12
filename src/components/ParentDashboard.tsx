@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { 
   UserSession, Student, Teacher, SchoolClass, Subject, 
-  Attendance, ExamGrade, Announcement, PaymentTransaction, SimulatedEmail, ManualPaymentRequest,
+  Attendance, ExamGrade, Announcement, PaymentTransaction, SimulatedEmail, SimulatedSMS, ManualPaymentRequest,
   TimetableEntry, SyllabusPlan, HomeworkAssignment
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark } from '../mockData';
@@ -29,11 +29,13 @@ interface ParentDashboardProps {
   announcements: Announcement[];
   transactions: PaymentTransaction[];
   emails: SimulatedEmail[];
+  sms: SimulatedSMS[];
   timetable?: TimetableEntry[];
   syllabusPlans?: SyllabusPlan[];
   homeworkAssignments?: HomeworkAssignment[];
   onPaymentSuccess: (amount: number, method: string, ref: string, paystackRef: string) => void;
   onSendEmail?: (recipientEmail: string, recipientName: string, subject: string, body: string, type: string) => void;
+  onSendSMS?: (recipientPhone: string, recipientName: string, message: string, type: string) => void;
   isDarkMode: boolean;
   onTabChange?: (tab: string) => void;
 }
@@ -50,11 +52,13 @@ export default function ParentDashboard({
   announcements,
   transactions,
   emails,
+  sms = [],
   timetable = [],
   syllabusPlans = [],
   homeworkAssignments = [],
   onPaymentSuccess,
   onSendEmail,
+  onSendSMS,
   isDarkMode,
   onTabChange
 }: ParentDashboardProps) {
@@ -184,7 +188,7 @@ export default function ParentDashboard({
   });
 
   // Simulated SMS Alerts log (Parent specific notifications)
-  const smsAlerts = [
+  const defaultSMSAlerts = [
     {
       id: 'sms-1',
       timestamp: '2026-07-10 07:48',
@@ -210,6 +214,17 @@ export default function ParentDashboard({
       message: `[ALERT] Edweso Royal Finance: School fee billing generated. 2nd Term balance GHS ${activeStudent.balanceGHS.toFixed(2)} is due. Pay online via parent portal instantly.`
     }
   ];
+
+  const parentDynamicSMS = sms
+    .filter(s => s.recipientPhone === activeStudent.parentPhone || s.recipientName === activeStudent.parentName)
+    .map(s => ({
+      id: s.id,
+      timestamp: s.sentAt,
+      phone: s.recipientPhone,
+      message: s.message
+    }));
+
+  const smsAlerts = [...parentDynamicSMS, ...defaultSMSAlerts];
 
   const handlePaystackPayment = (paymentDetails: { paystackRef: string; paymentMethod: string; amount: number; }) => {
     onPaymentSuccess(paymentDetails.amount, paymentDetails.paymentMethod, 'PRef-' + Date.now(), paymentDetails.paystackRef);

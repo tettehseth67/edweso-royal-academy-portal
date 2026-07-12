@@ -10,6 +10,7 @@ import {
   PaymentTransaction,
   PublicInquiry,
   SimulatedEmail,
+  SimulatedSMS,
   ClassNote,
   SyllabusPlan,
   TeacherAbsence,
@@ -346,6 +347,14 @@ export class SchoolDatabase {
     setStored('EMAILS', emails);
   }
 
+  static getSMS(): SimulatedSMS[] {
+    return getStored<SimulatedSMS[]>('SMS_ALERTS', initialSMS);
+  }
+
+  static saveSMS(smsList: SimulatedSMS[]): void {
+    setStored('SMS_ALERTS', smsList);
+  }
+
   static getClassNotes(): ClassNote[] {
     return getStored<ClassNote[]>('CLASS_NOTES', []);
   }
@@ -569,6 +578,27 @@ Best regards,
 Bursar Office
 Edweso Royal Academy`,
     sentAt: '2026-07-02 16:45',
+    type: 'FeeDeadline',
+    status: 'Sent'
+  }
+];
+
+export const initialSMS: SimulatedSMS[] = [
+  {
+    id: 'sms-init-1',
+    recipientPhone: '+233 24 412 3456',
+    recipientName: 'Isaac Mensah',
+    message: '[ALERT] Edweso Royal Academy: PTA Meeting scheduled for Saturday, July 18th at 10:00 AM in the main School Assembly Hall. Please make it a point to attend.',
+    sentAt: '2026-07-02 08:32',
+    type: 'Announcement',
+    status: 'Sent'
+  },
+  {
+    id: 'sms-init-2',
+    recipientPhone: '+233 27 755 8910',
+    recipientName: 'Kojo Boateng',
+    message: '[ALERT] Edweso Royal Finance: School fee billing outstanding. Balance GHS 2,400.00 is due. Pay online via parent portal instantly.',
+    sentAt: '2026-07-02 16:47',
     type: 'FeeDeadline',
     status: 'Sent'
   }

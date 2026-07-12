@@ -153,6 +153,16 @@ export interface SimulatedEmail {
   status: 'Sent' | 'Failed';
 }
 
+export interface SimulatedSMS {
+  id: string;
+  recipientPhone: string;
+  recipientName: string;
+  message: string;
+  sentAt: string;
+  type: 'Announcement' | 'FeeDeadline' | 'Attendance' | 'MorningReport';
+  status: 'Sent' | 'Failed';
+}
+
 export interface ClassNote {
   id: string;
   studentId: string; // References Student.id
