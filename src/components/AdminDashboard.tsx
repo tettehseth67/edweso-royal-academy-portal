@@ -425,13 +425,132 @@ export default function AdminDashboard({
   };
 
   // Payment Gateway & Bank Account Linking Configuration
-  const [paymentsSubTab, setPaymentsSubTab] = useState<'ledger' | 'manual-approvals' | 'bank-setup'>('ledger');
+  const [paymentsSubTab, setPaymentsSubTab] = useState<'ledger' | 'pending-verification' | 'manual-approvals' | 'bank-setup'>('ledger');
+  const [verificationStatusFilter, setVerificationStatusFilter] = useState<'Pending' | 'Successful' | 'Failed' | 'All'>('Pending');
+  const [verificationSearchQuery, setVerificationSearchQuery] = useState('');
+
+  const handleApprovePendingTransaction = (txId: string) => {
+    const targetTx = transactions.find(t => t.id === txId);
+    if (!targetTx) return;
+
+    // 1. Deduct paid amount from student's balance
+    const updatedStudents = students.map(s => {
+      if (s.id === targetTx.studentId) {
+        return {
+          ...s,
+          balanceGHS: Math.max(0, s.balanceGHS - targetTx.amountGHS)
+        };
+      }
+      return s;
+    });
+    onUpdateStudents(updatedStudents);
+
+    // 2. Update the transaction status in transaction ledger to 'Successful'
+    const updatedTx = transactions.map(t => {
+      if (t.id === txId) {
+        return {
+          ...t,
+          status: 'Successful' as const
+        };
+      }
+      return t;
+    });
+    onUpdateTransactions(updatedTx);
+
+    alert(`Successfully verified and approved transaction ${targetTx.reference}. Tuition balance of GHS ${targetTx.amountGHS.toFixed(2)} has been credited to ${targetTx.studentName} and an official receipt has been dispatched to their guardian.`);
+  };
   const [manualPayments, setManualPayments] = useState<ManualPaymentRequest[]>(() => {
     const saved = localStorage.getItem('era_manual_payments');
     return saved ? JSON.parse(saved) : [];
   });
   const [rejectReason, setRejectReason] = useState('');
   const [rejectingId, setRejectingId] = useState<string | null>(null);
+  
+  // Custom states for manual receipt queue and direct recording
+  const [manualStatusFilter, setManualStatusFilter] = useState<'All' | 'Pending' | 'Approved' | 'Rejected'>('All');
+  const [isDirectPaymentModalOpen, setIsDirectPaymentModalOpen] = useState(false);
+  const [directStudentId, setDirectStudentId] = useState('');
+  const [directAmount, setDirectAmount] = useState('');
+  const [directMethod, setDirectMethod] = useState<'Bank Transfer' | 'MTN Mobile Money' | 'Telecel Cash' | 'AirtelTigo Money' | 'Cash'>('Cash');
+  const [directReference, setDirectReference] = useState('');
+
+  const handleRecordDirectPayment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!directStudentId) {
+      alert('Please select a student.');
+      return;
+    }
+    const amount = Number(directAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid positive amount.');
+      return;
+    }
+    if (!directReference.trim()) {
+      alert('Please enter a reference code.');
+      return;
+    }
+
+    const targetStudent = students.find(s => s.id === directStudentId);
+    if (!targetStudent) {
+      alert('Selected student not found.');
+      return;
+    }
+
+    // 1. Deduct paid amount from student's balance
+    const updatedStudents = students.map(s => {
+      if (s.id === directStudentId) {
+        return {
+          ...s,
+          balanceGHS: Math.max(0, s.balanceGHS - amount)
+        };
+      }
+      return s;
+    });
+    onUpdateStudents(updatedStudents);
+
+    // 2. Log payment transaction in transaction ledger
+    const newTx: PaymentTransaction = {
+      id: 'tx-manual-' + Date.now(),
+      studentId: directStudentId,
+      studentName: targetStudent.name,
+      amountGHS: amount,
+      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'Successful',
+      reference: directReference.trim(),
+      paystackRef: 'DIRECT-BURSAR-' + Date.now(),
+      paymentMethod: directMethod as any,
+      email: targetStudent.parentEmail || 'student@school.edu',
+      term: 'Term 1'
+    };
+    onUpdateTransactions([newTx, ...transactions]);
+
+    // 3. Create a manual request marked as Approved automatically
+    const newRequest: ManualPaymentRequest = {
+      id: `M-${Date.now().toString().substring(6)}`,
+      studentId: directStudentId,
+      studentName: targetStudent.name,
+      amountGHS: amount,
+      date: new Date().toISOString().substring(0, 10),
+      referenceCode: directReference.trim(),
+      paymentMethod: directMethod as any,
+      status: 'Approved',
+      reviewedBy: 'Bursar Administrator',
+      reviewedAt: new Date().toISOString().substring(0, 10)
+    };
+
+    const updatedRequests = [newRequest, ...manualPayments];
+    setManualPayments(updatedRequests);
+    localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
+
+    // Reset Form
+    setDirectStudentId('');
+    setDirectAmount('');
+    setDirectMethod('Cash');
+    setDirectReference('');
+    setIsDirectPaymentModalOpen(false);
+
+    alert(`Successfully recorded and verified direct payment of GHS ${amount} for ${targetStudent.name}.`);
+  };
 
   const handleApproveManualPayment = (id: string) => {
     const request = manualPayments.find(r => r.id === id);
@@ -2585,6 +2704,17 @@ export default function AdminDashboard({
                 <span>Transaction Ledger</span>
               </button>
               <button
+                onClick={() => setPaymentsSubTab('pending-verification')}
+                className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
+                  paymentsSubTab === 'pending-verification'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              >
+                <ShieldCheck size={12} />
+                <span>Pending Verification ({transactions.filter(t => t.status === 'Pending').length})</span>
+              </button>
+              <button
                 onClick={() => setPaymentsSubTab('manual-approvals')}
                 className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
                   paymentsSubTab === 'manual-approvals'
@@ -2749,165 +2879,475 @@ export default function AdminDashboard({
           </>
           )}
 
-          {/* ==================== MANUAL RECEIPTS APPROVAL QUEUE ==================== */}
-          {paymentsSubTab === 'manual-approvals' && (
-            <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
-              <div className={`p-5 rounded-2xl border ${
-                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
-              }`}>
-                <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 flex-wrap gap-3">
-                  <div>
-                    <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
-                      <FileText className="text-emerald-500" size={16} />
-                      <span>Bursar Offline Receipt Verification Queue</span>
-                    </h3>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
-                      Verify uploaded mobile money and bank deposit slips. Approving will automatically deduct the student's balance and log a successful transaction.
-                    </p>
+          {/* ==================== PENDING VERIFICATION APPROVAL QUEUE ==================== */}
+          {paymentsSubTab === 'pending-verification' && (() => {
+            const pendingTransactions = transactions.filter((tx) => {
+              // Apply verification status filter
+              if (verificationStatusFilter !== 'All' && tx.status !== verificationStatusFilter) {
+                return false;
+              }
+              // Apply search query filter
+              if (verificationSearchQuery.trim()) {
+                const query = verificationSearchQuery.toLowerCase();
+                return (
+                  tx.studentName.toLowerCase().includes(query) ||
+                  tx.reference.toLowerCase().includes(query) ||
+                  tx.paystackRef.toLowerCase().includes(query) ||
+                  (tx.studentId && tx.studentId.toLowerCase().includes(query))
+                );
+              }
+              return true;
+            });
+
+            const pendingCount = transactions.filter(t => t.status === 'Pending').length;
+            const pendingSum = transactions.filter(t => t.status === 'Pending').reduce((sum, t) => sum + t.amountGHS, 0);
+
+            return (
+              <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
+                {/* Stats block */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex flex-col justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Awaiting Verification Volume</span>
+                    <span className="text-xl font-extrabold font-mono mt-1">
+                      {pendingCount} Transactions (GHS {pendingSum.toFixed(2)})
+                    </span>
+                  </div>
+                  <div className="p-4 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Verified & Dispatched Today</span>
+                    <span className="text-xl font-extrabold font-mono mt-1">
+                      {transactions.filter(t => t.status === 'Successful').length} Cleared Ledgers
+                    </span>
                   </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs font-semibold text-slate-600">
-                    <thead>
-                      <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
-                        <th className="p-3">Student Name / ID</th>
-                        <th className="p-3">Amount (GHS)</th>
-                        <th className="p-3">Channel / Method</th>
-                        <th className="p-3">Ref Code / Slip No.</th>
-                        <th className="p-3">Uploaded Receipt</th>
-                        <th className="p-3">Status</th>
-                        <th className="p-3 text-right">Actions / Review Details</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
-                      {manualPayments.length > 0 ? (
-                        manualPayments.map((req) => (
-                          <tr key={req.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                            <td className="p-3">
-                              <div className="font-bold text-slate-900 dark:text-white">{req.studentName}</div>
-                              <div className="text-[10px] text-slate-400 font-mono">ID: {req.studentId}</div>
-                            </td>
-                            <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-200">
-                              GHS {req.amountGHS.toFixed(2)}
-                            </td>
-                            <td className="p-3 font-medium text-slate-500 dark:text-slate-400">
-                              {req.paymentMethod}
-                            </td>
-                            <td className="p-3 font-mono text-[11px] text-slate-500 dark:text-slate-400">
-                              {req.referenceCode}
-                            </td>
-                            <td className="p-3">
-                              {req.receiptImage ? (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const win = window.open();
-                                    if (win) {
-                                      win.document.write(`
-                                        <html>
-                                          <head><title>Receipt Slip - ${req.id}</title></head>
-                                          <body style="margin:0; background:#0f172a; display:flex; align-items:center; justify-content:center; height:100vh;">
-                                            <img src="${req.receiptImage}" style="max-width:90%; max-height:90%; border-radius:8px; border:1px solid #334155;" />
-                                          </body>
-                                        </html>
-                                      `);
-                                    } else {
-                                      alert('Could not open preview. Popups might be blocked.');
-                                    }
-                                  }}
-                                  className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20 rounded font-bold text-[10px] flex items-center space-x-1 cursor-pointer"
-                                >
-                                  <Eye size={12} />
-                                  <span>View Slip</span>
-                                </button>
-                              ) : (
-                                <span className="text-slate-400 italic font-medium text-[10px]">No image attached</span>
-                              )}
-                            </td>
-                            <td className="p-3">
-                              <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
-                                req.status === 'Approved'
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                  : req.status === 'Rejected'
-                                  ? 'bg-rose-50 text-rose-700 border-rose-100'
-                                  : 'bg-amber-50 text-amber-700 border-amber-100'
-                              }`}>
-                                {req.status}
-                              </span>
-                            </td>
-                            <td className="p-3 text-right">
-                              {req.status === 'Pending' ? (
-                                <div className="flex items-center justify-end space-x-2">
-                                  {rejectingId === req.id ? (
-                                    <div className="flex flex-col space-y-1.5 w-48 text-left bg-slate-50 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                                      <input
-                                        type="text"
-                                        placeholder="Reason for declining..."
-                                        value={rejectReason}
-                                        onChange={(e) => setRejectReason(e.target.value)}
-                                        className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-750 p-1 rounded font-normal text-[10px] text-slate-800 dark:text-slate-200 focus:outline-hidden"
-                                      />
-                                      <div className="flex justify-end space-x-1">
-                                        <button
-                                          onClick={() => {
-                                            setRejectingId(null);
-                                            setRejectReason('');
-                                          }}
-                                          className="px-1.5 py-0.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-[9px] cursor-pointer"
-                                        >
-                                          Cancel
-                                        </button>
-                                        <button
-                                          onClick={() => handleRejectManualPayment(req.id)}
-                                          className="px-1.5 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-[9px] font-bold cursor-pointer"
-                                        >
-                                          Confirm Decline
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <button
-                                        onClick={() => handleApproveManualPayment(req.id)}
-                                        className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[10px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
-                                      >
-                                        Approve & Credit
-                                      </button>
-                                      <button
-                                        onClick={() => setRejectingId(req.id)}
-                                        className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-md text-[10px] font-bold transition-all cursor-pointer"
-                                      >
-                                        Decline
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="text-[10px] text-slate-400 font-medium">
-                                  {req.status === 'Approved' ? (
-                                    <span>Verified by <strong>{req.reviewedBy}</strong></span>
-                                  ) : (
-                                    <span className="text-rose-500">Reason: <strong>{req.rejectReason}</strong></span>
-                                  )}
-                                </div>
-                              )}
+                <div className={`p-5 rounded-2xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  {/* Header info */}
+                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 flex-wrap gap-3">
+                    <div>
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
+                        <ShieldCheck className="text-amber-500" size={16} />
+                        <span>Bursar Gateway Payment Pending Verification</span>
+                      </h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Audit and verify pending mobile wallet or bank transfer transactions. Approving will automatically deduct the student's balance, update ledger status to Successful, and trigger an official PDF receipt dispatched to the guardian's email.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Filters / Search Bar */}
+                  <div className="flex items-center justify-between flex-wrap gap-3 mb-4 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center space-x-1">
+                      {(['Pending', 'Successful', 'Failed', 'All'] as const).map((filter) => {
+                        const count = filter === 'All'
+                          ? transactions.length
+                          : transactions.filter(t => t.status === filter).length;
+                        return (
+                          <button
+                            key={filter}
+                            type="button"
+                            onClick={() => setVerificationStatusFilter(filter)}
+                            className={`px-3 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
+                              verificationStatusFilter === filter
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                          >
+                            {filter} ({count})
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="relative w-64">
+                      <Search className="absolute left-2.5 top-2 text-slate-400" size={12} />
+                      <input
+                        type="text"
+                        placeholder="Search student or ref..."
+                        value={verificationSearchQuery}
+                        onChange={(e) => setVerificationSearchQuery(e.target.value)}
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 pl-8 pr-3 py-1 rounded-lg text-xs focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs font-semibold text-slate-600">
+                      <thead>
+                        <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                          <th className="p-3">Reference / Paystack ID</th>
+                          <th className="p-3">Student Payee</th>
+                          <th className="p-3">Amount (GHS)</th>
+                          <th className="p-3">Channel / Method</th>
+                          <th className="p-3">Timestamp</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
+                        {pendingTransactions.length > 0 ? (
+                          pendingTransactions.map((tx) => (
+                            <tr key={tx.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                              <td className="p-3">
+                                <div className="font-extrabold text-slate-900 dark:text-white">{tx.reference}</div>
+                                <div className="text-[10px] text-slate-400 font-mono">{tx.paystackRef}</div>
+                              </td>
+                              <td className="p-3">
+                                <div className="font-bold text-slate-900 dark:text-white">{tx.studentName}</div>
+                                <div className="text-[10px] text-slate-400 font-mono">ID: {tx.studentId}</div>
+                              </td>
+                              <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-200">
+                                GHS {tx.amountGHS.toFixed(2)}
+                              </td>
+                              <td className="p-3">
+                                <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] border border-slate-200 dark:border-slate-700">
+                                  {tx.paymentMethod}
+                                </span>
+                              </td>
+                              <td className="p-3 font-medium text-slate-500">
+                                {tx.date}
+                              </td>
+                              <td className="p-3">
+                                <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
+                                  tx.status === 'Successful'
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                    : tx.status === 'Failed'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400'
+                                    : 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400'
+                                }`}>
+                                  {tx.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-right">
+                                {tx.status === 'Pending' ? (
+                                  <button
+                                    onClick={() => handleApprovePendingTransaction(tx.id)}
+                                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[10px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center space-x-1 ml-auto"
+                                  >
+                                    <Check size={10} />
+                                    <span>Verify & Approve</span>
+                                  </button>
+                                ) : (
+                                  <span className="text-slate-400 italic text-[10px]">Verified / Cleared</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={7} className="text-center py-12 text-slate-400 italic">
+                              No payment transactions found matching the current status filter.
                             </td>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={7} className="text-center py-12 text-slate-400 italic">
-                            No manual payment receipt upload requests found in the system.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
+
+          {/* ==================== MANUAL RECEIPTS APPROVAL QUEUE ==================== */}
+          {paymentsSubTab === 'manual-approvals' && (() => {
+            const filteredManualPayments = manualPayments.filter((req) => {
+              if (manualStatusFilter === 'All') return true;
+              return req.status === manualStatusFilter;
+            });
+            return (
+              <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
+                <div className={`p-5 rounded-2xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 flex-wrap gap-3">
+                    <div>
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
+                        <FileText className="text-emerald-500" size={16} />
+                        <span>Bursar Offline Receipt Verification Queue</span>
+                      </h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Verify uploaded mobile money and bank deposit slips. Approving will automatically deduct the student's balance and log a successful transaction.
+                      </p>
+                    </div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => setIsDirectPaymentModalOpen(true)}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center space-x-1 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                    >
+                      <Plus size={14} />
+                      <span>Record Offline Cash/Bank Payment</span>
+                    </button>
+                  </div>
+
+                  {/* Status Filters and Queue Counts */}
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-4 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center space-x-1">
+                      {(['All', 'Pending', 'Approved', 'Rejected'] as const).map((filter) => {
+                        const count = filter === 'All' 
+                          ? manualPayments.length 
+                          : manualPayments.filter(p => p.status === filter).length;
+                        return (
+                          <button
+                            key={filter}
+                            type="button"
+                            onClick={() => setManualStatusFilter(filter)}
+                            className={`px-3 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
+                              manualStatusFilter === filter
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                          >
+                            {filter} ({count})
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-bold">
+                      Showing {filteredManualPayments.length} of {manualPayments.length} requests
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs font-semibold text-slate-600">
+                      <thead>
+                        <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                          <th className="p-3">Student Name / ID</th>
+                          <th className="p-3">Amount (GHS)</th>
+                          <th className="p-3">Channel / Method</th>
+                          <th className="p-3">Ref Code / Slip No.</th>
+                          <th className="p-3">Uploaded Receipt</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3 text-right">Actions / Review Details</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
+                        {filteredManualPayments.length > 0 ? (
+                          filteredManualPayments.map((req) => (
+                            <tr key={req.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                              <td className="p-3">
+                                <div className="font-bold text-slate-900 dark:text-white">{req.studentName}</div>
+                                <div className="text-[10px] text-slate-400 font-mono">ID: {req.studentId}</div>
+                              </td>
+                              <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-200">
+                                GHS {req.amountGHS.toFixed(2)}
+                              </td>
+                              <td className="p-3 font-medium text-slate-500 dark:text-slate-400">
+                                {req.paymentMethod}
+                              </td>
+                              <td className="p-3 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                                {req.referenceCode}
+                              </td>
+                              <td className="p-3">
+                                {req.receiptImage ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const win = window.open();
+                                      if (win) {
+                                        win.document.write(`
+                                          <html>
+                                            <head><title>Receipt Slip - ${req.id}</title></head>
+                                            <body style="margin:0; background:#0f172a; display:flex; align-items:center; justify-content:center; height:100vh;">
+                                              <img src="${req.receiptImage}" style="max-width:90%; max-height:90%; border-radius:8px; border:1px solid #334155;" />
+                                            </body>
+                                          </html>
+                                        `);
+                                      } else {
+                                        alert('Could not open preview. Popups might be blocked.');
+                                      }
+                                    }}
+                                    className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20 rounded font-bold text-[10px] flex items-center space-x-1 cursor-pointer"
+                                  >
+                                    <Eye size={12} />
+                                    <span>View Slip</span>
+                                  </button>
+                                ) : (
+                                  <span className="text-slate-400 italic font-medium text-[10px]">No image attached</span>
+                                )}
+                              </td>
+                              <td className="p-3">
+                                <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
+                                  req.status === 'Approved'
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                    : req.status === 'Rejected'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-100'
+                                    : 'bg-amber-50 text-amber-700 border-amber-100'
+                                }`}>
+                                  {req.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-right">
+                                {req.status === 'Pending' ? (
+                                  <div className="flex items-center justify-end space-x-2">
+                                    {rejectingId === req.id ? (
+                                      <div className="flex flex-col space-y-1.5 w-48 text-left bg-slate-50 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                                        <input
+                                          type="text"
+                                          placeholder="Reason for declining..."
+                                          value={rejectReason}
+                                          onChange={(e) => setRejectReason(e.target.value)}
+                                          className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-750 p-1 rounded font-normal text-[10px] text-slate-800 dark:text-slate-200 focus:outline-hidden"
+                                        />
+                                        <div className="flex justify-end space-x-1">
+                                          <button
+                                            onClick={() => {
+                                              setRejectingId(null);
+                                              setRejectReason('');
+                                            }}
+                                            className="px-1.5 py-0.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-[9px] cursor-pointer"
+                                          >
+                                            Cancel
+                                          </button>
+                                          <button
+                                            onClick={() => handleRejectManualPayment(req.id)}
+                                            className="px-1.5 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-[9px] font-bold cursor-pointer"
+                                          >
+                                            Confirm Decline
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <button
+                                          onClick={() => handleApproveManualPayment(req.id)}
+                                          className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[10px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
+                                        >
+                                          Approve & Credit
+                                        </button>
+                                        <button
+                                          onClick={() => setRejectingId(req.id)}
+                                          className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-md text-[10px] font-bold transition-all cursor-pointer"
+                                        >
+                                          Decline
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="text-[10px] text-slate-400 font-medium">
+                                    {req.status === 'Approved' ? (
+                                      <span>Verified by <strong>{req.reviewedBy}</strong></span>
+                                    ) : (
+                                      <span className="text-rose-500">Reason: <strong>{req.rejectReason}</strong></span>
+                                    )}
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={7} className="text-center py-12 text-slate-400 italic">
+                              No manual payment receipt upload requests found matching current filter.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Direct payment recording modal inside the scope */}
+                {isDirectPaymentModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+                    <div className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-fade-in ${
+                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                    }`}>
+                      <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                        <div className="flex items-center space-x-2">
+                          <Receipt className="text-emerald-500" size={18} />
+                          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Record Offline Tuition Payment</h3>
+                        </div>
+                        <button
+                          onClick={() => setIsDirectPaymentModalOpen(false)}
+                          className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleRecordDirectPayment} className="space-y-4 mt-4 text-xs font-semibold">
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">Select Student payee</label>
+                          <select
+                            value={directStudentId}
+                            onChange={(e) => setDirectStudentId(e.target.value)}
+                            required
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          >
+                            <option value="">-- Choose student --</option>
+                            {students.map(s => (
+                              <option key={s.id} value={s.id}>
+                                {s.name} (ID: {s.id}) — Bal: GHS {s.balanceGHS.toFixed(2)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">Payment Amount (GHS)</label>
+                          <input
+                            type="number"
+                            required
+                            placeholder="e.g. 1500.00"
+                            value={directAmount}
+                            onChange={(e) => setDirectAmount(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">Payment Channel / Method</label>
+                          <select
+                            value={directMethod}
+                            onChange={(e) => setDirectMethod(e.target.value as any)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          >
+                            <option value="Cash">Physical Cash Payment</option>
+                            <option value="Bank Transfer">Direct Bank Transfer</option>
+                            <option value="MTN Mobile Money">MTN Mobile Money (Bursar)</option>
+                            <option value="Telecel Cash">Telecel Cash (Bursar)</option>
+                            <option value="AirtelTigo Money">AirtelTigo Money (Bursar)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">Bank Receipt / Trans Ref No.</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. TX-98218-GCB"
+                            value={directReference}
+                            onChange={(e) => setDirectReference(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          />
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 flex justify-end space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsDirectPaymentModalOpen(false)}
+                            className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:bg-slate-150 cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold cursor-pointer"
+                          >
+                            Record & Approve Payment
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* ==================== BANK & GATEWAY LINK LAYOUT ==================== */}
           {paymentsSubTab === 'bank-setup' && (

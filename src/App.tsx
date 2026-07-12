@@ -741,7 +741,81 @@ Edweso Royal Academy`;
     syncAndSave({ homeworkSubmissions: updatedSubmissions });
   };
 
+  const triggerEmailReceipt = (tx: PaymentTransaction, currentStudentsList?: Student[]) => {
+    const list = currentStudentsList || SchoolDatabase.getStudents() || students;
+    const student = list.find(s => s.id === tx.studentId);
+    const recipientEmail = student?.parentEmail || tx.email || 'parent@school.edu';
+    const recipientName = student?.parentName || tx.studentName || 'Parent / Guardian';
+
+    const pdfStyleReceiptBody = `
+========================================================================
+             EDWESO ROYAL ACADEMY — OFFICIAL PAYMENT RECEIPT
+========================================================================
+Receipt Reference: ${tx.reference}
+Date & Time:       ${tx.date}
+Payment Method:    ${tx.paymentMethod}
+Gateway Reference: ${tx.paystackRef}
+Status:            SUCCESSFUL
+------------------------------------------------------------------------
+STUDENT & CUSTOMER ACCOUNT INFORMATION:
+Student Name:      ${tx.studentName}
+Admission Number:  ${tx.studentId}
+Enrolled Term:     ${tx.term}
+Parent/Guardian:   ${recipientName}
+Contact Email:     ${recipientEmail}
+------------------------------------------------------------------------
+TRANSACTION FINANCIAL ANALYSIS:
+Total Amount Paid:          GHS ${tx.amountGHS.toFixed(2)}
+------------------------------------------------------------------------
+LEDGER CLEARANCE RECORD:
+Outstanding Tuition Balance: GHS ${(student ? Math.max(0, student.balanceGHS) : 0).toFixed(2)}
+------------------------------------------------------------------------
+This document is a formal verification of school fees payment. 
+It has been electronically generated and signed by the Accounts and 
+Bursary Department of Edweso Royal Academy. Please keep this copy 
+for your auditing records.
+
+Motto: KNOWLEDGE • DISCIPLINE • EXCELLENCE
+Bursar: Seth Tetteh
+Principal Signoff: Approved
+========================================================================
+`.trim();
+
+    const newEmail: SimulatedEmail = {
+      id: 'em-receipt-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      recipientEmail,
+      recipientName,
+      subject: `OFFICIAL RECEIPT: GHS ${tx.amountGHS.toFixed(2)} Tuition Payment Verified for ${tx.studentName}`,
+      body: pdfStyleReceiptBody,
+      sentAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      type: 'FeeDeadline',
+      status: 'Sent'
+    };
+
+    setEmails(prevEmails => {
+      const updated = [newEmail, ...prevEmails];
+      SchoolDatabase.saveEmails(updated);
+      syncAndSave({ emails: updated });
+      return updated;
+    });
+  };
+
   const handleUpdateTransactions = (updatedTx: PaymentTransaction[]) => {
+    // Detect if a new successful transaction was added
+    if (updatedTx.length > transactions.length) {
+      const newTx = updatedTx.find(tx => !transactions.some(old => old.id === tx.id));
+      if (newTx && newTx.status === 'Successful') {
+        triggerEmailReceipt(newTx);
+      }
+    } else {
+      // Also detect if an existing transaction went from 'Pending' to 'Successful'
+      updatedTx.forEach(tx => {
+        const oldTx = transactions.find(t => t.id === tx.id);
+        if (oldTx && oldTx.status === 'Pending' && tx.status === 'Successful') {
+          triggerEmailReceipt(tx);
+        }
+      });
+    }
     setTransactions(updatedTx);
     SchoolDatabase.saveTransactions(updatedTx);
     syncAndSave({ transactions: updatedTx });
@@ -783,6 +857,9 @@ Edweso Royal Academy`;
     const updatedTx = [newTx, ...transactions];
     setTransactions(updatedTx);
     SchoolDatabase.saveTransactions(updatedTx);
+
+    // 3. Automatically trigger email receipt
+    triggerEmailReceipt(newTx, updatedStudents);
 
     // Sync whole set to server
     syncAndSave({ students: updatedStudents, transactions: updatedTx });

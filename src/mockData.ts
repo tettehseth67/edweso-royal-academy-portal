@@ -180,7 +180,9 @@ export const initialTransactions: PaymentTransaction[] = [
   { id: 'tx2', studentId: 'st2', studentName: 'Ama Serwaa Prempeh', amountGHS: 2500.00, date: '2026-05-16 14:45', status: 'Successful', reference: 'ERA-TX-9872', paystackRef: 'PSTK-901248911', paymentMethod: 'Card', email: 'prempeh.family@yahoo.com', term: 'Term 1' },
   { id: 'tx3', studentId: 'st4', studentName: 'Esi Pokuaa Owusu', amountGHS: 2000.00, date: '2026-05-20 09:12', status: 'Successful', reference: 'ERA-TX-9873', paystackRef: 'PSTK-019348924', paymentMethod: 'Telecel Cash', email: 'owusu.bea@gmail.com', term: 'Term 1' },
   { id: 'tx4', studentId: 'st5', studentName: 'Emmanuel Tetteh', amountGHS: 2500.00, date: '2026-06-01 11:30', status: 'Successful', reference: 'ERA-TX-9874', paystackRef: 'PSTK-112348935', paymentMethod: 'MTN Mobile Money', email: 'tettehseth67@gmail.com', term: 'Term 1' },
-  { id: 'tx5', studentId: 'st3', studentName: 'Kwame Boateng Jr', amountGHS: 100.00, date: '2026-06-05 16:00', status: 'Failed', reference: 'ERA-TX-9875', paystackRef: 'PSTK-224489311', paymentMethod: 'AirtelTigo Money', email: 'kboateng@outlook.com', term: 'Term 1' }
+  { id: 'tx5', studentId: 'st3', studentName: 'Kwame Boateng Jr', amountGHS: 100.00, date: '2026-06-05 16:00', status: 'Failed', reference: 'ERA-TX-9875', paystackRef: 'PSTK-224489311', paymentMethod: 'AirtelTigo Money', email: 'kboateng@outlook.com', term: 'Term 1' },
+  { id: 'tx-p1', studentId: 'st1', studentName: 'Kofi Mensah Jnr', amountGHS: 1800.00, date: '2026-07-11 15:30', status: 'Pending', reference: 'ERA-TX-PND1', paystackRef: 'PSTK-PENDING-MOMO-910', paymentMethod: 'MTN Mobile Money', email: 'isaac.mensah@gmail.com', term: 'Term 1' },
+  { id: 'tx-p2', studentId: 'st3', studentName: 'Kwame Boateng Jr', amountGHS: 1500.00, date: '2026-07-12 09:10', status: 'Pending', reference: 'ERA-TX-PND2', paystackRef: 'PSTK-PENDING-BANK-102', paymentMethod: 'Bank Transfer', email: 'kboateng@outlook.com', term: 'Term 1' }
 ];
 
 // Initial Homework Assignments
@@ -315,7 +317,13 @@ export class SchoolDatabase {
   }
 
   static getTransactions(): PaymentTransaction[] {
-    return getStored<PaymentTransaction[]>('TRANSACTIONS', initialTransactions);
+    const txs = getStored<PaymentTransaction[]>('TRANSACTIONS', initialTransactions);
+    if (!txs.some(t => t.id === 'tx-p1') && !txs.some(t => t.id === 'tx-p2')) {
+      const merged = [...txs, ...initialTransactions.filter(item => item.id === 'tx-p1' || item.id === 'tx-p2')];
+      setStored('TRANSACTIONS', merged);
+      return merged;
+    }
+    return txs;
   }
 
   static saveTransactions(transactions: PaymentTransaction[]): void {

@@ -40,9 +40,10 @@ export default function PaystackModal({
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
-  const [step, setStep] = useState<'form' | 'processing' | 'otp' | 'success' | 'error'>('form');
+  const [step, setStep] = useState<'form' | 'momo-confirm' | 'processing' | 'otp' | 'success' | 'error'>('form');
   const [otpCode, setOtpCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [tempTxId, setTempTxId] = useState('');
   const [paystackReference] = useState(() => 'PSTK-' + Math.floor(Math.random() * 900000000 + 100000000));
 
   if (!isOpen) return null;
@@ -53,7 +54,18 @@ export default function PaystackModal({
       alert('Please enter a valid Ghanaian phone number');
       return;
     }
-    // Simulate payment sequence
+    
+    // Generate temporary transaction ID based on selected provider prefix
+    const providerPrefix = momoProvider === 'MTN Mobile Money' ? 'MTN' : momoProvider === 'Telecel Cash' ? 'VOD' : 'ATL';
+    const randomNum = Math.floor(Math.random() * 900000 + 100000);
+    const generatedTempId = `${providerPrefix}-TEMP-${randomNum}`;
+    
+    setTempTxId(generatedTempId);
+    setStep('momo-confirm');
+  };
+
+  const handleConfirmMomoPayment = () => {
+    // Proceed to simulated processing network response
     setStep('processing');
     setTimeout(() => {
       setStep('otp'); // Standard Momo OTP or approval prompt simulation
@@ -285,6 +297,61 @@ export default function PaystackModal({
 
               <div className="text-[11px] text-slate-400 text-center font-medium mt-3">
                 Your card and wallet details are fully encrypted.
+              </div>
+            </div>
+          )}
+
+          {step === 'momo-confirm' && (
+            <div className="space-y-4 animate-fade-in text-slate-800">
+              <div className="text-center mb-2">
+                <div className="inline-flex p-3 bg-amber-500/10 rounded-full mb-2 text-amber-600 dark:text-amber-400">
+                  <Smartphone size={24} />
+                </div>
+                <h5 className="font-bold text-sm text-slate-800">Review Mobile Money Order</h5>
+                <p className="text-xs text-slate-500 mt-1">
+                  A temporary transaction reference has been registered on your cellular network. Please review and confirm to complete payment.
+                </p>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 font-semibold text-xs space-y-2 text-slate-600">
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span>Network Carrier:</span>
+                  <span className="font-extrabold text-slate-800">{momoProvider}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span>Wallet Phone Number:</span>
+                  <span className="font-extrabold text-slate-800 font-mono">+233 {phoneNumber}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                  <span>Amount Due:</span>
+                  <span className="font-extrabold text-emerald-700 font-mono">GHS {amount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span>Temporary Transaction ID:</span>
+                  <span className="font-extrabold text-indigo-700 font-mono bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded text-[11px] select-all">
+                    {tempTxId}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                id="momo-confirm-pay-btn"
+                onClick={handleConfirmMomoPayment}
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-sm mt-4 transition-all shadow-xs hover:shadow-md cursor-pointer flex items-center justify-center space-x-2"
+              >
+                <span>Authorize GHS {amount.toFixed(2)}</span>
+              </button>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  id="momo-confirm-back"
+                  onClick={handleTryAgain}
+                  className="text-xs font-semibold text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  Change Details
+                </button>
               </div>
             </div>
           )}
