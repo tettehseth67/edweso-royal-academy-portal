@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ==================== EYE CARE & ACCESSIBILITY HELPER CLASSES ==================== */
+
+/* High Contrast & Bold Text Mode */
+.accessibility-high-contrast,
+.accessibility-high-contrast * {
+  border-color: #000000 !important;
+}
+
+.accessibility-high-contrast p,
+.accessibility-high-contrast span,
+.accessibility-high-contrast label,
+.accessibility-high-contrast li,
+.accessibility-high-contrast td,
+.accessibility-high-contrast th,
+.accessibility-high-contrast div:not(:empty),
+.accessibility-high-contrast a,
+.accessibility-high-contrast button,
+.accessibility-high-contrast input,
+.accessibility-high-contrast select,
+.accessibility-high-contrast textarea,
+.accessibility-high-contrast h1,
+.accessibility-high-contrast h2,
+.accessibility-high-contrast h3,
+.accessibility-high-contrast h4,
+.accessibility-high-contrast h5,
+.accessibility-high-contrast h6 {
+  color: #090d16 !important;
+  font-weight: 700 !important; /* Bold all standard elements */
+}
+
+.accessibility-high-contrast bg-white {
+  background-color: #ffffff !important;
+}
+
+/* High Legibility Layout Mode (increases spacing for visual reading ease) */
+.accessibility-dyslexic,
+.accessibility-dyslexic * {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.08em !important;
+  line-height: 1.75 !important;
+}
+
+/* Color Blindness & Vision Filters */
+.accessibility-filter-monochrome {
+  filter: grayscale(1) contrast(1.1) !important;
+}
+
+.accessibility-filter-contrast-boost {
+  filter: contrast(1.35) saturate(1.1) !important;
+}
+
+.accessibility-filter-deuteranopia {
+  /* Green-weak filter simulation */
+  filter: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="f"><feColorMatrix type="matrix" values="0.290,0.565,0.145,0,0 0.150,0.700,0.150,0,0 0.010,0.180,0.810,0,0 0,0,0,1,0"/></filter></svg>#f') !important;
+}
+
+/* Giant Accessible High-Contrast Cursor */
+.accessibility-giant-cursor,
+.accessibility-giant-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="8" fill="%23f59e0b" stroke="black" stroke-width="2" opacity="0.8"/><circle cx="18" cy="18" r="3" fill="black"/><path d="M12 18h-4M24 18h4M18 12v-4M18 24v4" stroke="black" stroke-width="2"/></svg>') 18 18, auto !important;
+}
+
+/* Click to Speak Hover Cues */
+.accessibility-click-to-speak-active p:hover,
+.accessibility-click-to-speak-active span:hover,
+.accessibility-click-to-speak-active h1:hover,
+.accessibility-click-to-speak-active h2:hover,
+.accessibility-click-to-speak-active h3:hover,
+.accessibility-click-to-speak-active h4:hover,
+.accessibility-click-to-speak-active h5:hover,
+.accessibility-click-to-speak-active h6:hover,
+.accessibility-click-to-speak-active li:hover,
+.accessibility-click-to-speak-active td:hover,
+.accessibility-click-to-speak-active button:hover {
+  outline: 3px dashed #10b981 !important;
+  outline-offset: 4px !important;
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  cursor: speak !important;
+}
+
+
