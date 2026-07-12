@@ -1,0 +1,869 @@
+{
+  "students": [
+    {
+      "id": "st1",
+      "name": "Kofi Mensah Jnr",
+      "admissionNumber": "ERA-S-2024-001",
+      "classId": "c4",
+      "parentName": "Isaac Mensah",
+      "parentPhone": "+233 24 455 6677",
+      "parentEmail": "isaac.mensah@gmail.com",
+      "status": "Active",
+      "balanceGHS": 1227,
+      "gender": "Male",
+      "dob": "2012-04-12"
+    },
+    {
+      "id": "st2",
+      "name": "Ama Serwaa Prempeh",
+      "admissionNumber": "ERA-S-2024-002",
+      "classId": "c4",
+      "parentName": "Nana Prempeh II",
+      "parentPhone": "+233 20 888 9900",
+      "parentEmail": "prempeh.family@yahoo.com",
+      "status": "Active",
+      "balanceGHS": 0,
+      "gender": "Female",
+      "dob": "2012-08-25"
+    },
+    {
+      "id": "st3",
+      "name": "Kwame Boateng Jr",
+      "admissionNumber": "ERA-S-2024-003",
+      "classId": "c4",
+      "parentName": "Kojo Boateng",
+      "parentPhone": "+233 27 666 5544",
+      "parentEmail": "kboateng@outlook.com",
+      "status": "Active",
+      "balanceGHS": 2400,
+      "gender": "Male",
+      "dob": "2012-01-15"
+    },
+    {
+      "id": "st4",
+      "name": "Esi Pokuaa Owusu",
+      "admissionNumber": "ERA-S-2023-104",
+      "classId": "c4",
+      "parentName": "Beatrice Owusu",
+      "parentPhone": "+233 54 111 2222",
+      "parentEmail": "owusu.bea@gmail.com",
+      "status": "Active",
+      "balanceGHS": 450,
+      "gender": "Female",
+      "dob": "2011-11-03"
+    },
+    {
+      "id": "st5",
+      "name": "Emmanuel Tetteh",
+      "admissionNumber": "ERA-S-2023-085",
+      "classId": "c4",
+      "parentName": "Seth Tetteh",
+      "parentPhone": "+233 24 777 6666",
+      "parentEmail": "tettehseth67@gmail.com",
+      "status": "Active",
+      "balanceGHS": 0,
+      "gender": "Male",
+      "dob": "2012-06-30"
+    },
+    {
+      "id": "st6",
+      "name": "Akosua Dufie Asante",
+      "admissionNumber": "ERA-S-2024-099",
+      "classId": "c2",
+      "parentName": "Yaw Asante",
+      "parentPhone": "+233 24 333 4444",
+      "parentEmail": "yaw.asante@edweso.edu.gh",
+      "status": "Active",
+      "balanceGHS": 1500,
+      "gender": "Female",
+      "dob": "2014-03-20"
+    },
+    {
+      "id": "st7",
+      "name": "Yao Dzamesi",
+      "admissionNumber": "ERA-S-2023-202",
+      "classId": "c5",
+      "parentName": "Justice Dzamesi",
+      "parentPhone": "+233 26 444 3333",
+      "parentEmail": "jdzamesi@gmail.com",
+      "status": "Active",
+      "balanceGHS": 3100,
+      "gender": "Male",
+      "dob": "2010-09-09"
+    },
+    {
+      "id": "st8",
+      "name": "Kojo Antwi",
+      "admissionNumber": "ERA-S-2022-012",
+      "classId": "c6",
+      "parentName": "Ebenezer Antwi",
+      "parentPhone": "+233 20 555 1212",
+      "parentEmail": "eb.antwi@gmail.com",
+      "status": "Active",
+      "balanceGHS": 0,
+      "gender": "Male",
+      "dob": "2009-02-14"
+    }
+  ],
+  "teachers": [
+    {
+      "id": "t1",
+      "name": "Mr. Kwame Boateng",
+      "staffNumber": "ERA-T-001",
+      "email": "kwame@edweso.edu.gh",
+      "phone": "+233 24 412 3456",
+      "subjectId": "Mathematics",
+      "status": "Active",
+      "gender": "Male"
+    },
+    {
+      "id": "t2",
+      "name": "Mrs. Ama Serwaa Addo",
+      "staffNumber": "ERA-T-002",
+      "email": "ama.serwaa@edweso.edu.gh",
+      "phone": "+233 27 755 8910",
+      "subjectId": "Integrated Science",
+      "status": "Active",
+      "gender": "Female"
+    },
+    {
+      "id": "t3",
+      "name": "Mr. Kofi Mensah",
+      "staffNumber": "ERA-T-003",
+      "email": "kofi.mensah@edweso.edu.gh",
+      "phone": "+233 20 123 4567",
+      "subjectId": "English Language",
+      "status": "Active",
+      "gender": "Male"
+    },
+    {
+      "id": "t4",
+      "name": "Miss Abena Osei",
+      "staffNumber": "ERA-T-004",
+      "email": "abena.osei@edweso.edu.gh",
+      "phone": "+233 54 876 5432",
+      "subjectId": "Social Studies",
+      "status": "Active",
+      "gender": "Female"
+    },
+    {
+      "id": "t5",
+      "name": "Mr. Yaw Asante",
+      "staffNumber": "ERA-T-005",
+      "email": "yaw.asante@edweso.edu.gh",
+      "phone": "+233 24 333 4444",
+      "subjectId": "ICT",
+      "status": "Active",
+      "gender": "Male"
+    },
+    {
+      "id": "t6",
+      "name": "Dr. Joseph Darko",
+      "staffNumber": "ERA-T-006",
+      "email": "j.darko@edweso.edu.gh",
+      "phone": "+233 26 999 8888",
+      "subjectId": "RME",
+      "status": "Active",
+      "gender": "Male"
+    }
+  ],
+  "classes": [
+    {
+      "id": "c1",
+      "name": "Primary 5",
+      "teacherId": "t3",
+      "room": "Block A, Room 1",
+      "gradeLevel": "Primary"
+    },
+    {
+      "id": "c2",
+      "name": "Primary 6",
+      "teacherId": "t4",
+      "room": "Block A, Room 2",
+      "gradeLevel": "Primary"
+    },
+    {
+      "id": "c3",
+      "name": "JHS 1",
+      "teacherId": "t2",
+      "room": "Block B, JHS 1",
+      "gradeLevel": "JHS"
+    },
+    {
+      "id": "c4",
+      "name": "JHS 2",
+      "teacherId": "t1",
+      "room": "Block B, JHS 2",
+      "gradeLevel": "JHS"
+    },
+    {
+      "id": "c5",
+      "name": "JHS 3",
+      "teacherId": "t5",
+      "room": "Block B, JHS 3",
+      "gradeLevel": "JHS"
+    },
+    {
+      "id": "c6",
+      "name": "SHS 1",
+      "teacherId": "t6",
+      "room": "Science Lab Block",
+      "gradeLevel": "SHS"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "s1",
+      "name": "Mathematics",
+      "code": "MATH",
+      "classId": "c4"
+    },
+    {
+      "id": "s2",
+      "name": "Integrated Science",
+      "code": "INT-SCI",
+      "classId": "c4"
+    },
+    {
+      "id": "s3",
+      "name": "English Language",
+      "code": "ENG",
+      "classId": "c4"
+    },
+    {
+      "id": "s4",
+      "name": "Social Studies",
+      "code": "SOC-ST",
+      "classId": "c4"
+    },
+    {
+      "id": "s5",
+      "name": "ICT (Information Tech)",
+      "code": "ICT",
+      "classId": "c4"
+    },
+    {
+      "id": "s6",
+      "name": "Religious & Moral Education (RME)",
+      "code": "RME",
+      "classId": "c4"
+    },
+    {
+      "id": "s7",
+      "name": "Fante / Twi",
+      "code": "GHA-LANG",
+      "classId": "c4"
+    },
+    {
+      "id": "s8",
+      "name": "Mathematics",
+      "code": "MATH-P6",
+      "classId": "c2"
+    },
+    {
+      "id": "s9",
+      "name": "English Language",
+      "code": "ENG-P6",
+      "classId": "c2"
+    },
+    {
+      "id": "s10",
+      "name": "Science",
+      "code": "SCI-P6",
+      "classId": "c2"
+    }
+  ],
+  "attendance": [
+    {
+      "id": "at6",
+      "studentId": "st1",
+      "classId": "c4",
+      "date": "2026-07-01",
+      "status": "Present"
+    },
+    {
+      "id": "at7",
+      "studentId": "st2",
+      "classId": "c4",
+      "date": "2026-07-01",
+      "status": "Present"
+    },
+    {
+      "id": "at8",
+      "studentId": "st3",
+      "classId": "c4",
+      "date": "2026-07-01",
+      "status": "Present"
+    },
+    {
+      "id": "at9",
+      "studentId": "st4",
+      "classId": "c4",
+      "date": "2026-07-01",
+      "status": "Present"
+    },
+    {
+      "id": "at10",
+      "studentId": "st5",
+      "classId": "c4",
+      "date": "2026-07-01",
+      "status": "Present"
+    },
+    {
+      "id": "at-teach-1783122065469-0",
+      "studentId": "st1",
+      "classId": "c4",
+      "date": "2026-07-02",
+      "status": "Present",
+      "remarks": ""
+    },
+    {
+      "id": "at-teach-1783122065469-1",
+      "studentId": "st2",
+      "classId": "c4",
+      "date": "2026-07-02",
+      "status": "Present",
+      "remarks": ""
+    },
+    {
+      "id": "at-teach-1783122065469-2",
+      "studentId": "st3",
+      "classId": "c4",
+      "date": "2026-07-02",
+      "status": "Late",
+      "remarks": "Lorry was delayed at Edweso Junction"
+    },
+    {
+      "id": "at-teach-1783122065469-3",
+      "studentId": "st4",
+      "classId": "c4",
+      "date": "2026-07-02",
+      "status": "Absent",
+      "remarks": "Sick leave (Malaria treatment)"
+    },
+    {
+      "id": "at-teach-1783122065469-4",
+      "studentId": "st5",
+      "classId": "c4",
+      "date": "2026-07-02",
+      "status": "Present",
+      "remarks": ""
+    }
+  ],
+  "grades": [
+    {
+      "id": "g1",
+      "studentId": "st1",
+      "subjectId": "s1",
+      "term": "Term 1",
+      "classScore": 24,
+      "examScore": 58,
+      "totalScore": 82,
+      "grade": "A",
+      "remarks": "Outstanding math conceptual understanding.",
+      "date": "2026-04-10"
+    },
+    {
+      "id": "g2",
+      "studentId": "st1",
+      "subjectId": "s2",
+      "term": "Term 1",
+      "classScore": 21,
+      "examScore": 52,
+      "totalScore": 73,
+      "grade": "B",
+      "remarks": "Solid work in science experiments.",
+      "date": "2026-04-12"
+    },
+    {
+      "id": "g3",
+      "studentId": "st1",
+      "subjectId": "s3",
+      "term": "Term 1",
+      "classScore": 25,
+      "examScore": 61,
+      "totalScore": 86,
+      "grade": "A",
+      "remarks": "Exceptional creative writing.",
+      "date": "2026-04-14"
+    },
+    {
+      "id": "g4",
+      "studentId": "st2",
+      "subjectId": "s1",
+      "term": "Term 1",
+      "classScore": 28,
+      "examScore": 65,
+      "totalScore": 93,
+      "grade": "A",
+      "remarks": "Flawless score in all algebra tests.",
+      "date": "2026-04-10"
+    },
+    {
+      "id": "g5",
+      "studentId": "st2",
+      "subjectId": "s2",
+      "term": "Term 1",
+      "classScore": 27,
+      "examScore": 64,
+      "totalScore": 91,
+      "grade": "A",
+      "remarks": "Remarkable research on electricity circuits.",
+      "date": "2026-04-12"
+    },
+    {
+      "id": "g6",
+      "studentId": "st3",
+      "subjectId": "s1",
+      "term": "Term 1",
+      "classScore": 18,
+      "examScore": 42,
+      "totalScore": 60,
+      "grade": "C",
+      "remarks": "Good attempt, can solve complex equations with practice.",
+      "date": "2026-04-10"
+    },
+    {
+      "id": "g7",
+      "studentId": "st3",
+      "subjectId": "s2",
+      "term": "Term 1",
+      "classScore": 15,
+      "examScore": 38,
+      "totalScore": 53,
+      "grade": "D",
+      "remarks": "Needs more focus during biology labs.",
+      "date": "2026-04-12"
+    }
+  ],
+  "timetable": [
+    {
+      "id": "tt1",
+      "classId": "c4",
+      "subjectId": "s1",
+      "teacherId": "t1",
+      "day": "Monday",
+      "startTime": "08:00",
+      "endTime": "09:30"
+    },
+    {
+      "id": "tt2",
+      "classId": "c4",
+      "subjectId": "s2",
+      "teacherId": "t2",
+      "day": "Monday",
+      "startTime": "10:00",
+      "endTime": "11:30"
+    },
+    {
+      "id": "tt3",
+      "classId": "c4",
+      "subjectId": "s3",
+      "teacherId": "t3",
+      "day": "Tuesday",
+      "startTime": "08:00",
+      "endTime": "09:30"
+    },
+    {
+      "id": "tt4",
+      "classId": "c4",
+      "subjectId": "s4",
+      "teacherId": "t4",
+      "day": "Tuesday",
+      "startTime": "10:00",
+      "endTime": "11:30"
+    },
+    {
+      "id": "tt5",
+      "classId": "c4",
+      "subjectId": "s5",
+      "teacherId": "t5",
+      "day": "Wednesday",
+      "startTime": "08:00",
+      "endTime": "09:30"
+    },
+    {
+      "id": "tt6",
+      "classId": "c4",
+      "subjectId": "s6",
+      "teacherId": "t6",
+      "day": "Wednesday",
+      "startTime": "10:00",
+      "endTime": "11:30"
+    },
+    {
+      "id": "tt7",
+      "classId": "c4",
+      "subjectId": "s1",
+      "teacherId": "t1",
+      "day": "Thursday",
+      "startTime": "08:00",
+      "endTime": "09:30"
+    },
+    {
+      "id": "tt8",
+      "classId": "c4",
+      "subjectId": "s2",
+      "teacherId": "t2",
+      "day": "Thursday",
+      "startTime": "10:00",
+      "endTime": "11:30"
+    },
+    {
+      "id": "tt9",
+      "classId": "c4",
+      "subjectId": "s7",
+      "teacherId": "t4",
+      "day": "Friday",
+      "startTime": "08:00",
+      "endTime": "10:00"
+    }
+  ],
+  "announcements": [
+    {
+      "id": "a1",
+      "title": "Edweso Royal PTA Meeting",
+      "content": "Dear Parents, our 2nd Term Parent-Teacher Association (PTA) meeting is scheduled for Saturday, July 18th at 10:00 AM in the main School Assembly Hall. We will discuss development fees and the upcoming National STEM Championship. Please make it a point to attend.",
+      "date": "2026-07-02 08:30",
+      "authorRole": "Admin",
+      "authorName": "Principal J. K. Appiah",
+      "targetAudience": "All"
+    },
+    {
+      "id": "a2",
+      "title": "Mid-Term Examinations Schedule",
+      "content": "The Mid-Term examinations for all Primary, JHS, and SHS departments will commence on July 20th. Class teachers should submit their draft exam questions by July 10th. Students should clear all outstanding fee balances to avoid disruption.",
+      "date": "2026-06-28 14:00",
+      "authorRole": "Admin",
+      "authorName": "Madam Margaret Mensah (VP Academics)",
+      "targetAudience": "All"
+    },
+    {
+      "id": "a3",
+      "title": "Science Lab Upgrade Guidelines",
+      "content": "Teachers, please notice that the Science lab will be locked from 2:00 PM today for maintenance. Ensure all laboratory chemicals are safely sealed and the power sockets turned off.",
+      "date": "2026-07-01 11:15",
+      "authorRole": "Admin",
+      "authorName": "Science Coordinator",
+      "targetAudience": "Teachers"
+    },
+    {
+      "id": "a4",
+      "title": "Inter-School Soccer Championship Support",
+      "content": "Royal Warriors play today against Ejisu High School at the municipal park. Kick-off is 4:00 PM. Students can travel on the school bus after normal classes at 3:15 PM.",
+      "date": "2026-07-02 12:00",
+      "authorRole": "Teacher",
+      "authorName": "Mr. Kwame Boateng",
+      "targetAudience": "Students"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-new-1783122223126",
+      "studentId": "st1",
+      "studentName": "Kofi Mensah Jnr",
+      "amountGHS": 23,
+      "date": "2026-07-03 23:43",
+      "status": "Successful",
+      "reference": "ERA-TX-7174",
+      "paystackRef": "PSTK-609388273",
+      "paymentMethod": "MTN Mobile Money",
+      "email": "kofi@edweso.edu.gh",
+      "term": "Term 1"
+    },
+    {
+      "id": "tx1",
+      "studentId": "st1",
+      "studentName": "Kofi Mensah Jnr",
+      "amountGHS": 1250,
+      "date": "2026-05-15 10:20",
+      "status": "Successful",
+      "reference": "ERA-TX-9871",
+      "paystackRef": "PSTK-734891240",
+      "paymentMethod": "MTN Mobile Money",
+      "email": "isaac.mensah@gmail.com",
+      "term": "Term 1"
+    },
+    {
+      "id": "tx2",
+      "studentId": "st2",
+      "studentName": "Ama Serwaa Prempeh",
+      "amountGHS": 2500,
+      "date": "2026-05-16 14:45",
+      "status": "Successful",
+      "reference": "ERA-TX-9872",
+      "paystackRef": "PSTK-901248911",
+      "paymentMethod": "Card",
+      "email": "prempeh.family@yahoo.com",
+      "term": "Term 1"
+    },
+    {
+      "id": "tx3",
+      "studentId": "st4",
+      "studentName": "Esi Pokuaa Owusu",
+      "amountGHS": 2000,
+      "date": "2026-05-20 09:12",
+      "status": "Successful",
+      "reference": "ERA-TX-9873",
+      "paystackRef": "PSTK-019348924",
+      "paymentMethod": "Telecel Cash",
+      "email": "owusu.bea@gmail.com",
+      "term": "Term 1"
+    },
+    {
+      "id": "tx4",
+      "studentId": "st5",
+      "studentName": "Emmanuel Tetteh",
+      "amountGHS": 2500,
+      "date": "2026-06-01 11:30",
+      "status": "Successful",
+      "reference": "ERA-TX-9874",
+      "paystackRef": "PSTK-112348935",
+      "paymentMethod": "MTN Mobile Money",
+      "email": "tettehseth67@gmail.com",
+      "term": "Term 1"
+    },
+    {
+      "id": "tx5",
+      "studentId": "st3",
+      "studentName": "Kwame Boateng Jr",
+      "amountGHS": 100,
+      "date": "2026-06-05 16:00",
+      "status": "Failed",
+      "reference": "ERA-TX-9875",
+      "paystackRef": "PSTK-224489311",
+      "paymentMethod": "AirtelTigo Money",
+      "email": "kboateng@outlook.com",
+      "term": "Term 1"
+    },
+    {
+      "id": "tx-p1",
+      "studentId": "st1",
+      "studentName": "Kofi Mensah Jnr",
+      "amountGHS": 1800,
+      "date": "2026-07-11 15:30",
+      "status": "Pending",
+      "reference": "ERA-TX-PND1",
+      "paystackRef": "PSTK-PENDING-MOMO-910",
+      "paymentMethod": "MTN Mobile Money",
+      "email": "isaac.mensah@gmail.com",
+      "term": "Term 1"
+    },
+    {
+      "id": "tx-p2",
+      "studentId": "st3",
+      "studentName": "Kwame Boateng Jr",
+      "amountGHS": 1500,
+      "date": "2026-07-12 09:10",
+      "status": "Pending",
+      "reference": "ERA-TX-PND2",
+      "paystackRef": "PSTK-PENDING-BANK-102",
+      "paymentMethod": "Bank Transfer",
+      "email": "kboateng@outlook.com",
+      "term": "Term 1"
+    }
+  ],
+  "emails": [
+    {
+      "id": "em-1",
+      "recipientEmail": "isaac.mensah@gmail.com",
+      "recipientName": "Isaac Mensah",
+      "subject": "Edweso Royal Academy PTA Meeting Bulletin",
+      "body": "Dear Isaac Mensah,\n\nThis is a simulated email alert from Edweso Royal Academy regarding the new announcement:\n\n\"Edweso Royal PTA Meeting\"\n--------------------------------------------------\nDear Parents, our 2nd Term Parent-Teacher Association (PTA) meeting is scheduled for Saturday, July 18th at 10:00 AM in the main School Assembly Hall. We will discuss development fees and the upcoming National STEM Championship. Please make it a point to attend.\n\nPlease login to your student portal to see more details.\n\nKNOWLEDGE • DISCIPLINE • EXCELLENCE\nEdweso Royal Academy Admin Portal Dispatch",
+      "sentAt": "2026-07-02 08:30",
+      "type": "Announcement",
+      "status": "Sent"
+    },
+    {
+      "id": "em-2",
+      "recipientEmail": "kboateng@outlook.com",
+      "recipientName": "Kojo Boateng",
+      "subject": "URGENT: School Fees Payment Deadline Approaching",
+      "body": "Dear Kojo Boateng,\n\nThis is an official fee reminder notification from the Finance Office of Edweso Royal Academy.\n\nOur records indicate that your ward, Kwame Boateng Jr, has an outstanding fees balance of GHS 2,400.00 for the current active term.\n\nPlease ensure this balance is cleared immediately. You can securely pay online with Paystack via your student portal, or make a cash deposit at the bursar's desk.\n\nIf you have already paid, kindly upload your transaction receipt in the student portal or contact our accounts desk.\n\nMotto: KNOWLEDGE • DISCIPLINE • EXCELLENCE\nBest regards,\nBursar Office\nEdweso Royal Academy",
+      "sentAt": "2026-07-02 16:45",
+      "type": "FeeDeadline",
+      "status": "Sent"
+    }
+  ],
+  "sms": [
+    {
+      "id": "sms-init-1",
+      "recipientPhone": "+233 24 412 3456",
+      "recipientName": "Isaac Mensah",
+      "message": "[ALERT] Edweso Royal Academy: PTA Meeting scheduled for Saturday, July 18th at 10:00 AM in the main School Assembly Hall. Please make it a point to attend.",
+      "sentAt": "2026-07-02 08:32",
+      "type": "Announcement",
+      "status": "Sent"
+    },
+    {
+      "id": "sms-init-2",
+      "recipientPhone": "+233 27 755 8910",
+      "recipientName": "Kojo Boateng",
+      "message": "[ALERT] Edweso Royal Finance: School fee billing outstanding. Balance GHS 2,400.00 is due. Pay online via parent portal instantly.",
+      "sentAt": "2026-07-02 16:47",
+      "type": "FeeDeadline",
+      "status": "Sent"
+    }
+  ],
+  "classNotes": [],
+  "syllabusPlans": [],
+  "teacherAbsences": [],
+  "coverAssignments": [],
+  "homeworkAssignments": [
+    {
+      "id": "hw1",
+      "classId": "c4",
+      "subjectId": "s1",
+      "subjectName": "Mathematics",
+      "title": "Solving Linear Equations",
+      "description": "Solve equations of the form ax + b = cx + d. Write out all step-by-step calculations. Practice problems 1 to 10 on page 42 of the GES Core Mathematics textbook.",
+      "dueDate": "2026-07-15",
+      "maxScore": 20,
+      "dateCreated": "2026-07-05"
+    },
+    {
+      "id": "hw2",
+      "classId": "c4",
+      "subjectId": "s2",
+      "subjectName": "Integrated Science",
+      "title": "Photosynthesis Experiment Reflection",
+      "description": "Write a 1-page essay explaining the role of chlorophyll in photosynthesis. Discuss the light-dependent and light-independent stages, and describe our classroom experiment results.",
+      "dueDate": "2026-07-18",
+      "maxScore": 10,
+      "dateCreated": "2026-07-06"
+    }
+  ],
+  "homeworkSubmissions": [
+    {
+      "id": "hsub1",
+      "assignmentId": "hw1",
+      "assignmentTitle": "Solving Linear Equations",
+      "studentId": "st5",
+      "studentName": "Emmanuel Tetteh",
+      "submissionText": "For equation 1: 3x + 5 = 2x + 10 => 3x - 2x = 10 - 5 => x = 5. Verified correct! For equation 2: 5x - 3 = 2x + 9 => 3x = 12 => x = 4. Done.",
+      "submittedAt": "2026-07-06 14:30",
+      "status": "Graded",
+      "score": 19,
+      "feedback": "Excellent step-by-step proofs, Emmanuel! Keep up the brilliant math precision.",
+      "gradedBy": "Mr. Kwame Boateng",
+      "gradedAt": "2026-07-07 10:00"
+    }
+  ],
+  "staffClockIns": [
+    {
+      "id": "clk-1",
+      "staffId": "t1",
+      "staffName": "Mr. Kwame Boateng",
+      "role": "Teacher",
+      "clockInTime": "2026-07-10 07:45",
+      "date": "2026-07-10",
+      "latitude": 6.7022,
+      "longitude": -1.4933,
+      "status": "In-Range",
+      "distanceFromFenceM": 12
+    },
+    {
+      "id": "clk-2",
+      "staffId": "t2",
+      "staffName": "Mrs. Ama Serwaa Addo",
+      "role": "Teacher",
+      "clockInTime": "2026-07-10 07:51",
+      "date": "2026-07-10",
+      "latitude": 6.7025,
+      "longitude": -1.4931,
+      "status": "In-Range",
+      "distanceFromFenceM": 45
+    },
+    {
+      "id": "clk-3",
+      "staffId": "t3",
+      "staffName": "Mr. Kofi Mensah",
+      "role": "Teacher",
+      "clockInTime": "2026-07-09 07:48",
+      "clockOutTime": "2026-07-09 15:45",
+      "date": "2026-07-09",
+      "latitude": 6.7023,
+      "longitude": -1.4932,
+      "status": "In-Range",
+      "distanceFromFenceM": 20
+    }
+  ],
+  "staffPayrolls": [
+    {
+      "id": "pay-1",
+      "staffId": "t1",
+      "staffName": "Mr. Kwame Boateng",
+      "role": "Mathematics Lead",
+      "baseSalary": 3800,
+      "allowances": 350,
+      "deductions": 180,
+      "netSalary": 3970,
+      "month": "July 2026",
+      "status": "Processing"
+    },
+    {
+      "id": "pay-2",
+      "staffId": "t2",
+      "staffName": "Mrs. Ama Serwaa Addo",
+      "role": "Science Form Teacher",
+      "baseSalary": 4000,
+      "allowances": 400,
+      "deductions": 200,
+      "netSalary": 4200,
+      "month": "July 2026",
+      "status": "Paid",
+      "paymentDate": "2026-07-10"
+    },
+    {
+      "id": "pay-3",
+      "staffId": "t3",
+      "staffName": "Mr. Kofi Mensah",
+      "role": "Language Instructor",
+      "baseSalary": 3500,
+      "allowances": 250,
+      "deductions": 150,
+      "netSalary": 3600,
+      "month": "July 2026",
+      "status": "Paid",
+      "paymentDate": "2026-07-10"
+    },
+    {
+      "id": "pay-4",
+      "staffId": "t4",
+      "staffName": "Miss Abena Osei",
+      "role": "Social Studies Teacher",
+      "baseSalary": 3500,
+      "allowances": 250,
+      "deductions": 150,
+      "netSalary": 3600,
+      "month": "July 2026",
+      "status": "Processing"
+    }
+  ],
+  "staffLeaveRequests": [
+    {
+      "id": "lv-1",
+      "staffId": "t3",
+      "staffName": "Mr. Kofi Mensah",
+      "role": "Teacher",
+      "startDate": "2026-07-15",
+      "endDate": "2026-07-17",
+      "reason": "Dental surgery and follow-up consultation in Kumasi",
+      "type": "Sick",
+      "status": "Pending",
+      "appliedOn": "2026-07-10"
+    },
+    {
+      "id": "lv-2",
+      "staffId": "t5",
+      "staffName": "Mr. Yaw Asante",
+      "role": "ICT Instructor",
+      "startDate": "2026-07-01",
+      "endDate": "2026-07-03",
+      "reason": "Attending regional computing educator workshop",
+      "type": "Annual",
+      "status": "Approved",
+      "appliedOn": "2026-06-25"
+    }
+  ]
+}
