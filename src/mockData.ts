@@ -19,7 +19,9 @@ import {
   HomeworkSubmission,
   StaffClockIn,
   StaffPayroll,
-  StaffLeaveRequest
+  StaffLeaveRequest,
+  PaymentSchedulerPlan,
+  PaymentSchedulerRunLog
 } from './types';
 
 // Initial School Classes
@@ -499,6 +501,22 @@ export class SchoolDatabase {
   static saveHomeworkSubmissions(submissions: HomeworkSubmission[]): void {
     setStored('HOMEWORK_SUBMISSIONS', submissions);
   }
+
+  static getSchedulerPlans(): PaymentSchedulerPlan[] {
+    return getStored<PaymentSchedulerPlan[]>('SCHEDULER_PLANS', initialSchedulerPlans);
+  }
+
+  static saveSchedulerPlans(plans: PaymentSchedulerPlan[]): void {
+    setStored('SCHEDULER_PLANS', plans);
+  }
+
+  static getSchedulerLogs(): PaymentSchedulerRunLog[] {
+    return getStored<PaymentSchedulerRunLog[]>('SCHEDULER_RUN_LOGS', initialSchedulerLogs);
+  }
+
+  static saveSchedulerLogs(logs: PaymentSchedulerRunLog[]): void {
+    setStored('SCHEDULER_RUN_LOGS', logs);
+  }
 }
 
 // Initial public inquiries submitted via website
@@ -723,4 +741,44 @@ export const initialStaffLeaves: StaffLeaveRequest[] = [
     appliedOn: '2026-06-25'
   }
 ];
+
+export const initialSchedulerPlans: PaymentSchedulerPlan[] = [
+  {
+    id: 'plan-1',
+    name: 'Weekly Auto Fee Reminders',
+    frequency: 'Weekly',
+    targetAudience: 'AllOutstanding',
+    emailSubject: 'URGENT: Outstanding Balance Reminder - Edweso Royal Academy',
+    emailTemplate: 'Dear {parent_name},\n\nThis is an automated weekly reminder that your ward, {student_name}, has an outstanding fee balance of GHS {outstanding_balance} at Edweso Royal Academy.\n\nPlease log in to the portal and settle this balance promptly via Paystack. Thank you for your continued support.\n\nBest regards,\nBursar Office\nEdweso Royal Academy',
+    isActive: true,
+    createdAt: '2026-07-01 10:00',
+    nextRunDate: '2026-07-15 08:00',
+    lastRunDate: '2026-07-08 08:00'
+  },
+  {
+    id: 'plan-2',
+    name: 'JHS 3 Pre-Exam Clearing',
+    frequency: 'Daily',
+    targetAudience: 'c3', // references JHS 3 class in initial Classes
+    emailSubject: 'IMPORTANT: Term 3 Examination Fee Clearing',
+    emailTemplate: 'Dear {parent_name},\n\nAs JHS 3 pupils prepare for final term exams, we kindly request the settlement of all outstanding balances. Your ward {student_name} currently has an outstanding balance of GHS {outstanding_balance}.\n\nKindly clear this at the Bursar office or via Mobile Money on the portal to avoid exam sitting disruptions.\n\nWarm regards,\nHeadmistress Office',
+    isActive: false,
+    createdAt: '2026-07-05 14:30',
+    nextRunDate: '2026-07-13 09:00',
+    lastRunDate: undefined
+  }
+];
+
+export const initialSchedulerLogs: PaymentSchedulerRunLog[] = [
+  {
+    id: 'log-1',
+    planId: 'plan-1',
+    planName: 'Weekly Auto Fee Reminders',
+    runDate: '2026-07-08 08:00',
+    emailsSentCount: 3,
+    recipientNames: ['Kofi Mensah Parent', 'Amina Yusuf Parent', 'Ekow Taylor Parent'],
+    status: 'Success'
+  }
+];
+
 

@@ -14,7 +14,8 @@ import {
   Student, Teacher, SchoolClass, Subject, 
   Attendance, ExamGrade, TimetableEntry, Announcement, 
   PaymentTransaction, PublicInquiry, SimulatedEmail, SimulatedSMS, SyllabusPlan, TeacherAbsence, CoverAssignment,
-  StaffClockIn, StaffPayroll, StaffLeaveRequest, ManualPaymentRequest, UserSession
+  StaffClockIn, StaffPayroll, StaffLeaveRequest, ManualPaymentRequest, UserSession,
+  PaymentSchedulerPlan, PaymentSchedulerRunLog
 } from '../types';
 import { calculateGhanaGrade, getGradeRemark, SchoolDatabase } from '../mockData';
 import SyllabusBoard from './SyllabusBoard';
@@ -62,6 +63,10 @@ interface AdminDashboardProps {
   onUpdateTransactions: (tx: PaymentTransaction[]) => void;
   session: UserSession;
   isDarkMode: boolean;
+  schedulerPlans?: PaymentSchedulerPlan[];
+  schedulerLogs?: PaymentSchedulerRunLog[];
+  onUpdateSchedulerPlans?: (plans: PaymentSchedulerPlan[]) => void;
+  onUpdateSchedulerLogs?: (logs: PaymentSchedulerRunLog[]) => void;
 }
 
 export default function AdminDashboard({
@@ -102,7 +107,11 @@ export default function AdminDashboard({
   onUpdateStaffLeaves,
   onUpdateTransactions,
   session,
-  isDarkMode
+  isDarkMode,
+  schedulerPlans = [],
+  schedulerLogs = [],
+  onUpdateSchedulerPlans,
+  onUpdateSchedulerLogs
 }: AdminDashboardProps) {
 
   // Search & Filter States
@@ -438,7 +447,7 @@ export default function AdminDashboard({
   };
 
   // Payment Gateway & Bank Account Linking Configuration
-  const [paymentsSubTab, setPaymentsSubTab] = useState<'ledger' | 'pending-verification' | 'manual-approvals' | 'bank-setup'>('ledger');
+  const [paymentsSubTab, setPaymentsSubTab] = useState<'ledger' | 'pending-verification' | 'manual-approvals' | 'bank-setup' | 'scheduler'>('ledger');
   const [verificationStatusFilter, setVerificationStatusFilter] = useState<'Pending' | 'Successful' | 'Failed' | 'All'>('Pending');
   const [verificationSearchQuery, setVerificationSearchQuery] = useState('');
 
@@ -748,6 +757,172 @@ export default function AdminDashboard({
     } else {
       alert('No students currently have outstanding fee balances to notify.');
     }
+  };
+
+  // Payment Scheduler States
+  const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false);
+  const [newPlanName, setNewPlanName] = useState('');
+  const [newPlanFrequency, setNewPlanFrequency] = useState<'Daily' | 'Weekly' | 'Bi-weekly' | 'Monthly'>('Weekly');
+  const [newPlanTarget, setNewPlanTarget] = useState<string>('AllOutstanding');
+  const [newPlanSubject, setNewPlanSubject] = useState('URGENT: Outstanding Balance Reminder - Edweso Royal Academy');
+  const [newPlanTemplate, setNewPlanTemplate] = useState('Dear {parent_name},\n\nThis is an automated reminder that your ward, {student_name}, has an outstanding tuition balance of GHS {outstanding_balance} at Edweso Royal Academy.\n\nPlease settle this outstanding balance through your parent portal as soon as possible.\n\nBest regards,\nBursar Department');
+  const [schedulerNotification, setSchedulerNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const handleCreatePlan = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPlanName) {
+      setSchedulerNotification({ message: 'Plan name is required.', type: 'error' });
+      return;
+    }
+    const newPlan: PaymentSchedulerPlan = {
+      id: `plan-${Date.now()}`,
+      name: newPlanName,
+      frequency: newPlanFrequency,
+      targetAudience: newPlanTarget,
+      emailSubject: newPlanSubject,
+      emailTemplate: newPlanTemplate,
+      isActive: true,
+      createdAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+      nextRunDate: getNextRunDate(newPlanFrequency)
+    };
+
+    const updatedPlans = [...schedulerPlans, newPlan];
+    if (onUpdateSchedulerPlans) {
+      onUpdateSchedulerPlans(updatedPlans);
+    }
+    setSchedulerNotification({ message: 'New automated payment scheduler plan created successfully!', type: 'success' });
+    setNewPlanName('');
+    setIsCreatePlanOpen(false);
+    setTimeout(() => setSchedulerNotification(null), 5000);
+  };
+
+  const handleTogglePlanActive = (planId: string) => {
+    const updatedPlans = schedulerPlans.map(plan => {
+      if (plan.id === planId) {
+        return { ...plan, isActive: !plan.isActive };
+      }
+      return plan;
+    });
+    if (onUpdateSchedulerPlans) {
+      onUpdateSchedulerPlans(updatedPlans);
+    }
+    setSchedulerNotification({ message: 'Plan status updated successfully.', type: 'success' });
+    setTimeout(() => setSchedulerNotification(null), 3000);
+  };
+
+  const handleDeletePlan = (planId: string) => {
+    setDeleteConfirm({
+      isOpen: true,
+      title: 'Delete Scheduler Plan',
+      message: 'Are you sure you want to delete this payment scheduler plan? This will stop all future automatic runs for this schedule.',
+      onConfirm: () => {
+        const updatedPlans = schedulerPlans.filter(p => p.id !== planId);
+        if (onUpdateSchedulerPlans) {
+          onUpdateSchedulerPlans(updatedPlans);
+        }
+        setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+        setSchedulerNotification({ message: 'Plan deleted successfully.', type: 'success' });
+        setTimeout(() => setSchedulerNotification(null), 3000);
+      }
+    });
+  };
+
+  const handleSimulateCronRun = () => {
+    const activePlans = schedulerPlans.filter(p => p.isActive);
+    if (activePlans.length === 0) {
+      setSchedulerNotification({ message: 'No active scheduler plans are available to execute.', type: 'error' });
+      return;
+    }
+
+    const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 16);
+    let totalEmailsSent = 0;
+    const newLogs: PaymentSchedulerRunLog[] = [];
+    const updatedPlans = [...schedulerPlans];
+
+    activePlans.forEach(plan => {
+      // Find eligible students with outstanding balance
+      let eligibleStudents = students.filter(s => s.balanceGHS > 0);
+      if (plan.targetAudience !== 'AllOutstanding') {
+        eligibleStudents = eligibleStudents.filter(s => s.classId === plan.targetAudience);
+      }
+
+      if (eligibleStudents.length === 0) {
+        // Log a skipped/successful run with 0 sent
+        newLogs.push({
+          id: `log-${Date.now()}-${plan.id}`,
+          planId: plan.id,
+          planName: plan.name,
+          runDate: nowStr,
+          emailsSentCount: 0,
+          recipientNames: [],
+          status: 'Success'
+        });
+        return;
+      }
+
+      const sentRecipients: string[] = [];
+
+      eligibleStudents.forEach(st => {
+        let body = plan.emailTemplate;
+        body = body.replace(/{parent_name}/g, st.parentName);
+        body = body.replace(/{student_name}/g, st.name);
+        body = body.replace(/{outstanding_balance}/g, st.balanceGHS.toFixed(2));
+
+        onSendEmail(
+          st.parentEmail,
+          st.parentName,
+          plan.emailSubject,
+          body,
+          'FeeDeadline'
+        );
+
+        sentRecipients.push(st.parentName);
+        totalEmailsSent++;
+      });
+
+      // Update plan lastRunDate and nextRunDate
+      const planIndex = updatedPlans.findIndex(p => p.id === plan.id);
+      if (planIndex !== -1) {
+        updatedPlans[planIndex] = {
+          ...updatedPlans[planIndex],
+          lastRunDate: nowStr,
+          nextRunDate: getNextRunDate(plan.frequency)
+        };
+      }
+
+      newLogs.push({
+        id: `log-${Date.now()}-${plan.id}`,
+        planId: plan.id,
+        planName: plan.name,
+        runDate: nowStr,
+        emailsSentCount: eligibleStudents.length,
+        recipientNames: sentRecipients,
+        status: 'Success'
+      });
+    });
+
+    if (onUpdateSchedulerPlans) {
+      onUpdateSchedulerPlans(updatedPlans);
+    }
+    if (onUpdateSchedulerLogs) {
+      onUpdateSchedulerLogs([...newLogs, ...schedulerLogs]);
+    }
+
+    setSchedulerNotification({ 
+      message: `Simulated scheduler cron run executed successfully! Dispatched ${totalEmailsSent} automated emails.`, 
+      type: 'success' 
+    });
+    setTimeout(() => setSchedulerNotification(null), 8000);
+  };
+
+  const getNextRunDate = (freq: 'Daily' | 'Weekly' | 'Bi-weekly' | 'Monthly') => {
+    const now = new Date();
+    if (freq === 'Daily') now.setDate(now.getDate() + 1);
+    else if (freq === 'Weekly') now.setDate(now.getDate() + 7);
+    else if (freq === 'Bi-weekly') now.setDate(now.getDate() + 14);
+    else if (freq === 'Monthly') now.setMonth(now.getMonth() + 1);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} 09:00`;
   };
 
   // Deletion Confirmation Modal State
@@ -2785,6 +2960,17 @@ export default function AdminDashboard({
                 <CreditCard size={12} />
                 <span>Bank & Payout Link</span>
               </button>
+              <button
+                onClick={() => setPaymentsSubTab('scheduler')}
+                className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
+                  paymentsSubTab === 'scheduler'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                }`}
+              >
+                <Calendar size={12} />
+                <span>Payment Scheduler</span>
+              </button>
             </div>
           </div>
 
@@ -3783,6 +3969,317 @@ export default function AdminDashboard({
                     </p>
                   </div>
                 </div>
+              </div>
+
+            </div>
+          )}
+
+          {paymentsSubTab === 'scheduler' && (
+            <div className="space-y-6 animate-fade-in" id="payment-scheduler-panel">
+              
+              <div className="pb-2 border-b border-slate-200/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <h3 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Recurring Payment Scheduler</h3>
+                  <p className="text-xs text-slate-400">Establish automated recurrence rules to periodically audit outstanding student balances and dispatch personalized email alerts to parents.</p>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setIsCreatePlanOpen(!isCreatePlanOpen)}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wide rounded-lg flex items-center space-x-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Plus size={14} />
+                    <span>{isCreatePlanOpen ? 'Cancel Form' : 'Create Schedule Plan'}</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleSimulateCronRun}
+                    className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs uppercase tracking-wide rounded-lg flex items-center space-x-1.5 cursor-pointer shadow-xs"
+                    title="Triggers the automatic background email processor immediately for all active schedules"
+                  >
+                    <RefreshCw size={14} className="animate-spin-slow" />
+                    <span>Simulate Scheduler Cron Run</span>
+                  </button>
+                </div>
+              </div>
+
+              {schedulerNotification && (
+                <div className={`p-4 rounded-xl border text-xs font-semibold flex items-center space-x-2 ${
+                  schedulerNotification.type === 'success' 
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                }`}>
+                  <span className={`h-2 w-2 rounded-full ${schedulerNotification.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                  <span>{schedulerNotification.message}</span>
+                </div>
+              )}
+
+              {/* Quick Metrics Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Schedules</span>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">{schedulerPlans.filter(p => p.isActive).length}</span>
+                    <span className="text-[10px] text-emerald-500 font-bold">Active</span>
+                  </div>
+                </div>
+                <div className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Schedules</span>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">{schedulerPlans.length}</span>
+                    <span className="text-[10px] text-slate-400 font-bold">Configured</span>
+                  </div>
+                </div>
+                <div className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cron Run Logs</span>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">{schedulerLogs.length}</span>
+                    <span className="text-[10px] text-slate-400 font-bold">Executions</span>
+                  </div>
+                </div>
+                <div className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outstanding Pupils</span>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-2xl font-extrabold text-rose-500 font-mono">{students.filter(s => s.balanceGHS > 0).length}</span>
+                    <span className="text-[10px] text-rose-500 font-bold">With Balance</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CREATE SCHEDULE FORM (COLLAPSIBLE) */}
+              {isCreatePlanOpen && (
+                <form onSubmit={handleCreatePlan} className={`p-6 rounded-2xl border transition-all space-y-4 animate-fade-in ${
+                  isDarkMode ? 'bg-slate-950 border-slate-850' : 'bg-slate-50/50 border-slate-200'
+                }`}>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 border-b pb-2 mb-2">Configure Automated Recurrence Rules</h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-bold">
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase mb-1">Schedule Rule Name</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g., Weekly Outstanding Balance Audit"
+                        value={newPlanName}
+                        onChange={(e) => setNewPlanName(e.target.value)}
+                        className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                        }`}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase mb-1">Audit Recurrence Frequency</label>
+                      <select
+                        value={newPlanFrequency}
+                        onChange={(e) => setNewPlanFrequency(e.target.value as any)}
+                        className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                        }`}
+                      >
+                        <option value="Daily">Daily Run</option>
+                        <option value="Weekly">Weekly Run</option>
+                        <option value="Bi-weekly">Bi-weekly Run</option>
+                        <option value="Monthly">Monthly Run</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase mb-1">Target Audience Segment</label>
+                      <select
+                        value={newPlanTarget}
+                        onChange={(e) => setNewPlanTarget(e.target.value)}
+                        className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                        }`}
+                      >
+                        <option value="AllOutstanding">All Pupils with Unpaid Balance</option>
+                        {classes.map(cl => (
+                          <option key={cl.id} value={cl.id}>Only {cl.name} Pupils</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-xs font-bold">
+                    <div>
+                      <label className="block text-[10px] text-slate-400 uppercase mb-1">Outgoing Email Subject</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. URGENT: Outstanding Tuition Fee Balance Notification"
+                        value={newPlanSubject}
+                        onChange={(e) => setNewPlanSubject(e.target.value)}
+                        className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-xs font-bold">
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="block text-[10px] text-slate-400 uppercase">Email Template Body</label>
+                        <span className="text-[9px] font-mono text-slate-400 font-normal font-sans">Use tags: <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{parent_name}`}</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{student_name}`}</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{outstanding_balance}`}</code></span>
+                      </div>
+                      <textarea
+                        rows={5}
+                        required
+                        value={newPlanTemplate}
+                        onChange={(e) => setNewPlanTemplate(e.target.value)}
+                        className={`w-full p-2.5 rounded-lg border text-xs leading-relaxed focus:outline-hidden focus:ring-1 focus:ring-emerald-500 font-mono ${
+                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-2.5 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsCreatePlanOpen(false)}
+                      className={`px-4 py-2 border rounded-lg text-xs font-extrabold uppercase tracking-wide cursor-pointer ${
+                        isDarkMode ? 'border-slate-800 text-slate-400 hover:bg-slate-900' : 'border-slate-200 text-slate-500 hover:bg-slate-100'
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wide rounded-lg cursor-pointer shadow-xs"
+                    >
+                      Save Scheduler Plan
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* CORES AND SCHEDULER PLANS GRID */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* PLAN LISTING PANEL */}
+                <div className={`p-5 rounded-2xl border lg:col-span-2 ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">Configured Scheduler Plans</h4>
+                    <span className="text-[10px] text-slate-400 font-semibold font-sans">Running behind-the-scenes chron</span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                          <th className="p-3">Schedule Name</th>
+                          <th className="p-3">Audience Segment</th>
+                          <th className="p-3">Recurrence</th>
+                          <th className="p-3">Audit Next Run</th>
+                          <th className="p-3">Active Status</th>
+                          <th className="p-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        {schedulerPlans.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="p-8 text-center text-slate-400 italic font-semibold">
+                              No recurrence plans configured. Click "Create Schedule Plan" to build one.
+                            </td>
+                          </tr>
+                        ) : (
+                          schedulerPlans.map(plan => {
+                            const targetClass = classes.find(c => c.id === plan.targetAudience);
+                            return (
+                              <tr key={plan.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300">
+                                <td className="p-3 font-bold text-slate-900 dark:text-white">
+                                  <div>{plan.name}</div>
+                                  <div className="text-[9px] text-slate-400 font-normal truncate max-w-xs mt-0.5">{plan.emailSubject}</div>
+                                </td>
+                                <td className="p-3">
+                                  {plan.targetAudience === 'AllOutstanding' ? (
+                                    <span className="text-[9px] bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded text-slate-600 dark:text-slate-400 uppercase font-bold">All Debtors</span>
+                                  ) : (
+                                    <span className="text-[9px] bg-sky-500/10 text-sky-600 px-2 py-0.5 rounded uppercase font-bold">{targetClass ? targetClass.name : 'Unknown Class'}</span>
+                                  )}
+                                </td>
+                                <td className="p-3 font-mono text-[10px]">{plan.frequency}</td>
+                                <td className="p-3 text-[10px] text-slate-400 font-mono">
+                                  <div>Next: {plan.nextRunDate}</div>
+                                  {plan.lastRunDate && <div className="text-[9px] text-emerald-500/80">Last: {plan.lastRunDate}</div>}
+                                </td>
+                                <td className="p-3">
+                                  <button
+                                    onClick={() => handleTogglePlanActive(plan.id)}
+                                    className={`px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase transition-all tracking-wider cursor-pointer ${
+                                      plan.isActive
+                                        ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200'
+                                    }`}
+                                  >
+                                    {plan.isActive ? '● Active' : '○ Paused'}
+                                  </button>
+                                </td>
+                                <td className="p-3 text-right">
+                                  <button
+                                    onClick={() => handleDeletePlan(plan.id)}
+                                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded transition-colors cursor-pointer"
+                                    title="Delete Plan"
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* RUN LOGS AUDIT TRAIL */}
+                <div className={`p-5 rounded-2xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">Cron Execution History</h4>
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="Cron Listener Active" />
+                  </div>
+
+                  <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
+                    {schedulerLogs.length === 0 ? (
+                      <div className="text-center py-12 text-slate-400 italic text-xs font-semibold">
+                        No automation logs recorded yet. Use the "Simulate Scheduler Cron Run" button above to execute active schedules.
+                      </div>
+                    ) : (
+                      schedulerLogs.map(log => (
+                        <div key={log.id} className={`p-3 rounded-xl border space-y-2 text-xs font-semibold ${
+                          isDarkMode ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50/50 border-slate-150'
+                        }`}>
+                          <div className="flex justify-between items-start">
+                            <span className="font-bold text-slate-800 dark:text-white leading-tight block truncate max-w-[150px]">{log.planName}</span>
+                            <span className="text-[9px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-black font-mono">SUCCESS</span>
+                          </div>
+
+                          <div className="text-[10px] text-slate-400 flex items-center justify-between font-mono">
+                            <span>{log.runDate}</span>
+                            <span className="text-slate-500">{log.emailsSentCount} emails sent</span>
+                          </div>
+
+                          {log.recipientNames.length > 0 && (
+                            <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800/40">
+                              <span className="text-[9px] uppercase tracking-wider text-slate-400 block mb-0.5">Notified Guardians:</span>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                                {log.recipientNames.join(', ')}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
               </div>
 
             </div>

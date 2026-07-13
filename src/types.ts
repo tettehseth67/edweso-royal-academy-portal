@@ -292,4 +292,29 @@ export interface StaffLeaveRequest {
   appliedOn: string;
 }
 
+export interface PaymentSchedulerPlan {
+  id: string;
+  name: string;
+  frequency: 'Daily' | 'Weekly' | 'Bi-weekly' | 'Monthly';
+  targetAudience: 'AllOutstanding' | string; // 'AllOutstanding' or classId
+  emailSubject: string;
+  emailTemplate: string;
+  isActive: boolean;
+  createdAt: string;
+  nextRunDate: string;
+  lastRunDate?: string;
+}
+
+export interface PaymentSchedulerRunLog {
+  id: string;
+  planId: string;
+  planName: string;
+  runDate: string;
+  emailsSentCount: number;
+  recipientNames: string[];
+  status: 'Success' | 'Failed';
+  errorMessage?: string;
+}
+
+
 

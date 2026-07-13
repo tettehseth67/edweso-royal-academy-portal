@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X, Eye, Accessibility, Type, Check, ZoomIn, ZoomOut } from 'lucide-react';
-import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, SimulatedSMS, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest } from './types';
+import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, SimulatedSMS, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest, PaymentSchedulerPlan, PaymentSchedulerRunLog } from './types';
 import { SchoolDatabase } from './mockData';
 
 // Component Imports
@@ -222,6 +222,8 @@ export default function App() {
   const [staffClockIns, setStaffClockIns] = useState<StaffClockIn[]>([]);
   const [staffPayrolls, setStaffPayrolls] = useState<StaffPayroll[]>([]);
   const [staffLeaveRequests, setStaffLeaveRequests] = useState<StaffLeaveRequest[]>([]);
+  const [schedulerPlans, setSchedulerPlans] = useState<PaymentSchedulerPlan[]>([]);
+  const [schedulerLogs, setSchedulerLogs] = useState<PaymentSchedulerRunLog[]>([]);
 
   // Helper to save database state to Node.js backend
   const syncAndSave = async (updatedFields: Partial<{
@@ -245,6 +247,8 @@ export default function App() {
     staffClockIns: StaffClockIn[];
     staffPayrolls: StaffPayroll[];
     staffLeaveRequests: StaffLeaveRequest[];
+    schedulerPlans: PaymentSchedulerPlan[];
+    schedulerLogs: PaymentSchedulerRunLog[];
   }>) => {
     const payload = {
       students: updatedFields.students ?? students,
@@ -267,6 +271,8 @@ export default function App() {
       staffClockIns: updatedFields.staffClockIns ?? staffClockIns,
       staffPayrolls: updatedFields.staffPayrolls ?? staffPayrolls,
       staffLeaveRequests: updatedFields.staffLeaveRequests ?? staffLeaveRequests,
+      schedulerPlans: updatedFields.schedulerPlans ?? schedulerPlans,
+      schedulerLogs: updatedFields.schedulerLogs ?? schedulerLogs,
     };
     try {
       await fetch('/api/school-data', {
@@ -308,6 +314,8 @@ export default function App() {
           setStaffClockIns(db.staffClockIns || []);
           setStaffPayrolls(db.staffPayrolls || []);
           setStaffLeaveRequests(db.staffLeaveRequests || []);
+          setSchedulerPlans(db.schedulerPlans || SchoolDatabase.getSchedulerPlans());
+          setSchedulerLogs(db.schedulerLogs || SchoolDatabase.getSchedulerLogs());
           loadedFromBackend = true;
           
           // Keep LocalStorage fallback updated
@@ -331,6 +339,8 @@ export default function App() {
           SchoolDatabase.saveStaffClockIns(db.staffClockIns || []);
           SchoolDatabase.saveStaffPayroll(db.staffPayrolls || []);
           SchoolDatabase.saveStaffLeaves(db.staffLeaveRequests || []);
+          SchoolDatabase.saveSchedulerPlans(db.schedulerPlans || SchoolDatabase.getSchedulerPlans());
+          SchoolDatabase.saveSchedulerLogs(db.schedulerLogs || SchoolDatabase.getSchedulerLogs());
         }
       } catch (e) {
         console.warn('Failed to fetch from backend, utilizing local storage fallback:', e);
@@ -357,6 +367,8 @@ export default function App() {
         const localClockIns = SchoolDatabase.getStaffClockIns();
         const localPayroll = SchoolDatabase.getStaffPayroll();
         const localLeaves = SchoolDatabase.getStaffLeaves();
+        const localPlans = SchoolDatabase.getSchedulerPlans();
+        const localLogs = SchoolDatabase.getSchedulerLogs();
 
         setStudents(localStudents);
         setTeachers(localTeachers);
@@ -378,6 +390,8 @@ export default function App() {
         setStaffClockIns(localClockIns);
         setStaffPayrolls(localPayroll);
         setStaffLeaveRequests(localLeaves);
+        setSchedulerPlans(localPlans);
+        setSchedulerLogs(localLogs);
 
         // Bootstrap backend with initial mock data
         try {
@@ -404,7 +418,9 @@ export default function App() {
               homeworkSubmissions: localHomeworkSubmissions,
               staffClockIns: localClockIns,
               staffPayrolls: localPayroll,
-              staffLeaveRequests: localLeaves
+              staffLeaveRequests: localLeaves,
+              schedulerPlans: localPlans,
+              schedulerLogs: localLogs
             })
           });
         } catch (err) {
@@ -740,6 +756,18 @@ Edweso Royal Academy`;
     });
   };
 
+  const handleUpdateSchedulerPlans = (updatedPlans: PaymentSchedulerPlan[]) => {
+    setSchedulerPlans(updatedPlans);
+    SchoolDatabase.saveSchedulerPlans(updatedPlans);
+    syncAndSave({ schedulerPlans: updatedPlans });
+  };
+
+  const handleUpdateSchedulerLogs = (updatedLogs: PaymentSchedulerRunLog[]) => {
+    setSchedulerLogs(updatedLogs);
+    SchoolDatabase.saveSchedulerLogs(updatedLogs);
+    syncAndSave({ schedulerLogs: updatedLogs });
+  };
+
   const handleUpdateAttendance = (updatedAttendance: Attendance[]) => {
     setAttendance(updatedAttendance);
     SchoolDatabase.saveAttendance(updatedAttendance);
@@ -1011,6 +1039,10 @@ Principal Signoff: Approved
               session={session}
               homeworkAssignments={homeworkAssignments}
               isDarkMode={isDarkMode}
+              schedulerPlans={schedulerPlans}
+              schedulerLogs={schedulerLogs}
+              onUpdateSchedulerPlans={handleUpdateSchedulerPlans}
+              onUpdateSchedulerLogs={handleUpdateSchedulerLogs}
             />
           )}
 
