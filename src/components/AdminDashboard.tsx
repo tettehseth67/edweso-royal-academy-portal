@@ -2910,7 +2910,7 @@ export default function AdminDashboard({
           
           <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Payments & Gateway Integration</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex-row">Payments & Gateway Integration</h2>
               <p className="text-xs text-slate-400">Review real-time collection transaction ledgers, specify bank payout endpoints, or configure custom Paystack keys.</p>
             </div>
             
