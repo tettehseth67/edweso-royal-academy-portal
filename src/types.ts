@@ -316,5 +316,18 @@ export interface PaymentSchedulerRunLog {
   errorMessage?: string;
 }
 
+export interface RoleAccessibilityConfig {
+  fontSizeScale: string; // 'normal' | 'large' | 'xl' | 'xxl'
+  highContrast: boolean;
+  dyslexicFont: boolean;
+  speakOnClick: boolean;
+  giantCursor: boolean;
+  readingRuler: boolean;
+  visionFilter: string; // 'none' | 'monochrome' | 'contrast-boost' | 'deuteranopia'
+}
+
+export type RoleAccessibilityPreferences = Record<string, RoleAccessibilityConfig>;
+
+
 
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X, Eye, Accessibility, Type, Check, ZoomIn, ZoomOut } from 'lucide-react';
-import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, SimulatedSMS, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest, PaymentSchedulerPlan, PaymentSchedulerRunLog } from './types';
+import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, SimulatedSMS, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest, PaymentSchedulerPlan, PaymentSchedulerRunLog, RoleAccessibilityConfig, RoleAccessibilityPreferences } from './types';
 import { SchoolDatabase } from './mockData';
 
 // Component Imports
@@ -224,6 +224,12 @@ export default function App() {
   const [staffLeaveRequests, setStaffLeaveRequests] = useState<StaffLeaveRequest[]>([]);
   const [schedulerPlans, setSchedulerPlans] = useState<PaymentSchedulerPlan[]>([]);
   const [schedulerLogs, setSchedulerLogs] = useState<PaymentSchedulerRunLog[]>([]);
+  const [roleAccessibility, setRoleAccessibility] = useState<RoleAccessibilityPreferences>({
+    admin: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
+    teacher: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
+    student: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
+    parent: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' }
+  });
 
   // Helper to save database state to Node.js backend
   const syncAndSave = async (updatedFields: Partial<{
@@ -249,6 +255,7 @@ export default function App() {
     staffLeaveRequests: StaffLeaveRequest[];
     schedulerPlans: PaymentSchedulerPlan[];
     schedulerLogs: PaymentSchedulerRunLog[];
+    roleAccessibility: RoleAccessibilityPreferences;
   }>) => {
     const payload = {
       students: updatedFields.students ?? students,
@@ -273,6 +280,7 @@ export default function App() {
       staffLeaveRequests: updatedFields.staffLeaveRequests ?? staffLeaveRequests,
       schedulerPlans: updatedFields.schedulerPlans ?? schedulerPlans,
       schedulerLogs: updatedFields.schedulerLogs ?? schedulerLogs,
+      roleAccessibility: updatedFields.roleAccessibility ?? roleAccessibility,
     };
     try {
       await fetch('/api/school-data', {
@@ -316,6 +324,7 @@ export default function App() {
           setStaffLeaveRequests(db.staffLeaveRequests || []);
           setSchedulerPlans(db.schedulerPlans || SchoolDatabase.getSchedulerPlans());
           setSchedulerLogs(db.schedulerLogs || SchoolDatabase.getSchedulerLogs());
+          setRoleAccessibility(db.roleAccessibility || SchoolDatabase.getRoleAccessibility());
           loadedFromBackend = true;
           
           // Keep LocalStorage fallback updated
@@ -341,6 +350,7 @@ export default function App() {
           SchoolDatabase.saveStaffLeaves(db.staffLeaveRequests || []);
           SchoolDatabase.saveSchedulerPlans(db.schedulerPlans || SchoolDatabase.getSchedulerPlans());
           SchoolDatabase.saveSchedulerLogs(db.schedulerLogs || SchoolDatabase.getSchedulerLogs());
+          SchoolDatabase.saveRoleAccessibility(db.roleAccessibility || SchoolDatabase.getRoleAccessibility());
         }
       } catch (e) {
         console.warn('Failed to fetch from backend, utilizing local storage fallback:', e);
@@ -369,6 +379,7 @@ export default function App() {
         const localLeaves = SchoolDatabase.getStaffLeaves();
         const localPlans = SchoolDatabase.getSchedulerPlans();
         const localLogs = SchoolDatabase.getSchedulerLogs();
+        const localRoleAccessibility = SchoolDatabase.getRoleAccessibility();
 
         setStudents(localStudents);
         setTeachers(localTeachers);
@@ -392,6 +403,7 @@ export default function App() {
         setStaffLeaveRequests(localLeaves);
         setSchedulerPlans(localPlans);
         setSchedulerLogs(localLogs);
+        setRoleAccessibility(localRoleAccessibility);
 
         // Bootstrap backend with initial mock data
         try {
@@ -420,7 +432,8 @@ export default function App() {
               staffPayrolls: localPayroll,
               staffLeaveRequests: localLeaves,
               schedulerPlans: localPlans,
-              schedulerLogs: localLogs
+              schedulerLogs: localLogs,
+              roleAccessibility: localRoleAccessibility
             })
           });
         } catch (err) {
@@ -485,6 +498,18 @@ export default function App() {
       `Authenticated successfully into ${roleLabel} Portal`
     );
     
+    // Load and apply accessibility preferences for this user role
+    const rolePrefs = roleAccessibility[userSession.role];
+    if (rolePrefs) {
+      if (rolePrefs.fontSizeScale) setFontSizeScale(rolePrefs.fontSizeScale);
+      if (rolePrefs.highContrast !== undefined) setHighContrast(rolePrefs.highContrast);
+      if (rolePrefs.dyslexicFont !== undefined) setDyslexicFont(rolePrefs.dyslexicFont);
+      if (rolePrefs.speakOnClick !== undefined) setSpeakOnClick(rolePrefs.speakOnClick);
+      if (rolePrefs.giantCursor !== undefined) setGiantCursor(rolePrefs.giantCursor);
+      if (rolePrefs.readingRuler !== undefined) setReadingRuler(rolePrefs.readingRuler);
+      if (rolePrefs.visionFilter) setVisionFilter(rolePrefs.visionFilter);
+    }
+    
     // Set default tab based on logged-in role
     if (userSession.role === 'admin') {
       setActiveTab('overview');
@@ -494,6 +519,44 @@ export default function App() {
       setActiveTab('profile');
     }
   };
+
+  // Synchronize accessibility state changes to the backend database when logged in
+  useEffect(() => {
+    if (!session) return;
+    
+    const currentPrefs = roleAccessibility[session.role];
+    
+    // Check if there is an actual difference to prevent infinite save loops
+    if (
+      currentPrefs &&
+      (currentPrefs.fontSizeScale !== fontSizeScale ||
+       currentPrefs.highContrast !== highContrast ||
+       currentPrefs.dyslexicFont !== dyslexicFont ||
+       currentPrefs.speakOnClick !== speakOnClick ||
+       currentPrefs.giantCursor !== giantCursor ||
+       currentPrefs.readingRuler !== readingRuler ||
+       currentPrefs.visionFilter !== visionFilter)
+    ) {
+      const updatedConfig: RoleAccessibilityConfig = {
+        fontSizeScale,
+        highContrast,
+        dyslexicFont,
+        speakOnClick,
+        giantCursor,
+        readingRuler,
+        visionFilter
+      };
+      
+      const updatedPrefs: RoleAccessibilityPreferences = {
+        ...roleAccessibility,
+        [session.role]: updatedConfig
+      };
+      
+      setRoleAccessibility(updatedPrefs);
+      SchoolDatabase.saveRoleAccessibility(updatedPrefs);
+      syncAndSave({ roleAccessibility: updatedPrefs });
+    }
+  }, [fontSizeScale, highContrast, dyslexicFont, speakOnClick, giantCursor, readingRuler, visionFilter, session, roleAccessibility]);
 
   const handleLogout = () => {
     setSession(null);
@@ -1266,6 +1329,12 @@ Principal Signoff: Approved
                     <span>Eye Care & Accessibility Suite</span>
                   </h4>
                   <p className="text-[10px] text-slate-400 font-bold mt-0.5">Comprehensive support for low-vision & fatigue</p>
+                  {session && (
+                    <div className="mt-1 flex items-center space-x-1.5 text-[9px] text-emerald-600 dark:text-emerald-500 font-bold font-mono bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-900/30 w-fit">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Saved in database per role: {session.role.toUpperCase()}</span>
+                    </div>
+                  )}
                 </div>
                 <button 
                   onClick={() => setIsAccessMenuOpen(false)}

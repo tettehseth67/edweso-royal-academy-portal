@@ -21,7 +21,9 @@ import {
   StaffPayroll,
   StaffLeaveRequest,
   PaymentSchedulerPlan,
-  PaymentSchedulerRunLog
+  PaymentSchedulerRunLog,
+  RoleAccessibilityConfig,
+  RoleAccessibilityPreferences
 } from './types';
 
 // Initial School Classes
@@ -517,6 +519,14 @@ export class SchoolDatabase {
   static saveSchedulerLogs(logs: PaymentSchedulerRunLog[]): void {
     setStored('SCHEDULER_RUN_LOGS', logs);
   }
+
+  static getRoleAccessibility(): RoleAccessibilityPreferences {
+    return getStored<RoleAccessibilityPreferences>('ROLE_ACCESSIBILITY', defaultRoleAccessibility);
+  }
+
+  static saveRoleAccessibility(prefs: RoleAccessibilityPreferences): void {
+    setStored('ROLE_ACCESSIBILITY', prefs);
+  }
 }
 
 // Initial public inquiries submitted via website
@@ -780,5 +790,13 @@ export const initialSchedulerLogs: PaymentSchedulerRunLog[] = [
     status: 'Success'
   }
 ];
+
+export const defaultRoleAccessibility: RoleAccessibilityPreferences = {
+  admin: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
+  teacher: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
+  student: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
+  parent: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' }
+};
+
 
 

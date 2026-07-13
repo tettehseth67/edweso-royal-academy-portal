@@ -4,7 +4,7 @@ import {
   Calendar, Megaphone, CreditCard, Search, Plus, 
   Trash2, Edit, Check, AlertTriangle, Eye, RefreshCw, Filter, ShieldCheck, Download,
   ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer, Cake, Gift,
-  Lock, Building, HelpCircle, Info, Smartphone, FileText, Receipt
+  Lock, Building, HelpCircle, Info, Smartphone, FileText, Receipt, Play, Send, Sparkles
 } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, 
@@ -451,6 +451,25 @@ export default function AdminDashboard({
   const [verificationStatusFilter, setVerificationStatusFilter] = useState<'Pending' | 'Successful' | 'Failed' | 'All'>('Pending');
   const [verificationSearchQuery, setVerificationSearchQuery] = useState('');
 
+  // Improved Paystack Ledger State variables
+  const [ledgerSearchQuery, setLedgerSearchQuery] = useState('');
+  const [ledgerStatusFilter, setLedgerStatusFilter] = useState<'All' | 'Successful' | 'Pending' | 'Failed'>('All');
+  const [ledgerMethodFilter, setLedgerMethodFilter] = useState<string>('All');
+  const [ledgerTermFilter, setLedgerTermFilter] = useState<'All' | 'Term 1' | 'Term 2' | 'Term 3'>('All');
+  const [ledgerSortField, setLedgerSortField] = useState<'date' | 'amount' | 'studentName'>('date');
+  const [ledgerSortOrder, setLedgerSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedLedgerTransaction, setSelectedLedgerTransaction] = useState<PaymentTransaction | null>(null);
+  const [isSimulatePaymentModalOpen, setIsSimulatePaymentModalOpen] = useState(false);
+  const [isSweeping, setIsSweeping] = useState(false);
+  const [sweepSuccess, setSweepSuccess] = useState(false);
+  
+  // Simulated form states for adding Paystack payment
+  const [simStudentId, setSimStudentId] = useState('');
+  const [simAmount, setSimAmount] = useState('');
+  const [simMethod, setSimMethod] = useState<'Card' | 'MTN Mobile Money' | 'Telecel Cash' | 'AirtelTigo Money' | 'Bank Transfer'>('MTN Mobile Money');
+  const [simTerm, setSimTerm] = useState<'Term 1' | 'Term 2' | 'Term 3'>('Term 1');
+  const [simStatus, setSimStatus] = useState<'Successful' | 'Pending' | 'Failed'>('Successful');
+
   const handleApprovePendingTransaction = (txId: string) => {
     const targetTx = transactions.find(t => t.id === txId);
     if (!targetTx) return;
@@ -495,6 +514,76 @@ export default function AdminDashboard({
   const [directAmount, setDirectAmount] = useState('');
   const [directMethod, setDirectMethod] = useState<'Bank Transfer' | 'MTN Mobile Money' | 'Telecel Cash' | 'AirtelTigo Money' | 'Cash'>('Cash');
   const [directReference, setDirectReference] = useState('');
+
+  const handleSimulatePaystackPayment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!simStudentId) {
+      alert('Please select a student payee.');
+      return;
+    }
+    const amount = Number(simAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid amount.');
+      return;
+    }
+
+    const targetStudent = students.find(s => s.id === simStudentId);
+    if (!targetStudent) {
+      alert('Student not found.');
+      return;
+    }
+
+    // Generate simulated reference codes
+    const ref = 'PSTK-' + Math.floor(10000000 + Math.random() * 90000000);
+    const paystackId = 'pay_' + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    // Adjust balance if Successful
+    if (simStatus === 'Successful') {
+      const updatedStudents = students.map(s => {
+        if (s.id === simStudentId) {
+          return {
+            ...s,
+            balanceGHS: Math.max(0, s.balanceGHS - amount)
+          };
+        }
+        return s;
+      });
+      onUpdateStudents(updatedStudents);
+    }
+
+    const newTx: PaymentTransaction = {
+      id: 'tx-ps-' + Date.now(),
+      studentId: simStudentId,
+      studentName: targetStudent.name,
+      amountGHS: amount,
+      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: simStatus,
+      reference: ref,
+      paystackRef: paystackId,
+      paymentMethod: simMethod,
+      email: targetStudent.parentEmail || 'student@school.edu',
+      term: simTerm
+    };
+
+    onUpdateTransactions([newTx, ...transactions]);
+
+    // Log simulated system activity
+    SchoolDatabase.addSystemActivity(
+      'attendance',
+      session ? session.name : 'System Scheduler',
+      `Simulated ${simStatus} Paystack payment of GHS ${amount} for ${targetStudent.name} (${simMethod})`
+    );
+
+    // Reset form states
+    setSimStudentId('');
+    setSimAmount('');
+    setSimMethod('MTN Mobile Money');
+    setSimTerm('Term 1');
+    setSimStatus('Successful');
+    setIsSimulatePaymentModalOpen(false);
+
+    alert(`Successfully generated a simulated ${simStatus} Paystack payment ledger entry for ${targetStudent.name}!`);
+  };
 
   const handleRecordDirectPayment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -923,6 +1012,91 @@ export default function AdminDashboard({
     else if (freq === 'Monthly') now.setMonth(now.getMonth() + 1);
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} 09:00`;
+  };
+
+  const [selectedLogForModal, setSelectedLogForModal] = useState<PaymentSchedulerRunLog | null>(null);
+
+  const handleRunSinglePlan = (planId: string) => {
+    const plan = schedulerPlans.find(p => p.id === planId);
+    if (!plan) return;
+
+    const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 16);
+    let eligibleStudents = students.filter(s => s.balanceGHS > 0);
+    if (plan.targetAudience !== 'AllOutstanding') {
+      eligibleStudents = eligibleStudents.filter(s => s.classId === plan.targetAudience);
+    }
+
+    if (eligibleStudents.length === 0) {
+      const newLog: PaymentSchedulerRunLog = {
+        id: `log-${Date.now()}-${plan.id}`,
+        planId: plan.id,
+        planName: plan.name,
+        runDate: nowStr,
+        emailsSentCount: 0,
+        recipientNames: [],
+        status: 'Success'
+      };
+      if (onUpdateSchedulerLogs) {
+        onUpdateSchedulerLogs([newLog, ...schedulerLogs]);
+      }
+      setSchedulerNotification({
+        message: `Manual run for "${plan.name}" executed. No students currently have an outstanding balance in this segment.`,
+        type: 'success'
+      });
+      setTimeout(() => setSchedulerNotification(null), 5000);
+      return;
+    }
+
+    const sentRecipients: string[] = [];
+    eligibleStudents.forEach(st => {
+      let body = plan.emailTemplate;
+      body = body.replace(/{parent_name}/g, st.parentName);
+      body = body.replace(/{student_name}/g, st.name);
+      body = body.replace(/{outstanding_balance}/g, st.balanceGHS.toFixed(2));
+
+      onSendEmail(
+        st.parentEmail,
+        st.parentName,
+        plan.emailSubject,
+        body,
+        'FeeDeadline'
+      );
+      sentRecipients.push(st.parentName);
+    });
+
+    const newLog: PaymentSchedulerRunLog = {
+      id: `log-${Date.now()}-${plan.id}`,
+      planId: plan.id,
+      planName: plan.name,
+      runDate: nowStr,
+      emailsSentCount: eligibleStudents.length,
+      recipientNames: sentRecipients,
+      status: 'Success'
+    };
+
+    const updatedPlans = schedulerPlans.map(p => {
+      if (p.id === planId) {
+        return {
+          ...p,
+          lastRunDate: nowStr,
+          nextRunDate: getNextRunDate(p.frequency)
+        };
+      }
+      return p;
+    });
+
+    if (onUpdateSchedulerPlans) {
+      onUpdateSchedulerPlans(updatedPlans);
+    }
+    if (onUpdateSchedulerLogs) {
+      onUpdateSchedulerLogs([newLog, ...schedulerLogs]);
+    }
+
+    setSchedulerNotification({
+      message: `Manual run for "${plan.name}" executed successfully. Dispatched ${eligibleStudents.length} simulated emails to outstanding guardians.`,
+      type: 'success'
+    });
+    setTimeout(() => setSchedulerNotification(null), 5000);
   };
 
   // Deletion Confirmation Modal State
@@ -2908,14 +3082,14 @@ export default function AdminDashboard({
       {activeTab === 'payments' && (
         <div className="space-y-6 animate-fade-in">
           
-          <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="pb-3 border-b border-slate-200/40 flex flex-col gap-4">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex-row">Payments & Gateway Integration</h2>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Payments & Gateway Integration</h2>
               <p className="text-xs text-slate-400">Review real-time collection transaction ledgers, specify bank payout endpoints, or configure custom Paystack keys.</p>
             </div>
             
             {/* Sub-tab Selection Buttons */}
-            <div className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200/40 dark:border-slate-800 shrink-0 self-start md:self-auto">
+            <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200/40 dark:border-slate-800 w-fit">
               <button
                 onClick={() => setPaymentsSubTab('ledger')}
                 className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
@@ -2974,145 +3148,729 @@ export default function AdminDashboard({
             </div>
           </div>
 
-          {paymentsSubTab === 'ledger' && (
-            <>
-              {/* Quick Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider">Total Fees Collected</span>
-              <span className="text-xl font-extrabold font-mono mt-1">GHS {totalRevenue.toFixed(2)}</span>
-            </div>
-            <div className="p-4 rounded-xl bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 flex flex-col justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider">Outstanding Accounts balance</span>
-              <span className="text-xl font-extrabold font-mono mt-1">GHS {outstandingFees.toFixed(2)}</span>
-            </div>
-            <div className="p-4 rounded-xl bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex flex-col justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider">Cleared Transactions</span>
-              <span className="text-xl font-extrabold mt-1">{transactions.filter(t => t.status === 'Successful').length} Successes</span>
-            </div>
-          </div>
+          {paymentsSubTab === 'ledger' && (() => {
+            // Apply filtering logic to transactions
+            const filteredTransactions = transactions.filter(tx => {
+              const query = ledgerSearchQuery.toLowerCase().trim();
+              const matchesSearch = !query || 
+                tx.studentName.toLowerCase().includes(query) ||
+                tx.reference.toLowerCase().includes(query) ||
+                tx.paystackRef.toLowerCase().includes(query) ||
+                tx.email.toLowerCase().includes(query);
 
-          {/* Monthly Cash Flow Trends Chart */}
-          <div className={`p-5 rounded-2xl border transition-all ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-sm'
-          }`} id="payments-cashflow-trends-card">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
-              <div>
-                <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Academic Year Cash Flow Trends</h3>
-                <p className="text-[10px] text-slate-400 mt-0.5">Monthly breakdown of total fee payments collected throughout the academic year to track cash flow trends.</p>
+              const matchesStatus = ledgerStatusFilter === 'All' || tx.status === ledgerStatusFilter;
+              const matchesMethod = ledgerMethodFilter === 'All' || tx.paymentMethod === ledgerMethodFilter;
+              const matchesTerm = ledgerTermFilter === 'All' || tx.term === ledgerTermFilter;
+
+              return matchesSearch && matchesStatus && matchesMethod && matchesTerm;
+            }).sort((a, b) => {
+              let comparison = 0;
+              if (ledgerSortField === 'date') {
+                comparison = a.date.localeCompare(b.date);
+              } else if (ledgerSortField === 'amount') {
+                comparison = a.amountGHS - b.amountGHS;
+              } else if (ledgerSortField === 'studentName') {
+                comparison = a.studentName.localeCompare(b.studentName);
+              }
+              return ledgerSortOrder === 'desc' ? -comparison : comparison;
+            });
+
+            // Calculate ratios or sub-stats for our widgets
+            const successfulCount = transactions.filter(t => t.status === 'Successful').length;
+            const cardCount = transactions.filter(t => t.status === 'Successful' && t.paymentMethod === 'Card').length;
+            const momoCount = transactions.filter(t => t.status === 'Successful' && t.paymentMethod !== 'Card').length;
+            const momoPercentage = successfulCount > 0 ? Math.round((momoCount / successfulCount) * 100) : 80;
+
+            const handleSweepFunds = () => {
+              setIsSweeping(true);
+              setSweepSuccess(false);
+              setTimeout(() => {
+                setIsSweeping(false);
+                setSweepSuccess(true);
+                setTimeout(() => {
+                  setSweepSuccess(false);
+                }, 5000);
+              }, 1500);
+            };
+
+            return (
+              <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
+                {/* Paystack Integration Active Alert Info */}
+                <div className="p-3.5 rounded-xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-between flex-wrap gap-2 text-xs">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <div>
+                      <span className="font-extrabold text-slate-900 dark:text-white uppercase text-[10px]">Live Paystack Webhook synchronized</span>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Listening for mobile money callbacks and card charge events on 0.0.0.0:3000/api/paystack-webhook</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[9px] font-mono bg-slate-100 dark:bg-slate-950 px-2 py-1 rounded text-slate-500 border border-slate-200/40 dark:border-slate-800 font-bold">MODE: SIMULATED LIVE</span>
+                    <button 
+                      onClick={() => setIsSimulatePaymentModalOpen(true)}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-md transition-all cursor-pointer flex items-center space-x-1"
+                    >
+                      <Sparkles size={11} className="animate-pulse" />
+                      <span>Simulate Paystack Deposit</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Stats Grid with matching styles */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="p-4 rounded-xl bg-slate-900 text-white border border-slate-800 flex flex-col justify-between shadow-xs">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Fees Collected</span>
+                        <History size={14} className="text-emerald-500" />
+                      </div>
+                      <span className="text-2xl font-extrabold font-mono mt-1.5 block text-white">GHS {totalRevenue.toFixed(2)}</span>
+                    </div>
+                    <div className="mt-3 text-[9px] text-slate-400 font-medium">
+                      Mobile Money Ratio: <span className="text-emerald-400 font-bold">{momoPercentage}% MoMo</span> / {100 - momoPercentage}% Cards
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Outstanding Balance</span>
+                        <AlertTriangle size={14} className="text-rose-500" />
+                      </div>
+                      <span className="text-2xl font-extrabold font-mono mt-1.5 block text-rose-900 dark:text-rose-100">GHS {outstandingFees.toFixed(2)}</span>
+                    </div>
+                    <div className="mt-3 text-[9px] text-rose-500 font-semibold">
+                      Requires active fee collector dunning alerts
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Transaction Count</span>
+                        <CheckSquare size={14} className="text-sky-500" />
+                      </div>
+                      <span className="text-2xl font-extrabold font-mono mt-1.5 block text-sky-950 dark:text-sky-100">{transactions.length} total tx</span>
+                    </div>
+                    <div className="mt-3 text-[9px] text-sky-600 font-semibold flex items-center justify-between">
+                      <span>{successfulCount} Successful</span>
+                      <span>{transactions.filter(t => t.status === 'Pending').length} Pending</span>
+                    </div>
+                  </div>
+
+                  {/* Paystack Settlement Sweep Widget */}
+                  <div className="p-4 rounded-xl bg-emerald-500/5 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Paystack Bank Sweep</span>
+                        <CreditCard size={14} className="text-emerald-600" />
+                      </div>
+                      <span className="text-2xl font-extrabold font-mono mt-1.5 block text-emerald-900 dark:text-emerald-100">
+                        {sweepSuccess ? 'GHS 0.00' : 'GHS 12,400.00'}
+                      </span>
+                    </div>
+                    
+                    <div className="mt-2 flex items-center justify-between">
+                      {isSweeping ? (
+                        <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center space-x-1">
+                          <RefreshCw size={10} className="animate-spin" />
+                          <span>Sweeping to bank...</span>
+                        </span>
+                      ) : sweepSuccess ? (
+                        <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold">
+                          ✓ Settled (Ref: 904-STX)
+                        </span>
+                      ) : (
+                        <span className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold truncate max-w-[130px]">
+                          Payout: GCB Bank *4910
+                        </span>
+                      )}
+                      
+                      {!isSweeping && !sweepSuccess && (
+                        <button
+                          onClick={handleSweepFunds}
+                          className="text-[9px] bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-1.5 py-0.5 rounded cursor-pointer uppercase transition-colors"
+                        >
+                          Sweep Now
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monthly Cash Flow Trends Chart */}
+                <div className={`p-5 rounded-2xl border transition-all ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-sm'
+                }`} id="payments-cashflow-trends-card">
+                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                    <div>
+                      <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Academic Year Cash Flow Trends</h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Monthly breakdown of total fee payments collected throughout the academic year to track cash flow trends.</p>
+                    </div>
+                    <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full font-bold">
+                      Cash Flow Analysis
+                    </span>
+                  </div>
+
+                  <div className="h-[200px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={monthlyFeeCollections} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
+                        <XAxis 
+                          dataKey="month" 
+                          stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                          fontSize={10} 
+                          fontWeight="bold"
+                          tickLine={false} 
+                        />
+                        <YAxis 
+                          stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                          fontSize={10} 
+                          fontWeight="bold"
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(v) => `GHS ${v}`}
+                        />
+                        <Tooltip 
+                          cursor={{ fill: isDarkMode ? 'rgba(30, 41, 59, 0.4)' : 'rgba(241, 245, 249, 0.6)' }}
+                          contentStyle={{ 
+                            backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', 
+                            borderColor: isDarkMode ? '#1e293b' : '#e2e8f0', 
+                            borderRadius: '12px', 
+                            fontSize: '11px',
+                            color: isDarkMode ? '#f8fafc' : '#0f172a',
+                            fontWeight: 'bold',
+                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                          }}
+                          formatter={(value: any) => [`GHS ${Number(value).toLocaleString()}`, 'Collections']}
+                        />
+                        <Bar name="Collections" dataKey="Fee Collections (GHS)" fill="#10b981" radius={[4, 4, 0, 0]}>
+                          {
+                            monthlyFeeCollections.map((entry, index) => {
+                              const amount = entry['Fee Collections (GHS)'];
+                              const barColor = amount > 10000 ? '#059669' : '#10b981';
+                              return <Cell key={`cell-payments-tab-${index}`} fill={barColor} />;
+                            })
+                          }
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600"></span> Peak Collection Volume (&gt;10,000 GHS)
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 ml-2"></span> Standard Collection Volume
+                    </span>
+                    <span>YTD Fee Revenue: GHS {monthlyFeeCollections.reduce((sum, item) => sum + item['Fee Collections (GHS)'], 0).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Filter and Search Bar widget */}
+                <div className={`p-4 rounded-xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/60'
+                } flex flex-col lg:flex-row lg:items-center justify-between gap-3`}>
+                  
+                  {/* Search box with left lookup icon */}
+                  <div className="relative flex-1">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input 
+                      type="text" 
+                      placeholder="Search Payee Name, Paystack Ref, ID..."
+                      value={ledgerSearchQuery}
+                      onChange={(e) => setLedgerSearchQuery(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 pl-9 pr-4 py-2 rounded-lg text-xs font-medium focus:outline-hidden focus:ring-1 focus:ring-emerald-500 text-slate-800 dark:text-slate-100"
+                    />
+                    {ledgerSearchQuery && (
+                      <button 
+                        onClick={() => setLedgerSearchQuery('')} 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 px-1 rounded font-bold cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Filter controls */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center space-x-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Status:</span>
+                      <select 
+                        value={ledgerStatusFilter}
+                        onChange={(e) => setLedgerStatusFilter(e.target.value as any)}
+                        className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
+                      >
+                        <option value="All">All Statuses</option>
+                        <option value="Successful">Successful</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Failed">Failed</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center space-x-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Channel:</span>
+                      <select 
+                        value={ledgerMethodFilter}
+                        onChange={(e) => setLedgerMethodFilter(e.target.value)}
+                        className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
+                      >
+                        <option value="All">All Channels</option>
+                        <option value="Card">Visa/Mastercard Card</option>
+                        <option value="MTN Mobile Money">MTN Mobile Money</option>
+                        <option value="Telecel Cash">Telecel Cash</option>
+                        <option value="AirtelTigo Money">AirtelTigo Money</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center space-x-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Term:</span>
+                      <select 
+                        value={ledgerTermFilter}
+                        onChange={(e) => setLedgerTermFilter(e.target.value as any)}
+                        className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
+                      >
+                        <option value="All">All Terms</option>
+                        <option value="Term 1">Term 1</option>
+                        <option value="Term 2">Term 2</option>
+                        <option value="Term 3">Term 3</option>
+                      </select>
+                    </div>
+
+                    {/* Sorting column toggles */}
+                    <div className="flex items-center border border-slate-200 dark:border-slate-850 rounded-lg overflow-hidden bg-white dark:bg-slate-950">
+                      <button
+                        onClick={() => {
+                          if (ledgerSortField === 'date') {
+                            setLedgerSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setLedgerSortField('date');
+                            setLedgerSortOrder('desc');
+                          }
+                        }}
+                        className={`px-2.5 py-1.5 text-[10px] font-bold uppercase transition-colors flex items-center space-x-0.5 ${
+                          ledgerSortField === 'date' 
+                            ? 'bg-emerald-600 text-white' 
+                            : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900'
+                        }`}
+                        title="Sort by Date"
+                      >
+                        <span>Date</span>
+                        <span className="text-[8px] font-mono">{ledgerSortField === 'date' ? (ledgerSortOrder === 'desc' ? '▼' : '▲') : ''}</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (ledgerSortField === 'amount') {
+                            setLedgerSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setLedgerSortField('amount');
+                            setLedgerSortOrder('desc');
+                          }
+                        }}
+                        className={`px-2.5 py-1.5 text-[10px] font-bold uppercase transition-colors flex items-center space-x-0.5 border-l border-slate-200 dark:border-slate-850 ${
+                          ledgerSortField === 'amount' 
+                            ? 'bg-emerald-600 text-white' 
+                            : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900'
+                        }`}
+                        title="Sort by Amount"
+                      >
+                        <span>Amount</span>
+                        <span className="text-[8px] font-mono">{ledgerSortField === 'amount' ? (ledgerSortOrder === 'desc' ? '▼' : '▲') : ''}</span>
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* Historical Table or Empty State */}
+                {filteredTransactions.length === 0 ? (
+                  <div className={`p-10 rounded-2xl border text-center ${
+                    isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'
+                  }`}>
+                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-950 flex items-center justify-center mx-auto mb-3">
+                      <Receipt size={20} className="text-slate-400" />
+                    </div>
+                    <h4 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">No matching transactions found</h4>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">There are no school tuition ledger records matching your selected query filters. Try clearing search criteria.</p>
+                    <button
+                      onClick={() => {
+                        setLedgerSearchQuery('');
+                        setLedgerStatusFilter('All');
+                        setLedgerMethodFilter('All');
+                        setLedgerTermFilter('All');
+                      }}
+                      className="mt-4 px-4 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-lg transition-all cursor-pointer"
+                    >
+                      Reset All Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider px-1">
+                      <span>Showing {filteredTransactions.length} of {transactions.length} Ledger Records</span>
+                      <span>Click row to audit Paystack Receipt</span>
+                    </div>
+
+                    <div className={`border rounded-2xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                      <div className="overflow-x-auto">
+                        <table id="payments-history-table" className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                              <th className="p-3">Reference / Paystack ID</th>
+                              <th className="p-3">Student payee</th>
+                              <th className="p-3">Terminal Amount</th>
+                              <th className="p-3">Channel / Provider</th>
+                              <th className="p-3">Timestamp</th>
+                              <th className="p-3">Term</th>
+                              <th className="p-3">Status</th>
+                              <th className="p-3 text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {filteredTransactions.map((tx) => {
+                              const std = students.find(s => s.id === tx.studentId);
+                              const classObj = classes.find(c => c.id === std?.classId);
+
+                              return (
+                                <tr 
+                                  key={tx.id} 
+                                  onClick={() => setSelectedLedgerTransaction(tx)}
+                                  className="hover:bg-emerald-500/5 dark:hover:bg-emerald-500/5 transition-colors font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
+                                >
+                                  <td className="p-3">
+                                    <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">{tx.reference}</p>
+                                    <p className="text-[9px] font-mono text-slate-400 mt-0.5 leading-none">{tx.paystackRef}</p>
+                                  </td>
+                                  <td className="p-3">
+                                    <p className="font-bold text-slate-800 dark:text-white leading-tight">{tx.studentName}</p>
+                                    <p className="text-[10px] text-slate-400 leading-none mt-0.5">
+                                      {classObj ? `${classObj.name} • ` : ''}{tx.email}
+                                    </p>
+                                  </td>
+                                  <td className="p-3 font-extrabold font-mono text-slate-900 dark:text-white">
+                                    GHS {tx.amountGHS.toFixed(2)}
+                                  </td>
+                                  <td className="p-3">
+                                    <span className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
+                                      tx.paymentMethod === 'Card' 
+                                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+                                        : tx.paymentMethod.includes('MTN')
+                                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                          : tx.paymentMethod.includes('Telecel')
+                                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                                            : 'bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200/40 dark:border-slate-800'
+                                    }`}>
+                                      {tx.paymentMethod === 'Card' ? <CreditCard size={10} /> : <Smartphone size={10} />}
+                                      <span>{tx.paymentMethod}</span>
+                                    </span>
+                                  </td>
+                                  <td className="p-3 text-slate-500 dark:text-slate-400 font-mono text-[11px]">{tx.date}</td>
+                                  <td className="p-3 text-slate-500 dark:text-slate-400 font-bold">{tx.term}</td>
+                                  <td className="p-3">
+                                    <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider ${
+                                      tx.status === 'Successful' 
+                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                                        : tx.status === 'Pending'
+                                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                          : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                                    }`}>
+                                      {tx.status}
+                                    </span>
+                                  </td>
+                                  <td className="p-3 text-right">
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedLedgerTransaction(tx);
+                                      }}
+                                      className="p-1 rounded-md bg-slate-100 dark:bg-slate-950 text-slate-500 hover:text-emerald-600 hover:bg-emerald-500/10 border border-slate-200/40 dark:border-slate-800 transition-colors cursor-pointer"
+                                    >
+                                      <Receipt size={13} />
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Paystack Official Receipt Viewer Modal */}
+                {selectedLedgerTransaction && (() => {
+                  const tx = selectedLedgerTransaction;
+                  const std = students.find(s => s.id === tx.studentId);
+                  const classObj = classes.find(c => c.id === std?.classId);
+                  const paystackFee = tx.amountGHS * 0.0195 + 1.5;
+                  const netAmount = tx.amountGHS - paystackFee;
+
+                  return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+                      <div className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-scale-in transition-all ${
+                        isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+                      }`}>
+                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60">
+                          <div className="flex items-center space-x-2">
+                            <span className="p-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                              <Receipt size={16} />
+                            </span>
+                            <div>
+                              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-900 dark:text-white">Paystack Receipt</h3>
+                              <p className="text-[9px] text-slate-400 uppercase font-bold font-mono">ID: {tx.paystackRef}</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setSelectedLedgerTransaction(null)}
+                            className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+
+                        {/* Thermal invoice printout-style content */}
+                        <div className="mt-4 p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-medium">
+                          
+                          {/* Status Header */}
+                          <div className="text-center pb-4 border-b border-dashed border-slate-200 dark:border-slate-800">
+                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Payment Amount</span>
+                            <span className="text-3xl font-extrabold font-mono text-slate-900 dark:text-white">GHS {tx.amountGHS.toFixed(2)}</span>
+                            
+                            <span className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase mt-2 border ${
+                              tx.status === 'Successful'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                : tx.status === 'Pending'
+                                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                                  : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                tx.status === 'Successful' ? 'bg-emerald-500' : tx.status === 'Pending' ? 'bg-amber-500' : 'bg-rose-500'
+                              }`} />
+                              <span>{tx.status}</span>
+                            </span>
+                          </div>
+
+                          {/* Data Matrix */}
+                          <div className="py-4 space-y-2.5 text-xs border-b border-dashed border-slate-200 dark:border-slate-800">
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Receipt Reference</span>
+                              <span className="font-mono text-slate-900 dark:text-white font-extrabold">{tx.reference}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Payee Student</span>
+                              <span className="font-bold text-slate-900 dark:text-white">{tx.studentName} {std ? `(${std.id})` : ''}</span>
+                            </div>
+                            {classObj && (
+                              <div className="flex justify-between">
+                                <span className="text-slate-400 font-semibold uppercase text-[9px]">Student Class</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{classObj.name}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Parent Contact</span>
+                              <span className="text-slate-900 dark:text-white font-semibold">{tx.email}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Settlement Channel</span>
+                              <span className="font-bold text-slate-900 dark:text-white flex items-center space-x-1">
+                                {tx.paymentMethod === 'Card' ? <CreditCard size={11} /> : <Smartphone size={11} />}
+                                <span>{tx.paymentMethod}</span>
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Timestamp</span>
+                              <span className="text-slate-900 dark:text-white font-mono text-[11px]">{tx.date}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Academic Allocation</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{tx.term} Fees</span>
+                            </div>
+                          </div>
+
+                          {/* Gateway pricing matrix */}
+                          <div className="pt-4 space-y-1.5 text-xs">
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-slate-400 font-semibold">Gross Charged</span>
+                              <span className="font-bold text-slate-800 dark:text-slate-200">GHS {tx.amountGHS.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-[10px] text-slate-400">
+                              <span className="italic">Paystack Merchant Fee (1.95% + GHS 1.50)</span>
+                              <span>- GHS {paystackFee.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-xs font-bold pt-1.5 border-t border-slate-250 dark:border-slate-800">
+                              <span className="text-slate-500">School Net Revenue</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-mono font-black">GHS {netAmount.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Dispatch audit timeline */}
+                        <div className="mt-4 space-y-2">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Dispatch Audit Log</span>
+                          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5 border border-slate-100 dark:border-slate-900/60 font-semibold">
+                            <div className="flex items-center space-x-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span>Gateway verified & cleared at {tx.date}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span>PDF Tuition receipt dispatched to {tx.email} (Status: DELIVERED)</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span>Simulated SMS alert linked via Paystack payload webhook (Status: SENT)</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Interactive triggers */}
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between mt-4">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => alert(`DISPATCH SYSTEM: Spooling print output for transaction ${tx.reference}. Receipt queued to school network thermal printer GCB-04.`)}
+                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center space-x-1"
+                            >
+                              <Printer size={13} />
+                              <span>Print</span>
+                            </button>
+                            <button
+                              onClick={() => alert(`DISPATCH SYSTEM: Receipt document simulated PDF generated. Download reference: PSTK-RECEIPT-${tx.reference}.pdf`)}
+                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center space-x-1"
+                            >
+                              <Download size={13} />
+                              <span>PDF</span>
+                            </button>
+                          </div>
+                          
+                          <button
+                            onClick={() => {
+                              alert(`Receipt successfully resent to ${tx.email}. SMS broadcasted.`);
+                            }}
+                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer uppercase tracking-wider"
+                          >
+                            Resend Copy
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Simulate Paystack Payment Modal */}
+                {isSimulatePaymentModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+                    <div className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-scale-in ${
+                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                    }`}>
+                      <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                        <div className="flex items-center space-x-2">
+                          <Sparkles className="text-emerald-500 animate-spin" size={18} />
+                          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Simulate Paystack Deposit</h3>
+                        </div>
+                        <button
+                          onClick={() => setIsSimulatePaymentModalOpen(false)}
+                          className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSimulatePaystackPayment} className="space-y-4 mt-4 text-xs font-semibold font-sans">
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Select Student Payee</label>
+                          <select
+                            value={simStudentId}
+                            onChange={(e) => setSimStudentId(e.target.value)}
+                            required
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          >
+                            <option value="">-- Choose student payee --</option>
+                            {students.map(s => (
+                              <option key={s.id} value={s.id}>
+                                {s.name} (ID: {s.id}) — Outstanding: GHS {s.balanceGHS.toFixed(2)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Tuition Payment Amount (GHS)</label>
+                          <input
+                            type="number"
+                            required
+                            placeholder="e.g. 1200.00"
+                            value={simAmount}
+                            onChange={(e) => setSimAmount(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium font-mono"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Payment Channel</label>
+                            <select
+                              value={simMethod}
+                              onChange={(e) => setSimMethod(e.target.value as any)}
+                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                            >
+                              <option value="Card">Debit Card (Visa/Mastercard)</option>
+                              <option value="MTN Mobile Money">MTN Mobile Money</option>
+                              <option value="Telecel Cash">Telecel Cash</option>
+                              <option value="AirtelTigo Money">AirtelTigo Money</option>
+                              <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Academic Term</label>
+                            <select
+                              value={simTerm}
+                              onChange={(e) => setSimTerm(e.target.value as any)}
+                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                            >
+                              <option value="Term 1">Term 1 Fees</option>
+                              <option value="Term 2">Term 2 Fees</option>
+                              <option value="Term 3">Term 3 Fees</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Simulated Gate Status</label>
+                          <select
+                            value={simStatus}
+                            onChange={(e) => setSimStatus(e.target.value as any)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-bold"
+                          >
+                            <option value="Successful">Successful (Reconciles Balance & Dispatches Receipt)</option>
+                            <option value="Pending">Pending Verification (Leaves Balance Outstanding)</option>
+                            <option value="Failed">Failed (Logs Failure record on Ledger)</option>
+                          </select>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 flex justify-end space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsSimulatePaymentModalOpen(false)}
+                            className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-xs font-bold"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold cursor-pointer text-xs uppercase tracking-wider"
+                          >
+                            Inject Transaction
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
               </div>
-              <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full font-bold">
-                Cash Flow Analysis
-              </span>
-            </div>
-
-            <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyFeeCollections} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
-                    fontSize={10} 
-                    fontWeight="bold"
-                    tickLine={false} 
-                  />
-                  <YAxis 
-                    stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
-                    fontSize={10} 
-                    fontWeight="bold"
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(v) => `GHS ${v}`}
-                  />
-                  <Tooltip 
-                    cursor={{ fill: isDarkMode ? 'rgba(30, 41, 59, 0.4)' : 'rgba(241, 245, 249, 0.6)' }}
-                    contentStyle={{ 
-                      backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', 
-                      borderColor: isDarkMode ? '#1e293b' : '#e2e8f0', 
-                      borderRadius: '12px', 
-                      fontSize: '11px',
-                      color: isDarkMode ? '#f8fafc' : '#0f172a',
-                      fontWeight: 'bold',
-                      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-                    }}
-                    formatter={(value: any) => [`GHS ${Number(value).toLocaleString()}`, 'Collections']}
-                  />
-                  <Bar name="Collections" dataKey="Fee Collections (GHS)" fill="#10b981" radius={[4, 4, 0, 0]}>
-                    {
-                      monthlyFeeCollections.map((entry, index) => {
-                        const amount = entry['Fee Collections (GHS)'];
-                        const barColor = amount > 10000 ? '#059669' : '#10b981';
-                        return <Cell key={`cell-payments-tab-${index}`} fill={barColor} />;
-                      })
-                    }
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-600"></span> Peak Collection Volume (&gt;10,000 GHS)
-                <span className="w-2 h-2 rounded-full bg-emerald-400 ml-2"></span> Standard Collection Volume
-              </span>
-              <span>YTD Fee Revenue: GHS {monthlyFeeCollections.reduce((sum, item) => sum + item['Fee Collections (GHS)'], 0).toLocaleString()}</span>
-            </div>
-          </div>
-
-          {/* Historical Table */}
-          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
-            <div className="overflow-x-auto">
-              <table id="payments-history-table" className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
-                    <th className="p-3">Reference / Paystack ID</th>
-                    <th className="p-3">Student payee</th>
-                    <th className="p-3">Terminal Amount</th>
-                    <th className="p-3">Channel / Provider</th>
-                    <th className="p-3">Timestamp</th>
-                    <th className="p-3">Term</th>
-                    <th className="p-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {transactions.map((tx) => (
-                    <tr key={tx.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
-                      <td className="p-3">
-                        <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">{tx.reference}</p>
-                        <p className="text-[9px] font-mono text-slate-400 mt-0.5 leading-none">{tx.paystackRef}</p>
-                      </td>
-                      <td className="p-3">
-                        <p className="font-bold text-slate-800 dark:text-white leading-tight">{tx.studentName}</p>
-                        <p className="text-[10px] text-slate-400 leading-none mt-0.5">{tx.email}</p>
-                      </td>
-                      <td className="p-3 font-extrabold font-mono text-slate-900 dark:text-white">GHS {tx.amountGHS.toFixed(2)}</td>
-                      <td className="p-3">
-                        <span className="bg-slate-50 dark:bg-slate-950 px-2 py-0.5 rounded text-[10px] font-bold text-slate-500 border border-slate-100 dark:border-slate-800">
-                          {tx.paymentMethod}
-                        </span>
-                      </td>
-                      <td className="p-3 text-slate-500 dark:text-slate-400">{tx.date}</td>
-                      <td className="p-3 text-slate-500 dark:text-slate-400">{tx.term}</td>
-                      <td className="p-3">
-                        <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                          tx.status === 'Successful' 
-                            ? 'bg-emerald-500/10 text-emerald-600' 
-                            : tx.status === 'Pending'
-                              ? 'bg-amber-500/10 text-amber-600'
-                              : 'bg-rose-500/10 text-rose-600'
-                        }`}>
-                          {tx.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          </>
-          )}
+            );
+          })()}
 
           {/* ==================== PENDING VERIFICATION APPROVAL QUEUE ==================== */}
           {paymentsSubTab === 'pending-verification' && (() => {
@@ -4053,89 +4811,158 @@ export default function AdminDashboard({
                 }`}>
                   <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 border-b pb-2 mb-2">Configure Automated Recurrence Rules</h4>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-bold">
-                    <div>
-                      <label className="block text-[10px] text-slate-400 uppercase mb-1">Schedule Rule Name</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g., Weekly Outstanding Balance Audit"
-                        value={newPlanName}
-                        onChange={(e) => setNewPlanName(e.target.value)}
-                        className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
-                        }`}
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left Column - Input Fields */}
+                    <div className="lg:col-span-2 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-bold">
+                        <div>
+                          <label className="block text-[10px] text-slate-400 uppercase mb-1">Schedule Rule Name</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g., Weekly Outstanding Balance Audit"
+                            value={newPlanName}
+                            onChange={(e) => setNewPlanName(e.target.value)}
+                            className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                            }`}
+                          />
+                        </div>
 
-                    <div>
-                      <label className="block text-[10px] text-slate-400 uppercase mb-1">Audit Recurrence Frequency</label>
-                      <select
-                        value={newPlanFrequency}
-                        onChange={(e) => setNewPlanFrequency(e.target.value as any)}
-                        className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
-                        }`}
-                      >
-                        <option value="Daily">Daily Run</option>
-                        <option value="Weekly">Weekly Run</option>
-                        <option value="Bi-weekly">Bi-weekly Run</option>
-                        <option value="Monthly">Monthly Run</option>
-                      </select>
-                    </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-400 uppercase mb-1">Audit Recurrence Frequency</label>
+                          <select
+                            value={newPlanFrequency}
+                            onChange={(e) => setNewPlanFrequency(e.target.value as any)}
+                            className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                            }`}
+                          >
+                            <option value="Daily">Daily Run</option>
+                            <option value="Weekly">Weekly Run</option>
+                            <option value="Bi-weekly">Bi-weekly Run</option>
+                            <option value="Monthly">Monthly Run</option>
+                          </select>
+                        </div>
 
-                    <div>
-                      <label className="block text-[10px] text-slate-400 uppercase mb-1">Target Audience Segment</label>
-                      <select
-                        value={newPlanTarget}
-                        onChange={(e) => setNewPlanTarget(e.target.value)}
-                        className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
-                        }`}
-                      >
-                        <option value="AllOutstanding">All Pupils with Unpaid Balance</option>
-                        {classes.map(cl => (
-                          <option key={cl.id} value={cl.id}>Only {cl.name} Pupils</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-xs font-bold">
-                    <div>
-                      <label className="block text-[10px] text-slate-400 uppercase mb-1">Outgoing Email Subject</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="e.g. URGENT: Outstanding Tuition Fee Balance Notification"
-                        value={newPlanSubject}
-                        onChange={(e) => setNewPlanSubject(e.target.value)}
-                        className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
-                        }`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-xs font-bold">
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="block text-[10px] text-slate-400 uppercase">Email Template Body</label>
-                        <span className="text-[9px] font-mono text-slate-400 font-normal font-sans">Use tags: <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{parent_name}`}</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{student_name}`}</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{outstanding_balance}`}</code></span>
+                        <div>
+                          <label className="block text-[10px] text-slate-400 uppercase mb-1">Target Audience Segment</label>
+                          <select
+                            value={newPlanTarget}
+                            onChange={(e) => setNewPlanTarget(e.target.value)}
+                            className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                            }`}
+                          >
+                            <option value="AllOutstanding">All Pupils with Unpaid Balance</option>
+                            {classes.map(cl => (
+                              <option key={cl.id} value={cl.id}>Only {cl.name} Pupils</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                      <textarea
-                        rows={5}
-                        required
-                        value={newPlanTemplate}
-                        onChange={(e) => setNewPlanTemplate(e.target.value)}
-                        className={`w-full p-2.5 rounded-lg border text-xs leading-relaxed focus:outline-hidden focus:ring-1 focus:ring-emerald-500 font-mono ${
-                          isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
-                        }`}
-                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-xs font-bold">
+                        <div>
+                          <label className="block text-[10px] text-slate-400 uppercase mb-1">Outgoing Email Subject</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. URGENT: Outstanding Tuition Fee Balance Notification"
+                            value={newPlanSubject}
+                            onChange={(e) => setNewPlanSubject(e.target.value)}
+                            className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-xs font-bold">
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="block text-[10px] text-slate-400 uppercase">Email Template Body</label>
+                            <span className="text-[9px] font-mono text-slate-400 font-normal font-sans">Use tags: <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{parent_name}`}</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{student_name}`}</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{outstanding_balance}`}</code></span>
+                          </div>
+                          <textarea
+                            rows={6}
+                            required
+                            value={newPlanTemplate}
+                            onChange={(e) => setNewPlanTemplate(e.target.value)}
+                            className={`w-full p-2.5 rounded-lg border text-xs leading-relaxed focus:outline-hidden focus:ring-1 focus:ring-emerald-500 font-mono ${
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column - Live Preview & Audience Lists */}
+                    <div className="space-y-4">
+                      {/* Live Template Preview Card */}
+                      <div className={`p-4 rounded-xl border space-y-3 ${isDarkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-white border-slate-200 shadow-xs'}`}>
+                        <div className="flex items-center justify-between border-b pb-1.5 border-slate-200/50 dark:border-slate-800/80">
+                          <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center space-x-1">
+                            <Sparkles size={10} className="animate-pulse" />
+                            <span>Live Template Preview</span>
+                          </span>
+                          <span className="text-[8px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-bold uppercase">Sample Data</span>
+                        </div>
+                        
+                        <div className="space-y-1 text-xs">
+                          <div className="text-[10px] text-slate-400 font-mono"><span className="font-bold">To:</span> guardian_email@domain.com</div>
+                          <div className="text-[10px] text-slate-400 font-mono font-bold truncate"><span className="font-bold">Subject:</span> {newPlanSubject || '(No Subject specified)'}</div>
+                        </div>
+
+                        <div className={`p-3 rounded-lg border text-xs font-semibold leading-relaxed font-sans min-h-[140px] whitespace-pre-wrap ${
+                          isDarkMode ? 'bg-slate-950 text-slate-300 border-slate-850' : 'bg-slate-50 text-slate-700 border-slate-150 shadow-inner'
+                        }`}>
+                          {(() => {
+                            let body = newPlanTemplate || '';
+                            body = body.replace(/{parent_name}/g, 'Abena Osei');
+                            body = body.replace(/{student_name}/g, 'Kwame Osei');
+                            body = body.replace(/{outstanding_balance}/g, '680.00');
+                            return body || 'Begin typing template body...';
+                          })()}
+                        </div>
+                      </div>
+
+                      {/* Audience Segment Preview */}
+                      {(() => {
+                        let targetStudents = students.filter(s => s.balanceGHS > 0);
+                        if (newPlanTarget !== 'AllOutstanding') {
+                          targetStudents = targetStudents.filter(s => s.classId === newPlanTarget);
+                        }
+                        return (
+                          <div className={`p-4 rounded-xl border space-y-2 ${isDarkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-white border-slate-200 shadow-xs'}`}>
+                            <div className="flex justify-between items-center border-b pb-1">
+                              <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">
+                                Target Recipients ({targetStudents.length} pupils)
+                              </span>
+                              <span className="text-[8px] text-slate-400 font-mono">Current outstanding</span>
+                            </div>
+                            <div className="max-h-[130px] overflow-y-auto space-y-1.5 pr-1">
+                              {targetStudents.length === 0 ? (
+                                <div className="text-[10px] text-slate-400 italic font-semibold text-center py-4">No outstanding pupils in this segment</div>
+                              ) : (
+                                targetStudents.map(st => (
+                                  <div key={st.id} className="flex justify-between items-center text-[10px] py-0.5 font-semibold text-slate-600 dark:text-slate-400">
+                                    <div className="truncate max-w-[150px]">
+                                      <div className="text-slate-800 dark:text-white font-bold">{st.name}</div>
+                                      <div className="text-[9px] text-slate-400 font-normal">Guardian: {st.parentName}</div>
+                                    </div>
+                                    <span className="font-mono text-rose-500 font-bold">GHS {st.balanceGHS.toFixed(2)}</span>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
-                  <div className="flex justify-end space-x-2.5 pt-2">
+                  <div className="flex justify-end space-x-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/60">
                     <button
                       type="button"
                       onClick={() => setIsCreatePlanOpen(false)}
@@ -4147,9 +4974,10 @@ export default function AdminDashboard({
                     </button>
                     <button
                       type="submit"
-                      className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wide rounded-lg cursor-pointer shadow-xs"
+                      className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wide rounded-lg cursor-pointer shadow-xs flex items-center space-x-1.5"
                     >
-                      Save Scheduler Plan
+                      <Plus size={13} />
+                      <span>Save Scheduler Plan</span>
                     </button>
                   </div>
                 </form>
@@ -4220,13 +5048,22 @@ export default function AdminDashboard({
                                   </button>
                                 </td>
                                 <td className="p-3 text-right">
-                                  <button
-                                    onClick={() => handleDeletePlan(plan.id)}
-                                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded transition-colors cursor-pointer"
-                                    title="Delete Plan"
-                                  >
-                                    <Trash2 size={13} />
-                                  </button>
+                                  <div className="flex items-center justify-end space-x-1.5">
+                                    <button
+                                      onClick={() => handleRunSinglePlan(plan.id)}
+                                      className="p-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg transition-colors cursor-pointer"
+                                      title="Run Auditing Plan Now"
+                                    >
+                                      <Play size={12} className="fill-current" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeletePlan(plan.id)}
+                                      className="p-1.5 text-slate-400 hover:text-rose-650 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                                      title="Delete Plan"
+                                    >
+                                      <Trash2 size={13} />
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             );
@@ -4253,17 +5090,27 @@ export default function AdminDashboard({
                       </div>
                     ) : (
                       schedulerLogs.map(log => (
-                        <div key={log.id} className={`p-3 rounded-xl border space-y-2 text-xs font-semibold ${
-                          isDarkMode ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50/50 border-slate-150'
-                        }`}>
+                        <div 
+                          key={log.id} 
+                          onClick={() => setSelectedLogForModal(log)}
+                          className={`p-3 rounded-xl border space-y-2 text-xs font-semibold cursor-pointer transition-all hover:scale-[1.01] ${
+                            isDarkMode 
+                              ? 'bg-slate-950/40 border-slate-800 hover:bg-slate-900 hover:border-slate-700' 
+                              : 'bg-slate-50/50 border-slate-150 hover:bg-slate-100/70 hover:border-slate-300 hover:shadow-xs'
+                          }`}
+                          title="Click to view full dispatch audit trail"
+                        >
                           <div className="flex justify-between items-start">
-                            <span className="font-bold text-slate-800 dark:text-white leading-tight block truncate max-w-[150px]">{log.planName}</span>
-                            <span className="text-[9px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-black font-mono">SUCCESS</span>
+                            <span className="font-bold text-slate-800 dark:text-white leading-tight block truncate max-w-[140px]">{log.planName}</span>
+                            <div className="flex items-center space-x-1.5">
+                              <span className="text-[9px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-black font-mono">SUCCESS</span>
+                              <Eye size={11} className="text-slate-400" />
+                            </div>
                           </div>
 
                           <div className="text-[10px] text-slate-400 flex items-center justify-between font-mono">
                             <span>{log.runDate}</span>
-                            <span className="text-slate-500">{log.emailsSentCount} emails sent</span>
+                            <span className="text-slate-500 font-bold">{log.emailsSentCount} emails sent</span>
                           </div>
 
                           {log.recipientNames.length > 0 && (
@@ -6864,6 +7711,65 @@ export default function AdminDashboard({
           }}
           onUpdateSyllabusPlans={onUpdateSyllabusPlans}
         />
+      )}
+
+      {selectedLogForModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border animate-fade-in ${
+            isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
+            <div className="flex justify-between items-start border-b pb-3 mb-4">
+              <div>
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-black font-mono tracking-wider uppercase">Successful Execution Log</span>
+                <h4 className="font-extrabold text-sm uppercase tracking-wide mt-1">{selectedLogForModal.planName}</h4>
+              </div>
+              <button 
+                onClick={() => setSelectedLogForModal(null)} 
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs font-semibold">
+              <div className="grid grid-cols-2 gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
+                <div>
+                  <span className="text-[9px] text-slate-400 uppercase block">Execution Time</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-300">{selectedLogForModal.runDate}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] text-slate-400 uppercase block">Notified Guardians</span>
+                  <span className="font-mono text-emerald-500">{selectedLogForModal.emailsSentCount} emails dispatched</span>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-[9px] text-slate-400 uppercase block mb-1">Audit Trail Recipient List</span>
+                {selectedLogForModal.recipientNames.length === 0 ? (
+                  <div className="text-slate-400 italic text-[11px] py-4 text-center">No recipients were eligible for this run (all balances clear).</div>
+                ) : (
+                  <div className="max-h-[160px] overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-lg divide-y divide-slate-150 dark:divide-slate-800/60 p-2 space-y-1">
+                    {selectedLogForModal.recipientNames.map((name, i) => (
+                      <div key={i} className="flex justify-between items-center py-1 text-[11px]">
+                        <span className="text-slate-850 dark:text-slate-300">{name}</span>
+                        <span className="text-[9px] text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono">DELIVERED</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-3 border-t border-slate-150 dark:border-slate-800 flex justify-end">
+                <button
+                  onClick={() => setSelectedLogForModal(null)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs uppercase tracking-wide rounded-lg cursor-pointer"
+                >
+                  Close Log Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>
