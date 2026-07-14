@@ -4,12 +4,41 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { initializeApp } from "firebase/app";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
 dotenv.config();
 
 const DB_FILE = path.join(process.cwd(), "school-db.json");
 
-// Helper to load backend state
+// Initialize Firebase SDK using the provisioned client configuration
+let firestoreDb: any = null;
+
+try {
+  const firebaseConfigPath = path.join(process.cwd(), "firebase-applet-config.json");
+  if (fs.existsSync(firebaseConfigPath)) {
+    const config = JSON.parse(fs.readFileSync(firebaseConfigPath, "utf-8"));
+    const app = initializeApp({
+      apiKey: config.apiKey,
+      authDomain: config.authDomain,
+      projectId: config.projectId,
+      storageBucket: config.storageBucket,
+      messagingSenderId: config.messagingSenderId,
+      appId: config.appId
+    });
+    
+    if (config.firestoreDatabaseId) {
+      firestoreDb = getFirestore(app, config.firestoreDatabaseId);
+    } else {
+      firestoreDb = getFirestore(app);
+    }
+    console.log("Firebase initialized successfully in server.ts");
+  }
+} catch (e) {
+  console.error("Failed to initialize Firebase in server.ts:", e);
+}
+
+// Helper to load local fallback backend state
 function loadDatabase() {
   if (fs.existsSync(DB_FILE)) {
     try {
@@ -21,7 +50,7 @@ function loadDatabase() {
   return null;
 }
 
-// Helper to save backend state
+// Helper to save local fallback backend state
 function saveDatabase(data: any) {
   try {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
@@ -36,14 +65,44 @@ async function startServer() {
 
   app.use(express.json({ limit: '10mb' }));
 
-  // API Routes
-  app.get("/api/school-data", (req, res) => {
-    const db = loadDatabase();
+  // API Routes with real-time Cloud Firestore integration
+  app.get("/api/school-data", async (req, res) => {
+    let db = null;
+    if (firestoreDb) {
+      try {
+        const docRef = doc(firestoreDb, "school_data", "master_record");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          db = docSnap.data();
+          console.log("Database successfully loaded from Firestore!");
+        } else {
+          console.log("No master_record found in Firestore. Seeding database from fallback file...");
+        }
+      } catch (err) {
+        console.error("Error loading database from Firestore:", err);
+      }
+    }
+    
+    if (!db) {
+      db = loadDatabase();
+    }
+    
     res.json({ status: "success", data: db });
   });
 
-  app.post("/api/school-data", (req, res) => {
+  app.post("/api/school-data", async (req, res) => {
     const data = req.body;
+    
+    if (firestoreDb) {
+      try {
+        const docRef = doc(firestoreDb, "school_data", "master_record");
+        await setDoc(docRef, data);
+        console.log("Database successfully saved to Firestore!");
+      } catch (err) {
+        console.error("Error saving database to Firestore:", err);
+      }
+    }
+    
     saveDatabase(data);
     res.json({ status: "success" });
   });

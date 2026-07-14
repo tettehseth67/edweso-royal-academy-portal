@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Allow read/write for the master school records
+    match /school_data/{documentId} {
+      allow read, write: if true;
+    }
+  }
+}

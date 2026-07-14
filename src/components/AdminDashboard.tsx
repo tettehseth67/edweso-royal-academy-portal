@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Users, UserCheck, BookOpen, CheckSquare, Award, 
   Calendar, Megaphone, CreditCard, Search, Plus, 
   Trash2, Edit, Check, AlertTriangle, Eye, RefreshCw, Filter, ShieldCheck, Download,
   ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer, Cake, Gift,
-  Lock, Building, HelpCircle, Info, Smartphone, FileText, Receipt, Play, Send, Sparkles
+  Lock, Building, HelpCircle, Info, Smartphone, FileText, Receipt, Play, Send, Sparkles, Camera
 } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, 
@@ -1128,6 +1128,82 @@ export default function AdminDashboard({
     profilePhoto: undefined as string | undefined
   });
 
+  // Student Camera State
+  const [isStudentCameraActive, setIsStudentCameraActive] = useState(false);
+  const [studentCameraStream, setStudentCameraStream] = useState<MediaStream | null>(null);
+  const [studentCameraError, setStudentCameraError] = useState('');
+  const studentVideoRef = useRef<HTMLVideoElement | null>(null);
+  const studentCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Synchronize student camera stream with video element
+  useEffect(() => {
+    if (isStudentCameraActive && studentCameraStream && studentVideoRef.current) {
+      studentVideoRef.current.srcObject = studentCameraStream;
+      studentVideoRef.current.play().catch(err => {
+        console.error("Error playing student video stream:", err);
+      });
+    }
+  }, [isStudentCameraActive, studentCameraStream]);
+
+  const startStudentCamera = async () => {
+    setStudentCameraError('');
+    setIsStudentCameraActive(true);
+    try {
+      const constraints = {
+        video: {
+          width: { ideal: 480 },
+          height: { ideal: 480 },
+          facingMode: 'user'
+        }
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      setStudentCameraStream(stream);
+    } catch (err) {
+      console.error('Camera access error:', err);
+      setStudentCameraError('Failed to access camera. Please check permissions or ensure a camera is connected.');
+    }
+  };
+
+  const stopStudentCamera = () => {
+    if (studentCameraStream) {
+      studentCameraStream.getTracks().forEach(track => track.stop());
+      setStudentCameraStream(null);
+    }
+    setIsStudentCameraActive(false);
+  };
+
+  const captureStudentPhoto = () => {
+    if (studentVideoRef.current && studentCanvasRef.current) {
+      const video = studentVideoRef.current;
+      const canvas = studentCanvasRef.current;
+      const context = canvas.getContext('2d');
+      if (context) {
+        const size = Math.min(video.videoWidth, video.videoHeight);
+        canvas.width = size;
+        canvas.height = size;
+        
+        // Center crop
+        const startX = (video.videoWidth - size) / 2;
+        const startY = (video.videoHeight - size) / 2;
+        
+        context.drawImage(video, startX, startY, size, size, 0, 0, size, size);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setStudentForm(prev => ({ ...prev, profilePhoto: dataUrl }));
+        stopStudentCamera();
+      }
+    }
+  };
+
+  const closeStudentModal = () => {
+    setIsStudentModalOpen(false);
+    if (studentCameraStream) {
+      studentCameraStream.getTracks().forEach(track => track.stop());
+      setStudentCameraStream(null);
+    }
+    setIsStudentCameraActive(false);
+    setStudentCameraError('');
+  };
+
   // Add/Edit Teacher Modal State
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
@@ -1406,7 +1482,7 @@ export default function AdminDashboard({
       };
       onUpdateStudents([...students, newStudent]);
     }
-    setIsStudentModalOpen(false);
+    closeStudentModal();
   };
 
   const handleDeleteStudent = (id: string) => {
@@ -6795,6 +6871,23 @@ export default function AdminDashboard({
                         }}
                       />
                     </label>
+
+                    <button
+                      type="button"
+                      id="student-camera-btn"
+                      onClick={() => {
+                        if (isStudentCameraActive) {
+                          stopStudentCamera();
+                        } else {
+                          startStudentCamera();
+                        }
+                      }}
+                      className="px-2 py-1 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors shadow-xs flex items-center gap-1"
+                    >
+                      <Camera size={12} className={isStudentCameraActive ? "text-emerald-500 animate-pulse" : "text-slate-400"} />
+                      <span>{isStudentCameraActive ? "Stop Camera" : "Take Photo"}</span>
+                    </button>
+
                     {studentForm.profilePhoto && (
                       <button
                         type="button"
@@ -6807,6 +6900,62 @@ export default function AdminDashboard({
                   </div>
                 </div>
               </div>
+
+              {/* Student Camera Viewfinder UI */}
+              {isStudentCameraActive && (
+                <div className="p-3 rounded-lg border border-emerald-500/30 bg-emerald-50/50 dark:bg-slate-950/60 space-y-3 animate-fade-in">
+                  <p className="font-bold text-[10px] text-emerald-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
+                    Live Camera Feed
+                  </p>
+                  
+                  {studentCameraError ? (
+                    <div className="text-rose-500 text-[10px] font-semibold bg-rose-500/10 p-2 rounded border border-rose-500/20">
+                      {studentCameraError}
+                    </div>
+                  ) : (
+                    <div className="relative aspect-square w-full max-w-[200px] mx-auto bg-slate-950 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner">
+                      <video
+                        ref={studentVideoRef}
+                        className="w-full h-full object-cover scale-x-[-1]"
+                        playsInline
+                        muted
+                      />
+                      {/* Grid / Target scan lines */}
+                      <div className="absolute inset-4 border border-emerald-500/20 rounded-full pointer-events-none">
+                        <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-emerald-400"></div>
+                        <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-emerald-400"></div>
+                        <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-emerald-400"></div>
+                        <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-emerald-400"></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 justify-center">
+                    {!studentCameraError && (
+                      <button
+                        type="button"
+                        id="student-capture-btn"
+                        onClick={captureStudentPhoto}
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider rounded transition-all active:scale-95 shadow-sm"
+                      >
+                        Capture Portrait
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      id="student-stop-camera-btn"
+                      onClick={stopStudentCamera}
+                      className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wider rounded transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  
+                  {/* Hidden Canvas used for grabbing high-quality frames */}
+                  <canvas ref={studentCanvasRef} className="hidden" />
+                </div>
+              )}
 
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Full Pupil Name</label>
@@ -6928,7 +7077,7 @@ export default function AdminDashboard({
                 <button
                   type="button"
                   id="student-cancel-btn"
-                  onClick={() => setIsStudentModalOpen(false)}
+                  onClick={closeStudentModal}
                   className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded text-xs transition-colors"
                 >
                   Cancel

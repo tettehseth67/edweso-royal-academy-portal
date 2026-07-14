@@ -469,7 +469,16 @@ export class SchoolDatabase {
       { id: 'act-6', type: 'grade' as const, user: 'Miss Abena Osei', details: 'Term III Social Studies grades approved and released', timestamp: '4 hours ago' },
       { id: 'act-7', type: 'login' as const, user: 'Student (Emmanuel Tetteh)', details: 'Logged in to student terminal to view grades', timestamp: '6 hours ago' },
     ];
-    return getStored<any[]>('SYSTEM_ACTIVITIES', defaultActivities);
+    const loaded = getStored<any[]>('SYSTEM_ACTIVITIES', defaultActivities);
+    const seenIds = new Set<string>();
+    return loaded.map((item, idx) => {
+      let uniqueId = item.id;
+      if (!uniqueId || seenIds.has(uniqueId)) {
+        uniqueId = `${uniqueId || 'act'}-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000000)}`;
+      }
+      seenIds.add(uniqueId);
+      return { ...item, id: uniqueId };
+    });
   }
 
   static saveSystemActivities(activities: any[]): void {
@@ -479,7 +488,7 @@ export class SchoolDatabase {
   static addSystemActivity(type: 'login' | 'grade' | 'attendance', user: string, details: string): void {
     const current = this.getSystemActivities();
     const newActivity = {
-      id: 'act-' + Date.now(),
+      id: 'act-' + Date.now() + '-' + Math.floor(Math.random() * 1000000),
       type,
       user,
       details,
