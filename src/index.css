@@ -5,6 +5,18 @@
   --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --animate-scan-line: scan-line 3.5s linear infinite;
+  --animate-bounce-short: bounce-short 1s ease-in-out infinite;
+
+  @keyframes scan-line {
+    0%, 100% { top: 0%; }
+    50% { top: 100%; }
+  }
+  @keyframes bounce-short {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
 }
 
 /* ==================== EYE CARE & ACCESSIBILITY HELPER CLASSES ==================== */

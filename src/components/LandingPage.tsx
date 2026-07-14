@@ -14,12 +14,16 @@ import {
   SchoolHistory, MissionVision, Leadership, SchoolPolicies, 
   GalleryView, NewsEvents, FAQView, PrivacyPolicy, TermsConditions 
 } from './FooterPages';
+import FeesEstimatorView from './FeesEstimatorView';
+import GESSyllabusView from './GESSyllabusView';
+import ClubsSportsView from './ClubsSportsView';
+import AlumniHubView from './AlumniHubView';
 
 interface LandingPageProps {
   onNavigateToLogin: (role?: 'admin' | 'teacher' | 'student' | 'parent') => void;
 }
 
-type ActivePage = 'home' | 'about' | 'academics' | 'admissions' | 'contact' | 'careers' | 'parent-resources' | 'history' | 'mission-vision' | 'leadership' | 'fees-plan' | 'gallery' | 'news' | 'faq' | 'policies' | 'privacy' | 'terms';
+type ActivePage = 'home' | 'about' | 'academics' | 'admissions' | 'contact' | 'careers' | 'parent-resources' | 'history' | 'mission-vision' | 'leadership' | 'fees-plan' | 'gallery' | 'news' | 'faq' | 'policies' | 'privacy' | 'terms' | 'clubs-sports' | 'fees-estimator' | 'ges-syllabus' | 'alumni-hub';
 
 export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
   const [activePage, setActivePage] = useState<ActivePage>('home');
@@ -361,13 +365,13 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
           </button>
           <button 
             onClick={() => setActivePage('admissions')}
-            className={`px-2 py-1 rounded ${activePage === 'admissions' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
+            className={`px-2 py-1 rounded shrink-0 ${activePage === 'admissions' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
           >
             Admissions
           </button>
           <button 
             onClick={() => setActivePage('contact')}
-            className={`px-2 py-1 rounded ${activePage === 'contact' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
+            className={`px-2 py-1 rounded shrink-0 ${activePage === 'contact' ? 'bg-emerald-50 text-emerald-800 font-extrabold' : ''}`}
           >
             Contact
           </button>
@@ -1859,6 +1863,30 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
           </div>
         )}
 
+        {activePage === 'fees-estimator' && (
+          <div className="bg-slate-50 dark:bg-slate-950 py-12">
+            <FeesEstimatorView />
+          </div>
+        )}
+
+        {activePage === 'ges-syllabus' && (
+          <div className="bg-white dark:bg-slate-950 py-12">
+            <GESSyllabusView />
+          </div>
+        )}
+
+        {activePage === 'clubs-sports' && (
+          <div className="bg-white dark:bg-slate-950 py-12">
+            <ClubsSportsView />
+          </div>
+        )}
+
+        {activePage === 'alumni-hub' && (
+          <div className="bg-white dark:bg-slate-950 py-12">
+            <AlumniHubView />
+          </div>
+        )}
+
       </div>
 
       {/* ==================== FOOTER AND DIRECT COORDINATES ==================== */}
@@ -1971,6 +1999,18 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                 >
                   Careers at ERA
                 </button>
+                <button 
+                  onClick={() => { setActivePage('clubs-sports'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="text-left hover:text-emerald-400 transition-colors cursor-pointer text-emerald-400 font-extrabold"
+                >
+                  Clubs & Athletics
+                </button>
+                <button 
+                  onClick={() => { setActivePage('alumni-hub'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="text-left hover:text-emerald-400 transition-colors cursor-pointer text-indigo-400 font-extrabold"
+                >
+                  Alumni Portal
+                </button>
               </div>
             </div>
 
@@ -2026,6 +2066,18 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                   className="text-left hover:text-emerald-400 transition-colors cursor-pointer text-amber-400 font-extrabold flex items-center gap-1"
                 >
                   <span>School Fees Code</span>
+                </button>
+                <button 
+                  onClick={() => { setActivePage('fees-estimator'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="text-left hover:text-emerald-400 transition-colors cursor-pointer text-amber-500 font-extrabold"
+                >
+                  Tuition Cost Estimator
+                </button>
+                <button 
+                  onClick={() => { setActivePage('ges-syllabus'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="text-left hover:text-emerald-400 transition-colors cursor-pointer text-emerald-400 font-extrabold"
+                >
+                  GES Syllabus Guide
                 </button>
                 <button 
                   onClick={() => onNavigateToLogin('parent')}

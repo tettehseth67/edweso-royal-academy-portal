@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ShieldCheck, UserCheck, GraduationCap, Mail, Lock, User, Phone, ArrowLeft, Info, HelpCircle } from 'lucide-react';
+import { ShieldCheck, UserCheck, GraduationCap, Mail, Lock, User, Phone, ArrowLeft, Info, HelpCircle, ScanFace } from 'lucide-react';
 import { UserRole, UserSession } from '../types';
+import BiometricLoginModal from './BiometricLoginModal';
 
 interface AuthPageProps {
   onLoginSuccess: (session: UserSession) => void;
@@ -17,6 +18,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [loginError, setLoginError] = useState('');
+  const [showBiometricModal, setShowBiometricModal] = useState(false);
 
   // Register Form States
   const [regName, setRegName] = useState('');
@@ -279,6 +281,25 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 >
                   Enter Administrative Console
                 </button>
+
+                {(selectedRole === 'admin' || selectedRole === 'teacher') && (
+                  <div className="space-y-4 pt-1">
+                    <div className="relative flex py-1 items-center">
+                      <div className="flex-grow border-t border-slate-800"></div>
+                      <span className="flex-shrink mx-4 text-slate-500 text-[10px] uppercase font-bold tracking-widest">or secure scan</span>
+                      <div className="flex-grow border-t border-slate-800"></div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowBiometricModal(true)}
+                      className="w-full py-2.5 bg-slate-950 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/25 hover:border-emerald-500/50 rounded-lg text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-lg hover:shadow-emerald-500/5 active:scale-98"
+                    >
+                      <ScanFace size={15} className="animate-pulse text-emerald-500" />
+                      <span>Scan Face to Authenticate</span>
+                    </button>
+                  </div>
+                )}
               </form>
 
               {/* Interactive Quick Autofill Suggestion box */}
@@ -506,6 +527,16 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
         </div>
 
       </div>
+
+      <BiometricLoginModal
+        isOpen={showBiometricModal}
+        onClose={() => setShowBiometricModal(false)}
+        selectedRole={(selectedRole === 'admin' || selectedRole === 'teacher') ? selectedRole : 'teacher'}
+        onSuccess={(session) => {
+          setShowBiometricModal(false);
+          onLoginSuccess(session);
+        }}
+      />
     </div>
   );
 }
