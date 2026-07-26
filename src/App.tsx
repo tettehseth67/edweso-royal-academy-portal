@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X, Eye, Accessibility, Type, Check, ZoomIn, ZoomOut } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, CheckSquare, Trash2, X, Eye, Accessibility, Type, Check, ZoomIn, ZoomOut, Sliders, Volume2, Sun, Moon } from 'lucide-react';
 import { UserRole, UserSession, Student, Teacher, SchoolClass, Subject, Attendance, ExamGrade, TimetableEntry, Announcement, PaymentTransaction, SimulatedEmail, SimulatedSMS, ClassNote, SyllabusPlan, TeacherAbsence, CoverAssignment, HomeworkAssignment, HomeworkSubmission, StaffClockIn, StaffPayroll, StaffLeaveRequest, PaymentSchedulerPlan, PaymentSchedulerRunLog, RoleAccessibilityConfig, RoleAccessibilityPreferences } from './types';
 import { SchoolDatabase } from './mockData';
 
@@ -39,8 +39,23 @@ export default function App() {
   const [visionFilter, setVisionFilter] = useState<string>(() => {
     return localStorage.getItem('accessibility_vision_filter') || 'none';
   });
+  const [blueLightFilter, setBlueLightFilter] = useState<boolean>(() => {
+    return localStorage.getItem('accessibility_blue_light') === 'true';
+  });
+  const [screenDimmer, setScreenDimmer] = useState<number>(() => {
+    const saved = localStorage.getItem('accessibility_screen_dimmer');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [narratorSpeed, setNarratorSpeed] = useState<number>(() => {
+    const saved = localStorage.getItem('accessibility_narrator_speed');
+    return saved ? parseFloat(saved) : 1.0;
+  });
   const [rulerY, setRulerY] = useState<number>(0);
   const [isAccessMenuOpen, setIsAccessMenuOpen] = useState<boolean>(false);
+
+  const handleToggleAccessibility = () => {
+    setIsAccessMenuOpen(prev => !prev);
+  };
 
   useEffect(() => {
     const html = document.documentElement;
@@ -91,13 +106,26 @@ export default function App() {
     html.classList.remove(
       'accessibility-filter-monochrome',
       'accessibility-filter-contrast-boost',
-      'accessibility-filter-deuteranopia'
+      'accessibility-filter-deuteranopia',
+      'accessibility-filter-tritanopia'
     );
     if (visionFilter !== 'none') {
       html.classList.add(`accessibility-filter-${visionFilter}`);
     }
     localStorage.setItem('accessibility_vision_filter', visionFilter);
   }, [visionFilter]);
+
+  useEffect(() => {
+    localStorage.setItem('accessibility_blue_light', String(blueLightFilter));
+  }, [blueLightFilter]);
+
+  useEffect(() => {
+    localStorage.setItem('accessibility_screen_dimmer', String(screenDimmer));
+  }, [screenDimmer]);
+
+  useEffect(() => {
+    localStorage.setItem('accessibility_narrator_speed', String(narratorSpeed));
+  }, [narratorSpeed]);
 
   // Click to Speak Narration Engine
   useEffect(() => {
@@ -124,7 +152,7 @@ export default function App() {
         window.speechSynthesis.cancel();
         
         const utterance = new SpeechSynthesisUtterance(textToSpeak.trim().substring(0, 350));
-        utterance.rate = 0.95; // Slightly slower, highly clear rate for easy hearing
+        utterance.rate = narratorSpeed; // Dynamically set speed!
         window.speechSynthesis.speak(utterance);
       }
     };
@@ -133,7 +161,7 @@ export default function App() {
     return () => {
       window.removeEventListener('click', handleTextClick, true);
     };
-  }, [speakOnClick]);
+  }, [speakOnClick, narratorSpeed]);
 
   // Reading Ruler Mouse Tracker
   useEffect(() => {
@@ -179,9 +207,11 @@ export default function App() {
   // Selected role for pre-configuring Auth Page
   const [authPageInitialRole, setAuthPageInitialRole] = useState<UserRole>('student');
 
-  // Light/Dark Mode State - Locked to professional light mode
-  const isDarkMode = false;
-  const setIsDarkMode = (val: boolean) => {};
+  // Light/Dark Mode State
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('era_dark_mode');
+    return saved ? JSON.parse(saved) : false;
+  });
 
   // Global Confirmation Modal State
   const [globalConfirm, setGlobalConfirm] = useState<{
@@ -225,10 +255,11 @@ export default function App() {
   const [schedulerPlans, setSchedulerPlans] = useState<PaymentSchedulerPlan[]>([]);
   const [schedulerLogs, setSchedulerLogs] = useState<PaymentSchedulerRunLog[]>([]);
   const [roleAccessibility, setRoleAccessibility] = useState<RoleAccessibilityPreferences>({
-    admin: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
-    teacher: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
-    student: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
-    parent: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' }
+    super_admin: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 },
+    admin: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 },
+    teacher: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 },
+    student: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 },
+    parent: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 }
   });
 
   // Helper to save database state to Node.js backend
@@ -508,10 +539,15 @@ export default function App() {
       if (rolePrefs.giantCursor !== undefined) setGiantCursor(rolePrefs.giantCursor);
       if (rolePrefs.readingRuler !== undefined) setReadingRuler(rolePrefs.readingRuler);
       if (rolePrefs.visionFilter) setVisionFilter(rolePrefs.visionFilter);
+      if (rolePrefs.blueLightFilter !== undefined) setBlueLightFilter(rolePrefs.blueLightFilter);
+      if (rolePrefs.screenDimmer !== undefined) setScreenDimmer(rolePrefs.screenDimmer);
+      if (rolePrefs.narratorSpeed !== undefined) setNarratorSpeed(rolePrefs.narratorSpeed);
     }
     
     // Set default tab based on logged-in role
-    if (userSession.role === 'admin') {
+    if (userSession.role === 'super_admin') {
+      setActiveTab('founder-governance');
+    } else if (userSession.role === 'admin') {
       setActiveTab('overview');
     } else if (userSession.role === 'teacher') {
       setActiveTab('profile');
@@ -535,7 +571,10 @@ export default function App() {
        currentPrefs.speakOnClick !== speakOnClick ||
        currentPrefs.giantCursor !== giantCursor ||
        currentPrefs.readingRuler !== readingRuler ||
-       currentPrefs.visionFilter !== visionFilter)
+       currentPrefs.visionFilter !== visionFilter ||
+       currentPrefs.blueLightFilter !== blueLightFilter ||
+       currentPrefs.screenDimmer !== screenDimmer ||
+       currentPrefs.narratorSpeed !== narratorSpeed)
     ) {
       const updatedConfig: RoleAccessibilityConfig = {
         fontSizeScale,
@@ -544,7 +583,10 @@ export default function App() {
         speakOnClick,
         giantCursor,
         readingRuler,
-        visionFilter
+        visionFilter,
+        blueLightFilter,
+        screenDimmer,
+        narratorSpeed
       };
       
       const updatedPrefs: RoleAccessibilityPreferences = {
@@ -556,7 +598,7 @@ export default function App() {
       SchoolDatabase.saveRoleAccessibility(updatedPrefs);
       syncAndSave({ roleAccessibility: updatedPrefs });
     }
-  }, [fontSizeScale, highContrast, dyslexicFont, speakOnClick, giantCursor, readingRuler, visionFilter, session, roleAccessibility]);
+  }, [fontSizeScale, highContrast, dyslexicFont, speakOnClick, giantCursor, readingRuler, visionFilter, blueLightFilter, screenDimmer, narratorSpeed, session, roleAccessibility]);
 
   const handleLogout = () => {
     setSession(null);
@@ -569,7 +611,9 @@ export default function App() {
   };
 
   const handleToggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('era_dark_mode', JSON.stringify(newMode));
   };
 
   // State sync wrapper functions (automatically updates React state + LocalStorage + Backend REST DB)
@@ -1041,7 +1085,10 @@ Principal Signoff: Approved
   return (
     <div className={isDarkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}>
       {page === 'landing' && (
-        <LandingPage onNavigateToLogin={handleNavigateToLogin} />
+        <LandingPage 
+          onNavigateToLogin={handleNavigateToLogin} 
+          onToggleAccessibility={handleToggleAccessibility}
+        />
       )}
 
       {page === 'auth' && (
@@ -1061,8 +1108,9 @@ Principal Signoff: Approved
           isDarkMode={isDarkMode}
           onToggleTheme={handleToggleTheme}
           onStartTour={() => setIsTourOpen(true)}
+          onToggleAccessibility={handleToggleAccessibility}
         >
-          {session.role === 'admin' && (
+          {(session.role === 'super_admin' || session.role === 'admin') && (
             <AdminDashboard
               activeTab={activeTab}
               students={students}
@@ -1290,23 +1338,40 @@ Principal Signoff: Approved
         />
       )}
 
+      {/* ==================== SCREEN DIMMER OVERLAY ==================== */}
+      {screenDimmer > 0 && (
+        <div 
+          className="pointer-events-none fixed inset-0 z-[999998] bg-black transition-all duration-150" 
+          style={{ opacity: (screenDimmer / 100) * 0.7 }}
+        />
+      )}
+
+      {/* ==================== BLUE LIGHT FILTER (AMBER TINT) OVERLAY ==================== */}
+      {blueLightFilter && (
+        <div 
+          className="pointer-events-none fixed inset-0 z-[999999] bg-[#ff8000]/6 dark:bg-[#ff8000]/4 transition-all duration-300" 
+        />
+      )}
+
       {/* ==================== GLOBAL ACCESSIBILITY & EYE CARE PANEL ==================== */}
       <div className="fixed bottom-6 left-6 z-[9999] flex flex-col items-start font-sans" id="global-accessibility-panel">
         {/* Floating Toggle Button */}
         <button
           onClick={() => setIsAccessMenuOpen(!isAccessMenuOpen)}
-          className={`flex items-center space-x-2.5 px-4 py-3 rounded-full shadow-2xl transition-all border transform hover:scale-105 active:scale-95 cursor-pointer ${
+          className={`flex items-center space-x-2.5 px-4.5 py-3 rounded-full shadow-2xl transition-all border transform hover:scale-105 active:scale-95 cursor-pointer ${
             isAccessMenuOpen 
               ? 'bg-emerald-800 border-emerald-600 text-white' 
-              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+              : isDarkMode
+                ? 'bg-slate-900 border-slate-800 text-slate-100 hover:bg-slate-800'
+                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
           style={{ boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.15)' }}
           title="Accessibility & Eye Care Adjustments"
           id="global-accessibility-trigger-btn"
         >
           <Accessibility size={18} className={isAccessMenuOpen ? 'animate-spin' : 'animate-pulse text-emerald-600'} />
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">Eye Care Suite</span>
-          {(fontSizeScale !== 'normal' || highContrast || dyslexicFont || speakOnClick || giantCursor || readingRuler || visionFilter !== 'none') && (
+          <span className={`text-[10px] font-black uppercase tracking-wider ${isDarkMode ? 'text-slate-100' : 'text-slate-700'}`}>Eye Care Suite</span>
+          {(fontSizeScale !== 'normal' || highContrast || dyslexicFont || speakOnClick || giantCursor || readingRuler || visionFilter !== 'none' || blueLightFilter || screenDimmer > 0 || narratorSpeed !== 1.0) && (
             <span className="w-2.5 h-2.5 rounded-full bg-amber-500 border-2 border-white animate-bounce" />
           )}
         </button>
@@ -1318,13 +1383,15 @@ Principal Signoff: Approved
             <div className="fixed inset-0 z-40" onClick={() => setIsAccessMenuOpen(false)} />
             
             <div 
-              className="absolute bottom-16 left-0 w-85 bg-white border border-slate-200 rounded-2xl shadow-2xl p-5 z-50 text-slate-800 animate-slide-in-bottom text-left"
+              className={`absolute bottom-16 left-0 w-96 border rounded-2xl shadow-2xl p-5 z-50 animate-slide-in-bottom text-left ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
+              }`}
               style={{ boxShadow: '0 20px 35px -5px rgba(0, 0, 0, 0.2), 0 10px 15px -10px rgba(0, 0, 0, 0.2)' }}
             >
               {/* Header */}
-              <div className="flex justify-between items-start pb-3 border-b border-slate-100 mb-4">
+              <div className={`flex justify-between items-start pb-3 border-b mb-4 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                 <div>
-                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 flex items-center space-x-1.5">
+                  <h4 className="text-xs font-black uppercase tracking-widest flex items-center space-x-1.5 text-slate-900 dark:text-white">
                     <Eye size={14} className="text-emerald-600 animate-pulse" />
                     <span>Eye Care & Accessibility Suite</span>
                   </h4>
@@ -1332,26 +1399,29 @@ Principal Signoff: Approved
                   {session && (
                     <div className="mt-1 flex items-center space-x-1.5 text-[9px] text-emerald-600 dark:text-emerald-500 font-bold font-mono bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-900/30 w-fit">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <span>Saved in database per role: {session.role.toUpperCase()}</span>
+                      <span>Saved per role: {session.role.toUpperCase()}</span>
                     </div>
                   )}
                 </div>
                 <button 
                   onClick={() => setIsAccessMenuOpen(false)}
-                  className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  className={`p-1 rounded-lg transition-colors cursor-pointer ${isDarkMode ? 'hover:bg-slate-800 text-slate-500 hover:text-slate-300' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600'}`}
                 >
                   <X size={15} />
                 </button>
               </div>
 
               {/* Settings Body */}
-              <div className="space-y-3.5 text-xs font-semibold max-h-[380px] overflow-y-auto pr-1">
+              <div className="space-y-4 text-xs font-semibold max-h-[420px] overflow-y-auto pr-1">
                 
                 {/* 1. Font Size Adjustments */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold">Website Text Scale</span>
-                    <span className="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-black">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold flex items-center space-x-1">
+                      <Type size={11} className="text-slate-400" />
+                      <span>Website Text Scale</span>
+                    </span>
+                    <span className="text-[9px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded font-black border border-emerald-100/20">
                       {fontSizeScale === 'normal' && '100% (Regular)'}
                       {fontSizeScale === 'large' && '115% (Large)'}
                       {fontSizeScale === 'xl' && '130% (Extra Large)'}
@@ -1364,7 +1434,9 @@ Principal Signoff: Approved
                       className={`py-2 rounded-xl text-[10px] font-extrabold border transition-all cursor-pointer ${
                         fontSizeScale === 'normal'
                           ? 'bg-emerald-700 border-emerald-700 text-white shadow-sm'
-                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                     >
                       A- (100%)
@@ -1374,7 +1446,9 @@ Principal Signoff: Approved
                       className={`py-2 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
                         fontSizeScale === 'large'
                           ? 'bg-emerald-700 border-emerald-700 text-white shadow-sm'
-                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                       title="Recommended Default Scale"
                     >
@@ -1385,7 +1459,9 @@ Principal Signoff: Approved
                       className={`py-2 rounded-xl text-sm font-extrabold border transition-all cursor-pointer ${
                         fontSizeScale === 'xl'
                           ? 'bg-emerald-700 border-emerald-700 text-white shadow-sm'
-                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                     >
                       A+ (130%)
@@ -1395,7 +1471,9 @@ Principal Signoff: Approved
                       className={`py-2 rounded-xl text-base font-extrabold border transition-all cursor-pointer ${
                         fontSizeScale === 'xxl'
                           ? 'bg-emerald-700 border-emerald-700 text-white shadow-sm'
-                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                     >
                       A++ (145%)
@@ -1403,28 +1481,79 @@ Principal Signoff: Approved
                   </div>
                 </div>
 
-                {/* 2. Text to Speech (Audio Narrator) */}
-                <div className="pt-2 border-t border-slate-100">
+                {/* 2. Premium Screen Dimmer Overlay Slider */}
+                <div className={`pt-2.5 border-t space-y-1.5 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold flex items-center space-x-1">
+                      <Sun size={11} className="text-slate-400" />
+                      <span>Night Screen Dimmer</span>
+                    </span>
+                    <span className="text-[9px] bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded font-black border border-amber-100/20">
+                      {screenDimmer === 0 ? 'OFF' : `${screenDimmer}% Dim`}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3 bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl border border-slate-150 dark:border-slate-800/80">
+                    <Sun size={14} className="text-slate-400 shrink-0" />
+                    <input
+                      type="range"
+                      min="0"
+                      max="70"
+                      step="5"
+                      value={screenDimmer}
+                      onChange={(e) => setScreenDimmer(parseInt(e.target.value, 10))}
+                      className="w-full accent-emerald-600 h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <Moon size={14} className="text-slate-500 shrink-0" />
+                  </div>
+                </div>
+
+                {/* 3. Blue Light Warm Tint Toggle */}
+                <div className={`pt-2.5 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Click-to-Speak Narrator</span>
-                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Click any text to hear it spoken aloud</span>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold flex items-center space-x-1">
+                        <span className="inline-block w-2.5 h-2.5 bg-amber-500 rounded-full shrink-0" />
+                        <span>Blue Light Filter</span>
+                      </span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Warm amber tint to reduce eye strain</span>
+                    </div>
+                    <button
+                      onClick={() => setBlueLightFilter(!blueLightFilter)}
+                      className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
+                        blueLightFilter ? 'bg-amber-500' : isDarkMode ? 'bg-slate-800' : 'bg-slate-200'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
+                        blueLightFilter ? 'right-0.5' : 'left-0.5'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. Click to Speak Narrator & Speech Speed Slider */}
+                <div className={`pt-2.5 border-t space-y-2 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold flex items-center space-x-1">
+                        <Volume2 size={11} className="text-slate-400" />
+                        <span>Click-to-Speak Narrator</span>
+                      </span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Click any text on page to hear it spoken</span>
                     </div>
                     <button
                       onClick={() => {
                         setSpeakOnClick(!speakOnClick);
                         if (!speakOnClick) {
-                          // Play a greeting voice
                           window.speechSynthesis.cancel();
-                          const u = new SpeechSynthesisUtterance("Click to speak mode is now activated. Simply click any text layout on the screen.");
-                          u.rate = 1.0;
+                          const u = new SpeechSynthesisUtterance("Click to speak activated.");
+                          u.rate = narratorSpeed;
                           window.speechSynthesis.speak(u);
                         } else {
                           window.speechSynthesis.cancel();
                         }
                       }}
                       className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
-                        speakOnClick ? 'bg-emerald-600 animate-pulse' : 'bg-slate-200'
+                        speakOnClick ? 'bg-emerald-600 animate-pulse' : isDarkMode ? 'bg-slate-800' : 'bg-slate-200'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
@@ -1432,19 +1561,37 @@ Principal Signoff: Approved
                       }`} />
                     </button>
                   </div>
+
+                  {speakOnClick && (
+                    <div className="bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl border border-slate-150 dark:border-slate-800/80 space-y-1.5 animate-fade-in">
+                      <div className="flex justify-between items-center text-[9px] text-slate-400">
+                        <span>Narrator Speed</span>
+                        <span className="font-bold text-emerald-600">{narratorSpeed.toFixed(1)}x</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="2.0"
+                        step="0.1"
+                        value={narratorSpeed}
+                        onChange={(e) => setNarratorSpeed(parseFloat(e.target.value))}
+                        className="w-full accent-emerald-600 h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                {/* 3. Horizontal Reading Ruler Line Toggle */}
-                <div className="pt-2 border-t border-slate-100">
+                {/* 5. Horizontal Reading Ruler Guide */}
+                <div className={`pt-2.5 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Horizontal Reading Ruler</span>
-                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Sliding horizontal highlighter guide</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Highlighter guide centered on cursor</span>
                     </div>
                     <button
                       onClick={() => setReadingRuler(!readingRuler)}
                       className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
-                        readingRuler ? 'bg-emerald-600' : 'bg-slate-200'
+                        readingRuler ? 'bg-emerald-600' : isDarkMode ? 'bg-slate-800' : 'bg-slate-200'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
@@ -1454,26 +1601,33 @@ Principal Signoff: Approved
                   </div>
                 </div>
 
-                {/* 4. Color Spectrum Filters */}
-                <div className="pt-2 border-t border-slate-100 space-y-1.5">
-                  <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Color-Blindness & Vision Filters</span>
-                  <div className="grid grid-cols-3 gap-1.5">
+                {/* 6. Color-Blindness & Vision Spectrum Filters */}
+                <div className={`pt-2.5 border-t space-y-1.5 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold flex items-center space-x-1">
+                    <Sliders size={11} className="text-slate-400" />
+                    <span>Color-Blindness & Vision Profiles</span>
+                  </span>
+                  <div className="grid grid-cols-2 gap-1.5">
                     <button
                       onClick={() => setVisionFilter('none')}
-                      className={`py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                      className={`py-2 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
                         visionFilter === 'none'
-                          ? 'bg-slate-800 border-slate-800 text-white'
-                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                          ? 'bg-emerald-700 border-emerald-700 text-white'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                     >
                       None
                     </button>
                     <button
                       onClick={() => setVisionFilter('monochrome')}
-                      className={`py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                      className={`py-2 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
                         visionFilter === 'monochrome'
-                          ? 'bg-slate-800 border-slate-800 text-white'
-                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                          ? 'bg-emerald-700 border-emerald-700 text-white'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
                       title="Grayscale high contrast"
                     >
@@ -1481,29 +1635,57 @@ Principal Signoff: Approved
                     </button>
                     <button
                       onClick={() => setVisionFilter('contrast-boost')}
-                      className={`py-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                      className={`py-2 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
                         visionFilter === 'contrast-boost'
-                          ? 'bg-slate-800 border-slate-800 text-white'
-                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                          ? 'bg-emerald-700 border-emerald-700 text-white'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                       }`}
-                      title="Intense saturation and contrast trigger"
+                      title="Intense saturation & contrast boost"
                     >
                       Contrast Boost
+                    </button>
+                    <button
+                      onClick={() => setVisionFilter('deuteranopia')}
+                      className={`py-2 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
+                        visionFilter === 'deuteranopia'
+                          ? 'bg-emerald-700 border-emerald-700 text-white'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                      title="Green-weakness color profile simulation"
+                    >
+                      Deuteranopia
+                    </button>
+                    <button
+                      onClick={() => setVisionFilter('tritanopia')}
+                      className={`py-2 rounded-xl text-[10px] font-bold border transition-all cursor-pointer col-span-2 ${
+                        visionFilter === 'tritanopia'
+                          ? 'bg-emerald-700 border-emerald-700 text-white'
+                          : isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
+                      }`}
+                      title="Blue-weakness color profile simulation"
+                    >
+                      Tritanopia Filter
                     </button>
                   </div>
                 </div>
 
-                {/* 5. Custom High Contrast Toggle */}
-                <div className="pt-2 border-t border-slate-100">
+                {/* 7. Ultra-Black & Bold Text */}
+                <div className={`pt-2.5 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Ultra-Black & Bold Text</span>
-                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Forces extra high contrast weight</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Enforces heavy font and high element contrast</span>
                     </div>
                     <button
                       onClick={() => setHighContrast(!highContrast)}
                       className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
-                        highContrast ? 'bg-emerald-600' : 'bg-slate-200'
+                        highContrast ? 'bg-emerald-600' : isDarkMode ? 'bg-slate-800' : 'bg-slate-200'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
@@ -1513,17 +1695,17 @@ Principal Signoff: Approved
                   </div>
                 </div>
 
-                {/* 6. Giant Accessible Cursor */}
-                <div className="pt-2 border-t border-slate-100">
+                {/* 8. Giant Accessible Cursor */}
+                <div className={`pt-2.5 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Giant Pointer Halo</span>
-                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Increases mouse size with bright cursor target</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Aura highlight tracking over the cursor</span>
                     </div>
                     <button
                       onClick={() => setGiantCursor(!giantCursor)}
                       className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
-                        giantCursor ? 'bg-emerald-600' : 'bg-slate-200'
+                        giantCursor ? 'bg-emerald-600' : isDarkMode ? 'bg-slate-800' : 'bg-slate-200'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
@@ -1533,17 +1715,17 @@ Principal Signoff: Approved
                   </div>
                 </div>
 
-                {/* 7. Spaced Dyslexic & Eye Care Layout Toggle */}
-                <div className="pt-2 border-t border-slate-100">
+                {/* 9. Spaced Dyslexic & Eye Care Layout Toggle */}
+                <div className={`pt-2.5 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-slate-400 uppercase tracking-wider font-extrabold block">Comfort-Spaced Reading</span>
-                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Increases row, word, & letter gap spacing</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold mt-0.5">Row gaps and letter space expansion</span>
                     </div>
                     <button
                       onClick={() => setDyslexicFont(!dyslexicFont)}
                       className={`w-10 h-5.5 rounded-full relative transition-colors cursor-pointer ${
-                        dyslexicFont ? 'bg-emerald-600' : 'bg-slate-200'
+                        dyslexicFont ? 'bg-emerald-600' : isDarkMode ? 'bg-slate-800' : 'bg-slate-200'
                       }`}
                     >
                       <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all shadow-sm ${
@@ -1554,7 +1736,7 @@ Principal Signoff: Approved
                 </div>
 
                 {/* Reset to defaults button */}
-                <div className="pt-2.5 border-t border-slate-100 flex space-x-2">
+                <div className={`pt-3 border-t flex space-x-2 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
                   <button
                     onClick={() => {
                       setFontSizeScale('large');
@@ -1564,9 +1746,12 @@ Principal Signoff: Approved
                       setGiantCursor(false);
                       setReadingRuler(false);
                       setVisionFilter('none');
+                      setBlueLightFilter(false);
+                      setScreenDimmer(0);
+                      setNarratorSpeed(1.0);
                       window.speechSynthesis.cancel();
                     }}
-                    className="w-full text-center py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[10px] uppercase tracking-wider font-extrabold transition-colors cursor-pointer"
+                    className="w-full text-center py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-[10px] uppercase tracking-wider font-extrabold transition-colors cursor-pointer"
                   >
                     Reset Defaults
                   </button>

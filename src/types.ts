@@ -2,7 +2,7 @@
  * Types and interfaces for Edweso Royal Academy Portal
  */
 
-export type UserRole = 'admin' | 'teacher' | 'student' | 'parent';
+export type UserRole = 'super_admin' | 'admin' | 'teacher' | 'student' | 'parent';
 
 export interface UserSession {
   id: string;
@@ -324,6 +324,9 @@ export interface RoleAccessibilityConfig {
   giantCursor: boolean;
   readingRuler: boolean;
   visionFilter: string; // 'none' | 'monochrome' | 'contrast-boost' | 'deuteranopia'
+  blueLightFilter?: boolean;
+  screenDimmer?: number;
+  narratorSpeed?: number;
 }
 
 export type RoleAccessibilityPreferences = Record<string, RoleAccessibilityConfig>;

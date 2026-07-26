@@ -5,7 +5,7 @@ import { UserRole, UserSession } from '../types';
 interface BiometricLoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedRole: 'admin' | 'teacher';
+  selectedRole: 'super_admin' | 'admin' | 'teacher';
   onSuccess: (session: UserSession) => void;
 }
 
@@ -29,8 +29,14 @@ export default function BiometricLoginModal({ isOpen, onClose, selectedRole, onS
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const staffDetails = {
+    super_admin: {
+      name: 'Nana Kwasi Edweso II (Founder & Executive Chairman)',
+      email: 'founder@edweso.edu.gh',
+      username: 'founder_edweso',
+      id: 'founder-01',
+    },
     admin: {
-      name: 'Principal J. K. Appiah',
+      name: 'Dr. J. K. Appiah (Headmaster / Principal)',
       email: 'admin@edweso.edu.gh',
       username: 'principal_appiah',
       id: 'admin-01',

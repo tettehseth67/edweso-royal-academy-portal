@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, UserCheck, BookOpen, 
   CheckSquare, Award, Calendar, Megaphone, CreditCard, User, Mail,
   AlertCircle, Check, CheckCircle, History, Send, FileText, Sunrise,
-  ShieldAlert, HelpCircle, ChevronUp, UserX, FileSpreadsheet, Smartphone
+  ShieldAlert, HelpCircle, ChevronUp, UserX, FileSpreadsheet, Smartphone, Crown
 } from 'lucide-react';
 import { UserSession, Announcement } from '../types';
 import { SchoolDatabase } from '../mockData';
@@ -19,6 +19,7 @@ interface DashboardLayoutProps {
   isDarkMode: boolean;
   onToggleTheme: () => void;
   onStartTour?: () => void;
+  onToggleAccessibility?: () => void;
 }
 
 export default function DashboardLayout({
@@ -29,7 +30,8 @@ export default function DashboardLayout({
   children,
   isDarkMode,
   onToggleTheme,
-  onStartTour
+  onStartTour,
+  onToggleAccessibility
 }: DashboardLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -76,6 +78,11 @@ export default function DashboardLayout({
     { id: 'sms', label: 'SMS Dispatch', icon: <Smartphone size={18} /> }
   ];
 
+  const superAdminNav = [
+    { id: 'founder-governance', label: 'Founder Governance Hub', icon: <Crown size={18} className="text-amber-400" /> },
+    ...adminNav
+  ];
+
   const teacherNav = [
     { id: 'profile', label: 'My Profile', icon: <User size={18} /> },
     { id: 'classes', label: 'Assigned Classes', icon: <BookOpen size={18} /> },
@@ -114,13 +121,15 @@ export default function DashboardLayout({
     { id: 'emails', label: 'Email Box', icon: <Send size={18} /> }
   ];
 
-  const currentNav = session.role === 'admin' 
-    ? adminNav 
-    : session.role === 'teacher' 
-      ? teacherNav 
-      : session.role === 'parent'
-        ? parentNav
-        : studentNav;
+  const currentNav = session.role === 'super_admin'
+    ? superAdminNav
+    : session.role === 'admin' 
+      ? adminNav 
+      : session.role === 'teacher' 
+        ? teacherNav 
+        : session.role === 'parent'
+          ? parentNav
+          : studentNav;
 
   const handleTabClick = (tabId: string) => {
     onTabChange(tabId);
@@ -173,7 +182,7 @@ export default function DashboardLayout({
   };
 
   const audienceFilter = (a: Announcement) => {
-    if (session.role === 'admin') return true;
+    if (session.role === 'super_admin' || session.role === 'admin') return true;
     if (session.role === 'teacher') return a.targetAudience === 'All' || a.targetAudience === 'Teachers';
     if (session.role === 'student' || session.role === 'parent') return a.targetAudience === 'All' || a.targetAudience === 'Students';
     return false;
@@ -197,7 +206,7 @@ export default function DashboardLayout({
         severity: 'high'
       });
     }
-  } else if (session.role === 'admin') {
+  } else if (session.role === 'super_admin' || session.role === 'admin') {
     const failedTxs = allTransactions.filter(t => t.status === 'Failed');
     if (failedTxs.length > 0) {
       paymentAlerts.push({
@@ -239,7 +248,7 @@ export default function DashboardLayout({
         {/* Sidebar Nav Items */}
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
           <div className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {session.role} portal
+            {session.role === 'super_admin' ? 'Founder Portal' : session.role === 'admin' ? 'Headmaster Portal' : `${session.role} portal`}
           </div>
           
           {currentNav.map((item) => {
@@ -523,6 +532,19 @@ export default function DashboardLayout({
               )}
             </div>
 
+            {/* Theme Toggle Button */}
+            <button
+              onClick={onToggleTheme}
+              className={`p-2 rounded-lg transition-all border shrink-0 flex items-center justify-center cursor-pointer ${
+                isDarkMode 
+                  ? 'border-slate-800 hover:bg-slate-800 text-amber-400' 
+                  : 'border-slate-200 hover:bg-slate-100 text-slate-500 hover:text-indigo-600'
+              }`}
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+
             {/* Guided Tour Trigger Button */}
             {onStartTour && (
               <button
@@ -563,11 +585,13 @@ export default function DashboardLayout({
                   }`}>
                     <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
                       <p className="text-xs font-bold">{session.name}</p>
-                      <p className="text-[10px] text-slate-400">{session.role.toUpperCase()}</p>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-amber-500">
+                        {session.role === 'super_admin' ? 'Founder & Executive Chairman' : session.role === 'admin' ? 'Headmaster / Principal' : session.role.toUpperCase()}
+                      </p>
                     </div>
                     <button
                       onClick={() => {
-                        handleTabClick((session.role === 'student' || session.role === 'teacher') ? 'profile' : session.role === 'parent' ? 'overview' : 'classes');
+                        handleTabClick(session.role === 'super_admin' ? 'founder-governance' : (session.role === 'student' || session.role === 'teacher') ? 'profile' : session.role === 'parent' ? 'overview' : 'overview');
                         setIsProfileDropdownOpen(false);
                       }}
                       className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 font-bold"
@@ -607,9 +631,11 @@ export default function DashboardLayout({
             onScroll={handleScroll}
             className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
           >
-            {children}
+            <div className="max-w-7xl mx-auto w-full">
+              {children}
+            </div>
           </main>
-          {(session.role === 'admin' || session.role === 'teacher') && (
+          {(session.role === 'super_admin' || session.role === 'admin' || session.role === 'teacher') && (
             <ActivityFeedWidget isDarkMode={isDarkMode} />
           )}
 

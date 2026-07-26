@@ -21,11 +21,12 @@ import AlumniHubView from './AlumniHubView';
 
 interface LandingPageProps {
   onNavigateToLogin: (role?: 'admin' | 'teacher' | 'student' | 'parent') => void;
+  onToggleAccessibility?: () => void;
 }
 
 type ActivePage = 'home' | 'about' | 'academics' | 'admissions' | 'contact' | 'careers' | 'parent-resources' | 'history' | 'mission-vision' | 'leadership' | 'fees-plan' | 'gallery' | 'news' | 'faq' | 'policies' | 'privacy' | 'terms' | 'clubs-sports' | 'fees-estimator' | 'ges-syllabus' | 'alumni-hub';
 
-export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
+export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }: LandingPageProps) {
   const [activePage, setActivePage] = useState<ActivePage>('home');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -254,20 +255,20 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
       
       {/* ==================== STICKY PUBLIC NAVBAR ==================== */}
       <nav id="landing-navbar" className="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 px-4 py-3 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           <div 
             onClick={() => setActivePage('home')} 
-            className="flex items-center space-x-3 cursor-pointer"
+            className="flex items-center space-x-2 sm:space-x-3 cursor-pointer shrink-0"
           >
             <img 
               src="/assets/images/logo.png" 
               alt="Edweso Royal Academy Logo" 
-              className="w-14 h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm"
+              className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl object-contain border border-amber-400/15 shadow-sm transition-all"
               referrerPolicy="no-referrer"
             />
             <div>
-              <span className="font-extrabold text-lg tracking-tight text-emerald-800 block leading-tight">Edweso Royal</span>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-amber-600 block leading-none">Academy</span>
+              <span className="font-extrabold text-xs sm:text-lg tracking-tight text-emerald-800 block leading-tight">Edweso Royal</span>
+              <span className="text-[8px] sm:text-[10px] uppercase font-bold tracking-widest text-amber-600 block leading-none">Academy</span>
             </div>
           </div>
 
@@ -325,20 +326,14 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
             </button>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setActivePage('admissions')}
-              className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs px-4 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all uppercase tracking-wider cursor-pointer"
-            >
-              Apply Now
-            </button>
+          <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
             <button
               onClick={() => onNavigateToLogin()}
               id="landing-login-btn"
-              className="bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs px-4 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center space-x-2 uppercase tracking-wide cursor-pointer"
+              className="bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-[10px] sm:text-xs px-2.5 py-2 sm:px-4 sm:py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all flex items-center space-x-1.5 uppercase tracking-wide cursor-pointer"
             >
               <span>Portal Login</span>
-              <ArrowRight size={14} />
+              <ArrowRight size={12} className="sm:w-3.5 sm:h-3.5 w-3 h-3" />
             </button>
           </div>
         </div>
@@ -2109,6 +2104,15 @@ export default function LandingPage({ onNavigateToLogin }: LandingPageProps) {
                 >
                   FAQs Support
                 </button>
+                {onToggleAccessibility && (
+                  <button 
+                    onClick={onToggleAccessibility}
+                    className="text-left hover:text-emerald-400 transition-colors cursor-pointer text-emerald-300 font-extrabold flex items-center space-x-1"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Eye Care Adjustments</span>
+                  </button>
+                )}
               </div>
             </div>
 

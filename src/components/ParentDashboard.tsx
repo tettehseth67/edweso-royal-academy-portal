@@ -663,54 +663,56 @@ export default function ParentDashboard({
           <div className={`border rounded-2xl overflow-hidden shadow-xs ${
             isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           }`}>
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className={`${isDarkMode ? 'bg-slate-950/30 border-slate-800' : 'bg-slate-50 border-slate-150'} border-b text-[10px] uppercase font-black text-slate-400 tracking-wider`}>
-                  <th className="p-4">Subject Name</th>
-                  <th className="p-4 text-center">Class Score (30%)</th>
-                  <th className="p-4 text-center">Exam Score (70%)</th>
-                  <th className="p-4 text-center">Total (100%)</th>
-                  <th className="p-4">Grade & Remark</th>
-                </tr>
-              </thead>
-              <tbody className={`divide-y text-xs font-semibold ${
-                isDarkMode ? 'divide-slate-800 text-slate-300' : 'divide-slate-150 text-slate-700'
-              }`}>
-                {childGrades.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="p-8 text-center text-slate-450 font-bold">
-                      No registered grades reported yet for this term.
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className={`${isDarkMode ? 'bg-slate-950/30 border-slate-800' : 'bg-slate-50 border-slate-150'} border-b text-[10px] uppercase font-black text-slate-400 tracking-wider`}>
+                    <th className="p-4">Subject Name</th>
+                    <th className="p-4 text-center">Class Score (30%)</th>
+                    <th className="p-4 text-center">Exam Score (70%)</th>
+                    <th className="p-4 text-center">Total (100%)</th>
+                    <th className="p-4">Grade & Remark</th>
                   </tr>
-                ) : (
-                  childGrades.map(g => {
-                    const totalScore = g.classScore + g.examScore;
-                    const ghGrade = calculateGhanaGrade(totalScore);
-                    const remark = getGradeRemark(ghGrade);
-                    const sub = subjects.find(s => s.id === g.subjectId);
-                    const subjectName = sub ? sub.name : g.subjectId;
+                </thead>
+                <tbody className={`divide-y text-xs font-semibold ${
+                  isDarkMode ? 'divide-slate-800 text-slate-300' : 'divide-slate-150 text-slate-700'
+                }`}>
+                  {childGrades.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-slate-450 font-bold">
+                        No registered grades reported yet for this term.
+                      </td>
+                    </tr>
+                  ) : (
+                    childGrades.map(g => {
+                      const totalScore = g.classScore + g.examScore;
+                      const ghGrade = calculateGhanaGrade(totalScore);
+                      const remark = getGradeRemark(ghGrade);
+                      const sub = subjects.find(s => s.id === g.subjectId);
+                      const subjectName = sub ? sub.name : g.subjectId;
 
-                    return (
-                      <tr key={g.id} className={isDarkMode ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50/50'}>
-                        <td className="p-4 font-extrabold text-slate-850 dark:text-slate-100">{subjectName}</td>
-                        <td className="p-4 text-center font-mono text-slate-400">{g.classScore} / 30</td>
-                        <td className="p-4 text-center font-mono text-slate-400">{g.examScore} / 70</td>
-                        <td className="p-4 text-center font-mono font-extrabold text-slate-850 dark:text-slate-100">{totalScore} %</td>
-                        <td className="p-4">
-                          <span className="inline-flex items-center space-x-1.5">
-                            <span className={`font-extrabold px-2 py-0.5 rounded-lg ${
-                              isDarkMode ? 'bg-slate-800 text-slate-100' : 'bg-slate-150 text-slate-800'
-                            }`}>Grade {ghGrade}</span>
-                            <span className="text-slate-400 font-bold">&bull;</span>
-                            <span className="text-slate-500 dark:text-slate-400 font-bold">{remark}</span>
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                      return (
+                        <tr key={g.id} className={isDarkMode ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50/55'}>
+                          <td className="p-4 font-extrabold text-slate-850 dark:text-slate-100">{subjectName}</td>
+                          <td className="p-4 text-center font-mono text-slate-400">{g.classScore} / 30</td>
+                          <td className="p-4 text-center font-mono text-slate-400">{g.examScore} / 70</td>
+                          <td className="p-4 text-center font-mono font-extrabold text-slate-850 dark:text-slate-100">{totalScore} %</td>
+                          <td className="p-4">
+                            <span className="inline-flex items-center space-x-1.5">
+                              <span className={`font-extrabold px-2 py-0.5 rounded-lg ${
+                                isDarkMode ? 'bg-slate-800 text-slate-100' : 'bg-slate-150 text-slate-800'
+                              }`}>Grade {ghGrade}</span>
+                              <span className="text-slate-400 font-bold">&bull;</span>
+                              <span className="text-slate-500 dark:text-slate-400 font-bold">{remark}</span>
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
         </div>
@@ -1695,38 +1697,40 @@ export default function ParentDashboard({
 
             {/* Marks breakdown table */}
             <div className="border border-slate-200 rounded-2xl overflow-hidden text-xs">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-100 border-b border-slate-200 text-[9px] uppercase font-black text-slate-500">
-                    <th className="p-3">Subject</th>
-                    <th className="p-3 text-center">Class (30%)</th>
-                    <th className="p-3 text-center">Exam (70%)</th>
-                    <th className="p-3 text-center">Total (100%)</th>
-                    <th className="p-3">Grade</th>
-                    <th className="p-3">Remark / Appraisal</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y text-slate-700 font-semibold">
-                  {childGrades.map(g => {
-                    const tot = g.classScore + g.examScore;
-                    const grade = calculateGhanaGrade(tot);
-                    const remark = getGradeRemark(grade);
-                    const sub = subjects.find(s => s.id === g.subjectId);
-                    const subjectName = sub ? sub.name : g.subjectId;
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100 border-b border-slate-200 text-[9px] uppercase font-black text-slate-500">
+                      <th className="p-3">Subject</th>
+                      <th className="p-3 text-center">Class (30%)</th>
+                      <th className="p-3 text-center">Exam (70%)</th>
+                      <th className="p-3 text-center">Total (100%)</th>
+                      <th className="p-3">Grade</th>
+                      <th className="p-3">Remark / Appraisal</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y text-slate-700 font-semibold">
+                    {childGrades.map(g => {
+                      const tot = g.classScore + g.examScore;
+                      const grade = calculateGhanaGrade(tot);
+                      const remark = getGradeRemark(grade);
+                      const sub = subjects.find(s => s.id === g.subjectId);
+                      const subjectName = sub ? sub.name : g.subjectId;
 
-                    return (
-                      <tr key={g.id}>
-                        <td className="p-3 font-extrabold text-slate-800">{subjectName}</td>
-                        <td className="p-3 text-center font-mono text-slate-550">{g.classScore}</td>
-                        <td className="p-3 text-center font-mono text-slate-550">{g.examScore}</td>
-                        <td className="p-3 text-center font-mono font-extrabold text-slate-850">{tot}%</td>
-                        <td className="p-3"><span className="px-2 py-0.5 bg-slate-100 rounded-md font-extrabold">{grade}</span></td>
-                        <td className="p-3 text-slate-500 italic">{remark}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                      return (
+                        <tr key={g.id}>
+                          <td className="p-3 font-extrabold text-slate-800">{subjectName}</td>
+                          <td className="p-3 text-center font-mono text-slate-550">{g.classScore}</td>
+                          <td className="p-3 text-center font-mono text-slate-550">{g.examScore}</td>
+                          <td className="p-3 text-center font-mono font-extrabold text-slate-850">{tot}%</td>
+                          <td className="p-3"><span className="px-2 py-0.5 bg-slate-100 rounded-md font-extrabold">{grade}</span></td>
+                          <td className="p-3 text-slate-500 italic">{remark}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Attendance & Summary appraisals */}

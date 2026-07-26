@@ -172,7 +172,7 @@ export default function StudentAssignmentsView({
       </div>
 
       {/* 2. STATS OVERVIEW */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 bg-slate-50 border border-slate-200/50 rounded-2xl flex items-center space-x-4">
           <div className="p-3 bg-indigo-50 rounded-xl text-indigo-700">
             <Clipboard size={20} />

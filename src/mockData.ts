@@ -801,10 +801,11 @@ export const initialSchedulerLogs: PaymentSchedulerRunLog[] = [
 ];
 
 export const defaultRoleAccessibility: RoleAccessibilityPreferences = {
-  admin: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
-  teacher: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
-  student: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' },
-  parent: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none' }
+  super_admin: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 },
+  admin: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 },
+  teacher: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 },
+  student: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 },
+  parent: { fontSizeScale: 'large', highContrast: false, dyslexicFont: false, speakOnClick: false, giantCursor: false, readingRuler: false, visionFilter: 'none', blueLightFilter: false, screenDimmer: 0, narratorSpeed: 1.0 }
 };
 
 

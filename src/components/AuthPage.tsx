@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, UserCheck, GraduationCap, Mail, Lock, User, Phone, ArrowLeft, Info, HelpCircle, ScanFace } from 'lucide-react';
+import { ShieldCheck, UserCheck, GraduationCap, Mail, Lock, User, Phone, ArrowLeft, Info, HelpCircle, ScanFace, Crown } from 'lucide-react';
 import { UserRole, UserSession } from '../types';
 import BiometricLoginModal from './BiometricLoginModal';
 
@@ -34,7 +34,8 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
 
   // Quick credentials list for demo purposes
   const demoUsers = {
-    admin: { email: 'admin@edweso.edu.gh', pass: 'admin123', name: 'Principal J. K. Appiah' },
+    super_admin: { email: 'founder@edweso.edu.gh', pass: 'founder123', name: 'Nana Kwasi Edweso II (Founder & Executive Chairman)' },
+    admin: { email: 'admin@edweso.edu.gh', pass: 'admin123', name: 'Dr. J. K. Appiah (Headmaster / Principal)' },
     teacher: { email: 'kwame@edweso.edu.gh', pass: 'teacher123', name: 'Mr. Kwame Boateng' },
     student: { email: 'kofi@edweso.edu.gh', pass: 'student123', name: 'Kofi Mensah Jnr' },
     parent: { email: 'parent@gmail.com', pass: 'parent123', name: 'Isaac Mensah' }
@@ -53,7 +54,15 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
 
     const trimmedEmail = email.trim().toLowerCase();
     
-    if (selectedRole === 'admin' && trimmedEmail === demoUsers.admin.email && password === demoUsers.admin.pass) {
+    if (selectedRole === 'super_admin' && trimmedEmail === demoUsers.super_admin.email && password === demoUsers.super_admin.pass) {
+      onLoginSuccess({
+        id: 'founder-01',
+        role: 'super_admin',
+        username: 'founder_edweso',
+        name: demoUsers.super_admin.name,
+        email: demoUsers.super_admin.email
+      });
+    } else if (selectedRole === 'admin' && trimmedEmail === demoUsers.admin.email && password === demoUsers.admin.pass) {
       onLoginSuccess({
         id: 'admin-01',
         role: 'admin',
@@ -156,12 +165,12 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
               </div>
 
               {/* Role Selectors */}
-              <div className="grid grid-cols-4 gap-1.5 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+              <div className="grid grid-cols-5 gap-1 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
                 <button
                   type="button"
                   id="role-btn-student"
                   onClick={() => autofillDemo('student')}
-                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md transition-all ${
                     selectedRole === 'student'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
@@ -174,7 +183,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                   type="button"
                   id="role-btn-parent"
                   onClick={() => autofillDemo('parent')}
-                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md transition-all ${
                     selectedRole === 'parent'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
@@ -187,7 +196,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                   type="button"
                   id="role-btn-teacher"
                   onClick={() => autofillDemo('teacher')}
-                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md transition-all ${
                     selectedRole === 'teacher'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
@@ -200,14 +209,27 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                   type="button"
                   id="role-btn-admin"
                   onClick={() => autofillDemo('admin')}
-                  className={`flex flex-col items-center justify-center py-2 rounded-md transition-all ${
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md transition-all ${
                     selectedRole === 'admin'
                       ? 'bg-emerald-700 text-white font-bold shadow-xs'
                       : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
                   }`}
                 >
                   <ShieldCheck size={15} className="mb-0.5" />
-                  <span className="text-[9px]">Admin</span>
+                  <span className="text-[9px]">Headmaster</span>
+                </button>
+                <button
+                  type="button"
+                  id="role-btn-super-admin"
+                  onClick={() => autofillDemo('super_admin')}
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-md transition-all ${
+                    selectedRole === 'super_admin'
+                      ? 'bg-amber-600 text-white font-bold shadow-xs'
+                      : 'text-amber-400/80 hover:text-amber-300 hover:bg-amber-950/30'
+                  }`}
+                >
+                  <Crown size={15} className="mb-0.5" />
+                  <span className="text-[9px]">Founder</span>
                 </button>
               </div>
 
@@ -282,7 +304,7 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                   Enter Administrative Console
                 </button>
 
-                {(selectedRole === 'admin' || selectedRole === 'teacher') && (
+                {(selectedRole === 'super_admin' || selectedRole === 'admin' || selectedRole === 'teacher') && (
                   <div className="space-y-4 pt-1">
                     <div className="relative flex py-1 items-center">
                       <div className="flex-grow border-t border-slate-800"></div>
@@ -310,10 +332,17 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                 </div>
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   <button
-                    onClick={() => autofillDemo('student')}
-                    className="text-[10px] bg-slate-900 border border-slate-800 text-emerald-400 font-bold px-2 py-1 rounded hover:bg-slate-800 transition-colors"
+                    onClick={() => autofillDemo('super_admin')}
+                    className="text-[10px] bg-amber-950/40 border border-amber-600/40 text-amber-300 font-extrabold px-2 py-1 rounded hover:bg-amber-900/50 transition-colors flex items-center space-x-1"
                   >
-                    Student (Kofi)
+                    <Crown size={11} className="text-amber-400" />
+                    <span>Founder (Nana Edweso)</span>
+                  </button>
+                  <button
+                    onClick={() => autofillDemo('admin')}
+                    className="text-[10px] bg-slate-900 border border-slate-800 text-sky-400 font-bold px-2 py-1 rounded hover:bg-slate-800 transition-colors"
+                  >
+                    Headmaster (Dr. Appiah)
                   </button>
                   <button
                     onClick={() => autofillDemo('teacher')}
@@ -322,10 +351,10 @@ export default function AuthPage({ onLoginSuccess, onBackToLanding, initialRole 
                     Teacher (Kwame)
                   </button>
                   <button
-                    onClick={() => autofillDemo('admin')}
-                    className="text-[10px] bg-slate-900 border border-slate-800 text-sky-400 font-bold px-2 py-1 rounded hover:bg-slate-800 transition-colors"
+                    onClick={() => autofillDemo('student')}
+                    className="text-[10px] bg-slate-900 border border-slate-800 text-emerald-400 font-bold px-2 py-1 rounded hover:bg-slate-800 transition-colors"
                   >
-                    Admin (Principal)
+                    Student (Kofi)
                   </button>
                 </div>
               </div>

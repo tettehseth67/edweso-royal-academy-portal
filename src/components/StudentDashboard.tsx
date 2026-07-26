@@ -334,7 +334,7 @@ export default function StudentDashboard({
         <div className="space-y-6 animate-fade-in">
           
           {/* Main profile layout */}
-          <div className="p-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row items-center md:items-start gap-6 text-slate-700">
+          <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row items-center md:items-start gap-6 text-slate-700 dark:text-slate-200">
             
             {/* Student Profile Photo component with upload and capture capability */}
             <div className="flex flex-col items-center gap-3 shrink-0" id="student-avatar-interactive-container">
@@ -433,41 +433,41 @@ export default function StudentDashboard({
               />
             )}
 
-            <div className="flex-1 text-center md:text-left space-y-4 text-slate-700">
+            <div className="flex-1 text-center md:text-left space-y-4 text-slate-700 dark:text-slate-300">
               <div>
-                <h2 className="text-xl font-display font-extrabold text-slate-800 leading-tight">{student.name}</h2>
-                <span className="text-xs bg-slate-50 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-full font-bold mt-2 inline-block">
+                <h2 className="text-xl font-display font-extrabold text-slate-800 dark:text-white leading-tight">{student.name}</h2>
+                <span className="text-xs bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-full font-bold mt-2 inline-block">
                   {sClass ? sClass.name : 'Not Enrolled'} Division
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
                 <div className="space-y-1">
-                  <p className="text-slate-950 font-bold uppercase text-[10px]">Admission ID</p>
-                  <p className="font-extrabold font-mono text-slate-950">{student.admissionNumber}</p>
+                  <p className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[10px]">Admission ID</p>
+                  <p className="font-extrabold font-mono text-slate-950 dark:text-slate-100">{student.admissionNumber}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-slate-950 font-bold uppercase text-[10px]">Gender & DOB</p>
-                  <p className="font-extrabold text-slate-950">{student.gender} | {student.dob}</p>
+                  <p className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[10px]">Gender & DOB</p>
+                  <p className="font-extrabold text-slate-950 dark:text-slate-100">{student.gender} | {student.dob}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-slate-950 font-bold uppercase text-[10px]">Primary Guardian</p>
-                  <p className="font-extrabold text-slate-950">{student.parentName}</p>
+                  <p className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[10px]">Primary Guardian</p>
+                  <p className="font-extrabold text-slate-950 dark:text-slate-100">{student.parentName}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-slate-400 font-bold uppercase text-[10px]">Guardian coordinates</p>
-                  <p className="font-semibold text-slate-700">{student.parentPhone} | {student.parentEmail}</p>
+                  <p className="text-slate-400 dark:text-slate-500 font-bold uppercase text-[10px]">Guardian coordinates</p>
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">{student.parentPhone} | {student.parentEmail}</p>
                 </div>
               </div>
             </div>
 
             {/* Quick Balance Status card */}
-            <div className="w-full md:w-64 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-center space-y-3 shrink-0 text-slate-600">
-              <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Fees Outstanding</span>
-              <span className={`text-2xl font-bold font-mono block ${student.balanceGHS > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+            <div className="w-full md:w-64 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-center space-y-3 shrink-0 text-slate-600 dark:text-slate-300">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-bold tracking-wider block">Fees Outstanding</span>
+              <span className={`text-2xl font-bold font-mono block ${student.balanceGHS > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                 GHS {student.balanceGHS.toFixed(2)}
               </span>
-              <span className="text-[10px] text-slate-400 block font-medium leading-relaxed">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-medium leading-relaxed">
                 {student.balanceGHS > 0 ? 'Please settle fees before exam week.' : 'Academic accounts fully cleared!'}
               </span>
             </div>
@@ -475,17 +475,17 @@ export default function StudentDashboard({
 
           {/* Quick links summary box */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">Enrolled Subjects</span>
-              <span className="text-lg font-bold block mt-1 text-slate-800">{studentSubjects.length} Courses</span>
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 dark:text-slate-300">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase block">Enrolled Subjects</span>
+              <span className="text-lg font-bold block mt-1 text-slate-800 dark:text-white">{studentSubjects.length} Courses</span>
             </div>
-            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">Attendance Rate</span>
-              <span className="text-lg font-bold block mt-1 text-slate-800">{attendanceRate}% Presence</span>
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 dark:text-slate-300">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase block">Attendance Rate</span>
+              <span className="text-lg font-bold block mt-1 text-slate-800 dark:text-white">{attendanceRate}% Presence</span>
             </div>
-            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">Term Grades Recorded</span>
-              <span className="text-lg font-bold block mt-1 text-slate-800">{studentGrades.length} Records</span>
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 dark:text-slate-300">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase block">Term Grades Recorded</span>
+              <span className="text-lg font-bold block mt-1 text-slate-800 dark:text-white">{studentGrades.length} Records</span>
             </div>
           </div>
 
@@ -557,45 +557,47 @@ export default function StudentDashboard({
           </div>
 
           <div className="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
-            <table id="student-grades-table" className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
-                  <th className="p-3">Subject Name</th>
-                  <th className="p-3">Asses score (30%)</th>
-                  <th className="p-3">Exam score (70%)</th>
-                  <th className="p-3">Aggregate total</th>
-                  <th className="p-3">GES Grade</th>
-                  <th className="p-3">Teacher Evaluations</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {studentSubjects.map(sub => {
-                  const subGrade = studentGrades.find(g => g.subjectId === sub.id);
-                  return (
-                    <tr key={sub.id} className="hover:bg-slate-50/55 transition-colors text-slate-600">
-                      <td className="p-3 font-bold text-slate-800">{sub.name}</td>
-                      <td className="p-3 font-mono text-slate-500">{subGrade ? `${subGrade.classScore} / 30` : '—'}</td>
-                      <td className="p-3 font-mono text-slate-500">{subGrade ? `${subGrade.examScore} / 70` : '—'}</td>
-                      <td className="p-3 font-bold text-slate-700 font-mono">
-                        {subGrade ? `${subGrade.totalScore}%` : '—'}
-                      </td>
-                      <td className="p-3">
-                        {subGrade ? (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded font-mono bg-slate-100 text-slate-600 border border-slate-200">
-                            {subGrade.grade}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-slate-400 italic">Not Inputted</span>
-                        )}
-                      </td>
-                      <td className="p-3 text-slate-500">
-                        {subGrade ? subGrade.remarks : <span className="text-[10px] italic text-slate-400">Evaluation pending terminal audit.</span>}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table id="student-grades-table" className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
+                    <th className="p-3">Subject Name</th>
+                    <th className="p-3">Asses score (30%)</th>
+                    <th className="p-3">Exam score (70%)</th>
+                    <th className="p-3">Aggregate total</th>
+                    <th className="p-3">GES Grade</th>
+                    <th className="p-3">Teacher Evaluations</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {studentSubjects.map(sub => {
+                    const subGrade = studentGrades.find(g => g.subjectId === sub.id);
+                    return (
+                      <tr key={sub.id} className="hover:bg-slate-50/55 transition-colors text-slate-600">
+                        <td className="p-3 font-bold text-slate-800">{sub.name}</td>
+                        <td className="p-3 font-mono text-slate-500">{subGrade ? `${subGrade.classScore} / 30` : '—'}</td>
+                        <td className="p-3 font-mono text-slate-500">{subGrade ? `${subGrade.examScore} / 70` : '—'}</td>
+                        <td className="p-3 font-bold text-slate-700 font-mono">
+                          {subGrade ? `${subGrade.totalScore}%` : '—'}
+                        </td>
+                        <td className="p-3">
+                          {subGrade ? (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded font-mono bg-slate-100 text-slate-600 border border-slate-200">
+                              {subGrade.grade}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-slate-400 italic">Not Inputted</span>
+                          )}
+                        </td>
+                        <td className="p-3 text-slate-500">
+                          {subGrade ? subGrade.remarks : <span className="text-[10px] italic text-slate-400">Evaluation pending terminal audit.</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* AI Report Card counseling component */}
@@ -684,53 +686,55 @@ export default function StudentDashboard({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-center text-slate-600">
-              <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Total Days Tracked</span>
-              <span className="text-xl font-bold mt-1 block text-slate-800">{totalDays} Days</span>
+            <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-center text-slate-600 dark:text-slate-300">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-bold tracking-wider block">Total Days Tracked</span>
+              <span className="text-xl font-bold mt-1 block text-slate-800 dark:text-white">{totalDays} Days</span>
             </div>
-            <div className="p-5 rounded-2xl text-center border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
-              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400">Present Marks</span>
-              <span className="text-xl font-bold mt-1 block text-slate-800">{studentAttendance.filter(a => a.status === 'Present').length}</span>
+            <div className="p-5 rounded-2xl text-center border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 dark:text-slate-300">
+              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400 dark:text-slate-500">Present Marks</span>
+              <span className="text-xl font-bold mt-1 block text-slate-800 dark:text-white">{studentAttendance.filter(a => a.status === 'Present').length}</span>
             </div>
-            <div className="p-5 rounded-2xl text-center border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
-              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400">Late Arrivals</span>
-              <span className="text-xl font-bold mt-1 block text-slate-800">{studentAttendance.filter(a => a.status === 'Late').length}</span>
+            <div className="p-5 rounded-2xl text-center border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 dark:text-slate-300">
+              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400 dark:text-slate-500">Late Arrivals</span>
+              <span className="text-xl font-bold mt-1 block text-slate-800 dark:text-white">{studentAttendance.filter(a => a.status === 'Late').length}</span>
             </div>
-            <div className="p-5 rounded-2xl text-center border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
-              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400">Absences Registered</span>
-              <span className="text-xl font-bold mt-1 block text-slate-800">{studentAttendance.filter(a => a.status === 'Absent').length}</span>
+            <div className="p-5 rounded-2xl text-center border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 dark:text-slate-300">
+              <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400 dark:text-slate-500">Absences Registered</span>
+              <span className="text-xl font-bold mt-1 block text-slate-800 dark:text-white">{studentAttendance.filter(a => a.status === 'Absent').length}</span>
             </div>
           </div>
 
-          <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-600">
-            <table id="student-attendance-table" className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
-                  <th className="p-3 text-slate-400">Attendance Date</th>
-                  <th className="p-3 text-slate-400">Status</th>
-                  <th className="p-3 text-slate-400">Syllabus Remarks / Excuses</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {studentAttendance.map(att => (
-                  <tr key={att.id} className="hover:bg-slate-50/55 transition-colors text-slate-600">
-                    <td className="p-3 font-mono">{att.date}</td>
-                    <td className="p-3">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                        att.status === 'Present' 
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
-                          : att.status === 'Late' 
-                            ? 'bg-amber-50 text-amber-700 border-amber-100' 
-                            : 'bg-rose-50 text-rose-700 border-rose-100'
-                      }`}>
-                        {att.status}
-                      </span>
-                    </td>
-                    <td className="p-3 text-slate-500">{att.remarks || 'Standard presence logged.'}</td>
+          <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-slate-600 dark:text-slate-300">
+            <div className="overflow-x-auto">
+              <table id="student-attendance-table" className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
+                    <th className="p-3 text-slate-400">Attendance Date</th>
+                    <th className="p-3 text-slate-400">Status</th>
+                    <th className="p-3 text-slate-400">Syllabus Remarks / Excuses</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {studentAttendance.map(att => (
+                    <tr key={att.id} className="hover:bg-slate-50/55 transition-colors text-slate-600">
+                      <td className="p-3 font-mono">{att.date}</td>
+                      <td className="p-3">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                          att.status === 'Present' 
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                            : att.status === 'Late' 
+                              ? 'bg-amber-50 text-amber-700 border-amber-100' 
+                              : 'bg-rose-50 text-rose-700 border-rose-100'
+                        }`}>
+                          {att.status}
+                        </span>
+                      </td>
+                      <td className="p-3 text-slate-500">{att.remarks || 'Standard presence logged.'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
@@ -1672,39 +1676,41 @@ export default function StudentDashboard({
 
               {/* Academic Performance Table */}
               <div className="border rounded-xl overflow-hidden border-slate-200 dark:border-slate-800">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase tracking-wider font-black text-slate-400">
-                      <th className="p-3">Course / Curriculum Subject</th>
-                      <th className="p-3 text-center">Class Assessment (30%)</th>
-                      <th className="p-3 text-center">Exam Score (70%)</th>
-                      <th className="p-3 text-center">Combined Score (100%)</th>
-                      <th className="p-3 text-center">Letter Grade</th>
-                      <th className="p-3">Teacher Evaluations / Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/40">
-                    {gradesList.map((g, i) => (
-                      <tr key={i} className="font-medium text-slate-700 dark:text-slate-300">
-                        <td className="p-3 font-extrabold text-slate-900 dark:text-white">
-                          <span>{g.subject}</span>
-                          <span className="text-[9px] font-mono text-slate-400 block mt-0.5">{g.code}</span>
-                        </td>
-                        <td className="p-3 text-center font-mono">{g.classScore > 0 ? `${g.classScore} / 30` : '—'}</td>
-                        <td className="p-3 text-center font-mono">{g.examScore > 0 ? `${g.examScore} / 70` : '—'}</td>
-                        <td className="p-3 text-center font-bold text-emerald-600 font-mono">{g.totalScore > 0 ? `${g.totalScore}%` : '—'}</td>
-                        <td className="p-3 text-center">
-                          {g.grade !== '—' ? (
-                            <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
-                              {g.grade}
-                            </span>
-                          ) : '—'}
-                        </td>
-                        <td className="p-3 text-slate-500 dark:text-slate-400 text-[11px] max-w-xs truncate">{g.remarks}</td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase tracking-wider font-black text-slate-400">
+                        <th className="p-3">Course / Curriculum Subject</th>
+                        <th className="p-3 text-center">Class Assessment (30%)</th>
+                        <th className="p-3 text-center">Exam Score (70%)</th>
+                        <th className="p-3 text-center">Combined Score (100%)</th>
+                        <th className="p-3 text-center">Letter Grade</th>
+                        <th className="p-3">Teacher Evaluations / Remarks</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/40">
+                      {gradesList.map((g, i) => (
+                        <tr key={i} className="font-medium text-slate-700 dark:text-slate-300">
+                          <td className="p-3 font-extrabold text-slate-900 dark:text-white">
+                            <span>{g.subject}</span>
+                            <span className="text-[9px] font-mono text-slate-400 block mt-0.5">{g.code}</span>
+                          </td>
+                          <td className="p-3 text-center font-mono">{g.classScore > 0 ? `${g.classScore} / 30` : '—'}</td>
+                          <td className="p-3 text-center font-mono">{g.examScore > 0 ? `${g.examScore} / 70` : '—'}</td>
+                          <td className="p-3 text-center font-bold text-emerald-600 font-mono">{g.totalScore > 0 ? `${g.totalScore}%` : '—'}</td>
+                          <td className="p-3 text-center">
+                            {g.grade !== '—' ? (
+                              <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
+                                {g.grade}
+                              </span>
+                            ) : '—'}
+                          </td>
+                          <td className="p-3 text-slate-500 dark:text-slate-400 text-[11px] max-w-xs truncate">{g.remarks}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* Assessment Metrics Ribbon */}

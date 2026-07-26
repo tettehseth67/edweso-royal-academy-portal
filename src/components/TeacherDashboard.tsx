@@ -1022,73 +1022,75 @@ Edweso Royal Academy Administration Portal Dispatch`;
 
           {/* List of pupils */}
           <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white shadow-sm">
-            <table id="teacher-attendance-sheet" className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
-                  <th className="p-3">Student Full Name</th>
-                  <th className="p-3">Admission Code</th>
-                  <th className="p-3 text-center">Status Marks</th>
-                  <th className="p-3">Syllabus excuse / Remarks</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-600">
-                {classStudents.map((stud) => {
-                  const state = localAttendance[stud.id] || { status: 'Present', remarks: '' };
-                  return (
-                    <tr key={stud.id} className="hover:bg-slate-50/30 transition-colors">
-                      <td className="p-3 font-bold text-slate-800">{stud.name}</td>
-                      <td className="p-3 font-mono text-[10px] text-slate-400">{stud.admissionNumber}</td>
-                      <td className="p-3">
-                        <div className="flex justify-center items-center space-x-1">
-                          <button
-                            type="button"
-                            onClick={() => handleSetStatus(stud.id, 'Present')}
-                            className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
-                              state.status === 'Present'
-                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
-                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                            }`}
-                          >
-                            Present
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleSetStatus(stud.id, 'Late')}
-                            className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
-                              state.status === 'Late'
-                                ? 'bg-amber-500 border-amber-500 text-white'
-                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                            }`}
-                          >
-                            Late
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleSetStatus(stud.id, 'Absent')}
-                            className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
-                              state.status === 'Absent'
-                                ? 'bg-rose-500 border-rose-500 text-white'
-                                : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                            }`}
-                          >
-                            Absent
-                          </button>
-                        </div>
-                      </td>
-                      <td className="p-3">
-                        <input
-                          type="text"
-                          placeholder="e.g. sick leave (Malaria)"
-                          value={state.remarks}
-                          onChange={(e) => handleSetRemarks(stud.id, e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs focus:outline-hidden text-slate-600"
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table id="teacher-attendance-sheet" className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
+                    <th className="p-3">Student Full Name</th>
+                    <th className="p-3">Admission Code</th>
+                    <th className="p-3 text-center">Status Marks</th>
+                    <th className="p-3">Syllabus excuse / Remarks</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-600">
+                  {classStudents.map((stud) => {
+                    const state = localAttendance[stud.id] || { status: 'Present', remarks: '' };
+                    return (
+                      <tr key={stud.id} className="hover:bg-slate-50/30 transition-colors">
+                        <td className="p-3 font-bold text-slate-800">{stud.name}</td>
+                        <td className="p-3 font-mono text-[10px] text-slate-400">{stud.admissionNumber}</td>
+                        <td className="p-3">
+                          <div className="flex justify-center items-center space-x-1">
+                            <button
+                              type="button"
+                              onClick={() => handleSetStatus(stud.id, 'Present')}
+                              className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+                                state.status === 'Present'
+                                  ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
+                                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                              }`}
+                            >
+                              Present
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSetStatus(stud.id, 'Late')}
+                              className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+                                state.status === 'Late'
+                                  ? 'bg-amber-500 border-amber-500 text-white'
+                                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                              }`}
+                            >
+                              Late
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSetStatus(stud.id, 'Absent')}
+                              className={`px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+                                state.status === 'Absent'
+                                  ? 'bg-rose-500 border-rose-500 text-white'
+                                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                              }`}
+                            >
+                              Absent
+                            </button>
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          <input
+                            type="text"
+                            placeholder="e.g. sick leave (Malaria)"
+                            value={state.remarks}
+                            onChange={(e) => handleSetRemarks(stud.id, e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs focus:outline-hidden text-slate-600"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="flex justify-end pt-2">
@@ -1131,61 +1133,63 @@ Edweso Royal Academy Administration Portal Dispatch`;
 
           {/* Interactive Class Grade Inputs */}
           <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white shadow-sm">
-            <table id="teacher-grading-sheet" className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
-                  <th className="p-3">Student Name</th>
-                  <th className="p-3">Class Assessment (Max 30)</th>
-                  <th className="p-3">Terminal Exam (Max 70)</th>
-                  <th className="p-3">Computed Total Score</th>
-                  <th className="p-3">GES Letter Grade</th>
-                  <th className="p-3">Auto Remark / Evaluation</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-600">
-                {classStudents.map((stud) => {
-                  const state = localGrades[stud.id] || { classScore: 0, examScore: 0 };
-                  const total = state.classScore + state.examScore;
-                  const gLetter = calculateGhanaGrade(total);
-                  return (
-                    <tr key={stud.id} className="hover:bg-slate-50/30 transition-colors">
-                      <td className="p-3 font-bold text-slate-800">{stud.name}</td>
-                      <td className="p-3">
-                        <input
-                          type="number"
-                          min={0}
-                          max={30}
-                          value={state.classScore || ''}
-                          onChange={(e) => handleClassScoreChange(stud.id, e.target.value)}
-                          className="w-20 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl text-xs focus:outline-hidden text-center font-semibold font-mono text-slate-700"
-                        />
-                      </td>
-                      <td className="p-3">
-                        <input
-                          type="number"
-                          min={0}
-                          max={70}
-                          value={state.examScore || ''}
-                          onChange={(e) => handleExamScoreChange(stud.id, e.target.value)}
-                          className="w-20 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl text-xs focus:outline-hidden text-center font-semibold font-mono text-slate-700"
-                        />
-                      </td>
-                      <td className="p-3 font-semibold text-slate-700 font-mono text-center sm:text-left">
-                        {total}%
-                      </td>
-                      <td className="p-3">
-                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full font-mono bg-indigo-50 text-indigo-700">
-                          {gLetter}
-                        </span>
-                      </td>
-                      <td className="p-3 text-slate-500 italic">
-                        {getGradeRemark(gLetter)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table id="teacher-grading-sheet" className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 font-bold uppercase tracking-wider text-[10px] text-slate-400 bg-slate-50">
+                    <th className="p-3">Student Name</th>
+                    <th className="p-3">Class Assessment (Max 30)</th>
+                    <th className="p-3">Terminal Exam (Max 70)</th>
+                    <th className="p-3">Computed Total Score</th>
+                    <th className="p-3">GES Letter Grade</th>
+                    <th className="p-3">Auto Remark / Evaluation</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-slate-600">
+                  {classStudents.map((stud) => {
+                    const state = localGrades[stud.id] || { classScore: 0, examScore: 0 };
+                    const total = state.classScore + state.examScore;
+                    const gLetter = calculateGhanaGrade(total);
+                    return (
+                      <tr key={stud.id} className="hover:bg-slate-50/30 transition-colors">
+                        <td className="p-3 font-bold text-slate-800">{stud.name}</td>
+                        <td className="p-3">
+                          <input
+                            type="number"
+                            min={0}
+                            max={30}
+                            value={state.classScore || ''}
+                            onChange={(e) => handleClassScoreChange(stud.id, e.target.value)}
+                            className="w-20 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl text-xs focus:outline-hidden text-center font-semibold font-mono text-slate-700"
+                          />
+                        </td>
+                        <td className="p-3">
+                          <input
+                            type="number"
+                            min={0}
+                            max={70}
+                            value={state.examScore || ''}
+                            onChange={(e) => handleExamScoreChange(stud.id, e.target.value)}
+                            className="w-20 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl text-xs focus:outline-hidden text-center font-semibold font-mono text-slate-700"
+                          />
+                        </td>
+                        <td className="p-3 font-semibold text-slate-700 font-mono text-center sm:text-left">
+                          {total}%
+                        </td>
+                        <td className="p-3">
+                          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full font-mono bg-indigo-50 text-indigo-700">
+                            {gLetter}
+                          </span>
+                        </td>
+                        <td className="p-3 text-slate-500 italic">
+                          {getGradeRemark(gLetter)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="flex justify-end pt-2">

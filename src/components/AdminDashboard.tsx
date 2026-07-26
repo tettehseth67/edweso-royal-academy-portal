@@ -4,7 +4,8 @@ import {
   Calendar, Megaphone, CreditCard, Search, Plus, 
   Trash2, Edit, Check, AlertTriangle, Eye, RefreshCw, Filter, ShieldCheck, Download,
   ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer, Cake, Gift,
-  Lock, Building, HelpCircle, Info, Smartphone, FileText, Receipt, Play, Send, Sparkles, Camera
+  Lock, Building, HelpCircle, Info, Smartphone, FileText, Receipt, Play, Send, Sparkles, Camera,
+  Crown, Scale, TrendingUp, CheckCircle2
 } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, 
@@ -132,6 +133,34 @@ export default function AdminDashboard({
   const [activityTypeFilter, setActivityTypeFilter] = useState<'all' | 'login' | 'grade' | 'attendance'>('all');
   const [activityPage, setActivityPage] = useState(1);
   const [activitiesList, setActivitiesList] = useState(() => SchoolDatabase.getSystemActivities());
+
+  // Founder (Super Admin) Governance States
+  const [founderDirectives, setFounderDirectives] = useState([
+    { id: 'dir-1', title: 'Q3 BECE Academic Rigor Enhancement', category: 'Academic Standard', recipient: 'Dr. J. K. Appiah (Headmaster)', date: '2026-07-15', status: 'In Execution', priority: 'High Priority' },
+    { id: 'dir-2', title: 'Solar Power Grid Phase 2 Commissioning', category: 'Infrastructure', recipient: 'Estate & Operations Committee', date: '2026-07-10', status: 'Completed', priority: 'Urgent' },
+    { id: 'dir-3', title: 'Staff Biometric Attendance Audit', category: 'Governance', recipient: 'Headmaster & HR', date: '2026-06-28', status: 'Enforced', priority: 'Standard' }
+  ]);
+  const [newDirectiveTitle, setNewDirectiveTitle] = useState('');
+  const [newDirectiveCategory, setNewDirectiveCategory] = useState<'Academic Standard' | 'Financial Allocation' | 'Staffing & Discipline' | 'Emergency Board Order'>('Academic Standard');
+  const [newDirectivePriority, setNewDirectivePriority] = useState<'Standard' | 'High Priority' | 'Urgent'>('High Priority');
+  const [newDirectiveBody, setNewDirectiveBody] = useState('');
+
+  const [founderProjects, setFounderProjects] = useState([
+    { id: 'proj-1', name: 'Ultra-Modern Robotics & STEM Innovation Hub', budget: 'GHS 250,000.00', contractor: 'Kasapreko Tech Build Ltd', status: 'Pending Founder Sign-Off', estCompletion: 'Oct 2026' },
+    { id: 'proj-2', name: 'Solar Power Microgrid & Back-Up Energy (Phase 2)', budget: 'GHS 120,000.00', contractor: 'Volta Green Energy Solutions', status: 'Approved', estCompletion: 'Aug 2026' },
+    { id: 'proj-3', name: 'School Bus Fleet Expansion (2 Coaster Buses)', budget: 'GHS 480,000.00', contractor: 'Toyota Ghana Motors', status: 'Approved', estCompletion: 'Sept 2026' },
+    { id: 'proj-4', name: 'Smart Classroom Interactive Displays (Primary Block)', budget: 'GHS 65,000.00', contractor: 'EdTech Africa Ghana', status: 'Under Board Review', estCompletion: 'Nov 2026' }
+  ]);
+
+  const [founderPolicies, setFounderPolicies] = useState({
+    biometricAttendance: true,
+    scholarshipEndowment: true,
+    dualCurriculum: true,
+    headmasterDiscretionaryCap: true,
+    ptaSponsorshipMatch: false
+  });
+
+  const [founderNotification, setFounderNotification] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeTab === 'activities') {
@@ -471,6 +500,10 @@ export default function AdminDashboard({
   const [simStatus, setSimStatus] = useState<'Successful' | 'Pending' | 'Failed'>('Successful');
 
   const handleApprovePendingTransaction = (txId: string) => {
+    if (session?.role !== 'super_admin') {
+      alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder & Executive Chairman Nana Kwasi Edweso II) is authorized to verify and approve transaction overrides.');
+      return;
+    }
     const targetTx = transactions.find(t => t.id === txId);
     if (!targetTx) return;
 
@@ -498,7 +531,7 @@ export default function AdminDashboard({
     });
     onUpdateTransactions(updatedTx);
 
-    alert(`Successfully verified and approved transaction ${targetTx.reference}. Tuition balance of GHS ${targetTx.amountGHS.toFixed(2)} has been credited to ${targetTx.studentName} and an official receipt has been dispatched to their guardian.`);
+    alert(`[SUPER ADMIN AUTHORIZED] Successfully verified and approved transaction ${targetTx.reference}. Tuition balance of GHS ${targetTx.amountGHS.toFixed(2)} credited to ${targetTx.studentName}.`);
   };
   const [manualPayments, setManualPayments] = useState<ManualPaymentRequest[]>(() => {
     const saved = localStorage.getItem('era_manual_payments');
@@ -607,51 +640,77 @@ export default function AdminDashboard({
       return;
     }
 
-    // 1. Deduct paid amount from student's balance
-    const updatedStudents = students.map(s => {
-      if (s.id === directStudentId) {
-        return {
-          ...s,
-          balanceGHS: Math.max(0, s.balanceGHS - amount)
-        };
-      }
-      return s;
-    });
-    onUpdateStudents(updatedStudents);
+    const isSuperAdminUser = session?.role === 'super_admin';
 
-    // 2. Log payment transaction in transaction ledger
-    const newTx: PaymentTransaction = {
-      id: 'tx-manual-' + Date.now(),
-      studentId: directStudentId,
-      studentName: targetStudent.name,
-      amountGHS: amount,
-      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      status: 'Successful',
-      reference: directReference.trim(),
-      paystackRef: 'DIRECT-BURSAR-' + Date.now(),
-      paymentMethod: directMethod as any,
-      email: targetStudent.parentEmail || 'student@school.edu',
-      term: 'Term 1'
-    };
-    onUpdateTransactions([newTx, ...transactions]);
+    if (isSuperAdminUser) {
+      // 1. Deduct paid amount from student's balance
+      const updatedStudents = students.map(s => {
+        if (s.id === directStudentId) {
+          return {
+            ...s,
+            balanceGHS: Math.max(0, s.balanceGHS - amount)
+          };
+        }
+        return s;
+      });
+      onUpdateStudents(updatedStudents);
 
-    // 3. Create a manual request marked as Approved automatically
-    const newRequest: ManualPaymentRequest = {
-      id: `M-${Date.now().toString().substring(6)}`,
-      studentId: directStudentId,
-      studentName: targetStudent.name,
-      amountGHS: amount,
-      date: new Date().toISOString().substring(0, 10),
-      referenceCode: directReference.trim(),
-      paymentMethod: directMethod as any,
-      status: 'Approved',
-      reviewedBy: 'Bursar Administrator',
-      reviewedAt: new Date().toISOString().substring(0, 10)
-    };
+      // 2. Log payment transaction in transaction ledger
+      const newTx: PaymentTransaction = {
+        id: 'tx-manual-' + Date.now(),
+        studentId: directStudentId,
+        studentName: targetStudent.name,
+        amountGHS: amount,
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        status: 'Successful',
+        reference: directReference.trim(),
+        paystackRef: 'DIRECT-SUPERADMIN-' + Date.now(),
+        paymentMethod: directMethod as any,
+        email: targetStudent.parentEmail || 'student@school.edu',
+        term: 'Term 1'
+      };
+      onUpdateTransactions([newTx, ...transactions]);
 
-    const updatedRequests = [newRequest, ...manualPayments];
-    setManualPayments(updatedRequests);
-    localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
+      // 3. Create a manual request marked as Approved automatically
+      const newRequest: ManualPaymentRequest = {
+        id: `M-${Date.now().toString().substring(6)}`,
+        studentId: directStudentId,
+        studentName: targetStudent.name,
+        amountGHS: amount,
+        date: new Date().toISOString().substring(0, 10),
+        referenceCode: directReference.trim(),
+        paymentMethod: directMethod as any,
+        status: 'Approved',
+        reviewedBy: 'Founder Nana Kwasi Edweso II (Super Admin)',
+        reviewedAt: new Date().toISOString().substring(0, 10)
+      };
+
+      const updatedRequests = [newRequest, ...manualPayments];
+      setManualPayments(updatedRequests);
+      localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
+
+      alert(`[SUPER ADMIN AUTHORIZED] Successfully verified and credited direct payment of GHS ${amount} for ${targetStudent.name}.`);
+    } else {
+      // Queued for Super Admin approval
+      const newRequest: ManualPaymentRequest = {
+        id: `M-${Date.now().toString().substring(6)}`,
+        studentId: directStudentId,
+        studentName: targetStudent.name,
+        amountGHS: amount,
+        date: new Date().toISOString().substring(0, 10),
+        referenceCode: directReference.trim(),
+        paymentMethod: directMethod as any,
+        status: 'Pending',
+        reviewedBy: 'Pending Super Admin Sign-off',
+        reviewedAt: ''
+      };
+
+      const updatedRequests = [newRequest, ...manualPayments];
+      setManualPayments(updatedRequests);
+      localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
+
+      alert(`Direct cash payment of GHS ${amount} for ${targetStudent.name} recorded and queued for MANDATORY SUPER ADMIN (Founder) EXECUTIVE APPROVAL before tuition balance adjustment.`);
+    }
 
     // Reset Form
     setDirectStudentId('');
@@ -659,11 +718,14 @@ export default function AdminDashboard({
     setDirectMethod('Cash');
     setDirectReference('');
     setIsDirectPaymentModalOpen(false);
-
-    alert(`Successfully recorded and verified direct payment of GHS ${amount} for ${targetStudent.name}.`);
   };
 
   const handleApproveManualPayment = (id: string) => {
+    if (session?.role !== 'super_admin') {
+      alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to approve manual fee receipts and credit student tuition balances.');
+      return;
+    }
+
     const request = manualPayments.find(r => r.id === id);
     if (!request) return;
 
@@ -689,7 +751,7 @@ export default function AdminDashboard({
       date: new Date().toISOString().replace('T', ' ').substring(0, 16),
       status: 'Successful',
       reference: request.referenceCode,
-      paystackRef: 'MANUAL-VERIFIED-' + request.id,
+      paystackRef: 'MANUAL-SUPERADMIN-' + request.id,
       paymentMethod: request.paymentMethod as any,
       email: studentRecord?.parentEmail || 'student@school.edu',
       term: 'Term 1'
@@ -702,7 +764,8 @@ export default function AdminDashboard({
         return {
           ...r,
           status: 'Approved' as const,
-          reviewedBy: 'Bursar Administrator'
+          reviewedBy: 'Founder Nana Kwasi Edweso II (Super Admin)',
+          reviewedAt: new Date().toISOString().substring(0, 10)
         };
       }
       return r;
@@ -710,10 +773,15 @@ export default function AdminDashboard({
     setManualPayments(updatedRequests);
     localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
 
-    alert(`Successfully approved payment receipt. GHS ${request.amountGHS} has been credited to student ${request.studentName}'s tuition balance.`);
+    alert(`[SUPER ADMIN AUTHORIZED] Successfully approved payment receipt. GHS ${request.amountGHS} credited to ${request.studentName}.`);
   };
 
   const handleRejectManualPayment = (id: string) => {
+    if (session?.role !== 'super_admin') {
+      alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to decline payment receipt submissions.');
+      return;
+    }
+
     if (!rejectReason.trim()) {
       alert('Please provide a reason for declining this receipt.');
       return;
@@ -724,7 +792,8 @@ export default function AdminDashboard({
           ...r,
           status: 'Rejected' as const,
           rejectReason: rejectReason.trim(),
-          reviewedBy: 'Bursar Administrator'
+          reviewedBy: 'Founder Nana Kwasi Edweso II (Super Admin)',
+          reviewedAt: new Date().toISOString().substring(0, 10)
         };
       }
       return r;
@@ -734,7 +803,72 @@ export default function AdminDashboard({
     setRejectingId(null);
     setRejectReason('');
 
-    alert('The receipt has been marked as declined and the student has been notified with the reason.');
+    alert('[SUPER ADMIN AUTHORIZED] Receipt declined and logged.');
+  };
+
+  const handleBatchApproveFinancialRequests = () => {
+    if (session?.role !== 'super_admin') {
+      alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) can execute batch executive approvals.');
+      return;
+    }
+
+    const pendingRequests = manualPayments.filter(r => r.status === 'Pending');
+    if (pendingRequests.length === 0) {
+      alert('No pending financial requests requiring Super Admin approval at this time.');
+      return;
+    }
+
+    let updatedStudentsList = [...students];
+    const newTxList: PaymentTransaction[] = [];
+
+    pendingRequests.forEach(req => {
+      // 1. Deduct paid amount
+      updatedStudentsList = updatedStudentsList.map(s => {
+        if (s.id === req.studentId) {
+          return {
+            ...s,
+            balanceGHS: Math.max(0, s.balanceGHS - req.amountGHS)
+          };
+        }
+        return s;
+      });
+
+      // 2. Add transaction
+      const st = students.find(s => s.id === req.studentId);
+      newTxList.push({
+        id: 'tx-manual-' + Math.random().toString(36).substring(2, 9),
+        studentId: req.studentId,
+        studentName: req.studentName,
+        amountGHS: req.amountGHS,
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        status: 'Successful',
+        reference: req.referenceCode,
+        paystackRef: 'BATCH-SUPERADMIN-' + req.id,
+        paymentMethod: req.paymentMethod as any,
+        email: st?.parentEmail || 'student@school.edu',
+        term: 'Term 1'
+      });
+    });
+
+    onUpdateStudents(updatedStudentsList);
+    onUpdateTransactions([...newTxList, ...transactions]);
+
+    const updatedManual = manualPayments.map(r => {
+      if (r.status === 'Pending') {
+        return {
+          ...r,
+          status: 'Approved' as const,
+          reviewedBy: 'Founder Nana Kwasi Edweso II (Super Admin)',
+          reviewedAt: new Date().toISOString().substring(0, 10)
+        };
+      }
+      return r;
+    });
+
+    setManualPayments(updatedManual);
+    localStorage.setItem('era_manual_payments', JSON.stringify(updatedManual));
+
+    alert(`[SUPER ADMIN BATCH AUTHORIZED] Successfully approved and credited all ${pendingRequests.length} pending fee receipts!`);
   };
   const [paystackMode, setPaystackMode] = useState<'test' | 'live'>(() => {
     return (localStorage.getItem('era_paystack_mode') as 'test' | 'live') || 'test';
@@ -1628,6 +1762,446 @@ export default function AdminDashboard({
   return (
     <div className="space-y-6">
       
+      {/* ==================== 0. FOUNDER GOVERNANCE HUB ==================== */}
+      {activeTab === 'founder-governance' && (
+        <div className="space-y-6 animate-fade-in">
+          
+          {founderNotification && (
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-bold flex items-center justify-between animate-fade-in shadow-xs dark:bg-amber-950/60 dark:border-amber-500/40 dark:text-amber-200">
+              <div className="flex items-center space-x-2">
+                <Crown size={18} className="text-amber-600 dark:text-amber-400 shrink-0 animate-bounce" />
+                <span>{founderNotification}</span>
+              </div>
+              <button 
+                onClick={() => setFounderNotification(null)}
+                className="text-amber-800 hover:text-amber-950 dark:text-amber-300 dark:hover:text-white text-xs font-black uppercase px-2.5 py-1 rounded-lg bg-amber-200/70 dark:bg-amber-900/60 transition-colors"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          {/* Founder Executive Banner */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-700 to-emerald-800 text-white flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-md border border-amber-400/30 relative overflow-hidden">
+            <div className="absolute -top-12 -right-12 w-72 h-72 bg-amber-300/20 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div className="space-y-2 relative z-10 max-w-2xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] bg-white/20 backdrop-blur-md text-amber-100 font-extrabold px-3 py-1 rounded-full border border-white/30 uppercase tracking-widest flex items-center space-x-1 shadow-xs">
+                  <Crown size={13} className="text-amber-200" />
+                  <span>Founder & Executive Chairman Console</span>
+                </span>
+                <span className="text-[10px] bg-emerald-950/40 text-emerald-100 font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-300/40 uppercase tracking-wider">
+                  Level 0 Super Admin Access
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black font-display text-white tracking-tight drop-shadow-xs">
+                Nana Kwasi Edweso II
+              </h1>
+              <p className="text-xs text-amber-100/90 leading-relaxed font-medium max-w-xl">
+                Founder, Proprietor & Chairman of the Executive Governing Board of Edweso Royal Academy. Exercising strategic governance over Headmaster Dr. J.K. Appiah, endowment reserves, capital infrastructure projects, and institutional bye-laws.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 w-full lg:w-auto shrink-0 relative z-10">
+              <div className="bg-white/15 backdrop-blur-md p-4 rounded-2xl border border-white/25 text-center shadow-xs">
+                <span className="text-[9px] text-amber-100 uppercase font-black tracking-widest block">Endowment & Reserve</span>
+                <span className="text-lg sm:text-xl font-black font-mono text-white mt-0.5 block drop-shadow-xs">GHS 1,850,000.00</span>
+                <span className="text-[9px] text-amber-200 font-bold block mt-0.5">+12.4% Capital Growth</span>
+              </div>
+              <div className="bg-white/15 backdrop-blur-md p-4 rounded-2xl border border-white/25 text-center shadow-xs">
+                <span className="text-[9px] text-emerald-100 uppercase font-black tracking-widest block">Headmaster Index</span>
+                <span className="text-lg sm:text-xl font-black font-mono text-white mt-0.5 block drop-shadow-xs">98.6%</span>
+                <span className="text-[9px] text-emerald-200 font-bold block mt-0.5">Dr. J. K. Appiah</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Founder Metric Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all space-y-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                <span className="text-[10px] font-black uppercase tracking-widest">School Headmaster</span>
+                <UserCheck size={18} className="text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div className="text-base font-black text-slate-900 dark:text-white">Dr. J. K. Appiah</div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Headmaster & Principal Administrator</p>
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">
+                <span>Status: Active Duty</span>
+                <span>Appointed Nov 2018</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all space-y-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                <span className="text-[10px] font-black uppercase tracking-widest">Active Infrastructure</span>
+                <Building size={18} className="text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="text-base font-black text-slate-900 dark:text-white">{founderProjects.length} Major Projects</div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Robotics Lab, Solar Grid, Bus Fleet</p>
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-amber-700 dark:text-amber-400 font-bold">
+                <span>Total Budget: GHS 915k</span>
+                <span>1 Pending Sign-Off</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all space-y-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                <span className="text-[10px] font-black uppercase tracking-widest">Board Directives</span>
+                <Scale size={18} className="text-sky-600 dark:text-sky-400" />
+              </div>
+              <div className="text-base font-black text-slate-900 dark:text-white">{founderDirectives.length} Mandates Dispatched</div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Enforced for Headmaster & Staff</p>
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-sky-700 dark:text-sky-400 font-bold">
+                <span>Compliance: 100%</span>
+                <span>Latest: Q3 BECE Rigor</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all space-y-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                <span className="text-[10px] font-black uppercase tracking-widest">Royal Scholarship Fund</span>
+                <Sparkles size={18} className="text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="text-base font-black text-slate-900 dark:text-white">42 Ward Beneficiaries</div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">100% Need-Based & Academic Merit</p>
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-purple-700 dark:text-purple-400 font-bold">
+                <span>Funded: GHS 84,000</span>
+                <span>Endowed by Founder</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 1: Headmaster Oversight & Mandate Dispatcher */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Headmaster Dossier & Performance Audit Card */}
+            <div className="lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div className="flex items-center space-x-2">
+                  <UserCheck size={18} className="text-emerald-600 dark:text-emerald-400" />
+                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Headmaster Dossier</h3>
+                </div>
+                <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800 font-bold px-2 py-0.5 rounded-md">
+                  Reporting to Founder
+                </span>
+              </div>
+
+              <div className="text-center space-y-2 pt-1">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-600 to-amber-600 text-white rounded-2xl mx-auto flex items-center justify-center border-2 border-amber-300 shadow-md font-black text-xl">
+                  JA
+                </div>
+                <div>
+                  <h4 className="text-base font-extrabold text-slate-900 dark:text-white">Dr. Joseph K. Appiah</h4>
+                  <p className="text-xs text-amber-700 dark:text-amber-400 font-bold">Headmaster & Principal Administrator</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Ph.D. Educational Leadership & Management</p>
+                </div>
+              </div>
+
+              <div className="space-y-2.5 pt-2 text-xs">
+                <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/60">
+                  <span className="text-slate-500 dark:text-slate-400">Primary Responsibility:</span>
+                  <span className="font-bold text-slate-900 dark:text-white">Academic & Staff Operations</span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/60">
+                  <span className="text-slate-500 dark:text-slate-400">Monthly Expense Approval Limit:</span>
+                  <span className="font-mono font-extrabold text-amber-700 dark:text-amber-400">GHS 20,000.00</span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/60">
+                  <span className="text-slate-500 dark:text-slate-400">Terminal Fees Collection Rate:</span>
+                  <span className="font-mono font-extrabold text-emerald-700 dark:text-emerald-400">94.2% (GHS 245.8k)</span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/60">
+                  <span className="text-slate-500 dark:text-slate-400">Staff Clock-In Punctuality Index:</span>
+                  <span className="font-mono font-extrabold text-sky-700 dark:text-sky-400">98.1%</span>
+                </div>
+              </div>
+
+              <div className="bg-amber-50/80 dark:bg-slate-950 p-3.5 rounded-xl border border-amber-200/80 dark:border-slate-800 space-y-1.5">
+                <span className="text-[10px] text-amber-800 dark:text-amber-400 font-black uppercase tracking-wider block">Founder Audit Remark</span>
+                <p className="text-[11px] text-slate-700 dark:text-slate-300 italic leading-snug">
+                  "Dr. Appiah continues to demonstrate stellar leadership in maintaining academic discipline and teacher accountability across all JHS and Primary blocks."
+                </p>
+              </div>
+            </div>
+
+            {/* Mandate Dispatcher to Headmaster */}
+            <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div className="flex items-center space-x-2">
+                  <Crown size={18} className="text-amber-600 dark:text-amber-400" />
+                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Issue Founder Directive to Headmaster</h3>
+                </div>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Instant Dispatch to Headmaster Desk</span>
+              </div>
+
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!newDirectiveTitle.trim() || !newDirectiveBody.trim()) return;
+                  const newDir = {
+                    id: `dir-${Date.now()}`,
+                    title: newDirectiveTitle.trim(),
+                    category: newDirectiveCategory,
+                    recipient: 'Dr. J. K. Appiah (Headmaster)',
+                    date: new Date().toISOString().substring(0, 10),
+                    status: 'Dispatched to Headmaster',
+                    priority: newDirectivePriority
+                  };
+                  setFounderDirectives([newDir, ...founderDirectives]);
+                  setFounderNotification(`Executive Directive "${newDirectiveTitle}" successfully dispatched to Headmaster Dr. J.K. Appiah!`);
+                  setNewDirectiveTitle('');
+                  setNewDirectiveBody('');
+                }} 
+                className="space-y-3"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Directive Title / Subject</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="e.g. Mandatory Mock Exams Revision Strategy" 
+                      value={newDirectiveTitle}
+                      onChange={(e) => setNewDirectiveTitle(e.target.value)}
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 font-medium"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Category</label>
+                      <select 
+                        value={newDirectiveCategory}
+                        onChange={(e) => setNewDirectiveCategory(e.target.value as any)}
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 font-bold"
+                      >
+                        <option value="Academic Standard">Academic Standard</option>
+                        <option value="Financial Allocation">Financial Allocation</option>
+                        <option value="Staffing & Discipline">Staffing & Discipline</option>
+                        <option value="Emergency Board Order">Emergency Board Order</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Priority Level</label>
+                      <select 
+                        value={newDirectivePriority}
+                        onChange={(e) => setNewDirectivePriority(e.target.value as any)}
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 font-bold"
+                      >
+                        <option value="Standard">Standard</option>
+                        <option value="High Priority">High Priority</option>
+                        <option value="Urgent">Urgent Board Directive</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Directive Text / Board Instructions</label>
+                  <textarea 
+                    rows={3}
+                    required
+                    placeholder="Enter detailed executive instructions for Dr. J.K. Appiah to execute immediately across Edweso Royal Academy..."
+                    value={newDirectiveBody}
+                    onChange={(e) => setNewDirectiveBody(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 font-medium"
+                  />
+                </div>
+
+                <div className="flex justify-end pt-1">
+                  <button 
+                    type="submit"
+                    className="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-black rounded-xl text-xs flex items-center space-x-2 shadow-sm transition-all cursor-pointer"
+                  >
+                    <Send size={14} />
+                    <span>Dispatch Executive Directive</span>
+                  </button>
+                </div>
+              </form>
+
+              {/* Recent Founder Directives List */}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Recent Executive Directives Log</span>
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {founderDirectives.map((dir) => (
+                    <div key={dir.id} className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-extrabold text-slate-900 dark:text-white">{dir.title}</span>
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${
+                            dir.priority === 'Urgent' 
+                              ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-300' 
+                              : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                          }`}>
+                            {dir.priority}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">To: {dir.recipient} • {dir.category} • {dir.date}</p>
+                      </div>
+                      <span className="text-[10px] font-black text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-2.5 py-1 rounded-lg">
+                        {dir.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Section 2: Capital Expenditure & Infrastructure Projects Sign-Off */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center space-x-2">
+                <Building size={18} className="text-amber-600 dark:text-amber-400" />
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Capital Expenditure & School Expansion Approvals</h3>
+              </div>
+              <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800 font-bold px-2.5 py-1 rounded-md">
+                Founder Approval Ledger
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {founderProjects.map((proj) => (
+                <div key={proj.id} className="p-4 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">{proj.name}</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Contractor: {proj.contractor}</p>
+                    </div>
+                    <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg border shrink-0 ${
+                      proj.status === 'Approved' 
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800' 
+                        : proj.status === 'Pending Founder Sign-Off'
+                          ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-700 animate-pulse'
+                          : 'bg-slate-200 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                    }`}>
+                      {proj.status}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200/60 dark:border-slate-800">
+                    <div>
+                      <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">Budget Allocation:</span>
+                      <p className="font-mono font-black text-amber-700 dark:text-amber-400 text-sm">{proj.budget}</p>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">Completion Target:</span>
+                      <p className="font-extrabold text-slate-900 dark:text-white text-xs">{proj.estCompletion}</p>
+                    </div>
+                  </div>
+
+                  {proj.status === 'Pending Founder Sign-Off' && (
+                    <div className="flex items-center space-x-2 pt-2 border-t border-slate-200/60 dark:border-slate-800">
+                      <button
+                        onClick={() => {
+                          setFounderProjects(founderProjects.map(p => p.id === proj.id ? { ...p, status: 'Approved' } : p));
+                          setFounderNotification(`Project "${proj.name}" (Budget: ${proj.budget}) has been officially APPROVED by Founder Nana Kwasi Edweso II!`);
+                        }}
+                        className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center space-x-1.5 shadow-xs cursor-pointer"
+                      >
+                        <CheckCircle2 size={14} />
+                        <span>Sign-Off & Approve Budget</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Section 3: School Board Policy & Institutional Bye-Laws */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center space-x-2">
+                <Scale size={18} className="text-amber-600 dark:text-amber-400" />
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Institutional Bye-Laws & Governance Policies</h3>
+              </div>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Founder Policy Governance</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3">
+                <div>
+                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">Mandatory Biometric Staff Clock-In</h5>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Require fingerprint/facial scan for teacher daily arrival</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const next = !founderPolicies.biometricAttendance;
+                    setFounderPolicies({ ...founderPolicies, biometricAttendance: next });
+                    setFounderNotification(`Biometric Staff Clock-In Policy updated to: ${next ? 'ENFORCED' : 'DISABLED'}`);
+                  }}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                    founderPolicies.biometricAttendance ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  {founderPolicies.biometricAttendance ? 'Enforced' : 'Disabled'}
+                </button>
+              </div>
+
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3">
+                <div>
+                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">Royal Excellence Scholarship Endowment</h5>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Automatic 10% tuition waiver for top 3 students per class</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const next = !founderPolicies.scholarshipEndowment;
+                    setFounderPolicies({ ...founderPolicies, scholarshipEndowment: next });
+                    setFounderNotification(`Scholarship Endowment Policy updated to: ${next ? 'ACTIVE' : 'SUSPENDED'}`);
+                  }}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                    founderPolicies.scholarshipEndowment ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  {founderPolicies.scholarshipEndowment ? 'Active' : 'Suspended'}
+                </button>
+              </div>
+
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3">
+                <div>
+                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">Dual Cambridge & BECE Standard</h5>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Integrate British & Ghanaian national curriculum frameworks</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const next = !founderPolicies.dualCurriculum;
+                    setFounderPolicies({ ...founderPolicies, dualCurriculum: next });
+                    setFounderNotification(`Dual Curriculum Policy updated to: ${next ? 'ENFORCED' : 'STANDARD'}`);
+                  }}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                    founderPolicies.dualCurriculum ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  {founderPolicies.dualCurriculum ? 'Enforced' : 'Standard'}
+                </button>
+              </div>
+
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3">
+                <div>
+                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">Headmaster Discretionary Expense Limit</h5>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Require Founder co-signature for expenses &gt; GHS 20,000</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const next = !founderPolicies.headmasterDiscretionaryCap;
+                    setFounderPolicies({ ...founderPolicies, headmasterDiscretionaryCap: next });
+                    setFounderNotification(`Headmaster Expense Cap updated to: ${next ? 'ENFORCED (GHS 20k)' : 'UNLIMITED'}`);
+                  }}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                    founderPolicies.headmasterDiscretionaryCap ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  {founderPolicies.headmasterDiscretionaryCap ? 'Enforced' : 'Unlimited'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
       {/* ==================== 1. OVERVIEW PANEL ==================== */}
       {activeTab === 'overview' && (
         <div className="space-y-6 animate-fade-in">
@@ -1635,9 +2209,24 @@ export default function AdminDashboard({
           {/* Welcome Card Banner */}
           <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-800 to-emerald-950 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-md border border-emerald-500/10">
             <div className="space-y-1 text-center md:text-left">
-              <span className="text-[10px] bg-emerald-700/60 px-3 py-1 rounded-full text-amber-300 font-bold border border-amber-400/20 uppercase tracking-widest">Edweso Administrative Dashboard</span>
-              <h1 className="text-xl sm:text-2xl font-black font-display mt-2 tracking-tight">Welcome Back, Principal J. K. Appiah</h1>
-              <p className="text-xs text-emerald-200">Manage students, process staff payroll trackers, review academic scores, and monitor GHS school fees balances.</p>
+              <span className="text-[10px] bg-emerald-700/60 px-3 py-1 rounded-full text-amber-300 font-bold border border-amber-400/20 uppercase tracking-widest inline-flex items-center space-x-1">
+                {session?.role === 'super_admin' ? (
+                  <>
+                    <Crown size={12} className="text-amber-400 mr-1" />
+                    <span>Founder & Board Executive Console</span>
+                  </>
+                ) : (
+                  <span>Edweso Administrative Dashboard</span>
+                )}
+              </span>
+              <h1 className="text-xl sm:text-2xl font-black font-display mt-2 tracking-tight">
+                {session?.role === 'super_admin' ? 'Welcome Back, Founder Nana Kwasi Edweso II' : 'Welcome Back, Principal J. K. Appiah'}
+              </h1>
+              <p className="text-xs text-emerald-200">
+                {session?.role === 'super_admin'
+                  ? 'Founder & Executive Board Console — Overseeing Headmaster Dr. J.K. Appiah, Financial Reserves, Capital Infrastructure & School Board Policies.'
+                  : 'Manage students, process staff payroll trackers, review academic scores, and monitor GHS school fees balances.'}
+              </p>
             </div>
             <div className="bg-emerald-900/60 p-3 rounded-xl border border-emerald-700 text-center shrink-0">
               <span className="text-[9px] text-emerald-300 uppercase font-black tracking-widest block">Terminal Revenue</span>
@@ -2478,13 +3067,23 @@ export default function AdminDashboard({
                   </div>
                   <button
                     onClick={() => {
+                      if (session?.role !== 'super_admin') {
+                        setPayrollActionStatus({ type: 'error', message: 'FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to execute staff payroll disbursements.' });
+                        alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder & Executive Chairman) can disburse staff salaries.');
+                        return;
+                      }
                       const updated = staffPayrolls.map(p => ({ ...p, status: 'Paid' as const, processedOn: new Date().toISOString().substring(0, 10) }));
                       onUpdateStaffPayrolls(updated);
-                      setPayrollActionStatus({ type: 'success', message: 'All outstanding staff salaries processed successfully!' });
+                      setPayrollActionStatus({ type: 'success', message: '[SUPER ADMIN AUTHORIZED] All staff salaries processed and disbursed successfully under Founder Executive seal.' });
                     }}
-                    className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-black rounded-lg text-xs cursor-pointer shadow-sm active:scale-95 transition-all"
+                    className={`px-3 py-1.5 font-black rounded-lg text-xs cursor-pointer shadow-sm active:scale-95 transition-all flex items-center space-x-1 ${
+                      session?.role === 'super_admin'
+                        ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                        : 'bg-slate-300 dark:bg-slate-800 text-slate-500 hover:bg-slate-400'
+                    }`}
                   >
-                    Process All Payouts
+                    <ShieldCheck size={13} />
+                    <span>{session?.role === 'super_admin' ? 'Super Admin Disburse All' : 'Requires Super Admin Disburse'}</span>
                   </button>
                 </div>
 
@@ -2528,13 +3127,23 @@ export default function AdminDashboard({
                             {pay.status === 'Pending' && (
                               <button
                                 onClick={() => {
+                                  if (session?.role !== 'super_admin') {
+                                    setPayrollActionStatus({ type: 'error', message: 'FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to execute staff payroll disbursements.' });
+                                    alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder) can disburse staff salaries.');
+                                    return;
+                                  }
                                   const updated = staffPayrolls.map(p => p.id === pay.id ? { ...p, status: 'Paid' as const, processedOn: new Date().toISOString().substring(0, 10) } : p);
                                   onUpdateStaffPayrolls(updated);
-                                  setPayrollActionStatus({ type: 'success', message: `Salary payout for ${pay.staffName} processed successfully!` });
+                                  setPayrollActionStatus({ type: 'success', message: `[SUPER ADMIN AUTHORIZED] Salary payout of GH¢ ${pay.netSalary.toLocaleString()} for ${pay.staffName} disbursed.` });
                                 }}
-                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded text-[10px] cursor-pointer"
+                                className={`px-2.5 py-1 font-extrabold rounded text-[10px] cursor-pointer flex items-center space-x-1 inline-flex ${
+                                  session?.role === 'super_admin'
+                                    ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                                }`}
                               >
-                                Pay Salary
+                                <ShieldCheck size={11} />
+                                <span>{session?.role === 'super_admin' ? 'Super Admin Disburse' : 'Requires Super Admin'}</span>
                               </button>
                             )}
                             <button
@@ -2959,53 +3568,55 @@ export default function AdminDashboard({
 
           {/* Collated Grades Table */}
           <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
-            <table id="grades-ledger-table" className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
-                  <th className="p-3">Student Name</th>
-                  <th className="p-3">Assessment score (Max 30)</th>
-                  <th className="p-3">Exam score (Max 70)</th>
-                  <th className="p-3">Terminal Aggregate</th>
-                  <th className="p-3">Grade (GES)</th>
-                  <th className="p-3">Remarks & Evaluations</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {students
-                  .filter(s => s.classId === gradeClassFilter)
-                  .map(student => {
-                    const studentGrade = grades.find(g => g.studentId === student.id && g.subjectId === gradeSubjectFilter);
-                    return (
-                      <tr key={student.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
-                        <td className="p-3 font-extrabold text-slate-900 dark:text-white">{student.name}</td>
-                        <td className="p-3 font-mono font-semibold">{studentGrade ? `${studentGrade.classScore} / 30` : '—'}</td>
-                        <td className="p-3 font-mono font-semibold">{studentGrade ? `${studentGrade.examScore} / 70` : '—'}</td>
-                        <td className="p-3 font-bold font-mono text-emerald-700 dark:text-emerald-400">
-                          {studentGrade ? `${studentGrade.totalScore}%` : '—'}
-                        </td>
-                        <td className="p-3">
-                          {studentGrade ? (
-                            <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded font-mono ${
-                              studentGrade.grade === 'A' || studentGrade.grade === 'B' 
-                                ? 'bg-emerald-500/10 text-emerald-600' 
-                                : studentGrade.grade === 'C' || studentGrade.grade === 'D'
-                                  ? 'bg-amber-500/10 text-amber-600'
-                                  : 'bg-rose-500/10 text-rose-600'
-                            }`}>
-                              {studentGrade.grade}
-                            </span>
-                          ) : (
-                            <span className="text-[10px] text-slate-400 italic">Not Inputted</span>
-                          )}
-                        </td>
-                        <td className="p-3 text-slate-500 dark:text-slate-400">
-                          {studentGrade ? studentGrade.remarks : <span className="text-[10px] italic text-slate-400">Assessments pending submission.</span>}
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table id="grades-ledger-table" className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                    <th className="p-3">Student Name</th>
+                    <th className="p-3">Assessment score (Max 30)</th>
+                    <th className="p-3">Exam score (Max 70)</th>
+                    <th className="p-3">Terminal Aggregate</th>
+                    <th className="p-3">Grade (GES)</th>
+                    <th className="p-3">Remarks & Evaluations</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {students
+                    .filter(s => s.classId === gradeClassFilter)
+                    .map(student => {
+                      const studentGrade = grades.find(g => g.studentId === student.id && g.subjectId === gradeSubjectFilter);
+                      return (
+                        <tr key={student.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
+                          <td className="p-3 font-extrabold text-slate-900 dark:text-white">{student.name}</td>
+                          <td className="p-3 font-mono font-semibold">{studentGrade ? `${studentGrade.classScore} / 30` : '—'}</td>
+                          <td className="p-3 font-mono font-semibold">{studentGrade ? `${studentGrade.examScore} / 70` : '—'}</td>
+                          <td className="p-3 font-bold font-mono text-emerald-700 dark:text-emerald-400">
+                            {studentGrade ? `${studentGrade.totalScore}%` : '—'}
+                          </td>
+                          <td className="p-3">
+                            {studentGrade ? (
+                              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded font-mono ${
+                                studentGrade.grade === 'A' || studentGrade.grade === 'B' 
+                                  ? 'bg-emerald-500/10 text-emerald-600' 
+                                  : studentGrade.grade === 'C' || studentGrade.grade === 'D'
+                                    ? 'bg-amber-500/10 text-amber-600'
+                                    : 'bg-rose-500/10 text-rose-600'
+                              }`}>
+                                {studentGrade.grade}
+                              </span>
+                            ) : (
+                              <span className="text-[10px] text-slate-400 italic">Not Inputted</span>
+                            )}
+                          </td>
+                          <td className="p-3 text-slate-500 dark:text-slate-400">
+                            {studentGrade ? studentGrade.remarks : <span className="text-[10px] italic text-slate-400">Assessments pending submission.</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
         </div>
@@ -4135,20 +4746,43 @@ export default function AdminDashboard({
                       <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
                         <FileText className="text-emerald-500" size={16} />
                         <span>Bursar Offline Receipt Verification Queue</span>
+                        {session?.role === 'super_admin' ? (
+                          <span className="bg-amber-500/10 text-amber-600 border border-amber-500/30 font-black text-[9px] px-2 py-0.5 rounded-full uppercase flex items-center space-x-1 inline-flex">
+                            <ShieldCheck size={10} />
+                            <span>Super Admin Approval Executive Mode</span>
+                          </span>
+                        ) : (
+                          <span className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 font-bold text-[9px] px-2 py-0.5 rounded-full uppercase flex items-center space-x-1 inline-flex">
+                            <Lock size={10} />
+                            <span>Requires Super Admin Sign-off</span>
+                          </span>
+                        )}
                       </h3>
                       <p className="text-[11px] text-slate-400 mt-0.5">
-                        Verify uploaded mobile money and bank deposit slips. Approving will automatically deduct the student's balance and log a successful transaction.
+                        Verify uploaded mobile money and bank deposit slips. All financial approvals are strictly reserved for Super Admin (Founder & Executive Chairman).
                       </p>
                     </div>
                     
-                    <button
-                      type="button"
-                      onClick={() => setIsDirectPaymentModalOpen(true)}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center space-x-1 shadow-xs hover:shadow-md transition-all cursor-pointer"
-                    >
-                      <Plus size={14} />
-                      <span>Record Offline Cash/Bank Payment</span>
-                    </button>
+                    <div className="flex items-center space-x-2">
+                      {session?.role === 'super_admin' && manualPayments.some(p => p.status === 'Pending') && (
+                        <button
+                          type="button"
+                          onClick={handleBatchApproveFinancialRequests}
+                          className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-extrabold text-xs flex items-center space-x-1 shadow-sm transition-all cursor-pointer"
+                        >
+                          <ShieldCheck size={14} />
+                          <span>Batch Executive Approve All ({manualPayments.filter(p => p.status === 'Pending').length})</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsDirectPaymentModalOpen(true)}
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center space-x-1 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                      >
+                        <Plus size={14} />
+                        <span>Record Offline Cash/Bank Payment</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Status Filters and Queue Counts */}
@@ -4282,12 +4916,23 @@ export default function AdminDashboard({
                                       <>
                                         <button
                                           onClick={() => handleApproveManualPayment(req.id)}
-                                          className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[10px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer"
+                                          className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center space-x-1 ${
+                                            session?.role === 'super_admin'
+                                              ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                                              : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                                          }`}
                                         >
-                                          Approve & Credit
+                                          <ShieldCheck size={11} />
+                                          <span>{session?.role === 'super_admin' ? 'Super Admin Approve' : 'Requires Super Admin'}</span>
                                         </button>
                                         <button
-                                          onClick={() => setRejectingId(req.id)}
+                                          onClick={() => {
+                                            if (session?.role !== 'super_admin') {
+                                              alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) can decline fee receipt submissions.');
+                                              return;
+                                            }
+                                            setRejectingId(req.id);
+                                          }}
                                           className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-md text-[10px] font-bold transition-all cursor-pointer"
                                         >
                                           Decline
@@ -4405,9 +5050,10 @@ export default function AdminDashboard({
                           </button>
                           <button
                             type="submit"
-                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold cursor-pointer"
+                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold cursor-pointer flex items-center space-x-1"
                           >
-                            Record & Approve Payment
+                            <ShieldCheck size={14} />
+                            <span>{session?.role === 'super_admin' ? 'Record & Authorize Payment' : 'Record & Request Super Admin Approval'}</span>
                           </button>
                         </div>
                       </form>
@@ -7723,39 +8369,41 @@ export default function AdminDashboard({
 
               {/* Academic Performance Table */}
               <div className="border rounded-xl overflow-hidden border-slate-200 dark:border-slate-800">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase tracking-wider font-black text-slate-400">
-                      <th className="p-3">Course / Curriculum Subject</th>
-                      <th className="p-3 text-center">Class Assessment (30%)</th>
-                      <th className="p-3 text-center">Exam Score (70%)</th>
-                      <th className="p-3 text-center">Combined Score (100%)</th>
-                      <th className="p-3 text-center">Letter Grade</th>
-                      <th className="p-3">Teacher Evaluations / Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/40">
-                    {gradesList.map((g, i) => (
-                      <tr key={i} className="font-medium text-slate-700 dark:text-slate-300">
-                        <td className="p-3 font-extrabold text-slate-900 dark:text-white">
-                          <span>{g.subject}</span>
-                          <span className="text-[9px] font-mono text-slate-400 block mt-0.5">{g.code}</span>
-                        </td>
-                        <td className="p-3 text-center font-mono">{g.classScore > 0 ? `${g.classScore} / 30` : '—'}</td>
-                        <td className="p-3 text-center font-mono">{g.examScore > 0 ? `${g.examScore} / 70` : '—'}</td>
-                        <td className="p-3 text-center font-bold text-emerald-600 font-mono">{g.totalScore > 0 ? `${g.totalScore}%` : '—'}</td>
-                        <td className="p-3 text-center">
-                          {g.grade !== '—' ? (
-                            <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
-                              {g.grade}
-                            </span>
-                          ) : '—'}
-                        </td>
-                        <td className="p-3 text-slate-500 dark:text-slate-400 text-[11px] max-w-xs truncate">{g.remarks}</td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase tracking-wider font-black text-slate-400">
+                        <th className="p-3">Course / Curriculum Subject</th>
+                        <th className="p-3 text-center">Class Assessment (30%)</th>
+                        <th className="p-3 text-center">Exam Score (70%)</th>
+                        <th className="p-3 text-center">Combined Score (100%)</th>
+                        <th className="p-3 text-center">Letter Grade</th>
+                        <th className="p-3">Teacher Evaluations / Remarks</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/40">
+                      {gradesList.map((g, i) => (
+                        <tr key={i} className="font-medium text-slate-700 dark:text-slate-300">
+                          <td className="p-3 font-extrabold text-slate-900 dark:text-white">
+                            <span>{g.subject}</span>
+                            <span className="text-[9px] font-mono text-slate-400 block mt-0.5">{g.code}</span>
+                          </td>
+                          <td className="p-3 text-center font-mono">{g.classScore > 0 ? `${g.classScore} / 30` : '—'}</td>
+                          <td className="p-3 text-center font-mono">{g.examScore > 0 ? `${g.examScore} / 70` : '—'}</td>
+                          <td className="p-3 text-center font-bold text-emerald-600 font-mono">{g.totalScore > 0 ? `${g.totalScore}%` : '—'}</td>
+                          <td className="p-3 text-center">
+                            {g.grade !== '—' ? (
+                              <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
+                                {g.grade}
+                              </span>
+                            ) : '—'}
+                          </td>
+                          <td className="p-3 text-slate-500 dark:text-slate-400 text-[11px] max-w-xs truncate">{g.remarks}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* Assessment Metrics Ribbon */}
