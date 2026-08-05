@@ -4,7 +4,7 @@ import {
   UserCheck, Calendar, ShieldAlert, GraduationCap, ChevronRight, Send, 
   Sparkles, Building2, Map, ShieldCheck, Heart, UserSquare2, Info, Users, Clock,
   Briefcase, Download, ChevronDown, Check, FileText, HelpCircle, HeartHandshake, X,
-  ChevronUp
+  ChevronUp, Loader2
 } from 'lucide-react';
 import { SchoolDatabase } from '../mockData';
 import { PublicInquiry } from '../types';
@@ -50,14 +50,17 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
 
   // Form States
   const [admissionForm, setAdmissionForm] = useState({
-    parentName: '',
-    parentPhone: '',
-    parentEmail: '',
-    studentName: '',
-    gradeLevel: 'JHS 1',
-    message: ''
+    parent_name: '',
+    parent_contact: '',
+    parent_email: '',
+    student_full_name: '',
+    student_grade_interest: 'Grade 1',
+    special_instructions: ''
   });
+  const [isSubmittingAdmission, setIsSubmittingAdmission] = useState(false);
   const [isAdmissionSubmitted, setIsAdmissionSubmitted] = useState(false);
+  const [admissionResponseText, setAdmissionResponseText] = useState<string | null>(null);
+  const [admissionError, setAdmissionError] = useState<string | null>(null);
   const [submittedInquiryId, setSubmittedInquiryId] = useState('');
 
   const [contactForm, setContactForm] = useState({
@@ -150,39 +153,71 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
     }
   ];
 
-  const handleAdmissionSubmit = (e: React.FormEvent) => {
+  const handleAdmissionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const inqId = 'ERA-INQ-' + Math.floor(1000 + Math.random() * 9000);
-    const newInquiry: PublicInquiry = {
-      id: inqId,
-      name: admissionForm.parentName,
-      email: admissionForm.parentEmail,
-      phone: admissionForm.parentPhone,
-      type: 'Admission',
-      message: `Student Name: ${admissionForm.studentName}\nGrade Interest: ${admissionForm.gradeLevel}\n\nParent Notes:\n${admissionForm.message}`,
-      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      status: 'Pending',
-      studentGradeLevel: admissionForm.gradeLevel
+    setIsSubmittingAdmission(true);
+    setAdmissionError(null);
+
+    const formData = {
+      parent_name: admissionForm.parent_name,
+      parent_contact: admissionForm.parent_contact,
+      parent_email: admissionForm.parent_email,
+      student_full_name: admissionForm.student_full_name,
+      student_grade_interest: admissionForm.student_grade_interest,
+      special_instructions: admissionForm.special_instructions
     };
 
-    // Save to LocalStorage Database
     try {
-      const current = SchoolDatabase.getInquiries();
-      SchoolDatabase.saveInquiries([newInquiry, ...current]);
-    } catch (err) {
-      console.error(err);
-    }
+      const res = await fetch("https://yaw0869.app.n8n.cloud/webhook/edweso-enrollment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
 
-    setSubmittedInquiryId(inqId);
-    setIsAdmissionSubmitted(true);
-    setAdmissionForm({
-      parentName: '',
-      parentPhone: '',
-      parentEmail: '',
-      studentName: '',
-      gradeLevel: 'JHS 1',
-      message: ''
-    });
+      if (!res.ok) {
+        throw new Error(`Submission failed with status ${res.status}`);
+      }
+
+      const message = await res.text();
+
+      // Log in local storage database for admin dashboard visibility
+      const inqId = 'ERA-INQ-' + Math.floor(1000 + Math.random() * 9000);
+      try {
+        const newInquiry: PublicInquiry = {
+          id: inqId,
+          name: admissionForm.parent_name,
+          email: admissionForm.parent_email,
+          phone: admissionForm.parent_contact,
+          type: 'Admission',
+          message: `Student: ${admissionForm.student_full_name}\nGrade Interest: ${admissionForm.student_grade_interest}\n\nSpecial Instructions:\n${admissionForm.special_instructions}`,
+          date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+          status: 'Pending',
+          studentGradeLevel: admissionForm.student_grade_interest
+        };
+        const current = SchoolDatabase.getInquiries();
+        SchoolDatabase.saveInquiries([newInquiry, ...current]);
+      } catch (err) {
+        console.error(err);
+      }
+
+      setSubmittedInquiryId(inqId);
+      setAdmissionResponseText(message);
+      setIsAdmissionSubmitted(true);
+      // Hide & reset form
+      setAdmissionForm({
+        parent_name: '',
+        parent_contact: '',
+        parent_email: '',
+        student_full_name: '',
+        student_grade_interest: 'Grade 1',
+        special_instructions: ''
+      });
+    } catch (error) {
+      console.error("Enrollment submission error:", error);
+      setAdmissionError("Something went wrong, please try again");
+    } finally {
+      setIsSubmittingAdmission(false);
+    }
   };
 
   const handleContactSubmit = (e: React.FormEvent) => {
@@ -1063,46 +1098,63 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
               {/* Form container */}
               <div className="lg:col-span-7">
                 {isAdmissionSubmitted ? (
-                  <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-xl space-y-4 text-center animate-fade-in">
-                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 mx-auto font-black">
-                      <ShieldCheck size={28} />
+                  <div className="p-6 bg-emerald-50 border border-emerald-200/80 rounded-xl space-y-4 animate-fade-in shadow-xs">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 font-black shrink-0">
+                        <ShieldCheck size={24} />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-emerald-900 text-sm uppercase tracking-wide">Application Submitted Successfully</h4>
+                        <p className="text-[11px] text-emerald-700 font-medium">Edweso Royal Academy Enrollment Webhook Confirmation</p>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <h4 className="font-extrabold text-emerald-800 text-sm uppercase">Inquiry Lodged Successfully!</h4>
-                      <p className="text-[10px] font-mono text-emerald-600 font-bold uppercase">Reference: {submittedInquiryId}</p>
+
+                    {admissionResponseText && (
+                      <div 
+                        className="p-4 bg-white border border-emerald-200/60 rounded-lg text-slate-700 text-xs leading-relaxed font-sans shadow-inner whitespace-pre-wrap"
+                        style={{ whiteSpace: 'pre-wrap' }}
+                      >
+                        {admissionResponseText}
+                      </div>
+                    )}
+
+                    <div className="pt-2">
+                      <button 
+                        onClick={() => {
+                          setIsAdmissionSubmitted(false);
+                          setAdmissionResponseText(null);
+                          setAdmissionError(null);
+                        }}
+                        className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded transition-colors cursor-pointer"
+                      >
+                        Submit Another Enrollment Application
+                      </button>
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed max-w-md mx-auto">
-                      Thank you for applying to Edweso Royal Academy! We have recorded your admissions interest inside our admin database dashboard. Our Registrar will call your phone coordinate shortly.
-                    </p>
-                    <button 
-                      onClick={() => setIsAdmissionSubmitted(false)}
-                      className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded transition-colors"
-                    >
-                      Submit Another Inquiry
-                    </button>
                   </div>
                 ) : (
                   <form onSubmit={handleAdmissionSubmit} className="space-y-4 text-xs font-semibold">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Parent/Guardian Name</label>
+                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Parent Full Name</label>
                         <input
                           type="text"
+                          name="parent_name"
                           required
                           placeholder="e.g. Seth Tetteh"
-                          value={admissionForm.parentName}
-                          onChange={(e) => setAdmissionForm({...admissionForm, parentName: e.target.value})}
+                          value={admissionForm.parent_name}
+                          onChange={(e) => setAdmissionForm({...admissionForm, parent_name: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Parent Mobile Coordinates</label>
+                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Parent Contact Number</label>
                         <input
                           type="text"
+                          name="parent_contact"
                           required
                           placeholder="e.g. +233 24 777 6666"
-                          value={admissionForm.parentPhone}
-                          onChange={(e) => setAdmissionForm({...admissionForm, parentPhone: e.target.value})}
+                          value={admissionForm.parent_contact}
+                          onChange={(e) => setAdmissionForm({...admissionForm, parent_contact: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
@@ -1110,29 +1162,51 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="sm:col-span-2">
-                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Parent Email Address</label>
+                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Parent Email</label>
                         <input
                           type="email"
+                          name="parent_email"
                           required
                           placeholder="e.g. parent@yahoo.com"
-                          value={admissionForm.parentEmail}
-                          onChange={(e) => setAdmissionForm({...admissionForm, parentEmail: e.target.value})}
+                          value={admissionForm.parent_email}
+                          onChange={(e) => setAdmissionForm({...admissionForm, parent_email: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                         />
                       </div>
                       <div>
                         <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Student Grade Interest</label>
                         <select
-                          value={admissionForm.gradeLevel}
-                          onChange={(e) => setAdmissionForm({...admissionForm, gradeLevel: e.target.value})}
+                          name="student_grade_interest"
+                          value={admissionForm.student_grade_interest}
+                          onChange={(e) => setAdmissionForm({...admissionForm, student_grade_interest: e.target.value})}
                           className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden text-xs"
                         >
-                          <option value="Primary 5">Primary 5</option>
-                          <option value="Primary 6">Primary 6</option>
-                          <option value="JHS 1">JHS 1</option>
-                          <option value="JHS 2">JHS 2</option>
-                          <option value="JHS 3">JHS 3</option>
-                          <option value="SHS 1">SHS 1</option>
+                          <optgroup label="Primary / Elementary">
+                            <option value="Grade 1">Grade 1</option>
+                            <option value="Grade 2">Grade 2</option>
+                            <option value="Grade 3">Grade 3</option>
+                            <option value="Grade 4">Grade 4</option>
+                            <option value="Grade 5">Grade 5</option>
+                            <option value="Grade 6">Grade 6</option>
+                          </optgroup>
+                          <optgroup label="Junior High School (JHS)">
+                            <option value="JHS 1">JHS 1</option>
+                            <option value="JHS 2">JHS 2</option>
+                            <option value="JHS 3">JHS 3</option>
+                          </optgroup>
+                          <optgroup label="Senior High School (SHS)">
+                            <option value="SHS 1">SHS 1</option>
+                            <option value="SHS 2">SHS 2</option>
+                            <option value="SHS 3">SHS 3</option>
+                          </optgroup>
+                          <optgroup label="Standard Grades (7–12)">
+                            <option value="Grade 7">Grade 7</option>
+                            <option value="Grade 8">Grade 8</option>
+                            <option value="Grade 9">Grade 9</option>
+                            <option value="Grade 10">Grade 10</option>
+                            <option value="Grade 11">Grade 11</option>
+                            <option value="Grade 12">Grade 12</option>
+                          </optgroup>
                         </select>
                       </div>
                     </div>
@@ -1141,10 +1215,11 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
                       <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Student Full Name</label>
                       <input
                         type="text"
+                        name="student_full_name"
                         required
                         placeholder="e.g. Samuel Kofi Mensah"
-                        value={admissionForm.studentName}
-                        onChange={(e) => setAdmissionForm({...admissionForm, studentName: e.target.value})}
+                        value={admissionForm.student_full_name}
+                        onChange={(e) => setAdmissionForm({...admissionForm, student_full_name: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
                       />
                     </div>
@@ -1152,20 +1227,43 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
                     <div>
                       <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Special instructions or requests</label>
                       <textarea
+                        name="special_instructions"
                         rows={3}
                         placeholder="State diagnostic remarks, previous schools, or query notes..."
-                        value={admissionForm.message}
-                        onChange={(e) => setAdmissionForm({...admissionForm, message: e.target.value})}
+                        value={admissionForm.special_instructions}
+                        onChange={(e) => setAdmissionForm({...admissionForm, special_instructions: e.target.value})}
                         className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded focus:outline-hidden text-xs"
                       />
+                      <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                        Please include the student's date of birth (YYYY-MM-DD) and immunization status.
+                      </p>
                     </div>
+
+                    {admissionError && (
+                      <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-lg text-rose-700 text-xs font-semibold flex items-center justify-between">
+                        <span>{admissionError}</span>
+                        <button type="button" onClick={() => setAdmissionError(null)} className="text-rose-500 hover:text-rose-700 cursor-pointer">
+                          <X size={14} />
+                        </button>
+                      </div>
+                    )}
 
                     <button
                       type="submit"
-                      className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold uppercase tracking-wider rounded text-xs transition-colors flex items-center justify-center space-x-2"
+                      disabled={isSubmittingAdmission}
+                      className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-600 disabled:opacity-75 disabled:cursor-not-allowed text-white font-extrabold uppercase tracking-wider rounded text-xs transition-colors flex items-center justify-center space-x-2 cursor-pointer"
                     >
-                      <Send size={14} />
-                      <span>Submit Enrollment Application</span>
+                      {isSubmittingAdmission ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          <span>Submitting your application…</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send size={14} />
+                          <span>Submit Enrollment Application</span>
+                        </>
+                      )}
                     </button>
                   </form>
                 )}
