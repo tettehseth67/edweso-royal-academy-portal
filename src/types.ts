@@ -140,6 +140,8 @@ export interface PublicInquiry {
   date: string;
   status: 'Pending' | 'Reviewed' | 'Contacted';
   studentGradeLevel?: string;
+  studentDob?: string;
+  studentName?: string;
 }
 
 export interface SimulatedEmail {

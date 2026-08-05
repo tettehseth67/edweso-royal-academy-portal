@@ -455,6 +455,12 @@ export default function AdminDashboard({
   });
   const [selectedInquiry, setSelectedInquiry] = useState<PublicInquiry | null>(null);
 
+  useEffect(() => {
+    if (activeTab === 'inquiries') {
+      setInquiries(SchoolDatabase.getInquiries());
+    }
+  }, [activeTab]);
+
   const handleInquiryStatusChange = (id: string, newStatus: 'Pending' | 'Reviewed' | 'Contacted') => {
     const updated = inquiries.map(inq => inq.id === id ? { ...inq, status: newStatus } : inq);
     setInquiries(updated);
@@ -5862,9 +5868,44 @@ export default function AdminDashboard({
       {activeTab === 'inquiries' && (
         <div className="space-y-6 animate-fade-in">
           
-          <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Public Web Inquiries Ledger</h2>
-            <p className="text-xs text-slate-400">Directly captures admissions applications and parent feedback submitted from the multipage school website.</p>
+          <div className="pb-3 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
+                <span>Public Web Inquiries & Enrollment Ledger</span>
+                <span className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[9px] font-black uppercase px-2 py-0.5 rounded-full flex items-center space-x-1 inline-flex">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>n8n Webhook Active</span>
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400">Directly captures admissions applications and parent feedback submitted from the school website and n8n webhook workflow dispatcher.</p>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setInquiries(SchoolDatabase.getInquiries())}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-lg text-xs transition-all cursor-pointer flex items-center space-x-1"
+              >
+                <span>Sync Latest Entries</span>
+              </button>
+            </div>
+          </div>
+
+          {/* n8n Webhook Integration Card */}
+          <div className="p-3.5 bg-gradient-to-r from-emerald-900/10 via-teal-900/5 to-slate-900/10 border border-emerald-500/20 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">n8n Workflow Endpoint:</span>
+                <code className="bg-slate-900 text-emerald-400 px-2 py-0.5 rounded text-[11px] font-mono select-all">https://yaw0869.app.n8n.cloud/webhook/edweso-enrollment</code>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Payload Parameters: <span className="font-mono font-bold text-slate-700 dark:text-slate-300">parent_name, parent_contact, parent_email, student_full_name, student_dob, student_grade_interest, special_instructions</span>
+              </p>
+            </div>
+            <div className="shrink-0 text-right">
+              <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-300 font-extrabold bg-emerald-100 dark:bg-emerald-950 px-2.5 py-1 rounded-md border border-emerald-300 dark:border-emerald-800">
+                Google Sheets & Multi-Route Agent Dispatcher Ready
+              </span>
+            </div>
           </div>
 
           {/* Quick Stats Grid */}
@@ -5891,7 +5932,8 @@ export default function AdminDashboard({
                   <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                     <th className="p-3">Ref ID</th>
                     <th className="p-3">Category</th>
-                    <th className="p-3">Sender Details</th>
+                    <th className="p-3">Parent Details</th>
+                    <th className="p-3">Student & DOB</th>
                     <th className="p-3">Message Snippet</th>
                     <th className="p-3">Received Time</th>
                     <th className="p-3">Status Action</th>
@@ -5901,64 +5943,101 @@ export default function AdminDashboard({
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {inquiries.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="p-8 text-center text-slate-400 italic font-semibold">
+                      <td colSpan={8} className="p-8 text-center text-slate-400 italic font-semibold">
                         No inquiries submitted yet.
                       </td>
                     </tr>
                   ) : (
-                    inquiries.map((inq) => (
-                      <tr key={inq.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300 font-semibold text-xs">
-                        <td className="p-3 font-mono text-[10px] font-bold text-emerald-600">{inq.id}</td>
-                        <td className="p-3">
-                          <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                            inq.type === 'Admission' 
-                              ? 'bg-amber-500/10 text-amber-600' 
-                              : inq.type === 'General'
-                                ? 'bg-sky-500/10 text-sky-600'
-                                : 'bg-pink-500/10 text-pink-600'
-                          }`}>
-                            {inq.type}
-                          </span>
-                        </td>
-                        <td className="p-3">
-                          <p className="font-bold text-slate-800 dark:text-white leading-tight">{inq.name}</p>
-                          <p className="text-[10px] text-slate-400 leading-none mt-0.5">{inq.phone}</p>
-                        </td>
-                        <td className="p-3 max-w-xs">
-                          <p className="truncate text-slate-500 dark:text-slate-400">{inq.message}</p>
-                        </td>
-                        <td className="p-3 text-slate-400 text-[10px]">{inq.date}</td>
-                        <td className="p-3">
-                          <select
-                            value={inq.status}
-                            onChange={(e) => handleInquiryStatusChange(inq.id, e.target.value as any)}
-                            className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-1 rounded text-[10px] font-bold focus:outline-hidden"
-                          >
-                            <option value="Pending">Pending</option>
-                            <option value="Reviewed">Reviewed</option>
-                            <option value="Contacted">Contacted</option>
-                          </select>
-                        </td>
-                        <td className="p-3 text-right">
-                          <div className="flex items-center justify-end space-x-2">
-                            <button
-                              onClick={() => setSelectedInquiry(inq)}
-                              className="p-1 text-slate-400 hover:text-emerald-600 transition-colors"
-                              title="Read Inquiry Content"
+                    inquiries.map((inq) => {
+                      // Extract student name/DOB fallback from message if old entry
+                      let dobVal = inq.studentDob;
+                      if (!dobVal && inq.message.includes('Date of Birth:')) {
+                        const match = inq.message.match(/Date of Birth:\s*([^\n]+)/);
+                        if (match) dobVal = match[1].trim();
+                      }
+                      let studentNameVal = inq.studentName;
+                      if (!studentNameVal && inq.message.includes('Student:')) {
+                        const match = inq.message.match(/Student:\s*([^\n]+)/);
+                        if (match) studentNameVal = match[1].trim();
+                      }
+
+                      return (
+                        <tr key={inq.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300 font-semibold text-xs">
+                          <td className="p-3 font-mono text-[10px] font-bold text-emerald-600">{inq.id}</td>
+                          <td className="p-3">
+                            <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                              inq.type === 'Admission' 
+                                ? 'bg-amber-500/10 text-amber-600' 
+                                : inq.type === 'General'
+                                  ? 'bg-sky-500/10 text-sky-600'
+                                  : 'bg-pink-500/10 text-pink-600'
+                            }`}>
+                              {inq.type}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <p className="font-bold text-slate-800 dark:text-white leading-tight">{inq.name}</p>
+                            <p className="text-[10px] text-slate-400 leading-none mt-0.5">{inq.phone}</p>
+                          </td>
+                          <td className="p-3">
+                            {studentNameVal || inq.studentGradeLevel || dobVal ? (
+                              <div>
+                                <p className="font-bold text-slate-800 dark:text-white leading-tight">
+                                  {studentNameVal || 'Student'}
+                                </p>
+                                <div className="flex items-center space-x-1.5 mt-0.5 flex-wrap gap-y-0.5">
+                                  {inq.studentGradeLevel && (
+                                    <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold px-1.5 py-0.2 rounded">
+                                      {inq.studentGradeLevel}
+                                    </span>
+                                  )}
+                                  {dobVal && (
+                                    <span className="text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono font-bold px-1.5 py-0.2 rounded">
+                                      DOB: {dobVal}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] text-slate-400 italic">N/A</span>
+                            )}
+                          </td>
+                          <td className="p-3 max-w-xs">
+                            <p className="truncate text-slate-500 dark:text-slate-400">{inq.message}</p>
+                          </td>
+                          <td className="p-3 text-slate-400 text-[10px]">{inq.date}</td>
+                          <td className="p-3">
+                            <select
+                              value={inq.status}
+                              onChange={(e) => handleInquiryStatusChange(inq.id, e.target.value as any)}
+                              className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-1 rounded text-[10px] font-bold focus:outline-hidden"
                             >
-                              <Eye size={14} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteInquiry(inq.id)}
-                              className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
-                              title="Delete Ledger Entry"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
+                              <option value="Pending">Pending</option>
+                              <option value="Reviewed">Reviewed</option>
+                              <option value="Contacted">Contacted</option>
+                            </select>
+                          </td>
+                          <td className="p-3 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <button
+                                onClick={() => setSelectedInquiry(inq)}
+                                className="p-1 text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer"
+                                title="Read Inquiry Content"
+                              >
+                                <Eye size={14} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteInquiry(inq.id)}
+                                className="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+                                title="Delete Ledger Entry"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -5966,78 +6045,113 @@ export default function AdminDashboard({
           </div>
 
           {/* Detailed Selected Inquiry Modal */}
-          {selectedInquiry && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
-              <div className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border ${
-                isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
-              }`}>
-                <div className="flex justify-between items-center border-b pb-2 mb-4 border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs font-mono font-bold text-emerald-600">[{selectedInquiry.id}]</span>
-                    <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ledger Details</span>
-                  </div>
-                  <button 
-                    onClick={() => setSelectedInquiry(null)}
-                    className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-slate-400 hover:text-slate-950 dark:hover:text-white text-xs"
-                  >
-                    ✕
-                  </button>
-                </div>
+          {selectedInquiry && (() => {
+            let modalDob = selectedInquiry.studentDob;
+            if (!modalDob && selectedInquiry.message.includes('Date of Birth:')) {
+              const match = selectedInquiry.message.match(/Date of Birth:\s*([^\n]+)/);
+              if (match) modalDob = match[1].trim();
+            }
+            let modalStudentName = selectedInquiry.studentName;
+            if (!modalStudentName && selectedInquiry.message.includes('Student:')) {
+              const match = selectedInquiry.message.match(/Student:\s*([^\n]+)/);
+              if (match) modalStudentName = match[1].trim();
+            }
 
-                <div className="space-y-4 text-xs font-medium">
-                  <div className="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
-                    <div>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase">Sender Full Name</p>
-                      <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase">Inquiry Category</p>
-                      <p className="font-extrabold text-emerald-600 mt-0.5 uppercase tracking-wide">{selectedInquiry.type}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase">Contact Phone</p>
-                      <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.phone}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase">Contact Email</p>
-                      <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.email}</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">Detailed Message</p>
-                    <div className="p-3.5 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-800 leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line text-[11px]">
-                      {selectedInquiry.message}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2">
+            return (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
+                <div className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+                }`}>
+                  <div className="flex justify-between items-center border-b pb-2 mb-4 border-slate-100 dark:border-slate-800">
                     <div className="flex items-center space-x-2">
-                      <span className="text-[10px] text-slate-400 font-bold">Update Status:</span>
-                      <select
-                        value={selectedInquiry.status}
-                        onChange={(e) => {
-                          handleInquiryStatusChange(selectedInquiry.id, e.target.value as any);
-                          setSelectedInquiry({ ...selectedInquiry, status: e.target.value as any });
-                        }}
-                        className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-1 rounded text-[10px] font-bold focus:outline-hidden"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Reviewed">Reviewed</option>
-                        <option value="Contacted">Contacted</option>
-                      </select>
+                      <span className="text-xs font-mono font-bold text-emerald-600">[{selectedInquiry.id}]</span>
+                      <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ledger Details</span>
                     </div>
-                    <button
+                    <button 
                       onClick={() => setSelectedInquiry(null)}
-                      className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase rounded"
+                      className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-slate-400 hover:text-slate-950 dark:hover:text-white text-xs cursor-pointer"
                     >
-                      Close Viewer
+                      ✕
                     </button>
+                  </div>
+
+                  <div className="space-y-4 text-xs font-medium">
+                    {/* Parent Contact Info */}
+                    <div className="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
+                      <div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">Parent / Sender Name</p>
+                        <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">Inquiry Type</p>
+                        <p className="font-extrabold text-emerald-600 mt-0.5 uppercase tracking-wide">{selectedInquiry.type}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">Contact Phone</p>
+                        <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.phone}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">Contact Email</p>
+                        <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.email}</p>
+                      </div>
+                    </div>
+
+                    {/* Student & DOB Details Card */}
+                    {(modalStudentName || selectedInquiry.studentGradeLevel || modalDob) && (
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-lg space-y-2">
+                        <p className="text-[9px] text-emerald-700 dark:text-emerald-400 font-black uppercase tracking-wider">Student & Enrollment Specifications</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <p className="text-[9px] text-slate-400 uppercase font-bold">Student Name</p>
+                            <p className="font-extrabold text-slate-800 dark:text-white text-xs">{modalStudentName || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] text-slate-400 uppercase font-bold">Grade Interest</p>
+                            <p className="font-extrabold text-emerald-600 text-xs">{selectedInquiry.studentGradeLevel || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] text-slate-400 uppercase font-bold">Date of Birth (DOB)</p>
+                            <p className="font-extrabold font-mono text-slate-800 dark:text-white text-xs">{modalDob || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">Detailed Message / Special Instructions</p>
+                      <div className="p-3.5 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-800 leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line text-[11px]">
+                        {selectedInquiry.message}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-[10px] text-slate-400 font-bold">Update Status:</span>
+                        <select
+                          value={selectedInquiry.status}
+                          onChange={(e) => {
+                            handleInquiryStatusChange(selectedInquiry.id, e.target.value as any);
+                            setSelectedInquiry({ ...selectedInquiry, status: e.target.value as any });
+                          }}
+                          className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-1 rounded text-[10px] font-bold focus:outline-hidden"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Reviewed">Reviewed</option>
+                          <option value="Contacted">Contacted</option>
+                        </select>
+                      </div>
+                      <button
+                        onClick={() => setSelectedInquiry(null)}
+                        className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase rounded cursor-pointer"
+                      >
+                        Close Viewer
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
         </div>
       )}

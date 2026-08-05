@@ -54,6 +54,7 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
     parent_contact: '',
     parent_email: '',
     student_full_name: '',
+    student_dob: '',
     student_grade_interest: 'Grade 1',
     special_instructions: ''
   });
@@ -159,12 +160,38 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
     setAdmissionError(null);
 
     const formData = {
+      // Primary exact requested snake_case keys
       parent_name: admissionForm.parent_name,
       parent_contact: admissionForm.parent_contact,
       parent_email: admissionForm.parent_email,
       student_full_name: admissionForm.student_full_name,
+      student_dob: admissionForm.student_dob,
+      date_of_birth: admissionForm.student_dob,
       student_grade_interest: admissionForm.student_grade_interest,
-      special_instructions: admissionForm.special_instructions
+      special_instructions: admissionForm.special_instructions,
+
+      // Title Case aliases for Google Sheet auto-mapping
+      "Parent Name": admissionForm.parent_name,
+      "Parent Contact": admissionForm.parent_contact,
+      "Parent Email": admissionForm.parent_email,
+      "Student Full Name": admissionForm.student_full_name,
+      "Student Date of Birth": admissionForm.student_dob,
+      "Student DOB": admissionForm.student_dob,
+      "Date of Birth": admissionForm.student_dob,
+      "Student Grade Interest": admissionForm.student_grade_interest,
+      "Special Instructions": admissionForm.special_instructions,
+
+      // camelCase aliases
+      parentName: admissionForm.parent_name,
+      parentContact: admissionForm.parent_contact,
+      parentEmail: admissionForm.parent_email,
+      studentFullName: admissionForm.student_full_name,
+      studentDob: admissionForm.student_dob,
+      dateOfBirth: admissionForm.student_dob,
+      studentGradeInterest: admissionForm.student_grade_interest,
+      specialInstructions: admissionForm.special_instructions,
+
+      submitted_at: new Date().toISOString()
     };
 
     try {
@@ -175,7 +202,9 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
       });
 
       if (!res.ok) {
-        throw new Error(`Submission failed with status ${res.status}`);
+        const errorText = await res.text().catch(() => '');
+        console.error(`n8n Webhook Error Status ${res.status}:`, errorText);
+        throw new Error(errorText || `Submission failed with status ${res.status}`);
       }
 
       const message = await res.text();
@@ -189,10 +218,12 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
           email: admissionForm.parent_email,
           phone: admissionForm.parent_contact,
           type: 'Admission',
-          message: `Student: ${admissionForm.student_full_name}\nGrade Interest: ${admissionForm.student_grade_interest}\n\nSpecial Instructions:\n${admissionForm.special_instructions}`,
+          message: `Student: ${admissionForm.student_full_name}\nDate of Birth: ${admissionForm.student_dob || 'N/A'}\nGrade Interest: ${admissionForm.student_grade_interest}\n\nSpecial Instructions:\n${admissionForm.special_instructions}`,
           date: new Date().toISOString().replace('T', ' ').substring(0, 16),
           status: 'Pending',
-          studentGradeLevel: admissionForm.student_grade_interest
+          studentGradeLevel: admissionForm.student_grade_interest,
+          studentDob: admissionForm.student_dob,
+          studentName: admissionForm.student_full_name
         };
         const current = SchoolDatabase.getInquiries();
         SchoolDatabase.saveInquiries([newInquiry, ...current]);
@@ -209,6 +240,7 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
         parent_contact: '',
         parent_email: '',
         student_full_name: '',
+        student_dob: '',
         student_grade_interest: 'Grade 1',
         special_instructions: ''
       });
@@ -1211,17 +1243,30 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Student Full Name</label>
-                      <input
-                        type="text"
-                        name="student_full_name"
-                        required
-                        placeholder="e.g. Samuel Kofi Mensah"
-                        value={admissionForm.student_full_name}
-                        onChange={(e) => setAdmissionForm({...admissionForm, student_full_name: e.target.value})}
-                        className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Student Full Name</label>
+                        <input
+                          type="text"
+                          name="student_full_name"
+                          required
+                          placeholder="e.g. Samuel Kofi Mensah"
+                          value={admissionForm.student_full_name}
+                          onChange={(e) => setAdmissionForm({...admissionForm, student_full_name: e.target.value})}
+                          className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-slate-400 font-bold uppercase mb-1">Student Date of Birth (DOB)</label>
+                        <input
+                          type="date"
+                          name="student_dob"
+                          required
+                          value={admissionForm.student_dob}
+                          onChange={(e) => setAdmissionForm({...admissionForm, student_dob: e.target.value})}
+                          className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded font-bold focus:outline-hidden text-xs"
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -1235,7 +1280,7 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
                         className="w-full bg-slate-100 border border-slate-200/50 p-2.5 rounded focus:outline-hidden text-xs"
                       />
                       <p className="text-[10px] text-slate-400 mt-1 font-medium">
-                        Please include the student's date of birth (YYYY-MM-DD) and immunization status.
+                        Please provide medical or previous academic remarks if applicable.
                       </p>
                     </div>
 
