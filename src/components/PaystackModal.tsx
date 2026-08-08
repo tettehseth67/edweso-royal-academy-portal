@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, CreditCard, Smartphone, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { dispatchWebhookWithFallback, N8N_ENDPOINTS } from '../utils/webhook';
 
 interface PaystackModalProps {
   isOpen: boolean;
@@ -101,6 +102,27 @@ export default function PaystackModal({
         setStep('error');
       } else {
         setStep('success');
+
+        // Dispatch payment details to n8n payment confirmation trigger via resilient helper
+        const paymentConfirmPayload = {
+          applicationId: studentId || `ENR-${Math.floor(Math.random() * 900000 + 100000)}`,
+          studentId: studentId,
+          studentName: studentName,
+          parentEmail: email,
+          payment_status: "SUCCESS",
+          paystack_reference: paystackReference,
+          amount_paid: amount,
+          currency: "GHS",
+          payment_method: paymentMethod === 'card' ? 'Card' : momoProvider,
+          timestamp: new Date().toISOString()
+        };
+
+        dispatchWebhookWithFallback(
+          N8N_ENDPOINTS.PAYMENT_CONFIRM.TEST,
+          N8N_ENDPOINTS.PAYMENT_CONFIRM.PROD,
+          paymentConfirmPayload
+        );
+
         setTimeout(() => {
           onSuccess({
             paystackRef: paystackReference,

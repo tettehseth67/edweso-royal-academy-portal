@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { SchoolDatabase } from '../mockData';
 import { PublicInquiry } from '../types';
+import { dispatchWebhookWithFallback, N8N_ENDPOINTS } from '../utils/webhook';
 import HeroCarousel from './HeroCarousel';
 import FinancialPlan from './FinancialPlan';
 import { 
@@ -196,31 +197,16 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
     };
 
     try {
-      // First attempt test webhook URL as requested, fallback to production webhook if test mode is inactive (404)
-      let res = await fetch("https://yaw0869.app.n8n.cloud/webhook-test/edweso-enrollment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-      });
+      // Dispatch via resilient webhook helper with fallback
+      const webhookRes = await dispatchWebhookWithFallback(
+        N8N_ENDPOINTS.ENROLLMENT.TEST,
+        N8N_ENDPOINTS.ENROLLMENT.PROD,
+        formData
+      );
 
-      if (!res.ok && res.status === 404) {
-        console.log("Test webhook inactive (404). Trying production webhook endpoint...");
-        res = await fetch("https://yaw0869.app.n8n.cloud/webhook/edweso-enrollment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData)
-        });
-      }
+      setAdmissionResponseText(webhookRes.data || 'Application submitted successfully.');
 
-      if (!res.ok) {
-        const errorText = await res.text().catch(() => '');
-        console.error(`n8n Webhook Error Status ${res.status}:`, errorText);
-        throw new Error(errorText || `Submission failed with status ${res.status}`);
-      }
-
-      const message = await res.text();
-
-      // Log in local storage database for admin dashboard visibility
+      // Always log in local storage database for admin dashboard visibility
       const inqId = 'ERA-INQ-' + Math.floor(1000 + Math.random() * 9000);
       try {
         const newInquiry: PublicInquiry = {
@@ -243,7 +229,6 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
       }
 
       setSubmittedInquiryId(inqId);
-      setAdmissionResponseText(message);
       setIsAdmissionSubmitted(true);
       // Hide & reset form
       setAdmissionForm({

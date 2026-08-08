@@ -1,101 +1,29 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  Users,
-  UserCheck,
-  BookOpen,
-  CheckSquare,
-  Award,
-  Calendar,
-  Megaphone,
-  CreditCard,
-  Search,
-  Plus,
-  Trash2,
-  Edit,
-  Check,
-  AlertTriangle,
-  Eye,
-  RefreshCw,
-  Filter,
-  ShieldCheck,
-  Download,
-  ShieldAlert,
-  X,
-  History,
-  LogIn,
-  Activity,
-  ChevronLeft,
-  ChevronRight,
-  Printer,
-  Cake,
-  Gift,
-  Lock,
-  Building,
-  HelpCircle,
-  Info,
-  Smartphone,
-  FileText,
-  Receipt,
-  Play,
-  Send,
-  Sparkles,
-  Camera,
-  Crown,
-  Scale,
-  TrendingUp,
-  CheckCircle2,
-} from "lucide-react";
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-import {
-  Student,
-  Teacher,
-  SchoolClass,
-  Subject,
-  Attendance,
-  ExamGrade,
-  TimetableEntry,
-  Announcement,
-  PaymentTransaction,
-  PublicInquiry,
-  SimulatedEmail,
-  SimulatedSMS,
-  SyllabusPlan,
-  TeacherAbsence,
-  CoverAssignment,
-  StaffClockIn,
-  StaffPayroll,
-  StaffLeaveRequest,
-  ManualPaymentRequest,
-  UserSession,
-  PaymentSchedulerPlan,
-  PaymentSchedulerRunLog,
-} from "../types";
-import {
-  calculateGhanaGrade,
-  getGradeRemark,
-  SchoolDatabase,
-} from "../mockData";
-import SyllabusBoard from "./SyllabusBoard";
-import SubstitutionAssistant from "./SubstitutionAssistant";
-import { FeaturedAnnouncementsCarousel } from "./FeaturedCarouselComponents";
-import TimetableDetailView from "./TimetableDetailView";
-import { HomeworkAssignment } from "../types";
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Users, UserCheck, BookOpen, CheckSquare, Award, 
+  Calendar, Megaphone, CreditCard, Search, Plus, 
+  Trash2, Edit, Check, AlertTriangle, Eye, RefreshCw, Filter, ShieldCheck, Download,
+  ShieldAlert, X, History, LogIn, Activity, ChevronLeft, ChevronRight, Printer, Cake, Gift,
+  Lock, Building, HelpCircle, Info, Smartphone, FileText, Receipt, Play, Send, Sparkles, Camera,
+  Crown, Scale, TrendingUp, CheckCircle2
+} from 'lucide-react';
+import { 
+  ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell 
+} from 'recharts';
+import { 
+  Student, Teacher, SchoolClass, Subject, 
+  Attendance, ExamGrade, TimetableEntry, Announcement, 
+  PaymentTransaction, PublicInquiry, SimulatedEmail, SimulatedSMS, SyllabusPlan, TeacherAbsence, CoverAssignment,
+  StaffClockIn, StaffPayroll, StaffLeaveRequest, ManualPaymentRequest, UserSession,
+  PaymentSchedulerPlan, PaymentSchedulerRunLog
+} from '../types';
+import { calculateGhanaGrade, getGradeRemark, SchoolDatabase } from '../mockData';
+import SyllabusBoard from './SyllabusBoard';
+import SubstitutionAssistant from './SubstitutionAssistant';
+import { FeaturedAnnouncementsCarousel } from './FeaturedCarouselComponents';
+import TimetableDetailView from './TimetableDetailView';
+import { HomeworkAssignment } from '../types';
 
 interface AdminDashboardProps {
   activeTab: string;
@@ -124,19 +52,8 @@ interface AdminDashboardProps {
   onUpdateTimetable: (tt: TimetableEntry[]) => void;
   onTriggerFeeAlerts: (studentIds?: string[]) => number;
   onDeleteEmail: (id: string) => void;
-  onSendEmail: (
-    recipientEmail: string,
-    recipientName: string,
-    subject: string,
-    body: string,
-    type: "Announcement" | "FeeDeadline",
-  ) => void;
-  onSendSMS: (
-    recipientPhone: string,
-    recipientName: string,
-    message: string,
-    type: "Announcement" | "FeeDeadline" | "Attendance" | "MorningReport",
-  ) => void;
+  onSendEmail: (recipientEmail: string, recipientName: string, subject: string, body: string, type: 'Announcement' | 'FeeDeadline') => void;
+  onSendSMS: (recipientPhone: string, recipientName: string, message: string, type: 'Announcement' | 'FeeDeadline' | 'Attendance' | 'MorningReport') => void;
   onDeleteSMS: (id: string) => void;
   onUpdateSyllabusPlans?: (updated: SyllabusPlan[]) => void;
   onUpdateTeacherAbsences?: (updated: TeacherAbsence[]) => void;
@@ -195,116 +112,44 @@ export default function AdminDashboard({
   schedulerPlans = [],
   schedulerLogs = [],
   onUpdateSchedulerPlans,
-  onUpdateSchedulerLogs,
+  onUpdateSchedulerLogs
 }: AdminDashboardProps) {
+
   // Search & Filter States
-  const [studentSearch, setStudentSearch] = useState("");
-  const [studentClassFilter, setStudentClassFilter] = useState("All");
-  const [teacherSearch, setTeacherSearch] = useState("");
-  const [teacherDeptFilter, setTeacherDeptFilter] = useState<
-    "All" | "Daycare-JHS" | "SHS"
-  >("All");
-  const [teachersActiveSubTab, setTeachersActiveSubTab] = useState<
-    "list" | "attendance" | "leaves" | "payroll"
-  >("list");
-  const [selectedPayrollStaff, setSelectedPayrollStaff] =
-    useState<StaffPayroll | null>(null);
-  const [payrollActionStatus, setPayrollActionStatus] = useState<{
-    type: "success" | "error" | null;
-    message: string;
-  }>({ type: null, message: "" });
-  const [gradeClassFilter, setGradeClassFilter] = useState("c4"); // Default JHS 2
-  const [gradeSubjectFilter, setGradeSubjectFilter] = useState("s1"); // Math
-  const [selectedReportCardStudent, setSelectedReportCardStudent] =
-    useState<Student | null>(null);
-  const [selectedTimetableEntry, setSelectedTimetableEntry] =
-    useState<TimetableEntry | null>(null);
+  const [studentSearch, setStudentSearch] = useState('');
+  const [studentClassFilter, setStudentClassFilter] = useState('All');
+  const [teacherSearch, setTeacherSearch] = useState('');
+  const [teacherDeptFilter, setTeacherDeptFilter] = useState<'All' | 'Daycare-JHS' | 'SHS'>('All');
+  const [teachersActiveSubTab, setTeachersActiveSubTab] = useState<'list' | 'attendance' | 'leaves' | 'payroll'>('list');
+  const [selectedPayrollStaff, setSelectedPayrollStaff] = useState<StaffPayroll | null>(null);
+  const [payrollActionStatus, setPayrollActionStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
+  const [gradeClassFilter, setGradeClassFilter] = useState('c4'); // Default JHS 2
+  const [gradeSubjectFilter, setGradeSubjectFilter] = useState('s1'); // Math
+  const [selectedReportCardStudent, setSelectedReportCardStudent] = useState<Student | null>(null);
+  const [selectedTimetableEntry, setSelectedTimetableEntry] = useState<TimetableEntry | null>(null);
 
   // System Activity states
-  const [activitySearch, setActivitySearch] = useState("");
-  const [activityTypeFilter, setActivityTypeFilter] = useState<
-    "all" | "login" | "grade" | "attendance"
-  >("all");
+  const [activitySearch, setActivitySearch] = useState('');
+  const [activityTypeFilter, setActivityTypeFilter] = useState<'all' | 'login' | 'grade' | 'attendance'>('all');
   const [activityPage, setActivityPage] = useState(1);
-  const [activitiesList, setActivitiesList] = useState(() =>
-    SchoolDatabase.getSystemActivities(),
-  );
+  const [activitiesList, setActivitiesList] = useState(() => SchoolDatabase.getSystemActivities());
 
   // Founder (Super Admin) Governance States
   const [founderDirectives, setFounderDirectives] = useState([
-    {
-      id: "dir-1",
-      title: "Q3 BECE Academic Rigor Enhancement",
-      category: "Academic Standard",
-      recipient: "Dr. J. K. Appiah (Headmaster)",
-      date: "2026-07-15",
-      status: "In Execution",
-      priority: "High Priority",
-    },
-    {
-      id: "dir-2",
-      title: "Solar Power Grid Phase 2 Commissioning",
-      category: "Infrastructure",
-      recipient: "Estate & Operations Committee",
-      date: "2026-07-10",
-      status: "Completed",
-      priority: "Urgent",
-    },
-    {
-      id: "dir-3",
-      title: "Staff Biometric Attendance Audit",
-      category: "Governance",
-      recipient: "Headmaster & HR",
-      date: "2026-06-28",
-      status: "Enforced",
-      priority: "Standard",
-    },
+    { id: 'dir-1', title: 'Q3 BECE Academic Rigor Enhancement', category: 'Academic Standard', recipient: 'Dr. J. K. Appiah (Headmaster)', date: '2026-07-15', status: 'In Execution', priority: 'High Priority' },
+    { id: 'dir-2', title: 'Solar Power Grid Phase 2 Commissioning', category: 'Infrastructure', recipient: 'Estate & Operations Committee', date: '2026-07-10', status: 'Completed', priority: 'Urgent' },
+    { id: 'dir-3', title: 'Staff Biometric Attendance Audit', category: 'Governance', recipient: 'Headmaster & HR', date: '2026-06-28', status: 'Enforced', priority: 'Standard' }
   ]);
-  const [newDirectiveTitle, setNewDirectiveTitle] = useState("");
-  const [newDirectiveCategory, setNewDirectiveCategory] = useState<
-    | "Academic Standard"
-    | "Financial Allocation"
-    | "Staffing & Discipline"
-    | "Emergency Board Order"
-  >("Academic Standard");
-  const [newDirectivePriority, setNewDirectivePriority] = useState<
-    "Standard" | "High Priority" | "Urgent"
-  >("High Priority");
-  const [newDirectiveBody, setNewDirectiveBody] = useState("");
+  const [newDirectiveTitle, setNewDirectiveTitle] = useState('');
+  const [newDirectiveCategory, setNewDirectiveCategory] = useState<'Academic Standard' | 'Financial Allocation' | 'Staffing & Discipline' | 'Emergency Board Order'>('Academic Standard');
+  const [newDirectivePriority, setNewDirectivePriority] = useState<'Standard' | 'High Priority' | 'Urgent'>('High Priority');
+  const [newDirectiveBody, setNewDirectiveBody] = useState('');
 
   const [founderProjects, setFounderProjects] = useState([
-    {
-      id: "proj-1",
-      name: "Ultra-Modern Robotics & STEM Innovation Hub",
-      budget: "GHS 250,000.00",
-      contractor: "Kasapreko Tech Build Ltd",
-      status: "Pending Founder Sign-Off",
-      estCompletion: "Oct 2026",
-    },
-    {
-      id: "proj-2",
-      name: "Solar Power Microgrid & Back-Up Energy (Phase 2)",
-      budget: "GHS 120,000.00",
-      contractor: "Volta Green Energy Solutions",
-      status: "Approved",
-      estCompletion: "Aug 2026",
-    },
-    {
-      id: "proj-3",
-      name: "School Bus Fleet Expansion (2 Coaster Buses)",
-      budget: "GHS 480,000.00",
-      contractor: "Toyota Ghana Motors",
-      status: "Approved",
-      estCompletion: "Sept 2026",
-    },
-    {
-      id: "proj-4",
-      name: "Smart Classroom Interactive Displays (Primary Block)",
-      budget: "GHS 65,000.00",
-      contractor: "EdTech Africa Ghana",
-      status: "Under Board Review",
-      estCompletion: "Nov 2026",
-    },
+    { id: 'proj-1', name: 'Ultra-Modern Robotics & STEM Innovation Hub', budget: 'GHS 250,000.00', contractor: 'Kasapreko Tech Build Ltd', status: 'Pending Founder Sign-Off', estCompletion: 'Oct 2026' },
+    { id: 'proj-2', name: 'Solar Power Microgrid & Back-Up Energy (Phase 2)', budget: 'GHS 120,000.00', contractor: 'Volta Green Energy Solutions', status: 'Approved', estCompletion: 'Aug 2026' },
+    { id: 'proj-3', name: 'School Bus Fleet Expansion (2 Coaster Buses)', budget: 'GHS 480,000.00', contractor: 'Toyota Ghana Motors', status: 'Approved', estCompletion: 'Sept 2026' },
+    { id: 'proj-4', name: 'Smart Classroom Interactive Displays (Primary Block)', budget: 'GHS 65,000.00', contractor: 'EdTech Africa Ghana', status: 'Under Board Review', estCompletion: 'Nov 2026' }
   ]);
 
   const [founderPolicies, setFounderPolicies] = useState({
@@ -312,15 +157,13 @@ export default function AdminDashboard({
     scholarshipEndowment: true,
     dualCurriculum: true,
     headmasterDiscretionaryCap: true,
-    ptaSponsorshipMatch: false,
+    ptaSponsorshipMatch: false
   });
 
-  const [founderNotification, setFounderNotification] = useState<string | null>(
-    null,
-  );
+  const [founderNotification, setFounderNotification] = useState<string | null>(null);
 
   useEffect(() => {
-    if (activeTab === "activities") {
+    if (activeTab === 'activities') {
       setActivitiesList(SchoolDatabase.getSystemActivities());
       setActivityPage(1);
     }
@@ -331,8 +174,8 @@ export default function AdminDashboard({
     id: string;
     title: string;
     description: string;
-    category: "Security" | "Finance" | "System";
-    severity: "High" | "Medium" | "Info";
+    category: 'Security' | 'Finance' | 'System';
+    severity: 'High' | 'Medium' | 'Info';
     timestamp: string;
     isResolved: boolean;
     metadata?: {
@@ -352,163 +195,142 @@ export default function AdminDashboard({
   const [unpaidFeeThreshold, setUnpaidFeeThreshold] = useState(1500);
   const [resolvedAlertIds, setResolvedAlertIds] = useState<string[]>([]);
   const [diagnosticScanLoading, setDiagnosticScanLoading] = useState(false);
-  const [activeDiagnosticCategory, setActiveDiagnosticCategory] = useState<
-    "All" | "Security" | "Finance" | "System"
-  >("All");
-  const [selectedDiagnosticAlert, setSelectedDiagnosticAlert] =
-    useState<DiagnosticAlert | null>(null);
+  const [activeDiagnosticCategory, setActiveDiagnosticCategory] = useState<'All' | 'Security' | 'Finance' | 'System'>('All');
+  const [selectedDiagnosticAlert, setSelectedDiagnosticAlert] = useState<DiagnosticAlert | null>(null);
 
   const [customAlerts, setCustomAlerts] = useState<DiagnosticAlert[]>(() => [
     {
-      id: "diag-sec-1",
-      title: "Failed Logins: Brute-Force Pattern Detected",
-      description:
-        "Multiple failed logins detected on Admin console from IP 197.251.10.22 (Ejisu, Ashanti Region).",
-      category: "Security",
-      severity: "High",
-      timestamp: "5 mins ago",
+      id: 'diag-sec-1',
+      title: 'Failed Logins: Brute-Force Pattern Detected',
+      description: 'Multiple failed logins detected on Admin console from IP 197.251.10.22 (Ejisu, Ashanti Region).',
+      category: 'Security',
+      severity: 'High',
+      timestamp: '5 mins ago',
       isResolved: false,
       metadata: {
-        targetUser: "Admin (Principal Appiah)",
-        ipAddress: "197.251.10.22",
-        location: "Ejisu, Ashanti Region",
-        attemptsCount: 4,
-      },
+        targetUser: 'Admin (Principal Appiah)',
+        ipAddress: '197.251.10.22',
+        location: 'Ejisu, Ashanti Region',
+        attemptsCount: 4
+      }
     },
     {
-      id: "diag-sec-2",
-      title: "Suspicious IP Login: External Portal Access",
-      description:
-        "Successful login on JHS Teacher account Mr. Kwame Boateng from unauthorized country endpoint IP 84.120.43.19 (London, UK).",
-      category: "Security",
-      severity: "Medium",
-      timestamp: "2 hours ago",
+      id: 'diag-sec-2',
+      title: 'Suspicious IP Login: External Portal Access',
+      description: 'Successful login on JHS Teacher account Mr. Kwame Boateng from unauthorized country endpoint IP 84.120.43.19 (London, UK).',
+      category: 'Security',
+      severity: 'Medium',
+      timestamp: '2 hours ago',
       isResolved: false,
       metadata: {
-        targetUser: "Mr. Kwame Boateng",
-        ipAddress: "84.120.43.19",
-        location: "London, UK",
-        attemptsCount: 1,
-      },
-    },
+        targetUser: 'Mr. Kwame Boateng',
+        ipAddress: '84.120.43.19',
+        location: 'London, UK',
+        attemptsCount: 1
+      }
+    }
   ]);
 
   // Dynamically generated alerts from active state props
   const dynamicFinanceAlerts: DiagnosticAlert[] = students
-    .filter((student) => student.balanceGHS >= unpaidFeeThreshold)
-    .map((student) => {
-      const clsName =
-        classes.find((c) => c.id === student.classId)?.name || "Unknown Class";
+    .filter(student => student.balanceGHS >= unpaidFeeThreshold)
+    .map(student => {
+      const clsName = classes.find(c => c.id === student.classId)?.name || 'Unknown Class';
       return {
         id: `diag-fin-student-${student.id}`,
         title: `Outstanding Fee Risk: ${student.name}`,
         description: `${student.name} (${clsName}) outstanding balance of GHS ${student.balanceGHS.toLocaleString()} exceeds your safety threshold of GHS ${unpaidFeeThreshold.toLocaleString()}.`,
-        category: "Finance",
-        severity:
-          student.balanceGHS >= unpaidFeeThreshold * 1.5 ? "High" : "Medium",
-        timestamp: "Real-time scan",
+        category: 'Finance',
+        severity: student.balanceGHS >= unpaidFeeThreshold * 1.5 ? 'High' : 'Medium',
+        timestamp: 'Real-time scan',
         isResolved: false,
         metadata: {
           studentId: student.id,
           studentName: student.name,
           classId: student.classId,
           className: clsName,
-          amountSpike: student.balanceGHS,
-        },
+          amountSpike: student.balanceGHS
+        }
       };
     });
 
-  const dynamicClassSpikeAlerts: DiagnosticAlert[] = classes
-    .map((c) => {
-      const classStudents = students.filter((s) => s.classId === c.id);
-      const classTotalUnpaid = classStudents.reduce(
-        (acc, s) => acc + s.balanceGHS,
-        0,
-      );
-      const spikeThreshold = unpaidFeeThreshold * 2.5; // risk accumulates inside the entire classroom
-
-      if (classTotalUnpaid >= spikeThreshold) {
-        return {
-          id: `diag-fin-class-${c.id}`,
-          title: `Fee Collection Deficit Spike: ${c.name}`,
-          description: `Unpaid tuition spike flagged in ${c.name}. Total cumulative outstanding has reached GHS ${classTotalUnpaid.toLocaleString()}, posing operational cash-flow risks.`,
-          category: "Finance",
-          severity:
-            classTotalUnpaid >= spikeThreshold * 1.5 ? "High" : "Medium",
-          timestamp: "Real-time scan",
-          isResolved: false,
-          metadata: {
-            classId: c.id,
-            className: c.name,
-            amountSpike: classTotalUnpaid,
-            attemptsCount: classStudents.filter((s) => s.balanceGHS > 0).length,
-          },
-        };
-      }
-      return null;
-    })
-    .filter((alert) => alert !== null) as DiagnosticAlert[];
+  const dynamicClassSpikeAlerts: DiagnosticAlert[] = classes.map(c => {
+    const classStudents = students.filter(s => s.classId === c.id);
+    const classTotalUnpaid = classStudents.reduce((acc, s) => acc + s.balanceGHS, 0);
+    const spikeThreshold = unpaidFeeThreshold * 2.5; // risk accumulates inside the entire classroom
+    
+    if (classTotalUnpaid >= spikeThreshold) {
+      return {
+        id: `diag-fin-class-${c.id}`,
+        title: `Fee Collection Deficit Spike: ${c.name}`,
+        description: `Unpaid tuition spike flagged in ${c.name}. Total cumulative outstanding has reached GHS ${classTotalUnpaid.toLocaleString()}, posing operational cash-flow risks.`,
+        category: 'Finance',
+        severity: classTotalUnpaid >= spikeThreshold * 1.5 ? 'High' : 'Medium',
+        timestamp: 'Real-time scan',
+        isResolved: false,
+        metadata: {
+          classId: c.id,
+          className: c.name,
+          amountSpike: classTotalUnpaid,
+          attemptsCount: classStudents.filter(s => s.balanceGHS > 0).length
+        }
+      };
+    }
+    return null;
+  }).filter(alert => alert !== null) as DiagnosticAlert[];
 
   const allDiagnosticAlerts: DiagnosticAlert[] = [
     ...customAlerts,
     ...dynamicFinanceAlerts,
-    ...dynamicClassSpikeAlerts,
-  ].map((alert) => ({
+    ...dynamicClassSpikeAlerts
+  ].map(alert => ({
     ...alert,
-    isResolved: resolvedAlertIds.includes(alert.id),
+    isResolved: resolvedAlertIds.includes(alert.id)
   }));
 
-  const activeUnresolvedAlerts = allDiagnosticAlerts.filter(
-    (a) => !a.isResolved,
-  );
-  const resolvedAlerts = allDiagnosticAlerts.filter((a) => a.isResolved);
+  const activeUnresolvedAlerts = allDiagnosticAlerts.filter(a => !a.isResolved);
+  const resolvedAlerts = allDiagnosticAlerts.filter(a => a.isResolved);
 
   const handleSimulateBruteForce = () => {
-    const randomPupil = students[
-      Math.floor(Math.random() * students.length)
-    ] || { name: "Kofi Mensah Jnr", id: "st1" };
+    const randomPupil = students[Math.floor(Math.random() * students.length)] || { name: 'Kofi Mensah Jnr', id: 'st1' };
     const randomIP = `197.251.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
     const newAlert: DiagnosticAlert = {
       id: `diag-sec-sim-${Date.now()}`,
-      title: "Security Alert: Brute Force Ingress Blocked",
+      title: 'Security Alert: Brute Force Ingress Blocked',
       description: `A burst of ${failedLoginsLimit + 2} failed login attempts was registered on Student account (${randomPupil.name}) from IP ${randomIP}. Gateway firewall has temporarily flagged this endpoint.`,
-      category: "Security",
-      severity: "High",
-      timestamp: "Just now",
+      category: 'Security',
+      severity: 'High',
+      timestamp: 'Just now',
       isResolved: false,
       metadata: {
         targetUser: `${randomPupil.name} (${randomPupil.id})`,
         ipAddress: randomIP,
-        location: "Ejisu District, Ashanti",
-        attemptsCount: failedLoginsLimit + 2,
-      },
+        location: 'Ejisu District, Ashanti',
+        attemptsCount: failedLoginsLimit + 2
+      }
     };
-    setCustomAlerts((prev) => [newAlert, ...prev]);
-    alert(
-      `Simulation active: Ingress warning generated for ${randomPupil.name}! Check the alerts below.`,
-    );
+    setCustomAlerts(prev => [newAlert, ...prev]);
+    alert(`Simulation active: Ingress warning generated for ${randomPupil.name}! Check the alerts below.`);
   };
 
   const handleSimulateFeesSpike = () => {
     const randomIP = `197.251.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
     const newAlert: DiagnosticAlert = {
       id: `diag-fin-sim-${Date.now()}`,
-      title: "Financial Alert: Sudden Fees Delta Anomaly",
+      title: 'Financial Alert: Sudden Fees Delta Anomaly',
       description: `Sudden cumulative billing unpaid deficit of GHS 4,800.00 flagged following Term III class adjustment.`,
-      category: "Finance",
-      severity: "High",
-      timestamp: "Just now",
+      category: 'Finance',
+      severity: 'High',
+      timestamp: 'Just now',
       isResolved: false,
       metadata: {
-        className: "JHS 2 (c4)",
+        className: 'JHS 2 (c4)',
         amountSpike: 4800,
-        attemptsCount: 3,
-      },
+        attemptsCount: 3
+      }
     };
-    setCustomAlerts((prev) => [newAlert, ...prev]);
-    alert(
-      `Simulation active: Outstanding tuition spike anomaly flagged! check the alerts below.`,
-    );
+    setCustomAlerts(prev => [newAlert, ...prev]);
+    alert(`Simulation active: Outstanding tuition spike anomaly flagged! check the alerts below.`);
   };
 
   const handleExportDatabase = () => {
@@ -522,31 +344,25 @@ export default function AdminDashboard({
       timetable,
       announcements,
       transactions,
-      emails,
+      emails
     };
     const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(payload, null, 2),
+      JSON.stringify(payload, null, 2)
     )}`;
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", jsonString);
-    downloadAnchor.setAttribute("download", "edweso-royal-db-backup.json");
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', jsonString);
+    downloadAnchor.setAttribute('download', 'edweso-royal-db-backup.json');
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
   };
 
-  const handleImportDatabase = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleImportDatabase = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (
-      !window.confirm(
-        "WARNING: Restoring a database backup will overwrite all existing student files, teacher listings, financial transactions, and grades on this server. Proceed?",
-      )
-    ) {
-      e.target.value = "";
+    if (!window.confirm('WARNING: Restoring a database backup will overwrite all existing student files, teacher listings, financial transactions, and grades on this server. Proceed?')) {
+      e.target.value = '';
       return;
     }
 
@@ -554,34 +370,28 @@ export default function AdminDashboard({
     reader.onload = async (event) => {
       try {
         const parsed = JSON.parse(event.target?.result as string);
-
+        
         // Simple verification that the backup matches school data structure
         if (!parsed.students || !parsed.teachers || !parsed.classes) {
-          alert(
-            "Invalid backup structure: Ensure the uploaded JSON file contains school records.",
-          );
+          alert('Invalid backup structure: Ensure the uploaded JSON file contains school records.');
           return;
         }
 
-        const res = await fetch("/api/school-data", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(parsed),
+        const res = await fetch('/api/school-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(parsed)
         });
 
         const json = await res.json();
-        if (json.status === "success") {
-          alert(
-            "System snapshot restored successfully! Reloading portal to refresh all local and remote states...",
-          );
+        if (json.status === 'success') {
+          alert('System snapshot restored successfully! Reloading portal to refresh all local and remote states...');
           window.location.reload();
         } else {
-          alert("Failed to save the restored state onto the cloud server.");
+          alert('Failed to save the restored state onto the cloud server.');
         }
       } catch (err) {
-        alert(
-          "Error parsing backup file: Ensure the uploaded file is valid JSON.",
-        );
+        alert('Error parsing backup file: Ensure the uploaded file is valid JSON.');
       }
     };
     reader.readAsText(file);
@@ -589,66 +399,53 @@ export default function AdminDashboard({
 
   const handleResolveAlert = (id: string) => {
     if (!resolvedAlertIds.includes(id)) {
-      setResolvedAlertIds((prev) => [...prev, id]);
+      setResolvedAlertIds(prev => [...prev, id]);
     }
   };
 
   const handleBlockIP = (id: string, ip: string) => {
     handleResolveAlert(id);
-    alert(
-      `Security Rule Dispatched: Firewall IP ${ip} successfully blacklisted. Secure SSL session blocks established.`,
-    );
+    alert(`Security Rule Dispatched: Firewall IP ${ip} successfully blacklisted. Secure SSL session blocks established.`);
   };
 
   const handleResetUserPassword = (id: string, user: string) => {
     handleResolveAlert(id);
-    alert(
-      `Security Policy Triggered: Password reset token issued for account ${user}. Access locks enabled.`,
-    );
+    alert(`Security Policy Triggered: Password reset token issued for account ${user}. Access locks enabled.`);
   };
 
   const handleSendQuickEmail = (id: string, studentId: string) => {
-    const target = students.find((s) => s.id === studentId);
+    const target = students.find(s => s.id === studentId);
     if (target) {
       onSendEmail(
         target.parentEmail,
         target.parentName,
         `URGENT: Outstanding Tuition Deficit Notice - ${target.name}`,
         `Dear ${target.parentName},\n\nOur system detected an outstanding balance of GHS ${target.balanceGHS.toLocaleString()} for your ward, ${target.name}. Please proceed with mobile money payment at your earliest convenience to avoid administrative limitations.\n\nWarm regards,\nAdministrative Board, Edweso Royal Academy`,
-        "FeeDeadline",
+        'FeeDeadline'
       );
       handleResolveAlert(id);
-      alert(
-        `Automated reminder emailed successfully to guardian ${target.parentName} (${target.parentEmail})! Alert resolved.`,
-      );
+      alert(`Automated reminder emailed successfully to guardian ${target.parentName} (${target.parentEmail})! Alert resolved.`);
     } else {
-      alert("Student coordinates not found.");
+      alert('Student coordinates not found.');
     }
   };
 
-  const handleSendBirthdayEmail = (
-    student: Student,
-    birthdayDateStr: string,
-  ) => {
+  const handleSendBirthdayEmail = (student: Student, birthdayDateStr: string) => {
     onSendEmail(
       student.parentEmail,
       student.parentName,
       `Celebrating ${student.name}'s Birthday! 🎂 - Edweso Royal Academy`,
       `Dear ${student.parentName},\n\nWe would like to join you in celebrating the upcoming birthday of your ward, ${student.name}, on ${birthdayDateStr}!\n\nAt Edweso Royal Academy, we cherish and support every student's growth and journey. May this special day bring them absolute joy, wisdom, and success in their studies!\n\nWarmest wishes,\nEdweso Royal Academy Management & Staff`,
-      "Announcement",
+      'Announcement'
     );
-    alert(
-      `Birthday celebratory email sent successfully to ${student.parentName} (${student.parentEmail})!`,
-    );
+    alert(`Birthday celebratory email sent successfully to ${student.parentName} (${student.parentEmail})!`);
   };
 
   const handleRunDiagnosticScan = () => {
     setDiagnosticScanLoading(true);
     setTimeout(() => {
       setDiagnosticScanLoading(false);
-      alert(
-        "Diagnostic Engine scanned 8 database registers successfully! All patterns updated.",
-      );
+      alert('Diagnostic Engine scanned 8 database registers successfully! All patterns updated.');
     }, 800);
   };
 
@@ -656,23 +453,16 @@ export default function AdminDashboard({
   const [inquiries, setInquiries] = useState<PublicInquiry[]>(() => {
     return SchoolDatabase.getInquiries();
   });
-  const [selectedInquiry, setSelectedInquiry] = useState<PublicInquiry | null>(
-    null,
-  );
+  const [selectedInquiry, setSelectedInquiry] = useState<PublicInquiry | null>(null);
 
   useEffect(() => {
-    if (activeTab === "inquiries") {
+    if (activeTab === 'inquiries') {
       setInquiries(SchoolDatabase.getInquiries());
     }
   }, [activeTab]);
 
-  const handleInquiryStatusChange = (
-    id: string,
-    newStatus: "Pending" | "Reviewed" | "Contacted",
-  ) => {
-    const updated = inquiries.map((inq) =>
-      inq.id === id ? { ...inq, status: newStatus } : inq,
-    );
+  const handleInquiryStatusChange = (id: string, newStatus: 'Pending' | 'Reviewed' | 'Contacted') => {
+    const updated = inquiries.map(inq => inq.id === id ? { ...inq, status: newStatus } : inq);
     setInquiries(updated);
     SchoolDatabase.saveInquiries(updated);
   };
@@ -680,86 +470,55 @@ export default function AdminDashboard({
   const handleDeleteInquiry = (id: string) => {
     setDeleteConfirm({
       isOpen: true,
-      title: "Delete Web Inquiry",
-      message:
-        "Are you sure you want to delete this public web inquiry? This will permanently erase the submission.",
+      title: 'Delete Web Inquiry',
+      message: 'Are you sure you want to delete this public web inquiry? This will permanently erase the submission.',
       onConfirm: () => {
-        const updated = inquiries.filter((inq) => inq.id !== id);
+        const updated = inquiries.filter(inq => inq.id !== id);
         setInquiries(updated);
         SchoolDatabase.saveInquiries(updated);
-        setDeleteConfirm((prev) => ({ ...prev, isOpen: false }));
-      },
+        setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+      }
     });
   };
 
   // Payment Gateway & Bank Account Linking Configuration
-  const [paymentsSubTab, setPaymentsSubTab] = useState<
-    | "ledger"
-    | "pending-verification"
-    | "manual-approvals"
-    | "bank-setup"
-    | "scheduler"
-  >("ledger");
-  const [verificationStatusFilter, setVerificationStatusFilter] = useState<
-    "Pending" | "Successful" | "Failed" | "All"
-  >("Pending");
-  const [verificationSearchQuery, setVerificationSearchQuery] = useState("");
+  const [paymentsSubTab, setPaymentsSubTab] = useState<'ledger' | 'pending-verification' | 'manual-approvals' | 'bank-setup' | 'scheduler'>('ledger');
+  const [verificationStatusFilter, setVerificationStatusFilter] = useState<'Pending' | 'Successful' | 'Failed' | 'All'>('Pending');
+  const [verificationSearchQuery, setVerificationSearchQuery] = useState('');
 
   // Improved Paystack Ledger State variables
-  const [ledgerSearchQuery, setLedgerSearchQuery] = useState("");
-  const [ledgerStatusFilter, setLedgerStatusFilter] = useState<
-    "All" | "Successful" | "Pending" | "Failed"
-  >("All");
-  const [ledgerMethodFilter, setLedgerMethodFilter] = useState<string>("All");
-  const [ledgerTermFilter, setLedgerTermFilter] = useState<
-    "All" | "Term 1" | "Term 2" | "Term 3"
-  >("All");
-  const [ledgerSortField, setLedgerSortField] = useState<
-    "date" | "amount" | "studentName"
-  >("date");
-  const [ledgerSortOrder, setLedgerSortOrder] = useState<"asc" | "desc">(
-    "desc",
-  );
-  const [selectedLedgerTransaction, setSelectedLedgerTransaction] =
-    useState<PaymentTransaction | null>(null);
-  const [isSimulatePaymentModalOpen, setIsSimulatePaymentModalOpen] =
-    useState(false);
+  const [ledgerSearchQuery, setLedgerSearchQuery] = useState('');
+  const [ledgerStatusFilter, setLedgerStatusFilter] = useState<'All' | 'Successful' | 'Pending' | 'Failed'>('All');
+  const [ledgerMethodFilter, setLedgerMethodFilter] = useState<string>('All');
+  const [ledgerTermFilter, setLedgerTermFilter] = useState<'All' | 'Term 1' | 'Term 2' | 'Term 3'>('All');
+  const [ledgerSortField, setLedgerSortField] = useState<'date' | 'amount' | 'studentName'>('date');
+  const [ledgerSortOrder, setLedgerSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedLedgerTransaction, setSelectedLedgerTransaction] = useState<PaymentTransaction | null>(null);
+  const [isSimulatePaymentModalOpen, setIsSimulatePaymentModalOpen] = useState(false);
   const [isSweeping, setIsSweeping] = useState(false);
   const [sweepSuccess, setSweepSuccess] = useState(false);
-
+  
   // Simulated form states for adding Paystack payment
-  const [simStudentId, setSimStudentId] = useState("");
-  const [simAmount, setSimAmount] = useState("");
-  const [simMethod, setSimMethod] = useState<
-    | "Card"
-    | "MTN Mobile Money"
-    | "Telecel Cash"
-    | "AirtelTigo Money"
-    | "Bank Transfer"
-  >("MTN Mobile Money");
-  const [simTerm, setSimTerm] = useState<"Term 1" | "Term 2" | "Term 3">(
-    "Term 1",
-  );
-  const [simStatus, setSimStatus] = useState<
-    "Successful" | "Pending" | "Failed"
-  >("Successful");
+  const [simStudentId, setSimStudentId] = useState('');
+  const [simAmount, setSimAmount] = useState('');
+  const [simMethod, setSimMethod] = useState<'Card' | 'MTN Mobile Money' | 'Telecel Cash' | 'AirtelTigo Money' | 'Bank Transfer'>('MTN Mobile Money');
+  const [simTerm, setSimTerm] = useState<'Term 1' | 'Term 2' | 'Term 3'>('Term 1');
+  const [simStatus, setSimStatus] = useState<'Successful' | 'Pending' | 'Failed'>('Successful');
 
   const handleApprovePendingTransaction = (txId: string) => {
-    if (session?.role !== "super_admin") {
-      alert(
-        "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder & Executive Chairman Nana Kwasi Edweso II) is authorized to verify and approve transaction overrides.",
-      );
+    if (session?.role !== 'super_admin') {
+      alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder & Executive Chairman Nana Kwasi Edweso II) is authorized to verify and approve transaction overrides.');
       return;
     }
-    const targetTx = transactions.find((t) => t.id === txId);
+    const targetTx = transactions.find(t => t.id === txId);
     if (!targetTx) return;
 
     // 1. Deduct paid amount from student's balance
-    const updatedStudents = students.map((s) => {
+    const updatedStudents = students.map(s => {
       if (s.id === targetTx.studentId) {
         return {
           ...s,
-          balanceGHS: Math.max(0, s.balanceGHS - targetTx.amountGHS),
+          balanceGHS: Math.max(0, s.balanceGHS - targetTx.amountGHS)
         };
       }
       return s;
@@ -767,77 +526,63 @@ export default function AdminDashboard({
     onUpdateStudents(updatedStudents);
 
     // 2. Update the transaction status in transaction ledger to 'Successful'
-    const updatedTx = transactions.map((t) => {
+    const updatedTx = transactions.map(t => {
       if (t.id === txId) {
         return {
           ...t,
-          status: "Successful" as const,
+          status: 'Successful' as const
         };
       }
       return t;
     });
     onUpdateTransactions(updatedTx);
 
-    alert(
-      `[SUPER ADMIN AUTHORIZED] Successfully verified and approved transaction ${targetTx.reference}. Tuition balance of GHS ${targetTx.amountGHS.toFixed(2)} credited to ${targetTx.studentName}.`,
-    );
+    alert(`[SUPER ADMIN AUTHORIZED] Successfully verified and approved transaction ${targetTx.reference}. Tuition balance of GHS ${targetTx.amountGHS.toFixed(2)} credited to ${targetTx.studentName}.`);
   };
-  const [manualPayments, setManualPayments] = useState<ManualPaymentRequest[]>(
-    () => {
-      const saved = localStorage.getItem("era_manual_payments");
-      return saved ? JSON.parse(saved) : [];
-    },
-  );
-  const [rejectReason, setRejectReason] = useState("");
+  const [manualPayments, setManualPayments] = useState<ManualPaymentRequest[]>(() => {
+    const saved = localStorage.getItem('era_manual_payments');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [rejectReason, setRejectReason] = useState('');
   const [rejectingId, setRejectingId] = useState<string | null>(null);
-
+  
   // Custom states for manual receipt queue and direct recording
-  const [manualStatusFilter, setManualStatusFilter] = useState<
-    "All" | "Pending" | "Approved" | "Rejected"
-  >("All");
-  const [isDirectPaymentModalOpen, setIsDirectPaymentModalOpen] =
-    useState(false);
-  const [directStudentId, setDirectStudentId] = useState("");
-  const [directAmount, setDirectAmount] = useState("");
-  const [directMethod, setDirectMethod] = useState<
-    | "Bank Transfer"
-    | "MTN Mobile Money"
-    | "Telecel Cash"
-    | "AirtelTigo Money"
-    | "Cash"
-  >("Cash");
-  const [directReference, setDirectReference] = useState("");
+  const [manualStatusFilter, setManualStatusFilter] = useState<'All' | 'Pending' | 'Approved' | 'Rejected'>('All');
+  const [isDirectPaymentModalOpen, setIsDirectPaymentModalOpen] = useState(false);
+  const [directStudentId, setDirectStudentId] = useState('');
+  const [directAmount, setDirectAmount] = useState('');
+  const [directMethod, setDirectMethod] = useState<'Bank Transfer' | 'MTN Mobile Money' | 'Telecel Cash' | 'AirtelTigo Money' | 'Cash'>('Cash');
+  const [directReference, setDirectReference] = useState('');
 
   const handleSimulatePaystackPayment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!simStudentId) {
-      alert("Please select a student payee.");
+      alert('Please select a student payee.');
       return;
     }
     const amount = Number(simAmount);
     if (isNaN(amount) || amount <= 0) {
-      alert("Please enter a valid amount.");
+      alert('Please enter a valid amount.');
       return;
     }
 
-    const targetStudent = students.find((s) => s.id === simStudentId);
+    const targetStudent = students.find(s => s.id === simStudentId);
     if (!targetStudent) {
-      alert("Student not found.");
+      alert('Student not found.');
       return;
     }
 
     // Generate simulated reference codes
-    const ref = "PSTK-" + Math.floor(10000000 + Math.random() * 90000000);
-    const paystackId =
-      "pay_" + Math.random().toString(36).substring(2, 10).toUpperCase();
+    const ref = 'PSTK-' + Math.floor(10000000 + Math.random() * 90000000);
+    const paystackId = 'pay_' + Math.random().toString(36).substring(2, 10).toUpperCase();
 
     // Adjust balance if Successful
-    if (simStatus === "Successful") {
-      const updatedStudents = students.map((s) => {
+    if (simStatus === 'Successful') {
+      const updatedStudents = students.map(s => {
         if (s.id === simStudentId) {
           return {
             ...s,
-            balanceGHS: Math.max(0, s.balanceGHS - amount),
+            balanceGHS: Math.max(0, s.balanceGHS - amount)
           };
         }
         return s;
@@ -846,72 +591,70 @@ export default function AdminDashboard({
     }
 
     const newTx: PaymentTransaction = {
-      id: "tx-ps-" + Date.now(),
+      id: 'tx-ps-' + Date.now(),
       studentId: simStudentId,
       studentName: targetStudent.name,
       amountGHS: amount,
-      date: new Date().toISOString().replace("T", " ").substring(0, 16),
+      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
       status: simStatus,
       reference: ref,
       paystackRef: paystackId,
       paymentMethod: simMethod,
-      email: targetStudent.parentEmail || "student@school.edu",
-      term: simTerm,
+      email: targetStudent.parentEmail || 'student@school.edu',
+      term: simTerm
     };
 
     onUpdateTransactions([newTx, ...transactions]);
 
     // Log simulated system activity
     SchoolDatabase.addSystemActivity(
-      "attendance",
-      session ? session.name : "System Scheduler",
-      `Simulated ${simStatus} Paystack payment of GHS ${amount} for ${targetStudent.name} (${simMethod})`,
+      'attendance',
+      session ? session.name : 'System Scheduler',
+      `Simulated ${simStatus} Paystack payment of GHS ${amount} for ${targetStudent.name} (${simMethod})`
     );
 
     // Reset form states
-    setSimStudentId("");
-    setSimAmount("");
-    setSimMethod("MTN Mobile Money");
-    setSimTerm("Term 1");
-    setSimStatus("Successful");
+    setSimStudentId('');
+    setSimAmount('');
+    setSimMethod('MTN Mobile Money');
+    setSimTerm('Term 1');
+    setSimStatus('Successful');
     setIsSimulatePaymentModalOpen(false);
 
-    alert(
-      `Successfully generated a simulated ${simStatus} Paystack payment ledger entry for ${targetStudent.name}!`,
-    );
+    alert(`Successfully generated a simulated ${simStatus} Paystack payment ledger entry for ${targetStudent.name}!`);
   };
 
   const handleRecordDirectPayment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!directStudentId) {
-      alert("Please select a student.");
+      alert('Please select a student.');
       return;
     }
     const amount = Number(directAmount);
     if (isNaN(amount) || amount <= 0) {
-      alert("Please enter a valid positive amount.");
+      alert('Please enter a valid positive amount.');
       return;
     }
     if (!directReference.trim()) {
-      alert("Please enter a reference code.");
+      alert('Please enter a reference code.');
       return;
     }
 
-    const targetStudent = students.find((s) => s.id === directStudentId);
+    const targetStudent = students.find(s => s.id === directStudentId);
     if (!targetStudent) {
-      alert("Selected student not found.");
+      alert('Selected student not found.');
       return;
     }
 
-    const isSuperAdminUser = session?.role === "super_admin";
+    const isSuperAdminUser = session?.role === 'super_admin';
 
     if (isSuperAdminUser) {
       // 1. Deduct paid amount from student's balance
-      const updatedStudents = students.map((s) => {
+      const updatedStudents = students.map(s => {
         if (s.id === directStudentId) {
           return {
             ...s,
-            balanceGHS: Math.max(0, s.balanceGHS - amount),
+            balanceGHS: Math.max(0, s.balanceGHS - amount)
           };
         }
         return s;
@@ -920,17 +663,17 @@ export default function AdminDashboard({
 
       // 2. Log payment transaction in transaction ledger
       const newTx: PaymentTransaction = {
-        id: "tx-manual-" + Date.now(),
+        id: 'tx-manual-' + Date.now(),
         studentId: directStudentId,
         studentName: targetStudent.name,
         amountGHS: amount,
-        date: new Date().toISOString().replace("T", " ").substring(0, 16),
-        status: "Successful",
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        status: 'Successful',
         reference: directReference.trim(),
-        paystackRef: "DIRECT-SUPERADMIN-" + Date.now(),
+        paystackRef: 'DIRECT-SUPERADMIN-' + Date.now(),
         paymentMethod: directMethod as any,
-        email: targetStudent.parentEmail || "student@school.edu",
-        term: "Term 1",
+        email: targetStudent.parentEmail || 'student@school.edu',
+        term: 'Term 1'
       };
       onUpdateTransactions([newTx, ...transactions]);
 
@@ -943,21 +686,16 @@ export default function AdminDashboard({
         date: new Date().toISOString().substring(0, 10),
         referenceCode: directReference.trim(),
         paymentMethod: directMethod as any,
-        status: "Approved",
-        reviewedBy: "Founder Nana Kwasi Edweso II (Super Admin)",
-        reviewedAt: new Date().toISOString().substring(0, 10),
+        status: 'Approved',
+        reviewedBy: 'Founder Nana Kwasi Edweso II (Super Admin)',
+        reviewedAt: new Date().toISOString().substring(0, 10)
       };
 
       const updatedRequests = [newRequest, ...manualPayments];
       setManualPayments(updatedRequests);
-      localStorage.setItem(
-        "era_manual_payments",
-        JSON.stringify(updatedRequests),
-      );
+      localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
 
-      alert(
-        `[SUPER ADMIN AUTHORIZED] Successfully verified and credited direct payment of GHS ${amount} for ${targetStudent.name}.`,
-      );
+      alert(`[SUPER ADMIN AUTHORIZED] Successfully verified and credited direct payment of GHS ${amount} for ${targetStudent.name}.`);
     } else {
       // Queued for Super Admin approval
       const newRequest: ManualPaymentRequest = {
@@ -968,48 +706,41 @@ export default function AdminDashboard({
         date: new Date().toISOString().substring(0, 10),
         referenceCode: directReference.trim(),
         paymentMethod: directMethod as any,
-        status: "Pending",
-        reviewedBy: "Pending Super Admin Sign-off",
-        reviewedAt: "",
+        status: 'Pending',
+        reviewedBy: 'Pending Super Admin Sign-off',
+        reviewedAt: ''
       };
 
       const updatedRequests = [newRequest, ...manualPayments];
       setManualPayments(updatedRequests);
-      localStorage.setItem(
-        "era_manual_payments",
-        JSON.stringify(updatedRequests),
-      );
+      localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
 
-      alert(
-        `Direct cash payment of GHS ${amount} for ${targetStudent.name} recorded and queued for MANDATORY SUPER ADMIN (Founder) EXECUTIVE APPROVAL before tuition balance adjustment.`,
-      );
+      alert(`Direct cash payment of GHS ${amount} for ${targetStudent.name} recorded and queued for MANDATORY SUPER ADMIN (Founder) EXECUTIVE APPROVAL before tuition balance adjustment.`);
     }
 
     // Reset Form
-    setDirectStudentId("");
-    setDirectAmount("");
-    setDirectMethod("Cash");
-    setDirectReference("");
+    setDirectStudentId('');
+    setDirectAmount('');
+    setDirectMethod('Cash');
+    setDirectReference('');
     setIsDirectPaymentModalOpen(false);
   };
 
   const handleApproveManualPayment = (id: string) => {
-    if (session?.role !== "super_admin") {
-      alert(
-        "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to approve manual fee receipts and credit student tuition balances.",
-      );
+    if (session?.role !== 'super_admin') {
+      alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to approve manual fee receipts and credit student tuition balances.');
       return;
     }
 
-    const request = manualPayments.find((r) => r.id === id);
+    const request = manualPayments.find(r => r.id === id);
     if (!request) return;
 
     // 1. Deduct paid amount from student's balance
-    const updatedStudents = students.map((s) => {
+    const updatedStudents = students.map(s => {
       if (s.id === request.studentId) {
         return {
           ...s,
-          balanceGHS: Math.max(0, s.balanceGHS - request.amountGHS),
+          balanceGHS: Math.max(0, s.balanceGHS - request.amountGHS)
         };
       }
       return s;
@@ -1017,229 +748,187 @@ export default function AdminDashboard({
     onUpdateStudents(updatedStudents);
 
     // 2. Log payment transaction in transaction ledger
-    const studentRecord = students.find((s) => s.id === request.studentId);
+    const studentRecord = students.find(s => s.id === request.studentId);
     const newTx: PaymentTransaction = {
-      id: "tx-manual-" + Date.now(),
+      id: 'tx-manual-' + Date.now(),
       studentId: request.studentId,
       studentName: request.studentName,
       amountGHS: request.amountGHS,
-      date: new Date().toISOString().replace("T", " ").substring(0, 16),
-      status: "Successful",
+      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'Successful',
       reference: request.referenceCode,
-      paystackRef: "MANUAL-SUPERADMIN-" + request.id,
+      paystackRef: 'MANUAL-SUPERADMIN-' + request.id,
       paymentMethod: request.paymentMethod as any,
-      email: studentRecord?.parentEmail || "student@school.edu",
-      term: "Term 1",
+      email: studentRecord?.parentEmail || 'student@school.edu',
+      term: 'Term 1'
     };
     onUpdateTransactions([newTx, ...transactions]);
 
     // 3. Update request status to Approved
-    const updatedRequests = manualPayments.map((r) => {
+    const updatedRequests = manualPayments.map(r => {
       if (r.id === id) {
         return {
           ...r,
-          status: "Approved" as const,
-          reviewedBy: "Founder Nana Kwasi Edweso II (Super Admin)",
-          reviewedAt: new Date().toISOString().substring(0, 10),
+          status: 'Approved' as const,
+          reviewedBy: 'Founder Nana Kwasi Edweso II (Super Admin)',
+          reviewedAt: new Date().toISOString().substring(0, 10)
         };
       }
       return r;
     });
     setManualPayments(updatedRequests);
-    localStorage.setItem(
-      "era_manual_payments",
-      JSON.stringify(updatedRequests),
-    );
+    localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
 
-    alert(
-      `[SUPER ADMIN AUTHORIZED] Successfully approved payment receipt. GHS ${request.amountGHS} credited to ${request.studentName}.`,
-    );
+    alert(`[SUPER ADMIN AUTHORIZED] Successfully approved payment receipt. GHS ${request.amountGHS} credited to ${request.studentName}.`);
   };
 
   const handleRejectManualPayment = (id: string) => {
-    if (session?.role !== "super_admin") {
-      alert(
-        "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to decline payment receipt submissions.",
-      );
+    if (session?.role !== 'super_admin') {
+      alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to decline payment receipt submissions.');
       return;
     }
 
     if (!rejectReason.trim()) {
-      alert("Please provide a reason for declining this receipt.");
+      alert('Please provide a reason for declining this receipt.');
       return;
     }
-    const updatedRequests = manualPayments.map((r) => {
+    const updatedRequests = manualPayments.map(r => {
       if (r.id === id) {
         return {
           ...r,
-          status: "Rejected" as const,
+          status: 'Rejected' as const,
           rejectReason: rejectReason.trim(),
-          reviewedBy: "Founder Nana Kwasi Edweso II (Super Admin)",
-          reviewedAt: new Date().toISOString().substring(0, 10),
+          reviewedBy: 'Founder Nana Kwasi Edweso II (Super Admin)',
+          reviewedAt: new Date().toISOString().substring(0, 10)
         };
       }
       return r;
     });
     setManualPayments(updatedRequests);
-    localStorage.setItem(
-      "era_manual_payments",
-      JSON.stringify(updatedRequests),
-    );
+    localStorage.setItem('era_manual_payments', JSON.stringify(updatedRequests));
     setRejectingId(null);
-    setRejectReason("");
+    setRejectReason('');
 
-    alert("[SUPER ADMIN AUTHORIZED] Receipt declined and logged.");
+    alert('[SUPER ADMIN AUTHORIZED] Receipt declined and logged.');
   };
 
   const handleBatchApproveFinancialRequests = () => {
-    if (session?.role !== "super_admin") {
-      alert(
-        "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) can execute batch executive approvals.",
-      );
+    if (session?.role !== 'super_admin') {
+      alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) can execute batch executive approvals.');
       return;
     }
 
-    const pendingRequests = manualPayments.filter(
-      (r) => r.status === "Pending",
-    );
+    const pendingRequests = manualPayments.filter(r => r.status === 'Pending');
     if (pendingRequests.length === 0) {
-      alert(
-        "No pending financial requests requiring Super Admin approval at this time.",
-      );
+      alert('No pending financial requests requiring Super Admin approval at this time.');
       return;
     }
 
     let updatedStudentsList = [...students];
     const newTxList: PaymentTransaction[] = [];
 
-    pendingRequests.forEach((req) => {
+    pendingRequests.forEach(req => {
       // 1. Deduct paid amount
-      updatedStudentsList = updatedStudentsList.map((s) => {
+      updatedStudentsList = updatedStudentsList.map(s => {
         if (s.id === req.studentId) {
           return {
             ...s,
-            balanceGHS: Math.max(0, s.balanceGHS - req.amountGHS),
+            balanceGHS: Math.max(0, s.balanceGHS - req.amountGHS)
           };
         }
         return s;
       });
 
       // 2. Add transaction
-      const st = students.find((s) => s.id === req.studentId);
+      const st = students.find(s => s.id === req.studentId);
       newTxList.push({
-        id: "tx-manual-" + Math.random().toString(36).substring(2, 9),
+        id: 'tx-manual-' + Math.random().toString(36).substring(2, 9),
         studentId: req.studentId,
         studentName: req.studentName,
         amountGHS: req.amountGHS,
-        date: new Date().toISOString().replace("T", " ").substring(0, 16),
-        status: "Successful",
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        status: 'Successful',
         reference: req.referenceCode,
-        paystackRef: "BATCH-SUPERADMIN-" + req.id,
+        paystackRef: 'BATCH-SUPERADMIN-' + req.id,
         paymentMethod: req.paymentMethod as any,
-        email: st?.parentEmail || "student@school.edu",
-        term: "Term 1",
+        email: st?.parentEmail || 'student@school.edu',
+        term: 'Term 1'
       });
     });
 
     onUpdateStudents(updatedStudentsList);
     onUpdateTransactions([...newTxList, ...transactions]);
 
-    const updatedManual = manualPayments.map((r) => {
-      if (r.status === "Pending") {
+    const updatedManual = manualPayments.map(r => {
+      if (r.status === 'Pending') {
         return {
           ...r,
-          status: "Approved" as const,
-          reviewedBy: "Founder Nana Kwasi Edweso II (Super Admin)",
-          reviewedAt: new Date().toISOString().substring(0, 10),
+          status: 'Approved' as const,
+          reviewedBy: 'Founder Nana Kwasi Edweso II (Super Admin)',
+          reviewedAt: new Date().toISOString().substring(0, 10)
         };
       }
       return r;
     });
 
     setManualPayments(updatedManual);
-    localStorage.setItem("era_manual_payments", JSON.stringify(updatedManual));
+    localStorage.setItem('era_manual_payments', JSON.stringify(updatedManual));
 
-    alert(
-      `[SUPER ADMIN BATCH AUTHORIZED] Successfully approved and credited all ${pendingRequests.length} pending fee receipts!`,
-    );
+    alert(`[SUPER ADMIN BATCH AUTHORIZED] Successfully approved and credited all ${pendingRequests.length} pending fee receipts!`);
   };
-  const [paystackMode, setPaystackMode] = useState<"test" | "live">(() => {
-    return (
-      (localStorage.getItem("era_paystack_mode") as "test" | "live") || "test"
-    );
+  const [paystackMode, setPaystackMode] = useState<'test' | 'live'>(() => {
+    return (localStorage.getItem('era_paystack_mode') as 'test' | 'live') || 'test';
   });
   const [paystackPublicKey, setPaystackPublicKey] = useState(() => {
-    return (
-      localStorage.getItem("era_paystack_pub_key") ||
-      "pk_test_edweso7a8d9b1c0e2f3g4h5i6j7k8l9"
-    );
+    return localStorage.getItem('era_paystack_pub_key') || 'pk_test_edweso7a8d9b1c0e2f3g4h5i6j7k8l9';
   });
   const [paystackSecretKey, setPaystackSecretKey] = useState(() => {
-    return (
-      localStorage.getItem("era_paystack_sec_key") ||
-      "sk_test_edweso9876543210abcdefghijklmnop"
-    );
+    return localStorage.getItem('era_paystack_sec_key') || 'sk_test_edweso9876543210abcdefghijklmnop';
   });
-  const [payoutMethod, setPayoutMethod] = useState<"bank" | "momo">(() => {
-    return (
-      (localStorage.getItem("era_payout_method") as "bank" | "momo") || "bank"
-    );
+  const [payoutMethod, setPayoutMethod] = useState<'bank' | 'momo'>(() => {
+    return (localStorage.getItem('era_payout_method') as 'bank' | 'momo') || 'bank';
   });
   const [payoutBankName, setPayoutBankName] = useState(() => {
-    return localStorage.getItem("era_payout_bank_name") || "GCB Bank PLC";
+    return localStorage.getItem('era_payout_bank_name') || 'GCB Bank PLC';
   });
   const [payoutAccountNumber, setPayoutAccountNumber] = useState(() => {
-    return localStorage.getItem("era_payout_acc_num") || "1011130004521";
+    return localStorage.getItem('era_payout_acc_num') || '1011130004521';
   });
   const [payoutAccountName, setPayoutAccountName] = useState(() => {
-    return (
-      localStorage.getItem("era_payout_acc_name") || "Edweso Royal Academy Ltd"
-    );
+    return localStorage.getItem('era_payout_acc_name') || 'Edweso Royal Academy Ltd';
   });
   const [payoutBankBranch, setPayoutBankBranch] = useState(() => {
-    return localStorage.getItem("era_payout_branch") || "Ejisu Main Branch";
+    return localStorage.getItem('era_payout_branch') || 'Ejisu Main Branch';
   });
   const [payoutMomoProvider, setPayoutMomoProvider] = useState(() => {
-    return (
-      localStorage.getItem("era_payout_momo_provider") || "MTN Mobile Money"
-    );
+    return localStorage.getItem('era_payout_momo_provider') || 'MTN Mobile Money';
   });
   const [payoutMomoNumber, setPayoutMomoNumber] = useState(() => {
-    return localStorage.getItem("era_payout_momo_num") || "0244123456";
+    return localStorage.getItem('era_payout_momo_num') || '0244123456';
   });
   const [isPayoutVerified, setIsPayoutVerified] = useState(() => {
-    return localStorage.getItem("era_payout_verified") === "true";
+    return localStorage.getItem('era_payout_verified') === 'true';
   });
   const [isVerifyingPayout, setIsVerifyingPayout] = useState(false);
-  const [payoutConfigError, setPayoutConfigError] = useState("");
-  const [payoutConfigSuccess, setPayoutConfigSuccess] = useState("");
+  const [payoutConfigError, setPayoutConfigError] = useState('');
+  const [payoutConfigSuccess, setPayoutConfigSuccess] = useState('');
 
   // Composer and alert states
-  const [composerStudentId, setComposerStudentId] = useState("");
-  const [composerSubject, setComposerSubject] = useState("");
-  const [composerBody, setComposerBody] = useState("");
-  const [composerNotification, setComposerNotification] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-  const [selectedEmailDetails, setSelectedEmailDetails] =
-    useState<SimulatedEmail | null>(null);
+  const [composerStudentId, setComposerStudentId] = useState('');
+  const [composerSubject, setComposerSubject] = useState('');
+  const [composerBody, setComposerBody] = useState('');
+  const [composerNotification, setComposerNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [selectedEmailDetails, setSelectedEmailDetails] = useState<SimulatedEmail | null>(null);
 
   const handleComposeEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!composerStudentId) {
-      setComposerNotification({
-        message: "Please select a student/guardian first.",
-        type: "error",
-      });
+      setComposerNotification({ message: 'Please select a student/guardian first.', type: 'error' });
       return;
     }
-    const targetStudent = students.find((s) => s.id === composerStudentId);
+    const targetStudent = students.find(s => s.id === composerStudentId);
     if (!targetStudent) {
-      setComposerNotification({
-        message: "Student record not found.",
-        type: "error",
-      });
+      setComposerNotification({ message: 'Student record not found.', type: 'error' });
       return;
     }
 
@@ -1247,105 +936,71 @@ export default function AdminDashboard({
       targetStudent.parentEmail,
       targetStudent.parentName,
       composerSubject || `Notice: Update Regarding ${targetStudent.name}`,
-      composerBody ||
-        `Dear ${targetStudent.parentName},\n\nWe are writing to provide a standard update regarding your ward, ${targetStudent.name}.\n\nBest regards,\nEdweso Royal Academy Admin`,
-      "Announcement",
+      composerBody || `Dear ${targetStudent.parentName},\n\nWe are writing to provide a standard update regarding your ward, ${targetStudent.name}.\n\nBest regards,\nEdweso Royal Academy Admin`,
+      'Announcement'
     );
 
-    setComposerNotification({
-      message: `Simulated custom email dispatched successfully to ${targetStudent.parentEmail}!`,
-      type: "success",
-    });
-    setComposerSubject("");
-    setComposerBody("");
-    setComposerStudentId("");
+    setComposerNotification({ message: `Simulated custom email dispatched successfully to ${targetStudent.parentEmail}!`, type: 'success' });
+    setComposerSubject('');
+    setComposerBody('');
+    setComposerStudentId('');
     setTimeout(() => setComposerNotification(null), 5000);
   };
 
   // Simulated SMS state hooks
-  const [smsComposerStudentId, setSmsComposerStudentId] = useState("");
-  const [smsComposerMessage, setSmsComposerMessage] = useState("");
-  const [smsComposerType, setSmsComposerType] = useState<
-    "Announcement" | "FeeDeadline" | "Attendance" | "MorningReport"
-  >("Announcement");
-  const [smsComposerNotification, setSmsComposerNotification] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-  const [selectedSMSDetails, setSelectedSMSDetails] =
-    useState<SimulatedSMS | null>(null);
+  const [smsComposerStudentId, setSmsComposerStudentId] = useState('');
+  const [smsComposerMessage, setSmsComposerMessage] = useState('');
+  const [smsComposerType, setSmsComposerType] = useState<'Announcement' | 'FeeDeadline' | 'Attendance' | 'MorningReport'>('Announcement');
+  const [smsComposerNotification, setSmsComposerNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [selectedSMSDetails, setSelectedSMSDetails] = useState<SimulatedSMS | null>(null);
 
   const handleComposeSMSSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!smsComposerStudentId) {
-      setSmsComposerNotification({
-        message: "Please select a student/guardian first.",
-        type: "error",
-      });
+      setSmsComposerNotification({ message: 'Please select a student/guardian first.', type: 'error' });
       return;
     }
-    const targetStudent = students.find((s) => s.id === smsComposerStudentId);
+    const targetStudent = students.find(s => s.id === smsComposerStudentId);
     if (!targetStudent) {
-      setSmsComposerNotification({
-        message: "Student record not found.",
-        type: "error",
-      });
+      setSmsComposerNotification({ message: 'Student record not found.', type: 'error' });
       return;
     }
 
     onSendSMS(
       targetStudent.parentPhone,
       targetStudent.parentName,
-      smsComposerMessage ||
-        `[NOTICE] Edweso Royal Academy: Update regarding ward ${targetStudent.name}. Check school portal or contact office.`,
-      smsComposerType,
+      smsComposerMessage || `[NOTICE] Edweso Royal Academy: Update regarding ward ${targetStudent.name}. Check school portal or contact office.`,
+      smsComposerType
     );
 
-    setSmsComposerNotification({
-      message: `Simulated custom SMS dispatched successfully to ${targetStudent.parentPhone}!`,
-      type: "success",
-    });
-    setSmsComposerMessage("");
-    setSmsComposerStudentId("");
+    setSmsComposerNotification({ message: `Simulated custom SMS dispatched successfully to ${targetStudent.parentPhone}!`, type: 'success' });
+    setSmsComposerMessage('');
+    setSmsComposerStudentId('');
     setTimeout(() => setSmsComposerNotification(null), 5000);
   };
 
   const triggerBulkFeeAlerts = () => {
     const sentCount = onTriggerFeeAlerts();
     if (sentCount > 0) {
-      alert(
-        `Successfully sent simulated fee reminder emails & SMS messages to ${sentCount} guardians of students with outstanding balances!`,
-      );
+      alert(`Successfully sent simulated fee reminder emails & SMS messages to ${sentCount} guardians of students with outstanding balances!`);
     } else {
-      alert("No students currently have outstanding fee balances to notify.");
+      alert('No students currently have outstanding fee balances to notify.');
     }
   };
 
   // Payment Scheduler States
   const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false);
-  const [newPlanName, setNewPlanName] = useState("");
-  const [newPlanFrequency, setNewPlanFrequency] = useState<
-    "Daily" | "Weekly" | "Bi-weekly" | "Monthly"
-  >("Weekly");
-  const [newPlanTarget, setNewPlanTarget] = useState<string>("AllOutstanding");
-  const [newPlanSubject, setNewPlanSubject] = useState(
-    "URGENT: Outstanding Balance Reminder - Edweso Royal Academy",
-  );
-  const [newPlanTemplate, setNewPlanTemplate] = useState(
-    "Dear {parent_name},\n\nThis is an automated reminder that your ward, {student_name}, has an outstanding tuition balance of GHS {outstanding_balance} at Edweso Royal Academy.\n\nPlease settle this outstanding balance through your parent portal as soon as possible.\n\nBest regards,\nBursar Department",
-  );
-  const [schedulerNotification, setSchedulerNotification] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [newPlanName, setNewPlanName] = useState('');
+  const [newPlanFrequency, setNewPlanFrequency] = useState<'Daily' | 'Weekly' | 'Bi-weekly' | 'Monthly'>('Weekly');
+  const [newPlanTarget, setNewPlanTarget] = useState<string>('AllOutstanding');
+  const [newPlanSubject, setNewPlanSubject] = useState('URGENT: Outstanding Balance Reminder - Edweso Royal Academy');
+  const [newPlanTemplate, setNewPlanTemplate] = useState('Dear {parent_name},\n\nThis is an automated reminder that your ward, {student_name}, has an outstanding tuition balance of GHS {outstanding_balance} at Edweso Royal Academy.\n\nPlease settle this outstanding balance through your parent portal as soon as possible.\n\nBest regards,\nBursar Department');
+  const [schedulerNotification, setSchedulerNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const handleCreatePlan = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPlanName) {
-      setSchedulerNotification({
-        message: "Plan name is required.",
-        type: "error",
-      });
+      setSchedulerNotification({ message: 'Plan name is required.', type: 'error' });
       return;
     }
     const newPlan: PaymentSchedulerPlan = {
@@ -1356,25 +1011,22 @@ export default function AdminDashboard({
       emailSubject: newPlanSubject,
       emailTemplate: newPlanTemplate,
       isActive: true,
-      createdAt: new Date().toISOString().replace("T", " ").slice(0, 16),
-      nextRunDate: getNextRunDate(newPlanFrequency),
+      createdAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+      nextRunDate: getNextRunDate(newPlanFrequency)
     };
 
     const updatedPlans = [...schedulerPlans, newPlan];
     if (onUpdateSchedulerPlans) {
       onUpdateSchedulerPlans(updatedPlans);
     }
-    setSchedulerNotification({
-      message: "New automated payment scheduler plan created successfully!",
-      type: "success",
-    });
-    setNewPlanName("");
+    setSchedulerNotification({ message: 'New automated payment scheduler plan created successfully!', type: 'success' });
+    setNewPlanName('');
     setIsCreatePlanOpen(false);
     setTimeout(() => setSchedulerNotification(null), 5000);
   };
 
   const handleTogglePlanActive = (planId: string) => {
-    const updatedPlans = schedulerPlans.map((plan) => {
+    const updatedPlans = schedulerPlans.map(plan => {
       if (plan.id === planId) {
         return { ...plan, isActive: !plan.isActive };
       }
@@ -1383,56 +1035,44 @@ export default function AdminDashboard({
     if (onUpdateSchedulerPlans) {
       onUpdateSchedulerPlans(updatedPlans);
     }
-    setSchedulerNotification({
-      message: "Plan status updated successfully.",
-      type: "success",
-    });
+    setSchedulerNotification({ message: 'Plan status updated successfully.', type: 'success' });
     setTimeout(() => setSchedulerNotification(null), 3000);
   };
 
   const handleDeletePlan = (planId: string) => {
     setDeleteConfirm({
       isOpen: true,
-      title: "Delete Scheduler Plan",
-      message:
-        "Are you sure you want to delete this payment scheduler plan? This will stop all future automatic runs for this schedule.",
+      title: 'Delete Scheduler Plan',
+      message: 'Are you sure you want to delete this payment scheduler plan? This will stop all future automatic runs for this schedule.',
       onConfirm: () => {
-        const updatedPlans = schedulerPlans.filter((p) => p.id !== planId);
+        const updatedPlans = schedulerPlans.filter(p => p.id !== planId);
         if (onUpdateSchedulerPlans) {
           onUpdateSchedulerPlans(updatedPlans);
         }
-        setDeleteConfirm((prev) => ({ ...prev, isOpen: false }));
-        setSchedulerNotification({
-          message: "Plan deleted successfully.",
-          type: "success",
-        });
+        setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+        setSchedulerNotification({ message: 'Plan deleted successfully.', type: 'success' });
         setTimeout(() => setSchedulerNotification(null), 3000);
-      },
+      }
     });
   };
 
   const handleSimulateCronRun = () => {
-    const activePlans = schedulerPlans.filter((p) => p.isActive);
+    const activePlans = schedulerPlans.filter(p => p.isActive);
     if (activePlans.length === 0) {
-      setSchedulerNotification({
-        message: "No active scheduler plans are available to execute.",
-        type: "error",
-      });
+      setSchedulerNotification({ message: 'No active scheduler plans are available to execute.', type: 'error' });
       return;
     }
 
-    const nowStr = new Date().toISOString().replace("T", " ").slice(0, 16);
+    const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 16);
     let totalEmailsSent = 0;
     const newLogs: PaymentSchedulerRunLog[] = [];
     const updatedPlans = [...schedulerPlans];
 
-    activePlans.forEach((plan) => {
+    activePlans.forEach(plan => {
       // Find eligible students with outstanding balance
-      let eligibleStudents = students.filter((s) => s.balanceGHS > 0);
-      if (plan.targetAudience !== "AllOutstanding") {
-        eligibleStudents = eligibleStudents.filter(
-          (s) => s.classId === plan.targetAudience,
-        );
+      let eligibleStudents = students.filter(s => s.balanceGHS > 0);
+      if (plan.targetAudience !== 'AllOutstanding') {
+        eligibleStudents = eligibleStudents.filter(s => s.classId === plan.targetAudience);
       }
 
       if (eligibleStudents.length === 0) {
@@ -1444,14 +1084,14 @@ export default function AdminDashboard({
           runDate: nowStr,
           emailsSentCount: 0,
           recipientNames: [],
-          status: "Success",
+          status: 'Success'
         });
         return;
       }
 
       const sentRecipients: string[] = [];
 
-      eligibleStudents.forEach((st) => {
+      eligibleStudents.forEach(st => {
         let body = plan.emailTemplate;
         body = body.replace(/{parent_name}/g, st.parentName);
         body = body.replace(/{student_name}/g, st.name);
@@ -1462,7 +1102,7 @@ export default function AdminDashboard({
           st.parentName,
           plan.emailSubject,
           body,
-          "FeeDeadline",
+          'FeeDeadline'
         );
 
         sentRecipients.push(st.parentName);
@@ -1470,12 +1110,12 @@ export default function AdminDashboard({
       });
 
       // Update plan lastRunDate and nextRunDate
-      const planIndex = updatedPlans.findIndex((p) => p.id === plan.id);
+      const planIndex = updatedPlans.findIndex(p => p.id === plan.id);
       if (planIndex !== -1) {
         updatedPlans[planIndex] = {
           ...updatedPlans[planIndex],
           lastRunDate: nowStr,
-          nextRunDate: getNextRunDate(plan.frequency),
+          nextRunDate: getNextRunDate(plan.frequency)
         };
       }
 
@@ -1486,7 +1126,7 @@ export default function AdminDashboard({
         runDate: nowStr,
         emailsSentCount: eligibleStudents.length,
         recipientNames: sentRecipients,
-        status: "Success",
+        status: 'Success'
       });
     });
 
@@ -1497,38 +1137,33 @@ export default function AdminDashboard({
       onUpdateSchedulerLogs([...newLogs, ...schedulerLogs]);
     }
 
-    setSchedulerNotification({
-      message: `Simulated scheduler cron run executed successfully! Dispatched ${totalEmailsSent} automated emails.`,
-      type: "success",
+    setSchedulerNotification({ 
+      message: `Simulated scheduler cron run executed successfully! Dispatched ${totalEmailsSent} automated emails.`, 
+      type: 'success' 
     });
     setTimeout(() => setSchedulerNotification(null), 8000);
   };
 
-  const getNextRunDate = (
-    freq: "Daily" | "Weekly" | "Bi-weekly" | "Monthly",
-  ) => {
+  const getNextRunDate = (freq: 'Daily' | 'Weekly' | 'Bi-weekly' | 'Monthly') => {
     const now = new Date();
-    if (freq === "Daily") now.setDate(now.getDate() + 1);
-    else if (freq === "Weekly") now.setDate(now.getDate() + 7);
-    else if (freq === "Bi-weekly") now.setDate(now.getDate() + 14);
-    else if (freq === "Monthly") now.setMonth(now.getMonth() + 1);
-    const pad = (n: number) => n.toString().padStart(2, "0");
+    if (freq === 'Daily') now.setDate(now.getDate() + 1);
+    else if (freq === 'Weekly') now.setDate(now.getDate() + 7);
+    else if (freq === 'Bi-weekly') now.setDate(now.getDate() + 14);
+    else if (freq === 'Monthly') now.setMonth(now.getMonth() + 1);
+    const pad = (n: number) => n.toString().padStart(2, '0');
     return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} 09:00`;
   };
 
-  const [selectedLogForModal, setSelectedLogForModal] =
-    useState<PaymentSchedulerRunLog | null>(null);
+  const [selectedLogForModal, setSelectedLogForModal] = useState<PaymentSchedulerRunLog | null>(null);
 
   const handleRunSinglePlan = (planId: string) => {
-    const plan = schedulerPlans.find((p) => p.id === planId);
+    const plan = schedulerPlans.find(p => p.id === planId);
     if (!plan) return;
 
-    const nowStr = new Date().toISOString().replace("T", " ").slice(0, 16);
-    let eligibleStudents = students.filter((s) => s.balanceGHS > 0);
-    if (plan.targetAudience !== "AllOutstanding") {
-      eligibleStudents = eligibleStudents.filter(
-        (s) => s.classId === plan.targetAudience,
-      );
+    const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 16);
+    let eligibleStudents = students.filter(s => s.balanceGHS > 0);
+    if (plan.targetAudience !== 'AllOutstanding') {
+      eligibleStudents = eligibleStudents.filter(s => s.classId === plan.targetAudience);
     }
 
     if (eligibleStudents.length === 0) {
@@ -1539,21 +1174,21 @@ export default function AdminDashboard({
         runDate: nowStr,
         emailsSentCount: 0,
         recipientNames: [],
-        status: "Success",
+        status: 'Success'
       };
       if (onUpdateSchedulerLogs) {
         onUpdateSchedulerLogs([newLog, ...schedulerLogs]);
       }
       setSchedulerNotification({
         message: `Manual run for "${plan.name}" executed. No students currently have an outstanding balance in this segment.`,
-        type: "success",
+        type: 'success'
       });
       setTimeout(() => setSchedulerNotification(null), 5000);
       return;
     }
 
     const sentRecipients: string[] = [];
-    eligibleStudents.forEach((st) => {
+    eligibleStudents.forEach(st => {
       let body = plan.emailTemplate;
       body = body.replace(/{parent_name}/g, st.parentName);
       body = body.replace(/{student_name}/g, st.name);
@@ -1564,7 +1199,7 @@ export default function AdminDashboard({
         st.parentName,
         plan.emailSubject,
         body,
-        "FeeDeadline",
+        'FeeDeadline'
       );
       sentRecipients.push(st.parentName);
     });
@@ -1576,15 +1211,15 @@ export default function AdminDashboard({
       runDate: nowStr,
       emailsSentCount: eligibleStudents.length,
       recipientNames: sentRecipients,
-      status: "Success",
+      status: 'Success'
     };
 
-    const updatedPlans = schedulerPlans.map((p) => {
+    const updatedPlans = schedulerPlans.map(p => {
       if (p.id === planId) {
         return {
           ...p,
           lastRunDate: nowStr,
-          nextRunDate: getNextRunDate(p.frequency),
+          nextRunDate: getNextRunDate(p.frequency)
         };
       }
       return p;
@@ -1599,7 +1234,7 @@ export default function AdminDashboard({
 
     setSchedulerNotification({
       message: `Manual run for "${plan.name}" executed successfully. Dispatched ${eligibleStudents.length} simulated emails to outstanding guardians.`,
-      type: "success",
+      type: 'success'
     });
     setTimeout(() => setSchedulerNotification(null), 5000);
   };
@@ -1612,73 +1247,66 @@ export default function AdminDashboard({
     onConfirm: () => void;
   }>({
     isOpen: false,
-    title: "",
-    message: "",
-    onConfirm: () => {},
+    title: '',
+    message: '',
+    onConfirm: () => {}
   });
 
   // Add/Edit Student Modal State
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [studentForm, setStudentForm] = useState({
-    name: "",
-    classId: "c4",
-    parentName: "",
-    parentPhone: "",
-    parentEmail: "",
-    gender: "Male" as "Male" | "Female",
+    name: '',
+    classId: 'c4',
+    parentName: '',
+    parentPhone: '',
+    parentEmail: '',
+    gender: 'Male' as 'Male' | 'Female',
     balanceGHS: 1200,
-    dob: "2012-01-01",
-    status: "Active" as "Active" | "Suspended" | "Alumni",
-    profilePhoto: undefined as string | undefined,
+    dob: '2012-01-01',
+    status: 'Active' as 'Active' | 'Suspended' | 'Alumni',
+    profilePhoto: undefined as string | undefined
   });
 
   // Student Camera State
   const [isStudentCameraActive, setIsStudentCameraActive] = useState(false);
-  const [studentCameraStream, setStudentCameraStream] =
-    useState<MediaStream | null>(null);
-  const [studentCameraError, setStudentCameraError] = useState("");
+  const [studentCameraStream, setStudentCameraStream] = useState<MediaStream | null>(null);
+  const [studentCameraError, setStudentCameraError] = useState('');
   const studentVideoRef = useRef<HTMLVideoElement | null>(null);
   const studentCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Synchronize student camera stream with video element
   useEffect(() => {
-    if (
-      isStudentCameraActive &&
-      studentCameraStream &&
-      studentVideoRef.current
-    ) {
+    if (isStudentCameraActive && studentCameraStream && studentVideoRef.current) {
       studentVideoRef.current.srcObject = studentCameraStream;
-      studentVideoRef.current.play().catch((err) => {
+      studentVideoRef.current.play().catch(err => {
         console.error("Error playing student video stream:", err);
       });
     }
   }, [isStudentCameraActive, studentCameraStream]);
 
   const startStudentCamera = async () => {
-    setStudentCameraError("");
+    setStudentCameraError('');
     setIsStudentCameraActive(true);
     try {
       const constraints = {
         video: {
           width: { ideal: 480 },
           height: { ideal: 480 },
-          facingMode: "user",
-        },
+          facingMode: 'user'
+        }
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       setStudentCameraStream(stream);
     } catch (err) {
-      console.error("Camera access error:", err);
-      setStudentCameraError(
-        "Failed to access camera. Please check permissions or ensure a camera is connected.",
-      );
+      console.error('Camera access error:', err);
+      setStudentCameraError('Failed to access camera. Please check permissions or ensure a camera is connected.');
     }
   };
 
   const stopStudentCamera = () => {
     if (studentCameraStream) {
-      studentCameraStream.getTracks().forEach((track) => track.stop());
+      studentCameraStream.getTracks().forEach(track => track.stop());
       setStudentCameraStream(null);
     }
     setIsStudentCameraActive(false);
@@ -1688,19 +1316,19 @@ export default function AdminDashboard({
     if (studentVideoRef.current && studentCanvasRef.current) {
       const video = studentVideoRef.current;
       const canvas = studentCanvasRef.current;
-      const context = canvas.getContext("2d");
+      const context = canvas.getContext('2d');
       if (context) {
         const size = Math.min(video.videoWidth, video.videoHeight);
         canvas.width = size;
         canvas.height = size;
-
+        
         // Center crop
         const startX = (video.videoWidth - size) / 2;
         const startY = (video.videoHeight - size) / 2;
-
+        
         context.drawImage(video, startX, startY, size, size, 0, 0, size, size);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-        setStudentForm((prev) => ({ ...prev, profilePhoto: dataUrl }));
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setStudentForm(prev => ({ ...prev, profilePhoto: dataUrl }));
         stopStudentCamera();
       }
     }
@@ -1709,204 +1337,163 @@ export default function AdminDashboard({
   const closeStudentModal = () => {
     setIsStudentModalOpen(false);
     if (studentCameraStream) {
-      studentCameraStream.getTracks().forEach((track) => track.stop());
+      studentCameraStream.getTracks().forEach(track => track.stop());
       setStudentCameraStream(null);
     }
     setIsStudentCameraActive(false);
-    setStudentCameraError("");
+    setStudentCameraError('');
   };
 
   // Add/Edit Teacher Modal State
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
   const [teacherForm, setTeacherForm] = useState({
-    name: "",
-    staffNumber: "",
-    email: "",
-    phone: "",
-    subjectId: "Mathematics",
-    status: "Active" as "Active" | "On Leave",
-    gender: "Male" as "Male" | "Female",
+    name: '',
+    staffNumber: '',
+    email: '',
+    phone: '',
+    subjectId: 'Mathematics',
+    status: 'Active' as 'Active' | 'On Leave',
+    gender: 'Male' as 'Male' | 'Female',
     profilePhoto: undefined as string | undefined,
-    department: "Daycare-JHS" as "Daycare-JHS" | "SHS",
+    department: 'Daycare-JHS' as 'Daycare-JHS' | 'SHS'
   });
 
   // Add Notice Modal State
   const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false);
   const [noticeForm, setNoticeForm] = useState({
-    title: "",
-    content: "",
-    targetAudience: "All" as "All" | "Teachers" | "Students",
+    title: '',
+    content: '',
+    targetAudience: 'All' as 'All' | 'Teachers' | 'Students'
   });
 
   // Grade Modals state
   const [isGradeModalOpen, setIsGradeModalOpen] = useState(false);
   const [gradeForm, setGradeForm] = useState({
-    studentId: "st1",
-    subjectId: "s1",
-    term: "Term 1" as "Term 1" | "Term 2" | "Term 3",
+    studentId: 'st1',
+    subjectId: 's1',
+    term: 'Term 1' as 'Term 1' | 'Term 2' | 'Term 3',
     classScore: 20, // Max 30
-    examScore: 50, // Max 70
+    examScore: 50   // Max 70
   });
 
   // Timetable State
   const [isTimetableModalOpen, setIsTimetableModalOpen] = useState(false);
   const [timetableForm, setTimetableForm] = useState({
-    classId: "c4",
-    subjectId: "s1",
-    teacherId: "t1",
-    day: "Monday" as any,
-    startTime: "08:00",
-    endTime: "09:30",
+    classId: 'c4',
+    subjectId: 's1',
+    teacherId: 't1',
+    day: 'Monday' as any,
+    startTime: '08:00',
+    endTime: '09:30'
   });
 
   // Helpers for calculations
   const totalStudents = students.length;
   const totalTeachers = teachers.length;
   const totalClasses = classes.length;
-  const successfulTx = transactions.filter((t) => t.status === "Successful");
+  const successfulTx = transactions.filter(t => t.status === 'Successful');
   const totalRevenue = successfulTx.reduce((acc, t) => acc + t.amountGHS, 0);
   const outstandingFees = students.reduce((acc, s) => acc + s.balanceGHS, 0);
 
   // Helper to identify students whose birthday is within the next 7 days
-  const getUpcomingBirthdays = (
-    studentList: Student[],
-    daysAhead: number = 7,
-  ) => {
-    const result: {
-      student: Student;
-      daysUntil: number;
-      birthdayDateStr: string;
-      formattedDob: string;
-    }[] = [];
+  const getUpcomingBirthdays = (studentList: Student[], daysAhead: number = 7) => {
+    const result: { student: Student; daysUntil: number; birthdayDateStr: string; formattedDob: string }[] = [];
     const today = new Date();
-
+    
     for (let i = 0; i <= daysAhead; i++) {
       const futureDate = new Date();
       futureDate.setDate(today.getDate() + i);
-      const m = String(futureDate.getMonth() + 1).padStart(2, "0");
-      const d = String(futureDate.getDate()).padStart(2, "0");
+      const m = String(futureDate.getMonth() + 1).padStart(2, '0');
+      const d = String(futureDate.getDate()).padStart(2, '0');
       const targetMMDD = `${m}-${d}`;
-
-      studentList.forEach((student) => {
+      
+      studentList.forEach(student => {
         if (student.dob) {
-          const parts = student.dob.split("-");
+          const parts = student.dob.split('-');
           if (parts.length === 3) {
-            const studentMMDD = `${parts[1].padStart(2, "0")}-${parts[2].padStart(2, "0")}`;
+            const studentMMDD = `${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
             if (studentMMDD === targetMMDD) {
               const monthNames = [
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
               ];
               const monthName = monthNames[futureDate.getMonth()];
               const dayNum = futureDate.getDate();
-              let suffix = "th";
-              if (dayNum === 1 || dayNum === 21 || dayNum === 31) suffix = "st";
-              else if (dayNum === 2 || dayNum === 22) suffix = "nd";
-              else if (dayNum === 3 || dayNum === 23) suffix = "rd";
-
+              let suffix = 'th';
+              if (dayNum === 1 || dayNum === 21 || dayNum === 31) suffix = 'st';
+              else if (dayNum === 2 || dayNum === 22) suffix = 'nd';
+              else if (dayNum === 3 || dayNum === 23) suffix = 'rd';
+              
               const birthdayDateStr = `${monthName} ${dayNum}${suffix}`;
               result.push({
                 student,
                 daysUntil: i,
                 birthdayDateStr,
-                formattedDob: `${parts[1]}/${parts[2]}`,
+                formattedDob: `${parts[1]}/${parts[2]}`
               });
             }
           }
         }
       });
     }
-
+    
     return result.sort((a, b) => a.daysUntil - b.daysUntil);
   };
 
   const upcomingBirthdays = getUpcomingBirthdays(students);
 
   // Recharts Dynamic Datasets
-  const enrollmentChartData = classes.map((c) => {
-    const classStudents = students.filter((s) => s.classId === c.id);
+  const enrollmentChartData = classes.map(c => {
+    const classStudents = students.filter(s => s.classId === c.id);
     return {
       className: c.name,
-      Male: classStudents.filter((s) => s.gender === "Male").length,
-      Female: classStudents.filter((s) => s.gender === "Female").length,
-      Total: classStudents.length,
+      Male: classStudents.filter(s => s.gender === 'Male').length,
+      Female: classStudents.filter(s => s.gender === 'Female').length,
+      Total: classStudents.length
     };
   });
 
-  const attendanceChartData = classes.map((c) => {
-    const classStudents = students.filter((s) => s.classId === c.id);
-    const studentIds = classStudents.map((s) => s.id);
-    const classAtt = attendance.filter(
-      (a) => a.classId === c.id || studentIds.includes(a.studentId),
-    );
+  const attendanceChartData = classes.map(c => {
+    const classStudents = students.filter(s => s.classId === c.id);
+    const studentIds = classStudents.map(s => s.id);
+    const classAtt = attendance.filter(a => a.classId === c.id || studentIds.includes(a.studentId));
     const total = classAtt.length;
-    const present = classAtt.filter(
-      (a) => a.status === "Present" || a.status === "Late",
-    ).length;
-
+    const present = classAtt.filter(a => a.status === 'Present' || a.status === 'Late').length;
+    
     let fallbackRate = 95.5;
-    if (c.id === "c1") fallbackRate = 94.2;
-    if (c.id === "c2") fallbackRate = 96.8;
-    if (c.id === "c3") fallbackRate = 91.5;
-    if (c.id === "c4") fallbackRate = 80.0;
-    if (c.id === "c5") fallbackRate = 88.4;
-    if (c.id === "c6") fallbackRate = 98.2;
+    if (c.id === 'c1') fallbackRate = 94.2;
+    if (c.id === 'c2') fallbackRate = 96.8;
+    if (c.id === 'c3') fallbackRate = 91.5;
+    if (c.id === 'c4') fallbackRate = 80.0;
+    if (c.id === 'c5') fallbackRate = 88.4;
+    if (c.id === 'c6') fallbackRate = 98.2;
 
-    const percentage =
-      total > 0
-        ? parseFloat(((present / total) * 100).toFixed(1))
-        : fallbackRate;
+    const percentage = total > 0 ? parseFloat(((present / total) * 100).toFixed(1)) : fallbackRate;
     return {
       className: c.name,
-      "Attendance %": percentage,
+      'Attendance %': percentage
     };
   });
 
   const financialTrendChartData = (() => {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
     // Seed standard Term values to look excellent initially, then add custom values dynamically
-    const monthlyMap: {
-      [key: string]: { Collected: number; Outstanding: number };
-    } = {
-      May: { Collected: 5750, Outstanding: 450 },
-      Jun: { Collected: 2500, Outstanding: 1200 },
-      Jul: { Collected: 0, Outstanding: outstandingFees },
+    const monthlyMap: { [key: string]: { Collected: number; Outstanding: number } } = {
+      'May': { Collected: 5750, Outstanding: 450 },
+      'Jun': { Collected: 2500, Outstanding: 1200 },
+      'Jul': { Collected: 0, Outstanding: outstandingFees }
     };
 
-    transactions.forEach((t) => {
+    transactions.forEach(t => {
       try {
-        const parts = t.date.split(" ")[0].split("-");
+        const parts = t.date.split(' ')[0].split('-');
         const monthIndex = parseInt(parts[1]) - 1;
         const mName = months[monthIndex];
         if (mName && monthlyMap[mName]) {
-          if (t.status === "Successful") {
-            monthlyMap[mName].Collected =
-              (monthlyMap[mName].Collected || 0) + t.amountGHS;
+          if (t.status === 'Successful') {
+            monthlyMap[mName].Collected = (monthlyMap[mName].Collected || 0) + t.amountGHS;
           }
         }
       } catch (e) {
@@ -1914,70 +1501,55 @@ export default function AdminDashboard({
       }
     });
 
-    const currentMonthName = months[new Date().getMonth()] || "Jul";
+    const currentMonthName = months[new Date().getMonth()] || 'Jul';
     if (monthlyMap[currentMonthName]) {
       monthlyMap[currentMonthName].Outstanding = outstandingFees;
     }
 
-    return Object.keys(monthlyMap)
-      .map((m) => ({
-        month: m,
-        Collected: monthlyMap[m].Collected,
-        Outstanding: monthlyMap[m].Outstanding,
-        "Total Billed": monthlyMap[m].Collected + monthlyMap[m].Outstanding,
-      }))
-      .sort((a, b) => months.indexOf(a.month) - months.indexOf(b.month));
+    return Object.keys(monthlyMap).map(m => ({
+      month: m,
+      Collected: monthlyMap[m].Collected,
+      Outstanding: monthlyMap[m].Outstanding,
+      'Total Billed': monthlyMap[m].Collected + monthlyMap[m].Outstanding
+    })).sort((a, b) => months.indexOf(a.month) - months.indexOf(b.month));
   })();
 
   const monthlyFeeCollections = (() => {
-    const monthsOrder = [
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-    ];
+    const monthsOrder = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
     const monthKeyMap: { [key: string]: string } = {
-      "09": "Sep",
-      "10": "Oct",
-      "11": "Nov",
-      "12": "Dec",
-      "01": "Jan",
-      "02": "Feb",
-      "03": "Mar",
-      "04": "Apr",
-      "05": "May",
-      "06": "Jun",
-      "07": "Jul",
-      "08": "Aug",
+      '09': 'Sep',
+      '10': 'Oct',
+      '11': 'Nov',
+      '12': 'Dec',
+      '01': 'Jan',
+      '02': 'Feb',
+      '03': 'Mar',
+      '04': 'Apr',
+      '05': 'May',
+      '06': 'Jun',
+      '07': 'Jul',
+      '08': 'Aug'
     };
 
     const collectionTotals: { [monthName: string]: number } = {
-      Sep: 12500,
-      Oct: 9800,
-      Nov: 8200,
-      Dec: 4500,
-      Jan: 14200,
-      Feb: 11500,
-      Mar: 7800,
-      Apr: 6200,
-      May: 5750,
-      Jun: 2500,
-      Jul: 0,
-      Aug: 0,
+      'Sep': 12500,
+      'Oct': 9800,
+      'Nov': 8200,
+      'Dec': 4500,
+      'Jan': 14200,
+      'Feb': 11500,
+      'Mar': 7800,
+      'Apr': 6200,
+      'May': 5750,
+      'Jun': 2500,
+      'Jul': 0,
+      'Aug': 0
     };
 
-    transactions.forEach((t) => {
-      if (t.status === "Successful") {
+    transactions.forEach(t => {
+      if (t.status === 'Successful') {
         try {
-          const parts = t.date.split(" ")[0].split("-");
+          const parts = t.date.split(' ')[0].split('-');
           const monthKey = parts[1];
           const monthName = monthKeyMap[monthKey];
           if (monthName && collectionTotals[monthName] !== undefined) {
@@ -1989,9 +1561,9 @@ export default function AdminDashboard({
       }
     });
 
-    return monthsOrder.map((m) => ({
+    return monthsOrder.map(m => ({
       month: m,
-      "Fee Collections (GHS)": collectionTotals[m],
+      'Fee Collections (GHS)': collectionTotals[m]
     }));
   })();
 
@@ -1999,16 +1571,16 @@ export default function AdminDashboard({
   const openAddStudent = () => {
     setEditingStudent(null);
     setStudentForm({
-      name: "",
-      classId: "c4",
-      parentName: "",
-      parentPhone: "",
-      parentEmail: "",
-      gender: "Male",
+      name: '',
+      classId: 'c4',
+      parentName: '',
+      parentPhone: '',
+      parentEmail: '',
+      gender: 'Male',
       balanceGHS: 1200,
-      dob: "2012-01-01",
-      status: "Active",
-      profilePhoto: undefined,
+      dob: '2012-01-01',
+      status: 'Active',
+      profilePhoto: undefined
     });
     setIsStudentModalOpen(true);
   };
@@ -2025,7 +1597,7 @@ export default function AdminDashboard({
       balanceGHS: st.balanceGHS,
       dob: st.dob,
       status: st.status,
-      profilePhoto: st.profilePhoto,
+      profilePhoto: st.profilePhoto
     });
     setIsStudentModalOpen(true);
   };
@@ -2034,24 +1606,19 @@ export default function AdminDashboard({
     e.preventDefault();
     if (editingStudent) {
       // Edit
-      const updated = students.map((s) =>
-        s.id === editingStudent.id
-          ? {
-              ...s,
-              ...studentForm,
-            }
-          : s,
-      );
+      const updated = students.map(s => s.id === editingStudent.id ? {
+        ...s,
+        ...studentForm
+      } : s);
       onUpdateStudents(updated);
     } else {
       // Add
-      const newId = "st" + (students.length + 10);
-      const admissionNum =
-        "ERA-S-2026-" + Math.floor(100 + Math.random() * 900);
+      const newId = 'st' + (students.length + 10);
+      const admissionNum = 'ERA-S-2026-' + Math.floor(100 + Math.random() * 900);
       const newStudent: Student = {
         id: newId,
         admissionNumber: admissionNum,
-        ...studentForm,
+        ...studentForm
       };
       onUpdateStudents([...students, newStudent]);
     }
@@ -2061,13 +1628,12 @@ export default function AdminDashboard({
   const handleDeleteStudent = (id: string) => {
     setDeleteConfirm({
       isOpen: true,
-      title: "Delete Student Record",
-      message:
-        "Are you sure you want to delete this student record? This action is irreversible and will remove all student profile history, grades, and fee records.",
+      title: 'Delete Student Record',
+      message: 'Are you sure you want to delete this student record? This action is irreversible and will remove all student profile history, grades, and fee records.',
       onConfirm: () => {
-        onUpdateStudents(students.filter((s) => s.id !== id));
-        setDeleteConfirm((prev) => ({ ...prev, isOpen: false }));
-      },
+        onUpdateStudents(students.filter(s => s.id !== id));
+        setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+      }
     });
   };
 
@@ -2075,15 +1641,15 @@ export default function AdminDashboard({
   const openAddTeacher = () => {
     setEditingTeacher(null);
     setTeacherForm({
-      name: "",
-      staffNumber: "ERA-T-" + Math.floor(100 + Math.random() * 900),
-      email: "",
-      phone: "",
-      subjectId: "Mathematics",
-      status: "Active",
-      gender: "Male",
+      name: '',
+      staffNumber: 'ERA-T-' + Math.floor(100 + Math.random() * 900),
+      email: '',
+      phone: '',
+      subjectId: 'Mathematics',
+      status: 'Active',
+      gender: 'Male',
       profilePhoto: undefined,
-      department: "Daycare-JHS",
+      department: 'Daycare-JHS'
     });
     setIsTeacherModalOpen(true);
   };
@@ -2099,7 +1665,7 @@ export default function AdminDashboard({
       status: t.status,
       gender: t.gender,
       profilePhoto: t.profilePhoto,
-      department: t.department || "Daycare-JHS",
+      department: t.department || 'Daycare-JHS'
     });
     setIsTeacherModalOpen(true);
   };
@@ -2107,12 +1673,10 @@ export default function AdminDashboard({
   const handleTeacherSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingTeacher) {
-      const updated = teachers.map((t) =>
-        t.id === editingTeacher.id ? { ...t, ...teacherForm } : t,
-      );
+      const updated = teachers.map(t => t.id === editingTeacher.id ? { ...t, ...teacherForm } : t);
       onUpdateTeachers(updated);
     } else {
-      const newId = "t" + (teachers.length + 10);
+      const newId = 't' + (teachers.length + 10);
       onUpdateTeachers([...teachers, { id: newId, ...teacherForm }]);
     }
     setIsTeacherModalOpen(false);
@@ -2121,13 +1685,12 @@ export default function AdminDashboard({
   const handleDeleteTeacher = (id: string) => {
     setDeleteConfirm({
       isOpen: true,
-      title: "Delete Teacher Register",
-      message:
-        "Are you sure you want to delete this teacher register? This action is irreversible and will purge their record from active faculty lists and staff registers.",
+      title: 'Delete Teacher Register',
+      message: 'Are you sure you want to delete this teacher register? This action is irreversible and will purge their record from active faculty lists and staff registers.',
       onConfirm: () => {
-        onUpdateTeachers(teachers.filter((t) => t.id !== id));
-        setDeleteConfirm((prev) => ({ ...prev, isOpen: false }));
-      },
+        onUpdateTeachers(teachers.filter(t => t.id !== id));
+        setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+      }
     });
   };
 
@@ -2135,29 +1698,28 @@ export default function AdminDashboard({
   const handleNoticeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newNotice: Announcement = {
-      id: "a" + (announcements.length + 10),
+      id: 'a' + (announcements.length + 10),
       title: noticeForm.title,
       content: noticeForm.content,
       targetAudience: noticeForm.targetAudience,
-      date: new Date().toISOString().replace("T", " ").substring(0, 16),
-      authorRole: "Admin",
-      authorName: "Principal J. K. Appiah",
+      date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      authorRole: 'Admin',
+      authorName: 'Principal J. K. Appiah'
     };
     onUpdateAnnouncements([newNotice, ...announcements]);
     setIsNoticeModalOpen(false);
-    setNoticeForm({ title: "", content: "", targetAudience: "All" });
+    setNoticeForm({ title: '', content: '', targetAudience: 'All' });
   };
 
   const handleDeleteNotice = (id: string) => {
     setDeleteConfirm({
       isOpen: true,
-      title: "Delete Announcement Notice",
-      message:
-        "Are you sure you want to delete this notice? It will be removed from all parent and student notification boards.",
+      title: 'Delete Announcement Notice',
+      message: 'Are you sure you want to delete this notice? It will be removed from all parent and student notification boards.',
       onConfirm: () => {
-        onUpdateAnnouncements(announcements.filter((a) => a.id !== id));
-        setDeleteConfirm((prev) => ({ ...prev, isOpen: false }));
-      },
+        onUpdateAnnouncements(announcements.filter(a => a.id !== id));
+        setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+      }
     });
   };
 
@@ -2171,7 +1733,7 @@ export default function AdminDashboard({
     const remark = getGradeRemark(computedGrade);
 
     const newGrade: ExamGrade = {
-      id: "g" + (grades.length + 10),
+      id: 'g' + (grades.length + 10),
       studentId: gradeForm.studentId,
       subjectId: gradeForm.subjectId,
       term: gradeForm.term,
@@ -2180,7 +1742,7 @@ export default function AdminDashboard({
       totalScore: total,
       grade: computedGrade,
       remarks: remark,
-      date: new Date().toISOString().substring(0, 10),
+      date: new Date().toISOString().substring(0, 10)
     };
 
     onUpdateGrades([...grades, newGrade]);
@@ -2191,13 +1753,13 @@ export default function AdminDashboard({
   const handleTimetableSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const entry: TimetableEntry = {
-      id: "tt" + (timetable.length + 10),
+      id: 'tt' + (timetable.length + 10),
       classId: timetableForm.classId,
       subjectId: timetableForm.subjectId,
       teacherId: timetableForm.teacherId,
       day: timetableForm.day,
       startTime: timetableForm.startTime,
-      endTime: timetableForm.endTime,
+      endTime: timetableForm.endTime
     };
     onUpdateTimetable([...timetable, entry]);
     setIsTimetableModalOpen(false);
@@ -2205,19 +1767,18 @@ export default function AdminDashboard({
 
   return (
     <div className="space-y-6">
+      
       {/* ==================== 0. FOUNDER GOVERNANCE HUB ==================== */}
-      {activeTab === "founder-governance" && (
+      {activeTab === 'founder-governance' && (
         <div className="space-y-6 animate-fade-in">
+          
           {founderNotification && (
             <div className="p-4 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-bold flex items-center justify-between animate-fade-in shadow-xs dark:bg-amber-950/60 dark:border-amber-500/40 dark:text-amber-200">
               <div className="flex items-center space-x-2">
-                <Crown
-                  size={18}
-                  className="text-amber-600 dark:text-amber-400 shrink-0 animate-bounce"
-                />
+                <Crown size={18} className="text-amber-600 dark:text-amber-400 shrink-0 animate-bounce" />
                 <span>{founderNotification}</span>
               </div>
-              <button
+              <button 
                 onClick={() => setFounderNotification(null)}
                 className="text-amber-800 hover:text-amber-950 dark:text-amber-300 dark:hover:text-white text-xs font-black uppercase px-2.5 py-1 rounded-lg bg-amber-200/70 dark:bg-amber-900/60 transition-colors"
               >
@@ -2229,7 +1790,7 @@ export default function AdminDashboard({
           {/* Founder Executive Banner */}
           <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-700 to-emerald-800 text-white flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-md border border-amber-400/30 relative overflow-hidden">
             <div className="absolute -top-12 -right-12 w-72 h-72 bg-amber-300/20 rounded-full blur-3xl pointer-events-none"></div>
-
+            
             <div className="space-y-2 relative z-10 max-w-2xl">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] bg-white/20 backdrop-blur-md text-amber-100 font-extrabold px-3 py-1 rounded-full border border-white/30 uppercase tracking-widest flex items-center space-x-1 shadow-xs">
@@ -2244,35 +1805,20 @@ export default function AdminDashboard({
                 Nana Kwasi Edweso II
               </h1>
               <p className="text-xs text-amber-100/90 leading-relaxed font-medium max-w-xl">
-                Founder, Proprietor & Chairman of the Executive Governing Board
-                of Edweso Royal Academy. Exercising strategic governance over
-                Headmaster Dr. J.K. Appiah, endowment reserves, capital
-                infrastructure projects, and institutional bye-laws.
+                Founder, Proprietor & Chairman of the Executive Governing Board of Edweso Royal Academy. Exercising strategic governance over Headmaster Dr. J.K. Appiah, endowment reserves, capital infrastructure projects, and institutional bye-laws.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 w-full lg:w-auto shrink-0 relative z-10">
               <div className="bg-white/15 backdrop-blur-md p-4 rounded-2xl border border-white/25 text-center shadow-xs">
-                <span className="text-[9px] text-amber-100 uppercase font-black tracking-widest block">
-                  Endowment & Reserve
-                </span>
-                <span className="text-lg sm:text-xl font-black font-mono text-white mt-0.5 block drop-shadow-xs">
-                  GHS 1,850,000.00
-                </span>
-                <span className="text-[9px] text-amber-200 font-bold block mt-0.5">
-                  +12.4% Capital Growth
-                </span>
+                <span className="text-[9px] text-amber-100 uppercase font-black tracking-widest block">Endowment & Reserve</span>
+                <span className="text-lg sm:text-xl font-black font-mono text-white mt-0.5 block drop-shadow-xs">GHS 1,850,000.00</span>
+                <span className="text-[9px] text-amber-200 font-bold block mt-0.5">+12.4% Capital Growth</span>
               </div>
               <div className="bg-white/15 backdrop-blur-md p-4 rounded-2xl border border-white/25 text-center shadow-xs">
-                <span className="text-[9px] text-emerald-100 uppercase font-black tracking-widest block">
-                  Headmaster Index
-                </span>
-                <span className="text-lg sm:text-xl font-black font-mono text-white mt-0.5 block drop-shadow-xs">
-                  98.6%
-                </span>
-                <span className="text-[9px] text-emerald-200 font-bold block mt-0.5">
-                  Dr. J. K. Appiah
-                </span>
+                <span className="text-[9px] text-emerald-100 uppercase font-black tracking-widest block">Headmaster Index</span>
+                <span className="text-lg sm:text-xl font-black font-mono text-white mt-0.5 block drop-shadow-xs">98.6%</span>
+                <span className="text-[9px] text-emerald-200 font-bold block mt-0.5">Dr. J. K. Appiah</span>
               </div>
             </div>
           </div>
@@ -2281,20 +1827,11 @@ export default function AdminDashboard({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all space-y-2">
               <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-                <span className="text-[10px] font-black uppercase tracking-widest">
-                  School Headmaster
-                </span>
-                <UserCheck
-                  size={18}
-                  className="text-emerald-600 dark:text-emerald-400"
-                />
+                <span className="text-[10px] font-black uppercase tracking-widest">School Headmaster</span>
+                <UserCheck size={18} className="text-emerald-600 dark:text-emerald-400" />
               </div>
-              <div className="text-base font-black text-slate-900 dark:text-white">
-                Dr. J. K. Appiah
-              </div>
-              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
-                Headmaster & Principal Administrator
-              </p>
+              <div className="text-base font-black text-slate-900 dark:text-white">Dr. J. K. Appiah</div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Headmaster & Principal Administrator</p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">
                 <span>Status: Active Duty</span>
                 <span>Appointed Nov 2018</span>
@@ -2303,20 +1840,11 @@ export default function AdminDashboard({
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all space-y-2">
               <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-                <span className="text-[10px] font-black uppercase tracking-widest">
-                  Active Infrastructure
-                </span>
-                <Building
-                  size={18}
-                  className="text-amber-600 dark:text-amber-400"
-                />
+                <span className="text-[10px] font-black uppercase tracking-widest">Active Infrastructure</span>
+                <Building size={18} className="text-amber-600 dark:text-amber-400" />
               </div>
-              <div className="text-base font-black text-slate-900 dark:text-white">
-                {founderProjects.length} Major Projects
-              </div>
-              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
-                Robotics Lab, Solar Grid, Bus Fleet
-              </p>
+              <div className="text-base font-black text-slate-900 dark:text-white">{founderProjects.length} Major Projects</div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Robotics Lab, Solar Grid, Bus Fleet</p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-amber-700 dark:text-amber-400 font-bold">
                 <span>Total Budget: GHS 915k</span>
                 <span>1 Pending Sign-Off</span>
@@ -2325,17 +1853,11 @@ export default function AdminDashboard({
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all space-y-2">
               <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-                <span className="text-[10px] font-black uppercase tracking-widest">
-                  Board Directives
-                </span>
+                <span className="text-[10px] font-black uppercase tracking-widest">Board Directives</span>
                 <Scale size={18} className="text-sky-600 dark:text-sky-400" />
               </div>
-              <div className="text-base font-black text-slate-900 dark:text-white">
-                {founderDirectives.length} Mandates Dispatched
-              </div>
-              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
-                Enforced for Headmaster & Staff
-              </p>
+              <div className="text-base font-black text-slate-900 dark:text-white">{founderDirectives.length} Mandates Dispatched</div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Enforced for Headmaster & Staff</p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-sky-700 dark:text-sky-400 font-bold">
                 <span>Compliance: 100%</span>
                 <span>Latest: Q3 BECE Rigor</span>
@@ -2344,20 +1866,11 @@ export default function AdminDashboard({
 
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-all space-y-2">
               <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-                <span className="text-[10px] font-black uppercase tracking-widest">
-                  Royal Scholarship Fund
-                </span>
-                <Sparkles
-                  size={18}
-                  className="text-purple-600 dark:text-purple-400"
-                />
+                <span className="text-[10px] font-black uppercase tracking-widest">Royal Scholarship Fund</span>
+                <Sparkles size={18} className="text-purple-600 dark:text-purple-400" />
               </div>
-              <div className="text-base font-black text-slate-900 dark:text-white">
-                42 Ward Beneficiaries
-              </div>
-              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
-                100% Need-Based & Academic Merit
-              </p>
+              <div className="text-base font-black text-slate-900 dark:text-white">42 Ward Beneficiaries</div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">100% Need-Based & Academic Merit</p>
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-purple-700 dark:text-purple-400 font-bold">
                 <span>Funded: GHS 84,000</span>
                 <span>Endowed by Founder</span>
@@ -2367,17 +1880,13 @@ export default function AdminDashboard({
 
           {/* Section 1: Headmaster Oversight & Mandate Dispatcher */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
             {/* Headmaster Dossier & Performance Audit Card */}
             <div className="lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex items-center space-x-2">
-                  <UserCheck
-                    size={18}
-                    className="text-emerald-600 dark:text-emerald-400"
-                  />
-                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                    Headmaster Dossier
-                  </h3>
+                  <UserCheck size={18} className="text-emerald-600 dark:text-emerald-400" />
+                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Headmaster Dossier</h3>
                 </div>
                 <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800 font-bold px-2 py-0.5 rounded-md">
                   Reporting to Founder
@@ -2389,61 +1898,35 @@ export default function AdminDashboard({
                   JA
                 </div>
                 <div>
-                  <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
-                    Dr. Joseph K. Appiah
-                  </h4>
-                  <p className="text-xs text-amber-700 dark:text-amber-400 font-bold">
-                    Headmaster & Principal Administrator
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Ph.D. Educational Leadership & Management
-                  </p>
+                  <h4 className="text-base font-extrabold text-slate-900 dark:text-white">Dr. Joseph K. Appiah</h4>
+                  <p className="text-xs text-amber-700 dark:text-amber-400 font-bold">Headmaster & Principal Administrator</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Ph.D. Educational Leadership & Management</p>
                 </div>
               </div>
 
               <div className="space-y-2.5 pt-2 text-xs">
                 <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/60">
-                  <span className="text-slate-500 dark:text-slate-400">
-                    Primary Responsibility:
-                  </span>
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    Academic & Staff Operations
-                  </span>
+                  <span className="text-slate-500 dark:text-slate-400">Primary Responsibility:</span>
+                  <span className="font-bold text-slate-900 dark:text-white">Academic & Staff Operations</span>
                 </div>
                 <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/60">
-                  <span className="text-slate-500 dark:text-slate-400">
-                    Monthly Expense Approval Limit:
-                  </span>
-                  <span className="font-mono font-extrabold text-amber-700 dark:text-amber-400">
-                    GHS 20,000.00
-                  </span>
+                  <span className="text-slate-500 dark:text-slate-400">Monthly Expense Approval Limit:</span>
+                  <span className="font-mono font-extrabold text-amber-700 dark:text-amber-400">GHS 20,000.00</span>
                 </div>
                 <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/60">
-                  <span className="text-slate-500 dark:text-slate-400">
-                    Terminal Fees Collection Rate:
-                  </span>
-                  <span className="font-mono font-extrabold text-emerald-700 dark:text-emerald-400">
-                    94.2% (GHS 245.8k)
-                  </span>
+                  <span className="text-slate-500 dark:text-slate-400">Terminal Fees Collection Rate:</span>
+                  <span className="font-mono font-extrabold text-emerald-700 dark:text-emerald-400">94.2% (GHS 245.8k)</span>
                 </div>
                 <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/60">
-                  <span className="text-slate-500 dark:text-slate-400">
-                    Staff Clock-In Punctuality Index:
-                  </span>
-                  <span className="font-mono font-extrabold text-sky-700 dark:text-sky-400">
-                    98.1%
-                  </span>
+                  <span className="text-slate-500 dark:text-slate-400">Staff Clock-In Punctuality Index:</span>
+                  <span className="font-mono font-extrabold text-sky-700 dark:text-sky-400">98.1%</span>
                 </div>
               </div>
 
               <div className="bg-amber-50/80 dark:bg-slate-950 p-3.5 rounded-xl border border-amber-200/80 dark:border-slate-800 space-y-1.5">
-                <span className="text-[10px] text-amber-800 dark:text-amber-400 font-black uppercase tracking-wider block">
-                  Founder Audit Remark
-                </span>
+                <span className="text-[10px] text-amber-800 dark:text-amber-400 font-black uppercase tracking-wider block">Founder Audit Remark</span>
                 <p className="text-[11px] text-slate-700 dark:text-slate-300 italic leading-snug">
-                  "Dr. Appiah continues to demonstrate stellar leadership in
-                  maintaining academic discipline and teacher accountability
-                  across all JHS and Primary blocks."
+                  "Dr. Appiah continues to demonstrate stellar leadership in maintaining academic discipline and teacher accountability across all JHS and Primary blocks."
                 </p>
               </div>
             </div>
@@ -2452,51 +1935,39 @@ export default function AdminDashboard({
             <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex items-center space-x-2">
-                  <Crown
-                    size={18}
-                    className="text-amber-600 dark:text-amber-400"
-                  />
-                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                    Issue Founder Directive to Headmaster
-                  </h3>
+                  <Crown size={18} className="text-amber-600 dark:text-amber-400" />
+                  <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Issue Founder Directive to Headmaster</h3>
                 </div>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                  Instant Dispatch to Headmaster Desk
-                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Instant Dispatch to Headmaster Desk</span>
               </div>
 
-              <form
+              <form 
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (!newDirectiveTitle.trim() || !newDirectiveBody.trim())
-                    return;
+                  if (!newDirectiveTitle.trim() || !newDirectiveBody.trim()) return;
                   const newDir = {
                     id: `dir-${Date.now()}`,
                     title: newDirectiveTitle.trim(),
                     category: newDirectiveCategory,
-                    recipient: "Dr. J. K. Appiah (Headmaster)",
+                    recipient: 'Dr. J. K. Appiah (Headmaster)',
                     date: new Date().toISOString().substring(0, 10),
-                    status: "Dispatched to Headmaster",
-                    priority: newDirectivePriority,
+                    status: 'Dispatched to Headmaster',
+                    priority: newDirectivePriority
                   };
                   setFounderDirectives([newDir, ...founderDirectives]);
-                  setFounderNotification(
-                    `Executive Directive "${newDirectiveTitle}" successfully dispatched to Headmaster Dr. J.K. Appiah!`,
-                  );
-                  setNewDirectiveTitle("");
-                  setNewDirectiveBody("");
-                }}
+                  setFounderNotification(`Executive Directive "${newDirectiveTitle}" successfully dispatched to Headmaster Dr. J.K. Appiah!`);
+                  setNewDirectiveTitle('');
+                  setNewDirectiveBody('');
+                }} 
                 className="space-y-3"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                      Directive Title / Subject
-                    </label>
-                    <input
-                      type="text"
+                    <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Directive Title / Subject</label>
+                    <input 
+                      type="text" 
                       required
-                      placeholder="e.g. Mandatory Mock Exams Revision Strategy"
+                      placeholder="e.g. Mandatory Mock Exams Revision Strategy" 
                       value={newDirectiveTitle}
                       onChange={(e) => setNewDirectiveTitle(e.target.value)}
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 font-medium"
@@ -2504,39 +1975,23 @@ export default function AdminDashboard({
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                        Category
-                      </label>
-                      <select
+                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Category</label>
+                      <select 
                         value={newDirectiveCategory}
-                        onChange={(e) =>
-                          setNewDirectiveCategory(e.target.value as any)
-                        }
+                        onChange={(e) => setNewDirectiveCategory(e.target.value as any)}
                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 font-bold"
                       >
-                        <option value="Academic Standard">
-                          Academic Standard
-                        </option>
-                        <option value="Financial Allocation">
-                          Financial Allocation
-                        </option>
-                        <option value="Staffing & Discipline">
-                          Staffing & Discipline
-                        </option>
-                        <option value="Emergency Board Order">
-                          Emergency Board Order
-                        </option>
+                        <option value="Academic Standard">Academic Standard</option>
+                        <option value="Financial Allocation">Financial Allocation</option>
+                        <option value="Staffing & Discipline">Staffing & Discipline</option>
+                        <option value="Emergency Board Order">Emergency Board Order</option>
                       </select>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                        Priority Level
-                      </label>
-                      <select
+                      <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Priority Level</label>
+                      <select 
                         value={newDirectivePriority}
-                        onChange={(e) =>
-                          setNewDirectivePriority(e.target.value as any)
-                        }
+                        onChange={(e) => setNewDirectivePriority(e.target.value as any)}
                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 font-bold"
                       >
                         <option value="Standard">Standard</option>
@@ -2548,10 +2003,8 @@ export default function AdminDashboard({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                    Directive Text / Board Instructions
-                  </label>
-                  <textarea
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Directive Text / Board Instructions</label>
+                  <textarea 
                     rows={3}
                     required
                     placeholder="Enter detailed executive instructions for Dr. J.K. Appiah to execute immediately across Edweso Royal Academy..."
@@ -2562,7 +2015,7 @@ export default function AdminDashboard({
                 </div>
 
                 <div className="flex justify-end pt-1">
-                  <button
+                  <button 
                     type="submit"
                     className="px-4 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-black rounded-xl text-xs flex items-center space-x-2 shadow-sm transition-all cursor-pointer"
                   >
@@ -2574,33 +2027,22 @@ export default function AdminDashboard({
 
               {/* Recent Founder Directives List */}
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                  Recent Executive Directives Log
-                </span>
+                <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Recent Executive Directives Log</span>
                 <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                   {founderDirectives.map((dir) => (
-                    <div
-                      key={dir.id}
-                      className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs"
-                    >
+                    <div key={dir.id} className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between text-xs">
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-extrabold text-slate-900 dark:text-white">
-                            {dir.title}
-                          </span>
-                          <span
-                            className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${
-                              dir.priority === "Urgent"
-                                ? "bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-300"
-                                : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                            }`}
-                          >
+                          <span className="font-extrabold text-slate-900 dark:text-white">{dir.title}</span>
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md ${
+                            dir.priority === 'Urgent' 
+                              ? 'bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-300' 
+                              : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                          }`}>
                             {dir.priority}
                           </span>
                         </div>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                          To: {dir.recipient} • {dir.category} • {dir.date}
-                        </p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">To: {dir.recipient} • {dir.category} • {dir.date}</p>
                       </div>
                       <span className="text-[10px] font-black text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-2.5 py-1 rounded-lg">
                         {dir.status}
@@ -2610,19 +2052,15 @@ export default function AdminDashboard({
                 </div>
               </div>
             </div>
+
           </div>
 
           {/* Section 2: Capital Expenditure & Infrastructure Projects Sign-Off */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center space-x-2">
-                <Building
-                  size={18}
-                  className="text-amber-600 dark:text-amber-400"
-                />
-                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                  Capital Expenditure & School Expansion Approvals
-                </h3>
+                <Building size={18} className="text-amber-600 dark:text-amber-400" />
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Capital Expenditure & School Expansion Approvals</h3>
               </div>
               <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800 font-bold px-2.5 py-1 rounded-md">
                 Founder Approval Ledger
@@ -2631,65 +2069,40 @@ export default function AdminDashboard({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {founderProjects.map((proj) => (
-                <div
-                  key={proj.id}
-                  className="p-4 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3"
-                >
+                <div key={proj.id} className="p-4 bg-slate-50/80 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                        {proj.name}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                        Contractor: {proj.contractor}
-                      </p>
+                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">{proj.name}</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Contractor: {proj.contractor}</p>
                     </div>
-                    <span
-                      className={`text-[10px] font-black px-2.5 py-1 rounded-lg border shrink-0 ${
-                        proj.status === "Approved"
-                          ? "bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800"
-                          : proj.status === "Pending Founder Sign-Off"
-                            ? "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-700 animate-pulse"
-                            : "bg-slate-200 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
-                      }`}
-                    >
+                    <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg border shrink-0 ${
+                      proj.status === 'Approved' 
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800' 
+                        : proj.status === 'Pending Founder Sign-Off'
+                          ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-700 animate-pulse'
+                          : 'bg-slate-200 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                    }`}>
                       {proj.status}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200/60 dark:border-slate-800">
                     <div>
-                      <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">
-                        Budget Allocation:
-                      </span>
-                      <p className="font-mono font-black text-amber-700 dark:text-amber-400 text-sm">
-                        {proj.budget}
-                      </p>
+                      <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">Budget Allocation:</span>
+                      <p className="font-mono font-black text-amber-700 dark:text-amber-400 text-sm">{proj.budget}</p>
                     </div>
                     <div>
-                      <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">
-                        Completion Target:
-                      </span>
-                      <p className="font-extrabold text-slate-900 dark:text-white text-xs">
-                        {proj.estCompletion}
-                      </p>
+                      <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">Completion Target:</span>
+                      <p className="font-extrabold text-slate-900 dark:text-white text-xs">{proj.estCompletion}</p>
                     </div>
                   </div>
 
-                  {proj.status === "Pending Founder Sign-Off" && (
+                  {proj.status === 'Pending Founder Sign-Off' && (
                     <div className="flex items-center space-x-2 pt-2 border-t border-slate-200/60 dark:border-slate-800">
                       <button
                         onClick={() => {
-                          setFounderProjects(
-                            founderProjects.map((p) =>
-                              p.id === proj.id
-                                ? { ...p, status: "Approved" }
-                                : p,
-                            ),
-                          );
-                          setFounderNotification(
-                            `Project "${proj.name}" (Budget: ${proj.budget}) has been officially APPROVED by Founder Nana Kwasi Edweso II!`,
-                          );
+                          setFounderProjects(founderProjects.map(p => p.id === proj.id ? { ...p, status: 'Approved' } : p));
+                          setFounderNotification(`Project "${proj.name}" (Budget: ${proj.budget}) has been officially APPROVED by Founder Nana Kwasi Edweso II!`);
                         }}
                         className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center space-x-1.5 shadow-xs cursor-pointer"
                       >
@@ -2707,158 +2120,103 @@ export default function AdminDashboard({
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center space-x-2">
-                <Scale
-                  size={18}
-                  className="text-amber-600 dark:text-amber-400"
-                />
-                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                  Institutional Bye-Laws & Governance Policies
-                </h3>
+                <Scale size={18} className="text-amber-600 dark:text-amber-400" />
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Institutional Bye-Laws & Governance Policies</h3>
               </div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                Founder Policy Governance
-              </span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Founder Policy Governance</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3">
                 <div>
-                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">
-                    Mandatory Biometric Staff Clock-In
-                  </h5>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Require fingerprint/facial scan for teacher daily arrival
-                  </p>
+                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">Mandatory Biometric Staff Clock-In</h5>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Require fingerprint/facial scan for teacher daily arrival</p>
                 </div>
                 <button
                   onClick={() => {
                     const next = !founderPolicies.biometricAttendance;
-                    setFounderPolicies({
-                      ...founderPolicies,
-                      biometricAttendance: next,
-                    });
-                    setFounderNotification(
-                      `Biometric Staff Clock-In Policy updated to: ${next ? "ENFORCED" : "DISABLED"}`,
-                    );
+                    setFounderPolicies({ ...founderPolicies, biometricAttendance: next });
+                    setFounderNotification(`Biometric Staff Clock-In Policy updated to: ${next ? 'ENFORCED' : 'DISABLED'}`);
                   }}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                    founderPolicies.biometricAttendance
-                      ? "bg-emerald-600 text-white shadow-xs"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    founderPolicies.biometricAttendance ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  {founderPolicies.biometricAttendance
-                    ? "Enforced"
-                    : "Disabled"}
+                  {founderPolicies.biometricAttendance ? 'Enforced' : 'Disabled'}
                 </button>
               </div>
 
               <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3">
                 <div>
-                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">
-                    Royal Excellence Scholarship Endowment
-                  </h5>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Automatic 10% tuition waiver for top 3 students per class
-                  </p>
+                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">Royal Excellence Scholarship Endowment</h5>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Automatic 10% tuition waiver for top 3 students per class</p>
                 </div>
                 <button
                   onClick={() => {
                     const next = !founderPolicies.scholarshipEndowment;
-                    setFounderPolicies({
-                      ...founderPolicies,
-                      scholarshipEndowment: next,
-                    });
-                    setFounderNotification(
-                      `Scholarship Endowment Policy updated to: ${next ? "ACTIVE" : "SUSPENDED"}`,
-                    );
+                    setFounderPolicies({ ...founderPolicies, scholarshipEndowment: next });
+                    setFounderNotification(`Scholarship Endowment Policy updated to: ${next ? 'ACTIVE' : 'SUSPENDED'}`);
                   }}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                    founderPolicies.scholarshipEndowment
-                      ? "bg-emerald-600 text-white shadow-xs"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    founderPolicies.scholarshipEndowment ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  {founderPolicies.scholarshipEndowment
-                    ? "Active"
-                    : "Suspended"}
+                  {founderPolicies.scholarshipEndowment ? 'Active' : 'Suspended'}
                 </button>
               </div>
 
               <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3">
                 <div>
-                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">
-                    Dual Cambridge & BECE Standard
-                  </h5>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Integrate British & Ghanaian national curriculum frameworks
-                  </p>
+                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">Dual Cambridge & BECE Standard</h5>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Integrate British & Ghanaian national curriculum frameworks</p>
                 </div>
                 <button
                   onClick={() => {
                     const next = !founderPolicies.dualCurriculum;
-                    setFounderPolicies({
-                      ...founderPolicies,
-                      dualCurriculum: next,
-                    });
-                    setFounderNotification(
-                      `Dual Curriculum Policy updated to: ${next ? "ENFORCED" : "STANDARD"}`,
-                    );
+                    setFounderPolicies({ ...founderPolicies, dualCurriculum: next });
+                    setFounderNotification(`Dual Curriculum Policy updated to: ${next ? 'ENFORCED' : 'STANDARD'}`);
                   }}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                    founderPolicies.dualCurriculum
-                      ? "bg-emerald-600 text-white shadow-xs"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    founderPolicies.dualCurriculum ? 'bg-emerald-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  {founderPolicies.dualCurriculum ? "Enforced" : "Standard"}
+                  {founderPolicies.dualCurriculum ? 'Enforced' : 'Standard'}
                 </button>
               </div>
 
               <div className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-between gap-3">
                 <div>
-                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">
-                    Headmaster Discretionary Expense Limit
-                  </h5>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Require Founder co-signature for expenses &gt; GHS 20,000
-                  </p>
+                  <h5 className="text-xs font-extrabold text-slate-900 dark:text-white">Headmaster Discretionary Expense Limit</h5>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Require Founder co-signature for expenses &gt; GHS 20,000</p>
                 </div>
                 <button
                   onClick={() => {
                     const next = !founderPolicies.headmasterDiscretionaryCap;
-                    setFounderPolicies({
-                      ...founderPolicies,
-                      headmasterDiscretionaryCap: next,
-                    });
-                    setFounderNotification(
-                      `Headmaster Expense Cap updated to: ${next ? "ENFORCED (GHS 20k)" : "UNLIMITED"}`,
-                    );
+                    setFounderPolicies({ ...founderPolicies, headmasterDiscretionaryCap: next });
+                    setFounderNotification(`Headmaster Expense Cap updated to: ${next ? 'ENFORCED (GHS 20k)' : 'UNLIMITED'}`);
                   }}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                    founderPolicies.headmasterDiscretionaryCap
-                      ? "bg-amber-600 text-white shadow-xs"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    founderPolicies.headmasterDiscretionaryCap ? 'bg-amber-600 text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
-                  {founderPolicies.headmasterDiscretionaryCap
-                    ? "Enforced"
-                    : "Unlimited"}
+                  {founderPolicies.headmasterDiscretionaryCap ? 'Enforced' : 'Unlimited'}
                 </button>
               </div>
             </div>
           </div>
+
         </div>
       )}
 
       {/* ==================== 1. OVERVIEW PANEL ==================== */}
-      {activeTab === "overview" && (
+      {activeTab === 'overview' && (
         <div className="space-y-6 animate-fade-in">
+          
           {/* Welcome Card Banner */}
           <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-800 to-emerald-950 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-md border border-emerald-500/10">
             <div className="space-y-1 text-center md:text-left">
               <span className="text-[10px] bg-emerald-700/60 px-3 py-1 rounded-full text-amber-300 font-bold border border-amber-400/20 uppercase tracking-widest inline-flex items-center space-x-1">
-                {session?.role === "super_admin" ? (
+                {session?.role === 'super_admin' ? (
                   <>
                     <Crown size={12} className="text-amber-400 mr-1" />
                     <span>Founder & Board Executive Console</span>
@@ -2868,23 +2226,17 @@ export default function AdminDashboard({
                 )}
               </span>
               <h1 className="text-xl sm:text-2xl font-black font-display mt-2 tracking-tight">
-                {session?.role === "super_admin"
-                  ? "Welcome Back, Founder Nana Kwasi Edweso II"
-                  : "Welcome Back, Principal J. K. Appiah"}
+                {session?.role === 'super_admin' ? 'Welcome Back, Founder Nana Kwasi Edweso II' : 'Welcome Back, Principal J. K. Appiah'}
               </h1>
               <p className="text-xs text-emerald-200">
-                {session?.role === "super_admin"
-                  ? "Founder & Executive Board Console — Overseeing Headmaster Dr. J.K. Appiah, Financial Reserves, Capital Infrastructure & School Board Policies."
-                  : "Manage students, process staff payroll trackers, review academic scores, and monitor GHS school fees balances."}
+                {session?.role === 'super_admin'
+                  ? 'Founder & Executive Board Console — Overseeing Headmaster Dr. J.K. Appiah, Financial Reserves, Capital Infrastructure & School Board Policies.'
+                  : 'Manage students, process staff payroll trackers, review academic scores, and monitor GHS school fees balances.'}
               </p>
             </div>
             <div className="bg-emerald-900/60 p-3 rounded-xl border border-emerald-700 text-center shrink-0">
-              <span className="text-[9px] text-emerald-300 uppercase font-black tracking-widest block">
-                Terminal Revenue
-              </span>
-              <span className="text-lg font-black font-mono text-amber-400">
-                GHS {totalRevenue.toFixed(2)}
-              </span>
+              <span className="text-[9px] text-emerald-300 uppercase font-black tracking-widest block">Terminal Revenue</span>
+              <span className="text-lg font-black font-mono text-amber-400">GHS {totalRevenue.toFixed(2)}</span>
             </div>
           </div>
 
@@ -2896,38 +2248,25 @@ export default function AdminDashboard({
                   <ShieldAlert size={18} />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-xs font-black tracking-wide text-rose-700 dark:text-rose-400 uppercase">
-                    System Diagnostics: Active Risks Flagged
-                  </h4>
+                  <h4 className="text-xs font-black tracking-wide text-rose-700 dark:text-rose-400 uppercase">System Diagnostics: Active Risks Flagged</h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold leading-normal">
-                    Our real-time diagnostic engine has detected{" "}
-                    <span className="text-rose-600 dark:text-rose-400 font-black">
-                      {activeUnresolvedAlerts.length} active anomalies
-                    </span>{" "}
-                    (failed login patterns, unrecognized device accesses, or
-                    sudden tuition spikes).
+                    Our real-time diagnostic engine has detected <span className="text-rose-600 dark:text-rose-400 font-black">{activeUnresolvedAlerts.length} active anomalies</span> (failed login patterns, unrecognized device accesses, or sudden tuition spikes).
                   </p>
                   <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-[10px] text-slate-400">
                     {activeUnresolvedAlerts.slice(0, 2).map((a) => (
                       <span key={a.id} className="flex items-center space-x-1">
                         <span className="w-1 h-1 rounded-full bg-rose-500"></span>
-                        <span className="font-bold text-slate-600 dark:text-slate-300">
-                          {a.title}
-                        </span>
+                        <span className="font-bold text-slate-600 dark:text-slate-300">{a.title}</span>
                       </span>
                     ))}
                     {activeUnresolvedAlerts.length > 2 && (
-                      <span className="font-bold text-rose-500">
-                        +{activeUnresolvedAlerts.length - 2} more flags
-                      </span>
+                      <span className="font-bold text-rose-500">+{activeUnresolvedAlerts.length - 2} more flags</span>
                     )}
                   </div>
                 </div>
               </div>
               <div className="text-center shrink-0">
-                <span className="text-[9px] font-bold text-rose-600 dark:text-rose-400 block mb-1">
-                  Check Left Menu Tab
-                </span>
+                <span className="text-[9px] font-bold text-rose-600 dark:text-rose-400 block mb-1">Check Left Menu Tab</span>
                 <span className="px-3 py-1.5 bg-rose-600 text-white font-extrabold text-[10px] uppercase tracking-wide rounded-lg self-end sm:self-center block">
                   System Diagnostics
                 </span>
@@ -2942,12 +2281,8 @@ export default function AdminDashboard({
                 <Users size={20} />
               </div>
               <div>
-                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">
-                  Total Students
-                </span>
-                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">
-                  {totalStudents}
-                </span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Total Students</span>
+                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">{totalStudents}</span>
               </div>
             </div>
 
@@ -2956,12 +2291,8 @@ export default function AdminDashboard({
                 <UserCheck size={20} />
               </div>
               <div>
-                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">
-                  Cert. Teachers
-                </span>
-                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">
-                  {totalTeachers}
-                </span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Cert. Teachers</span>
+                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">{totalTeachers}</span>
               </div>
             </div>
 
@@ -2970,12 +2301,8 @@ export default function AdminDashboard({
                 <BookOpen size={20} />
               </div>
               <div>
-                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">
-                  Active Classes
-                </span>
-                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">
-                  {totalClasses}
-                </span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Active Classes</span>
+                <span className="text-xl font-display font-bold text-slate-800 leading-none mt-1.5 block">{totalClasses}</span>
               </div>
             </div>
 
@@ -2984,113 +2311,72 @@ export default function AdminDashboard({
                 <CreditCard size={20} />
               </div>
               <div>
-                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">
-                  Pending Fees
-                </span>
-                <span className="text-xs sm:text-sm font-bold font-mono text-slate-800 leading-none mt-1.5 block">
-                  GHS {outstandingFees.toLocaleString()}
-                </span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block leading-none">Pending Fees</span>
+                <span className="text-xs sm:text-sm font-bold font-mono text-slate-800 leading-none mt-1.5 block">GHS {outstandingFees.toLocaleString()}</span>
               </div>
             </div>
           </div>
 
           {/* Upcoming Student Birthdays Alert/Suggest Block */}
           {upcomingBirthdays.length > 0 && (
-            <div
-              className="p-5 rounded-2xl bg-amber-50 border border-amber-200 shadow-xs flex flex-col items-start gap-4 animate-fade-in"
-              id="birthday-alerts-container"
-            >
+            <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 shadow-xs flex flex-col items-start gap-4 animate-fade-in" id="birthday-alerts-container">
               <div className="flex items-start gap-3 w-full">
                 <div className="p-2 bg-amber-500/10 text-amber-600 rounded-lg shrink-0 mt-0.5 animate-bounce">
                   <Cake size={18} />
                 </div>
                 <div className="space-y-1 w-full">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] bg-amber-500/15 text-amber-800 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">
-                      Celebration Desk
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-500">
-                      Next 7 Days
-                    </span>
+                    <span className="text-[10px] bg-amber-500/15 text-amber-800 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">Celebration Desk</span>
+                    <span className="text-[10px] font-bold text-slate-500">Next 7 Days</span>
                   </div>
-                  <h4 className="text-xs font-black tracking-wide text-slate-800 uppercase">
-                    Upcoming Student Birthdays
-                  </h4>
+                  <h4 className="text-xs font-black tracking-wide text-slate-800 uppercase">Upcoming Student Birthdays</h4>
                   <p className="text-[11px] text-slate-500 font-semibold leading-normal">
-                    The following students have birthdays within the next 7
-                    days. Select "Send Celebratory Email" to automatically
-                    congratulate their parents and build school community trust.
+                    The following students have birthdays within the next 7 days. Select "Send Celebratory Email" to automatically congratulate their parents and build school community trust.
                   </p>
-
+                  
                   {/* List of birthday students */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3 w-full">
-                    {upcomingBirthdays.map(
-                      ({ student, daysUntil, birthdayDateStr }) => {
-                        const sClass = classes.find(
-                          (c) => c.id === student.classId,
-                        );
-                        return (
-                          <div
-                            key={student.id}
-                            className="flex items-center justify-between p-3 bg-white rounded-xl border border-amber-200/55 shadow-2xs hover:border-amber-300 transition-all"
-                          >
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-200 flex items-center justify-center overflow-hidden shrink-0">
-                                {student.profilePhoto ? (
-                                  <img
-                                    src={student.profilePhoto}
-                                    alt={student.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <span className="text-xs font-black text-amber-700">
-                                    {student.name.charAt(0)}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-left">
-                                <p className="text-[11px] font-black text-slate-900 leading-none">
-                                  {student.name}
-                                </p>
-                                <span className="text-[9px] text-slate-400 font-bold mt-1 inline-block">
-                                  {sClass?.name || "Class"} • {birthdayDateStr}
-                                </span>
-                              </div>
+                    {upcomingBirthdays.map(({ student, daysUntil, birthdayDateStr }) => {
+                      const sClass = classes.find(c => c.id === student.classId);
+                      return (
+                        <div key={student.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-amber-200/55 shadow-2xs hover:border-amber-300 transition-all">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-200 flex items-center justify-center overflow-hidden shrink-0">
+                              {student.profilePhoto ? (
+                                <img src={student.profilePhoto} alt={student.name} className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-xs font-black text-amber-700">{student.name.charAt(0)}</span>
+                              )}
                             </div>
-
-                            <div className="flex items-center gap-1.5">
-                              <span
-                                className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                                  daysUntil === 0
-                                    ? "bg-rose-100 text-rose-800 border border-rose-200/50 animate-pulse"
-                                    : daysUntil === 1
-                                      ? "bg-amber-100 text-amber-800 border border-amber-200"
-                                      : "bg-slate-100 text-slate-700 border border-slate-200/30"
-                                }`}
-                              >
-                                {daysUntil === 0
-                                  ? "Today! 🎉"
-                                  : daysUntil === 1
-                                    ? "Tomorrow"
-                                    : `In ${daysUntil}d`}
+                            <div className="text-left">
+                              <p className="text-[11px] font-black text-slate-900 leading-none">{student.name}</p>
+                              <span className="text-[9px] text-slate-400 font-bold mt-1 inline-block">
+                                {sClass?.name || 'Class'} • {birthdayDateStr}
                               </span>
-                              <button
-                                onClick={() =>
-                                  handleSendBirthdayEmail(
-                                    student,
-                                    birthdayDateStr,
-                                  )
-                                }
-                                className="p-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all active:scale-90 cursor-pointer"
-                                title="Send Celebratory Email"
-                              >
-                                <Gift size={12} />
-                              </button>
                             </div>
                           </div>
-                        );
-                      },
-                    )}
+                          
+                          <div className="flex items-center gap-1.5">
+                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                              daysUntil === 0 
+                                ? 'bg-rose-100 text-rose-800 border border-rose-200/50 animate-pulse'
+                                : daysUntil === 1
+                                ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                : 'bg-slate-100 text-slate-700 border border-slate-200/30'
+                            }`}>
+                              {daysUntil === 0 ? 'Today! 🎉' : daysUntil === 1 ? 'Tomorrow' : `In ${daysUntil}d`}
+                            </span>
+                            <button
+                              onClick={() => handleSendBirthdayEmail(student, birthdayDateStr)}
+                              className="p-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all active:scale-90 cursor-pointer"
+                              title="Send Celebratory Email"
+                            >
+                              <Gift size={12} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -3102,32 +2388,18 @@ export default function AdminDashboard({
             const CustomTooltip = ({ active, payload, label }: any) => {
               if (active && payload && payload.length) {
                 return (
-                  <div
-                    className={`p-3 rounded-lg shadow-xl text-xs font-semibold border ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800 text-white"
-                        : "bg-white border-slate-100 text-slate-950"
-                    }`}
-                  >
+                  <div className={`p-3 rounded-lg shadow-xl text-xs font-semibold border ${
+                    isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-950'
+                  }`}>
                     <p className="font-extrabold mb-1.5">{label}</p>
                     {payload.map((p: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="flex justify-between items-center gap-4 mt-1 font-medium"
-                      >
+                      <div key={idx} className="flex justify-between items-center gap-4 mt-1 font-medium">
                         <span className="flex items-center gap-1.5">
-                          <span
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: p.color }}
-                          ></span>
-                          <span className="opacity-80 capitalize">
-                            {p.name}:
-                          </span>
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }}></span>
+                          <span className="opacity-80 capitalize">{p.name}:</span>
                         </span>
                         <span className="font-mono font-bold">
-                          {p.name.includes("%") ? "" : "GHS "}
-                          {p.value.toLocaleString()}
-                          {p.name.includes("%") ? "%" : ""}
+                          {p.name.includes('%') ? '' : 'GHS '}{p.value.toLocaleString()}{p.name.includes('%') ? '%' : ''}
                         </span>
                       </div>
                     ))}
@@ -3139,19 +2411,16 @@ export default function AdminDashboard({
 
             return (
               <div className="space-y-6">
+                
                 {/* First Row: Financial Performance (2 cols) & Enrollment (1 col) */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  
                   {/* Card 1: Term Billing & Financial Ledger Flow */}
                   <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700">
                     <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                       <div>
-                        <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">
-                          Term Billing & Collection Flow
-                        </h3>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          Collected revenue vs. outstanding invoice balances for
-                          the current term.
-                        </p>
+                        <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">Term Billing & Collection Flow</h3>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Collected revenue vs. outstanding invoice balances for the current term.</p>
                       </div>
                       <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-semibold border border-emerald-100">
                         Paystack Live Sync
@@ -3160,96 +2429,58 @@ export default function AdminDashboard({
 
                     <div className="h-[280px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart
-                          data={financialTrendChartData}
-                          margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
-                        >
+                        <AreaChart data={financialTrendChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                           <defs>
-                            <linearGradient
-                              id="colorCollected"
-                              x1="0"
-                              y1="0"
-                              x2="0"
-                              y2="1"
-                            >
-                              <stop
-                                offset="5%"
-                                stopColor="#10b981"
-                                stopOpacity={0.25}
-                              />
-                              <stop
-                                offset="95%"
-                                stopColor="#10b981"
-                                stopOpacity={0.01}
-                              />
+                            <linearGradient id="colorCollected" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#10b981" stopOpacity={0.25}/>
+                              <stop offset="95%" stopColor="#10b981" stopOpacity={0.01}/>
                             </linearGradient>
-                            <linearGradient
-                              id="colorOutstanding"
-                              x1="0"
-                              y1="0"
-                              x2="0"
-                              y2="1"
-                            >
-                              <stop
-                                offset="5%"
-                                stopColor="#f43f5e"
-                                stopOpacity={0.25}
-                              />
-                              <stop
-                                offset="95%"
-                                stopColor="#f43f5e"
-                                stopOpacity={0.01}
-                              />
+                            <linearGradient id="colorOutstanding" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.25}/>
+                              <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.01}/>
                             </linearGradient>
                           </defs>
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                            stroke="#e2e8f0"
-                          />
-                          <XAxis
-                            dataKey="month"
-                            stroke="#0f172a"
-                            fontSize={10}
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                          <XAxis 
+                            dataKey="month" 
+                            stroke="#0f172a" 
+                            fontSize={10} 
                             fontWeight="bold"
-                            tickLine={false}
+                            tickLine={false} 
                           />
-                          <YAxis
-                            stroke="#0f172a"
-                            fontSize={10}
+                          <YAxis 
+                            stroke="#0f172a" 
+                            fontSize={10} 
                             fontWeight="bold"
                             tickLine={false}
                             axisLine={false}
                             tickFormatter={(v) => `GHS ${v}`}
                           />
                           <Tooltip content={<CustomTooltip />} />
-                          <Legend
-                            verticalAlign="top"
-                            height={36}
+                          <Legend 
+                            verticalAlign="top" 
+                            height={36} 
                             iconType="circle"
                             iconSize={8}
-                            wrapperStyle={{
-                              fontSize: "11px",
-                              fontWeight: "bold",
-                            }}
+                            wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }}
                           />
-                          <Area
-                            name="Collected"
-                            type="monotone"
-                            dataKey="Collected"
-                            stroke="#10b981"
+                          <Area 
+                            name="Collected" 
+                            type="monotone" 
+                            dataKey="Collected" 
+                            stroke="#10b981" 
                             strokeWidth={2.5}
-                            fillOpacity={1}
-                            fill="url(#colorCollected)"
+                            fillOpacity={1} 
+                            fill="url(#colorCollected)" 
                           />
-                          <Area
-                            name="Outstanding"
-                            type="monotone"
-                            dataKey="Outstanding"
-                            stroke="#f43f5e"
+                          <Area 
+                            name="Outstanding" 
+                            type="monotone" 
+                            dataKey="Outstanding" 
+                            stroke="#f43f5e" 
                             strokeWidth={2.5}
-                            fillOpacity={1}
-                            fill="url(#colorOutstanding)"
+                            fillOpacity={1} 
+                            fill="url(#colorOutstanding)" 
                           />
                         </AreaChart>
                       </ResponsiveContainer>
@@ -3258,16 +2489,9 @@ export default function AdminDashboard({
                     <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-medium">
                       <span className="flex items-center gap-1">
                         <ShieldCheck size={14} className="text-emerald-600" />
-                        <span>
-                          Real-time settlements certified by central audit node.
-                        </span>
+                        <span>Real-time settlements certified by central audit node.</span>
                       </span>
-                      <span className="font-semibold text-slate-700">
-                        Total Billable: GHS{" "}
-                        {financialTrendChartData
-                          .reduce((sum, f) => sum + f["Total Billed"], 0)
-                          .toLocaleString()}
-                      </span>
+                      <span className="font-semibold text-slate-700">Total Billable: GHS {financialTrendChartData.reduce((sum, f) => sum + f['Total Billed'], 0).toLocaleString()}</span>
                     </div>
                   </div>
 
@@ -3275,89 +2499,57 @@ export default function AdminDashboard({
                   <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700">
                     <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                       <div>
-                        <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">
-                          Enrollment by Class
-                        </h3>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          Student headcount distribution broken down by gender.
-                        </p>
+                        <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">Enrollment by Class</h3>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Student headcount distribution broken down by gender.</p>
                       </div>
                     </div>
 
                     <div className="h-[280px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                          data={enrollmentChartData}
-                          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                        >
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                            stroke="#e2e8f0"
-                          />
-                          <XAxis
-                            dataKey="className"
-                            stroke="#0f172a"
-                            fontSize={9}
+                        <BarChart data={enrollmentChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                          <XAxis 
+                            dataKey="className" 
+                            stroke="#0f172a" 
+                            fontSize={9} 
                             fontWeight="bold"
-                            tickLine={false}
+                            tickLine={false} 
                           />
-                          <YAxis
-                            stroke="#0f172a"
-                            fontSize={10}
+                          <YAxis 
+                            stroke="#0f172a" 
+                            fontSize={10} 
                             fontWeight="bold"
                             tickLine={false}
                             axisLine={false}
                           />
                           <Tooltip content={<CustomTooltip />} />
-                          <Legend
-                            verticalAlign="top"
-                            height={36}
+                          <Legend 
+                            verticalAlign="top" 
+                            height={36} 
                             iconType="circle"
                             iconSize={8}
-                            wrapperStyle={{
-                              fontSize: "11px",
-                              fontWeight: "bold",
-                            }}
+                            wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }}
                           />
-                          <Bar
-                            name="Male"
-                            dataKey="Male"
-                            fill="#0284c7"
-                            radius={[4, 4, 0, 0]}
-                            stackId="gender"
-                          />
-                          <Bar
-                            name="Female"
-                            dataKey="Female"
-                            fill="#ec4899"
-                            radius={[4, 4, 0, 0]}
-                            stackId="gender"
-                          />
+                          <Bar name="Male" dataKey="Male" fill="#0284c7" radius={[4, 4, 0, 0]} stackId="gender" />
+                          <Bar name="Female" dataKey="Female" fill="#ec4899" radius={[4, 4, 0, 0]} stackId="gender" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
 
                     <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-medium">
                       <span>Classrooms Occupied: {classes.length}</span>
-                      <span className="font-semibold text-slate-700">
-                        Total Registered: {totalStudents}
-                      </span>
+                      <span className="font-semibold text-slate-700">Total Registered: {totalStudents}</span>
                     </div>
                   </div>
+
                 </div>
 
                 {/* Second Row: Class Attendance Rate (3 cols) */}
                 <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700">
                   <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                     <div>
-                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">
-                        Average Class Attendance Rate
-                      </h3>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        Terminal academic attendance ratios derived from daily
-                        classroom logs.
-                      </p>
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">Average Class Attendance Rate</h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Terminal academic attendance ratios derived from daily classroom logs.</p>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
                       <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
@@ -3367,25 +2559,18 @@ export default function AdminDashboard({
 
                   <div className="h-[220px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={attendanceChartData}
-                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                      >
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          vertical={false}
-                          stroke="#e2e8f0"
-                        />
-                        <XAxis
-                          dataKey="className"
-                          stroke="#0f172a"
-                          fontSize={10}
+                      <BarChart data={attendanceChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis 
+                          dataKey="className" 
+                          stroke="#0f172a" 
+                          fontSize={10} 
                           fontWeight="bold"
-                          tickLine={false}
+                          tickLine={false} 
                         />
-                        <YAxis
-                          stroke="#0f172a"
-                          fontSize={10}
+                        <YAxis 
+                          stroke="#0f172a" 
+                          fontSize={10} 
                           fontWeight="bold"
                           tickLine={false}
                           axisLine={false}
@@ -3393,24 +2578,14 @@ export default function AdminDashboard({
                           tickFormatter={(v) => `${v}%`}
                         />
                         <Tooltip content={<CustomTooltip />} />
-                        <Bar
-                          name="Attendance %"
-                          dataKey="Attendance %"
-                          fill="#0d9488"
-                          radius={[4, 4, 0, 0]}
-                        >
-                          {attendanceChartData.map((entry, index) => {
-                            const rate = entry["Attendance %"];
-                            const barColor =
-                              rate < 85
-                                ? "#e11d48"
-                                : rate < 93
-                                  ? "#f59e0b"
-                                  : "#0d9488";
-                            return (
-                              <Cell key={`cell-${index}`} fill={barColor} />
-                            );
-                          })}
+                        <Bar name="Attendance %" dataKey="Attendance %" fill="#0d9488" radius={[4, 4, 0, 0]}>
+                          {
+                            attendanceChartData.map((entry, index) => {
+                              const rate = entry['Attendance %'];
+                              const barColor = rate < 85 ? '#e11d48' : rate < 93 ? '#f59e0b' : '#0d9488';
+                              return <Cell key={`cell-${index}`} fill={barColor} />;
+                            })
+                          }
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
@@ -3418,40 +2593,20 @@ export default function AdminDashboard({
 
                   <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-medium">
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>{" "}
-                      Excellent (&gt;93%)
-                      <span className="w-2 h-2 rounded-full bg-amber-500 ml-2"></span>{" "}
-                      Satisfactory (85%-93%)
-                      <span className="w-2 h-2 rounded-full bg-rose-500 ml-2"></span>{" "}
-                      Watch List (&lt;85%)
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Excellent (&gt;93%)
+                      <span className="w-2 h-2 rounded-full bg-amber-500 ml-2"></span> Satisfactory (85%-93%)
+                      <span className="w-2 h-2 rounded-full bg-rose-500 ml-2"></span> Watch List (&lt;85%)
                     </span>
-                    <span className="font-semibold text-slate-700">
-                      Term Average Attendance:{" "}
-                      {Math.round(
-                        attendanceChartData.reduce(
-                          (acc, c) => acc + c["Attendance %"],
-                          0,
-                        ) / attendanceChartData.length,
-                      )}
-                      %
-                    </span>
+                    <span className="font-semibold text-slate-700">Term Average Attendance: {Math.round(attendanceChartData.reduce((acc, c) => acc + c['Attendance %'], 0) / attendanceChartData.length)}%</span>
                   </div>
                 </div>
 
                 {/* Third Row: Academic Year Fee Collections & Cash Flow Trends */}
-                <div
-                  className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700"
-                  id="academic-year-cashflow-card"
-                >
+                <div className="p-5 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700" id="academic-year-cashflow-card">
                   <div className="flex justify-between items-center pb-3 border-b border-slate-100 mb-4">
                     <div>
-                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">
-                        Academic Year Fee Collections & Cash Flow
-                      </h3>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        Real-time aggregate monthly tuition & fee revenue
-                        collected dynamically throughout the academic year.
-                      </p>
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-slate-800">Academic Year Fee Collections & Cash Flow</h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Real-time aggregate monthly tuition & fee revenue collected dynamically throughout the academic year.</p>
                     </div>
                     <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full font-semibold">
                       Cash Flow Trends
@@ -3460,48 +2615,32 @@ export default function AdminDashboard({
 
                   <div className="h-[240px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={monthlyFeeCollections}
-                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                      >
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          vertical={false}
-                          stroke="#e2e8f0"
-                        />
-                        <XAxis
-                          dataKey="month"
-                          stroke="#0f172a"
-                          fontSize={10}
+                      <BarChart data={monthlyFeeCollections} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <XAxis 
+                          dataKey="month" 
+                          stroke="#0f172a" 
+                          fontSize={10} 
                           fontWeight="bold"
-                          tickLine={false}
+                          tickLine={false} 
                         />
-                        <YAxis
-                          stroke="#0f172a"
-                          fontSize={10}
+                        <YAxis 
+                          stroke="#0f172a" 
+                          fontSize={10} 
                           fontWeight="bold"
                           tickLine={false}
                           axisLine={false}
                           tickFormatter={(v) => `GHS ${v}`}
                         />
                         <Tooltip content={<CustomTooltip />} />
-                        <Bar
-                          name="Fee Collections (GHS)"
-                          dataKey="Fee Collections (GHS)"
-                          fill="#0ea5e9"
-                          radius={[4, 4, 0, 0]}
-                        >
-                          {monthlyFeeCollections.map((entry, index) => {
-                            const amt = entry["Fee Collections (GHS)"];
-                            const barColor =
-                              amt > 10000 ? "#0d9488" : "#0ea5e9";
-                            return (
-                              <Cell
-                                key={`cell-overview-fee-${index}`}
-                                fill={barColor}
-                              />
-                            );
-                          })}
+                        <Bar name="Fee Collections (GHS)" dataKey="Fee Collections (GHS)" fill="#0ea5e9" radius={[4, 4, 0, 0]}>
+                          {
+                            monthlyFeeCollections.map((entry, index) => {
+                              const amt = entry['Fee Collections (GHS)'];
+                              const barColor = amt > 10000 ? '#0d9488' : '#0ea5e9';
+                              return <Cell key={`cell-overview-fee-${index}`} fill={barColor} />;
+                            })
+                          }
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
@@ -3509,53 +2648,38 @@ export default function AdminDashboard({
 
                   <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 font-medium">
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>{" "}
-                      High Collections Volume (&gt;10,000 GHS)
-                      <span className="w-2 h-2 rounded-full bg-sky-500 ml-2"></span>{" "}
-                      Standard Collections Volume
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span> High Collections Volume (&gt;10,000 GHS)
+                      <span className="w-2 h-2 rounded-full bg-sky-500 ml-2"></span> Standard Collections Volume
                     </span>
-                    <span className="font-semibold text-slate-700">
-                      Cumulative Academic Revenue: GHS{" "}
-                      {monthlyFeeCollections
-                        .reduce(
-                          (sum, item) => sum + item["Fee Collections (GHS)"],
-                          0,
-                        )
-                        .toLocaleString()}
-                    </span>
+                    <span className="font-semibold text-slate-700">Cumulative Academic Revenue: GHS {monthlyFeeCollections.reduce((sum, item) => sum + item['Fee Collections (GHS)'], 0).toLocaleString()}</span>
                   </div>
                 </div>
+
               </div>
             );
           })()}
 
           {/* Quick announcements overview */}
-          <div
-            className={`p-5 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-300"}`}
-          >
-            <h4 className="font-extrabold text-xs uppercase tracking-wider pb-3 border-b border-slate-300 dark:border-slate-700 mb-3">
-              Live Bulletins Feed
-            </h4>
-            <FeaturedAnnouncementsCarousel
-              announcements={announcements}
+          <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
+            <h4 className="font-extrabold text-xs uppercase tracking-wider pb-3 border-b border-slate-300 dark:border-slate-700 mb-3">Live Bulletins Feed</h4>
+            <FeaturedAnnouncementsCarousel 
+              announcements={announcements} 
               onDeleteNotice={handleDeleteNotice}
               isAdmin={true}
             />
           </div>
+
         </div>
       )}
 
       {/* ==================== 2. STUDENT REGISTER (CRUD) ==================== */}
-      {activeTab === "students" && (
+      {activeTab === 'students' && (
         <div className="space-y-4 animate-fade-in">
+          
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                Student Enrollment Ledger
-              </h2>
-              <p className="text-xs text-slate-400">
-                Total {students.length} active registered pupils.
-              </p>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Student Enrollment Ledger</h2>
+              <p className="text-xs text-slate-400">Total {students.length} active registered pupils.</p>
             </div>
             <button
               onClick={openAddStudent}
@@ -3578,10 +2702,7 @@ export default function AdminDashboard({
                 onChange={(e) => setStudentSearch(e.target.value)}
                 className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 pl-9 pr-3 text-xs text-slate-800 dark:text-white focus:outline-hidden focus:border-emerald-500 font-semibold"
               />
-              <Search
-                className="absolute left-3 top-2.5 text-slate-400"
-                size={14}
-              />
+              <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
             </div>
 
             <div>
@@ -3592,28 +2713,19 @@ export default function AdminDashboard({
                 className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 px-3 text-xs text-slate-800 dark:text-white focus:outline-hidden focus:border-emerald-500 font-semibold"
               >
                 <option value="All">All Class Grades</option>
-                {classes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
+                {classes.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
           </div>
 
           {/* Table Container */}
-          <div
-            className={`border rounded-xl overflow-hidden ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60"}`}
-          >
+          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
             <div className="overflow-x-auto">
-              <table
-                id="students-ledger-table"
-                className="w-full text-left text-xs border-collapse"
-              >
+              <table id="students-ledger-table" className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr
-                    className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                  >
+                  <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                     <th className="p-3">Pupil details</th>
                     <th className="p-3">Admit ID</th>
                     <th className="p-3">Class/Grade</th>
@@ -3625,87 +2737,54 @@ export default function AdminDashboard({
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {students
-                    .filter((s) => {
-                      const matchesSearch =
-                        s.name
-                          .toLowerCase()
-                          .includes(studentSearch.toLowerCase()) ||
-                        s.admissionNumber
-                          .toLowerCase()
-                          .includes(studentSearch.toLowerCase());
-                      const matchesClass =
-                        studentClassFilter === "All" ||
-                        s.classId === studentClassFilter;
+                    .filter(s => {
+                      const matchesSearch = s.name.toLowerCase().includes(studentSearch.toLowerCase()) || 
+                                            s.admissionNumber.toLowerCase().includes(studentSearch.toLowerCase());
+                      const matchesClass = studentClassFilter === 'All' || s.classId === studentClassFilter;
                       return matchesSearch && matchesClass;
                     })
                     .map((st) => {
-                      const stClass = classes.find((c) => c.id === st.classId);
+                      const stClass = classes.find(c => c.id === st.classId);
                       return (
-                        <tr
-                          key={st.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300"
-                        >
+                        <tr key={st.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
                           <td className="p-3">
                             <div className="flex items-center space-x-2.5">
                               <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-[10px] text-emerald-800 overflow-hidden border border-slate-200/50 dark:border-slate-800 shrink-0">
                                 {st.profilePhoto ? (
-                                  <img
-                                    src={st.profilePhoto}
-                                    alt={st.name}
-                                    className="w-full h-full object-cover"
-                                    referrerPolicy="no-referrer"
-                                  />
+                                  <img src={st.profilePhoto} alt={st.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                                 ) : (
                                   st.name.substring(0, 2).toUpperCase()
                                 )}
                               </div>
                               <div>
-                                <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">
-                                  {st.name}
-                                </p>
-                                <p className="text-[10px] text-slate-400 leading-none mt-0.5">
-                                  {st.gender} | DOB: {st.dob}
-                                </p>
+                                <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">{st.name}</p>
+                                <p className="text-[10px] text-slate-400 leading-none mt-0.5">{st.gender} | DOB: {st.dob}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="p-3 font-mono text-[10px] font-bold text-slate-400">
-                            {st.admissionNumber}
-                          </td>
+                          <td className="p-3 font-mono text-[10px] font-bold text-slate-400">{st.admissionNumber}</td>
                           <td className="p-3">
                             <span className="bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded">
-                              {stClass ? stClass.name : "Unknown"}
+                              {stClass ? stClass.name : 'Unknown'}
                             </span>
                           </td>
                           <td className="p-3">
-                            <p className="font-bold text-slate-800 dark:text-slate-200">
-                              {st.parentName}
-                            </p>
-                            <p className="text-[10px] text-slate-400">
-                              {st.parentPhone}
-                            </p>
+                            <p className="font-bold text-slate-800 dark:text-slate-200">{st.parentName}</p>
+                            <p className="text-[10px] text-slate-400">{st.parentPhone}</p>
                           </td>
                           <td className="p-3 font-bold font-mono">
-                            <span
-                              className={
-                                st.balanceGHS > 0
-                                  ? "text-rose-600"
-                                  : "text-emerald-600"
-                              }
-                            >
+                            <span className={st.balanceGHS > 0 ? 'text-rose-600' : 'text-emerald-600'}>
                               GHS {st.balanceGHS.toFixed(2)}
                             </span>
                           </td>
                           <td className="p-3">
-                            <span
-                              className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                                st.status === "Active"
-                                  ? "bg-emerald-500/10 text-emerald-600"
-                                  : st.status === "Suspended"
-                                    ? "bg-rose-500/10 text-rose-600"
-                                    : "bg-slate-500/10 text-slate-500"
-                              }`}
-                            >
+                            <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                              st.status === 'Active' 
+                                ? 'bg-emerald-500/10 text-emerald-600' 
+                                : st.status === 'Suspended'
+                                  ? 'bg-rose-500/10 text-rose-600'
+                                  : 'bg-slate-500/10 text-slate-500'
+                            }`}>
                               {st.status}
                             </span>
                           </td>
@@ -3741,23 +2820,20 @@ export default function AdminDashboard({
               </table>
             </div>
           </div>
+
         </div>
       )}
 
       {/* ==================== 3. FACULTY & STAFF OPERATIONS HUB ==================== */}
-      {activeTab === "teachers" && (
+      {activeTab === 'teachers' && (
         <div className="space-y-6 animate-fade-in">
+          
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                Faculty & Staff Operations Hub
-              </h2>
-              <p className="text-xs text-slate-400">
-                Manage teacher register, geofenced attendance logs, leaves, and
-                payroll ledger.
-              </p>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Faculty & Staff Operations Hub</h2>
+              <p className="text-xs text-slate-400">Manage teacher register, geofenced attendance logs, leaves, and payroll ledger.</p>
             </div>
-            {teachersActiveSubTab === "list" && (
+            {teachersActiveSubTab === 'list' && (
               <button
                 onClick={openAddTeacher}
                 id="admin-add-teacher-btn"
@@ -3773,54 +2849,52 @@ export default function AdminDashboard({
           <div className="flex border-b border-slate-200 dark:border-slate-800">
             <button
               onClick={() => {
-                setTeachersActiveSubTab("list");
-                setPayrollActionStatus({ type: null, message: "" });
+                setTeachersActiveSubTab('list');
+                setPayrollActionStatus({ type: null, message: '' });
               }}
               className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
-                teachersActiveSubTab === "list"
-                  ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
-                  : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                teachersActiveSubTab === 'list'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               Faculty Registry ({teachers.length})
             </button>
             <button
               onClick={() => {
-                setTeachersActiveSubTab("attendance");
-                setPayrollActionStatus({ type: null, message: "" });
+                setTeachersActiveSubTab('attendance');
+                setPayrollActionStatus({ type: null, message: '' });
               }}
               className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
-                teachersActiveSubTab === "attendance"
-                  ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
-                  : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                teachersActiveSubTab === 'attendance'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               Staff Clock-Ins ({staffClockIns.length})
             </button>
             <button
               onClick={() => {
-                setTeachersActiveSubTab("leaves");
-                setPayrollActionStatus({ type: null, message: "" });
+                setTeachersActiveSubTab('leaves');
+                setPayrollActionStatus({ type: null, message: '' });
               }}
               className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
-                teachersActiveSubTab === "leaves"
-                  ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
-                  : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                teachersActiveSubTab === 'leaves'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
-              Leave Requests (
-              {staffLeaveRequests.filter((l) => l.status === "Pending").length}{" "}
-              Pending)
+              Leave Requests ({staffLeaveRequests.filter(l => l.status === 'Pending').length} Pending)
             </button>
             <button
               onClick={() => {
-                setTeachersActiveSubTab("payroll");
-                setPayrollActionStatus({ type: null, message: "" });
+                setTeachersActiveSubTab('payroll');
+                setPayrollActionStatus({ type: null, message: '' });
               }}
               className={`pb-3 px-4 font-extrabold text-xs border-b-2 transition-all cursor-pointer ${
-                teachersActiveSubTab === "payroll"
-                  ? "border-emerald-600 text-emerald-600 dark:text-emerald-400"
-                  : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                teachersActiveSubTab === 'payroll'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               Payroll & Salaries Ledger
@@ -3828,14 +2902,10 @@ export default function AdminDashboard({
           </div>
 
           {/* ==================== ATTENDANCE LOG VIEW ==================== */}
-          {teachersActiveSubTab === "attendance" && (
+          {teachersActiveSubTab === 'attendance' && (
             <div className="space-y-4 animate-fade-in">
-              <div
-                className={`p-5 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-300"}`}
-              >
-                <h3 className="text-sm font-bold mb-3">
-                  Live Geofenced Attendance Feed
-                </h3>
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
+                <h3 className="text-sm font-bold mb-3">Live Geofenced Attendance Feed</h3>
                 {staffClockIns.length === 0 ? (
                   <div className="text-center py-12 text-slate-400 text-xs font-semibold">
                     No clock-in records registered in the system yet.
@@ -3844,9 +2914,7 @@ export default function AdminDashboard({
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr
-                          className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                        >
+                        <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                           <th className="p-3">Staff Name / Role</th>
                           <th className="p-3">Date</th>
                           <th className="p-3">Clock-In Time</th>
@@ -3858,42 +2926,27 @@ export default function AdminDashboard({
                       </thead>
                       <tbody>
                         {staffClockIns.map((log) => (
-                          <tr
-                            key={log.id}
-                            className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? "border-slate-800/50 text-slate-300" : "border-slate-100 text-slate-700"}`}
-                          >
+                          <tr key={log.id} className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? 'border-slate-800/50 text-slate-300' : 'border-slate-100 text-slate-700'}`}>
                             <td className="p-3">
-                              <div className="font-bold text-slate-900 dark:text-white">
-                                {log.staffName}
-                              </div>
-                              <div className="text-[10px] text-slate-400 font-medium">
-                                {log.role} (ID: {log.staffId})
-                              </div>
+                              <div className="font-bold text-slate-900 dark:text-white">{log.staffName}</div>
+                              <div className="text-[10px] text-slate-400 font-medium">{log.role} (ID: {log.staffId})</div>
                             </td>
-                            <td className="p-3 font-mono font-semibold">
-                              {log.date}
-                            </td>
+                            <td className="p-3 font-mono font-semibold">{log.date}</td>
                             <td className="p-3 font-semibold text-emerald-600 dark:text-emerald-400">
-                              {log.clockInTime.split(" ")[1] || log.clockInTime}
+                              {log.clockInTime.split(' ')[1] || log.clockInTime}
                             </td>
                             <td className="p-3 font-semibold text-rose-600 dark:text-rose-400">
-                              {log.clockOutTime
-                                ? log.clockOutTime.split(" ")[1] ||
-                                  log.clockOutTime
-                                : "—"}
+                              {log.clockOutTime ? (log.clockOutTime.split(' ')[1] || log.clockOutTime) : '—'}
                             </td>
                             <td className="p-3 text-[11px] font-medium text-slate-500">
-                              {log.latitude.toFixed(5)}° N,{" "}
-                              {log.longitude.toFixed(5)}° W
+                              {log.latitude.toFixed(5)}° N, {log.longitude.toFixed(5)}° W
                             </td>
                             <td className="p-3">
-                              <span
-                                className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase ${
-                                  log.status === "In-Range"
-                                    ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
-                                    : "bg-rose-500/10 text-rose-600 border border-rose-500/20"
-                                }`}
-                              >
+                              <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase ${
+                                log.status === 'In-Range'
+                                  ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                                  : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
+                              }`}>
                                 {log.status}
                               </span>
                             </td>
@@ -3911,14 +2964,10 @@ export default function AdminDashboard({
           )}
 
           {/* ==================== LEAVE REQUESTS REVIEW VIEW ==================== */}
-          {teachersActiveSubTab === "leaves" && (
+          {teachersActiveSubTab === 'leaves' && (
             <div className="space-y-4 animate-fade-in">
-              <div
-                className={`p-5 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-300"}`}
-              >
-                <h3 className="text-sm font-bold mb-3">
-                  Academic Faculty Leave Register
-                </h3>
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
+                <h3 className="text-sm font-bold mb-3">Academic Faculty Leave Register</h3>
                 {staffLeaveRequests.length === 0 ? (
                   <div className="text-center py-12 text-slate-400 text-xs font-semibold">
                     No leave requests found in the system.
@@ -3927,9 +2976,7 @@ export default function AdminDashboard({
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr
-                          className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                        >
+                        <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                           <th className="p-3">Staff Member</th>
                           <th className="p-3">Type</th>
                           <th className="p-3">Duration</th>
@@ -3941,17 +2988,10 @@ export default function AdminDashboard({
                       </thead>
                       <tbody>
                         {staffLeaveRequests.map((req) => (
-                          <tr
-                            key={req.id}
-                            className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? "border-slate-800/50 text-slate-300" : "border-slate-100 text-slate-700"}`}
-                          >
+                          <tr key={req.id} className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? 'border-slate-800/50 text-slate-300' : 'border-slate-100 text-slate-700'}`}>
                             <td className="p-3">
-                              <div className="font-bold text-slate-900 dark:text-white">
-                                {req.staffName}
-                              </div>
-                              <div className="text-[10px] text-slate-400 font-medium">
-                                {req.role} (ID: {req.staffId})
-                              </div>
+                              <div className="font-bold text-slate-900 dark:text-white">{req.staffName}</div>
+                              <div className="text-[10px] text-slate-400 font-medium">{req.role} (ID: {req.staffId})</div>
                             </td>
                             <td className="p-3">
                               <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold px-2 py-0.5 rounded uppercase">
@@ -3961,42 +3001,27 @@ export default function AdminDashboard({
                             <td className="p-3 font-semibold text-slate-800 dark:text-slate-200">
                               {req.startDate} to {req.endDate}
                             </td>
-                            <td className="p-3 font-mono font-medium text-slate-400">
-                              {req.appliedOn}
-                            </td>
-                            <td
-                              className="p-3 max-w-[220px] truncate font-medium"
-                              title={req.reason}
-                            >
+                            <td className="p-3 font-mono font-medium text-slate-400">{req.appliedOn}</td>
+                            <td className="p-3 max-w-[220px] truncate font-medium" title={req.reason}>
                               "{req.reason}"
                             </td>
                             <td className="p-3">
-                              <span
-                                className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${
-                                  req.status === "Approved"
-                                    ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                                    : req.status === "Rejected"
-                                      ? "bg-rose-500/10 text-rose-600 border-rose-500/20"
-                                      : "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                                }`}
-                              >
+                              <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${
+                                req.status === 'Approved'
+                                  ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                                  : req.status === 'Rejected'
+                                  ? 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                                  : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                              }`}>
                                 {req.status}
                               </span>
                             </td>
                             <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
-                              {req.status === "Pending" ? (
+                              {req.status === 'Pending' ? (
                                 <>
                                   <button
                                     onClick={() => {
-                                      const updated = staffLeaveRequests.map(
-                                        (l) =>
-                                          l.id === req.id
-                                            ? {
-                                                ...l,
-                                                status: "Approved" as const,
-                                              }
-                                            : l,
-                                      );
+                                      const updated = staffLeaveRequests.map(l => l.id === req.id ? { ...l, status: 'Approved' as const } : l);
                                       onUpdateStaffLeaves(updated);
                                     }}
                                     className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-sm text-[10px] cursor-pointer"
@@ -4005,15 +3030,7 @@ export default function AdminDashboard({
                                   </button>
                                   <button
                                     onClick={() => {
-                                      const updated = staffLeaveRequests.map(
-                                        (l) =>
-                                          l.id === req.id
-                                            ? {
-                                                ...l,
-                                                status: "Rejected" as const,
-                                              }
-                                            : l,
-                                      );
+                                      const updated = staffLeaveRequests.map(l => l.id === req.id ? { ...l, status: 'Rejected' as const } : l);
                                       onUpdateStaffLeaves(updated);
                                     }}
                                     className="px-2 py-1 bg-rose-600 hover:bg-rose-700 text-white font-extrabold rounded-sm text-[10px] cursor-pointer"
@@ -4022,9 +3039,7 @@ export default function AdminDashboard({
                                   </button>
                                 </>
                               ) : (
-                                <span className="text-[10px] text-slate-400 font-medium">
-                                  Reviewed
-                                </span>
+                                <span className="text-[10px] text-slate-400 font-medium">Reviewed</span>
                               )}
                             </td>
                           </tr>
@@ -4038,79 +3053,50 @@ export default function AdminDashboard({
           )}
 
           {/* ==================== PAYROLL & SALARIES LEDGER VIEW ==================== */}
-          {teachersActiveSubTab === "payroll" && (
+          {teachersActiveSubTab === 'payroll' && (
             <div className="space-y-4 animate-fade-in">
               {payrollActionStatus.message && (
-                <div
-                  className={`p-4 rounded-xl text-xs font-bold border ${
-                    payrollActionStatus.type === "success"
-                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
-                      : "bg-rose-500/10 border-rose-500/20 text-rose-600"
-                  }`}
-                >
+                <div className={`p-4 rounded-xl text-xs font-bold border ${
+                  payrollActionStatus.type === 'success'
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600'
+                    : 'bg-rose-500/10 border-rose-500/20 text-rose-600'
+                }`}>
                   {payrollActionStatus.message}
                 </div>
               )}
 
-              <div
-                className={`p-5 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-300"}`}
-              >
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}>
                 <div className="flex justify-between items-center mb-4">
                   <div>
-                    <h3 className="text-sm font-bold">
-                      Monthly Staff Payroll Ledger (GHS)
-                    </h3>
-                    <p className="text-[10px] text-slate-400 font-medium">
-                      Process salaries, print legal slips, and track statutory
-                      PAYE tax and SSNIT deductions.
-                    </p>
+                    <h3 className="text-sm font-bold">Monthly Staff Payroll Ledger (GHS)</h3>
+                    <p className="text-[10px] text-slate-400 font-medium">Process salaries, print legal slips, and track statutory PAYE tax and SSNIT deductions.</p>
                   </div>
                   <button
                     onClick={() => {
-                      if (session?.role !== "super_admin") {
-                        setPayrollActionStatus({
-                          type: "error",
-                          message:
-                            "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to execute staff payroll disbursements.",
-                        });
-                        alert(
-                          "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder & Executive Chairman) can disburse staff salaries.",
-                        );
+                      if (session?.role !== 'super_admin') {
+                        setPayrollActionStatus({ type: 'error', message: 'FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to execute staff payroll disbursements.' });
+                        alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder & Executive Chairman) can disburse staff salaries.');
                         return;
                       }
-                      const updated = staffPayrolls.map((p) => ({
-                        ...p,
-                        status: "Paid" as const,
-                        processedOn: new Date().toISOString().substring(0, 10),
-                      }));
+                      const updated = staffPayrolls.map(p => ({ ...p, status: 'Paid' as const, processedOn: new Date().toISOString().substring(0, 10) }));
                       onUpdateStaffPayrolls(updated);
-                      setPayrollActionStatus({
-                        type: "success",
-                        message:
-                          "[SUPER ADMIN AUTHORIZED] All staff salaries processed and disbursed successfully under Founder Executive seal.",
-                      });
+                      setPayrollActionStatus({ type: 'success', message: '[SUPER ADMIN AUTHORIZED] All staff salaries processed and disbursed successfully under Founder Executive seal.' });
                     }}
                     className={`px-3 py-1.5 font-black rounded-lg text-xs cursor-pointer shadow-sm active:scale-95 transition-all flex items-center space-x-1 ${
-                      session?.role === "super_admin"
-                        ? "bg-amber-600 hover:bg-amber-500 text-white"
-                        : "bg-slate-300 dark:bg-slate-800 text-slate-500 hover:bg-slate-400"
+                      session?.role === 'super_admin'
+                        ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                        : 'bg-slate-300 dark:bg-slate-800 text-slate-500 hover:bg-slate-400'
                     }`}
                   >
                     <ShieldCheck size={13} />
-                    <span>
-                      {session?.role === "super_admin"
-                        ? "Super Admin Disburse All"
-                        : "Requires Super Admin Disburse"}
-                    </span>
+                    <span>{session?.role === 'super_admin' ? 'Super Admin Disburse All' : 'Requires Super Admin Disburse'}</span>
                   </button>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr
-                        className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                      >
+                      <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                         <th className="p-3">Staff Name</th>
                         <th className="p-3">Basic Salary</th>
                         <th className="p-3">Allowances</th>
@@ -4122,90 +3108,48 @@ export default function AdminDashboard({
                     </thead>
                     <tbody>
                       {staffPayrolls.map((pay) => (
-                        <tr
-                          key={pay.id}
-                          className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? "border-slate-800/50 text-slate-300" : "border-slate-100 text-slate-700"}`}
-                        >
+                        <tr key={pay.id} className={`border-b hover:bg-slate-50/50 dark:hover:bg-slate-800/40 ${isDarkMode ? 'border-slate-800/50 text-slate-300' : 'border-slate-100 text-slate-700'}`}>
                           <td className="p-3">
-                            <div className="font-bold text-slate-900 dark:text-white">
-                              {pay.staffName}
-                            </div>
-                            <div className="text-[10px] text-slate-400 font-medium">
-                              Role: {pay.role} (ID: {pay.staffId})
-                            </div>
+                            <div className="font-bold text-slate-900 dark:text-white">{pay.staffName}</div>
+                            <div className="text-[10px] text-slate-400 font-medium">Role: {pay.role} (ID: {pay.staffId})</div>
                           </td>
-                          <td className="p-3 font-mono font-bold">
-                            GH¢ {pay.baseSalary.toLocaleString()}
-                          </td>
-                          <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                            GH¢ {pay.allowances.toLocaleString()}
-                          </td>
-                          <td className="p-3 font-mono font-bold text-rose-600 dark:text-rose-400">
-                            GH¢ {pay.deductions.toLocaleString()}
-                          </td>
-                          <td className="p-3 font-mono font-extrabold text-indigo-600 dark:text-indigo-400">
-                            GH¢ {pay.netSalary.toLocaleString()}
-                          </td>
+                          <td className="p-3 font-mono font-bold">GH¢ {pay.baseSalary.toLocaleString()}</td>
+                          <td className="p-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">GH¢ {pay.allowances.toLocaleString()}</td>
+                          <td className="p-3 font-mono font-bold text-rose-600 dark:text-rose-400">GH¢ {pay.deductions.toLocaleString()}</td>
+                          <td className="p-3 font-mono font-extrabold text-indigo-600 dark:text-indigo-400">GH¢ {pay.netSalary.toLocaleString()}</td>
                           <td className="p-3">
-                            <span
-                              className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase ${
-                                pay.status === "Paid"
-                                  ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
-                                  : "bg-amber-500/10 text-amber-600 border border-amber-500/20"
-                              }`}
-                            >
+                            <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase ${
+                              pay.status === 'Paid'
+                                ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                                : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                            }`}>
                               {pay.status}
                             </span>
                             {pay.processedOn && (
-                              <span className="text-[8px] text-slate-400 block mt-0.5">
-                                Paid on {pay.processedOn}
-                              </span>
+                              <span className="text-[8px] text-slate-400 block mt-0.5">Paid on {pay.processedOn}</span>
                             )}
                           </td>
                           <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
-                            {pay.status === "Pending" && (
+                            {pay.status === 'Pending' && (
                               <button
                                 onClick={() => {
-                                  if (session?.role !== "super_admin") {
-                                    setPayrollActionStatus({
-                                      type: "error",
-                                      message:
-                                        "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to execute staff payroll disbursements.",
-                                    });
-                                    alert(
-                                      "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder) can disburse staff salaries.",
-                                    );
+                                  if (session?.role !== 'super_admin') {
+                                    setPayrollActionStatus({ type: 'error', message: 'FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) is authorized to execute staff payroll disbursements.' });
+                                    alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder) can disburse staff salaries.');
                                     return;
                                   }
-                                  const updated = staffPayrolls.map((p) =>
-                                    p.id === pay.id
-                                      ? {
-                                          ...p,
-                                          status: "Paid" as const,
-                                          processedOn: new Date()
-                                            .toISOString()
-                                            .substring(0, 10),
-                                        }
-                                      : p,
-                                  );
+                                  const updated = staffPayrolls.map(p => p.id === pay.id ? { ...p, status: 'Paid' as const, processedOn: new Date().toISOString().substring(0, 10) } : p);
                                   onUpdateStaffPayrolls(updated);
-                                  setPayrollActionStatus({
-                                    type: "success",
-                                    message: `[SUPER ADMIN AUTHORIZED] Salary payout of GH¢ ${pay.netSalary.toLocaleString()} for ${pay.staffName} disbursed.`,
-                                  });
+                                  setPayrollActionStatus({ type: 'success', message: `[SUPER ADMIN AUTHORIZED] Salary payout of GH¢ ${pay.netSalary.toLocaleString()} for ${pay.staffName} disbursed.` });
                                 }}
                                 className={`px-2.5 py-1 font-extrabold rounded text-[10px] cursor-pointer flex items-center space-x-1 inline-flex ${
-                                  session?.role === "super_admin"
-                                    ? "bg-amber-600 hover:bg-amber-700 text-white"
-                                    : "bg-slate-200 dark:bg-slate-800 text-slate-500"
+                                  session?.role === 'super_admin'
+                                    ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
                                 }`}
                               >
                                 <ShieldCheck size={11} />
-                                <span>
-                                  {session?.role === "super_admin"
-                                    ? "Super Admin Disburse"
-                                    : "Requires Super Admin"}
-                                </span>
+                                <span>{session?.role === 'super_admin' ? 'Super Admin Disburse' : 'Requires Super Admin'}</span>
                               </button>
                             )}
                             <button
@@ -4227,20 +3171,14 @@ export default function AdminDashboard({
           {/* ==================== VIEW PASYLIP DRAWER MODAL ==================== */}
           {selectedPayrollStaff && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-              <div
-                className={`w-full max-w-2xl rounded-2xl shadow-2xl border flex flex-col overflow-hidden max-h-[90vh] ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800"
-                    : "bg-white border-slate-100"
-                }`}
-              >
+              <div className={`w-full max-w-2xl rounded-2xl shadow-2xl border flex flex-col overflow-hidden max-h-[90vh] ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+              }`}>
                 {/* Header */}
                 <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                   <div className="flex items-center space-x-2">
                     <Printer size={16} className="text-emerald-600" />
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">
-                      Edweso Royal Academy Payslip
-                    </span>
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">Edweso Royal Academy Payslip</span>
                   </div>
                   <button
                     onClick={() => setSelectedPayrollStaff(null)}
@@ -4254,52 +3192,25 @@ export default function AdminDashboard({
                 <div className="p-6 overflow-y-auto space-y-6 text-slate-700 dark:text-slate-300">
                   {/* Letterhead */}
                   <div className="text-center space-y-1">
-                    <h2 className="font-display font-black text-slate-900 dark:text-white uppercase tracking-wider text-base">
-                      Edweso Royal Academy
-                    </h2>
-                    <p className="text-[10px] font-bold text-slate-400">
-                      P.O. Box 45, Ejisu-Edweso, Ashanti Region, Ghana
-                    </p>
-                    <p className="text-[9px] font-mono text-slate-500">
-                      TEL: +233 24 357 8980 • EMAIL: payroll@edwesocode.edu.gh
-                    </p>
+                    <h2 className="font-display font-black text-slate-900 dark:text-white uppercase tracking-wider text-base">Edweso Royal Academy</h2>
+                    <p className="text-[10px] font-bold text-slate-400">P.O. Box 45, Ejisu-Edweso, Ashanti Region, Ghana</p>
+                    <p className="text-[9px] font-mono text-slate-500">TEL: +233 24 357 8980 • EMAIL: payroll@edwesocode.edu.gh</p>
                     <div className="h-[2px] bg-indigo-600 w-1/3 mx-auto mt-2" />
                   </div>
 
                   {/* Metadata Grid */}
                   <div className="grid grid-cols-2 gap-4 text-xs pt-4 border-t border-slate-200/50 dark:border-slate-800/50">
                     <div>
-                      <span className="text-[9px] uppercase font-bold text-slate-400 block">
-                        Employee Information
-                      </span>
-                      <div className="font-bold text-slate-900 dark:text-white mt-0.5">
-                        {selectedPayrollStaff.staffName}
-                      </div>
-                      <div className="text-slate-500 font-medium">
-                        Role: {selectedPayrollStaff.role}
-                      </div>
-                      <div className="text-slate-500 font-mono">
-                        ID: {selectedPayrollStaff.staffId}
-                      </div>
+                      <span className="text-[9px] uppercase font-bold text-slate-400 block">Employee Information</span>
+                      <div className="font-bold text-slate-900 dark:text-white mt-0.5">{selectedPayrollStaff.staffName}</div>
+                      <div className="text-slate-500 font-medium">Role: {selectedPayrollStaff.role}</div>
+                      <div className="text-slate-500 font-mono">ID: {selectedPayrollStaff.staffId}</div>
                     </div>
                     <div className="text-right">
-                      <span className="text-[9px] uppercase font-bold text-slate-400 block">
-                        Payment Particulars
-                      </span>
-                      <div className="font-bold text-slate-900 dark:text-white mt-0.5">
-                        Pay Period: July 2026
-                      </div>
-                      <div className="text-slate-500 font-semibold">
-                        Status:{" "}
-                        <span className="text-emerald-600">
-                          {selectedPayrollStaff.status}
-                        </span>
-                      </div>
-                      {selectedPayrollStaff.processedOn && (
-                        <div className="text-slate-400 font-mono text-[10px]">
-                          Processed: {selectedPayrollStaff.processedOn}
-                        </div>
-                      )}
+                      <span className="text-[9px] uppercase font-bold text-slate-400 block">Payment Particulars</span>
+                      <div className="font-bold text-slate-900 dark:text-white mt-0.5">Pay Period: July 2026</div>
+                      <div className="text-slate-500 font-semibold">Status: <span className="text-emerald-600">{selectedPayrollStaff.status}</span></div>
+                      {selectedPayrollStaff.processedOn && <div className="text-slate-400 font-mono text-[10px]">Processed: {selectedPayrollStaff.processedOn}</div>}
                     </div>
                   </div>
 
@@ -4309,21 +3220,15 @@ export default function AdminDashboard({
                       <div>Earnings Item</div>
                       <div className="text-right">Amount (GHS)</div>
                     </div>
-
+                    
                     <div className="divide-y divide-slate-100 dark:divide-slate-800">
                       <div className="grid grid-cols-2 p-2.5 font-medium">
                         <div>Basic Salary</div>
-                        <div className="text-right font-mono font-bold">
-                          GH¢{" "}
-                          {selectedPayrollStaff.basicSalary.toLocaleString()}.00
-                        </div>
+                        <div className="text-right font-mono font-bold">GH¢ {selectedPayrollStaff.basicSalary.toLocaleString()}.00</div>
                       </div>
                       <div className="grid grid-cols-2 p-2.5 font-medium text-emerald-600 dark:text-emerald-400">
                         <div>Transport & Housing Allowance</div>
-                        <div className="text-right font-mono font-bold">
-                          GH¢ {selectedPayrollStaff.allowances.toLocaleString()}
-                          .00
-                        </div>
+                        <div className="text-right font-mono font-bold">GH¢ {selectedPayrollStaff.allowances.toLocaleString()}.00</div>
                       </div>
                     </div>
 
@@ -4335,41 +3240,23 @@ export default function AdminDashboard({
                     <div className="divide-y divide-slate-100 dark:divide-slate-800">
                       <div className="grid grid-cols-2 p-2.5 font-medium text-rose-500">
                         <div>SSNIT Employee Contribution (5.5%)</div>
-                        <div className="text-right font-mono font-bold">
-                          GH¢{" "}
-                          {Math.floor(selectedPayrollStaff.basicSalary * 0.055)}
-                          .00
-                        </div>
+                        <div className="text-right font-mono font-bold">GH¢ {Math.floor(selectedPayrollStaff.basicSalary * 0.055)}.00</div>
                       </div>
                       <div className="grid grid-cols-2 p-2.5 font-medium text-rose-500">
                         <div>PAYE Income Tax Deduction</div>
-                        <div className="text-right font-mono font-bold">
-                          GH¢{" "}
-                          {selectedPayrollStaff.deductions -
-                            Math.floor(
-                              selectedPayrollStaff.basicSalary * 0.055,
-                            )}
-                          .00
-                        </div>
+                        <div className="text-right font-mono font-bold">GH¢ {selectedPayrollStaff.deductions - Math.floor(selectedPayrollStaff.basicSalary * 0.055)}.00</div>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 bg-indigo-50 dark:bg-indigo-950/20 p-3 border-t border-slate-200 dark:border-slate-800 font-extrabold text-sm text-indigo-700 dark:text-indigo-300">
                       <div>Net Payable Salary</div>
-                      <div className="text-right font-mono font-black">
-                        GH¢ {selectedPayrollStaff.netSalary.toLocaleString()}.00
-                      </div>
+                      <div className="text-right font-mono font-black">GH¢ {selectedPayrollStaff.netSalary.toLocaleString()}.00</div>
                     </div>
                   </div>
 
                   {/* Legal/Compliance notice */}
                   <div className="p-3 bg-indigo-50/40 dark:bg-slate-950/40 rounded-lg text-[10px] text-slate-500 leading-relaxed border border-indigo-100/20">
-                    <strong>Notice:</strong> This electronic payslip acts as a
-                    legal receipt of earnings paid into your registered GCB Bank
-                    / Consolidated Bank Ghana (CBG) account. Income tax
-                    deductions (PAYE) are remitted directly to the Ghana Revenue
-                    Authority (GRA) in compliance with the Income Tax Act, 2015
-                    (Act 896).
+                    <strong>Notice:</strong> This electronic payslip acts as a legal receipt of earnings paid into your registered GCB Bank / Consolidated Bank Ghana (CBG) account. Income tax deductions (PAYE) are remitted directly to the Ghana Revenue Authority (GRA) in compliance with the Income Tax Act, 2015 (Act 896).
                   </div>
                 </div>
 
@@ -4395,7 +3282,7 @@ export default function AdminDashboard({
           )}
 
           {/* ==================== STANDARD FACULTY DIRECTORY LIST ==================== */}
-          {teachersActiveSubTab === "list" && (
+          {teachersActiveSubTab === 'list' && (
             <>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4">
                 <div className="max-w-xs w-full relative">
@@ -4407,232 +3294,162 @@ export default function AdminDashboard({
                     onChange={(e) => setTeacherSearch(e.target.value)}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 pl-9 pr-3 text-xs text-slate-800 dark:text-white focus:outline-hidden focus:border-emerald-500 font-semibold"
                   />
-                  <Search
-                    className="absolute left-3 top-2.5 text-slate-400"
-                    size={14}
-                  />
+                  <Search className="absolute left-3 top-2.5 text-slate-400" size={14} />
                 </div>
 
                 {/* Department Filtering Toggles */}
                 <div className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200/40 dark:border-slate-800 shrink-0">
-                  {(["All", "Daycare-JHS", "SHS"] as const).map((dept) => (
+                  {(['All', 'Daycare-JHS', 'SHS'] as const).map((dept) => (
                     <button
                       key={dept}
                       onClick={() => setTeacherDeptFilter(dept)}
                       className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
                         teacherDeptFilter === dept
-                          ? "bg-emerald-600 text-white shadow-xs"
-                          : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                       }`}
                     >
-                      {dept === "All" ? "All Departments" : dept}
+                      {dept === 'All' ? 'All Departments' : dept}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div
-                className={`border rounded-xl overflow-hidden ${isDarkMode ? "bg-slate-900 border-slate-880" : "bg-white border-slate-200/60"}`}
-              >
-                <div className="overflow-x-auto">
-                  <table
-                    id="teachers-registry-table"
-                    className="w-full text-left text-xs border-collapse"
-                  >
-                    <thead>
-                      <tr
-                        className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                      >
-                        <th className="p-3">Faculty Details</th>
-                        <th className="p-3">Staff ID</th>
-                        <th className="p-3">Department</th>
-                        <th className="p-3">Subject Specialty</th>
-                        <th className="p-3">Contact Email</th>
-                        <th className="p-3">Mobile Contact</th>
-                        <th className="p-3">Status</th>
-                        <th className="p-3 text-right">Actions</th>
+          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-880' : 'bg-white border-slate-200/60'}`}>
+            <div className="overflow-x-auto">
+              <table id="teachers-registry-table" className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                    <th className="p-3">Faculty Details</th>
+                    <th className="p-3">Staff ID</th>
+                    <th className="p-3">Department</th>
+                    <th className="p-3">Subject Specialty</th>
+                    <th className="p-3">Contact Email</th>
+                    <th className="p-3">Mobile Contact</th>
+                    <th className="p-3">Status</th>
+                    <th className="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {teachers
+                    .filter(t => t.name.toLowerCase().includes(teacherSearch.toLowerCase()))
+                    .filter(t => {
+                      const dept = t.department || (t.id === 't6' ? 'SHS' : 'Daycare-JHS');
+                      return teacherDeptFilter === 'All' || dept === teacherDeptFilter;
+                    })
+                    .map((teach) => (
+                      <tr key={teach.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
+                        <td className="p-3">
+                          <div className="flex items-center space-x-2.5">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-[10px] text-emerald-800 overflow-hidden border border-slate-200/50 dark:border-slate-800 shrink-0">
+                              {teach.profilePhoto ? (
+                                <img src={teach.profilePhoto} alt={teach.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                              ) : (
+                                teach.name.substring(0, 2).toUpperCase()
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">{teach.name}</p>
+                              <span className="text-[10px] text-slate-400 leading-none mt-0.5 inline-block">{teach.gender}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-3 font-mono text-[10px] text-slate-400">{teach.staffNumber}</td>
+                        <td className="p-3">
+                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                            (teach.department || (teach.id === 't6' ? 'SHS' : 'Daycare-JHS')) === 'SHS'
+                              ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                              : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                          }`}>
+                            {teach.department || (teach.id === 't6' ? 'SHS' : 'Daycare-JHS')}
+                          </span>
+                        </td>
+                        <td className="p-3">
+                          <span className="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">
+                            {teach.subjectId}
+                          </span>
+                        </td>
+                        <td className="p-3">{teach.email}</td>
+                        <td className="p-3 font-semibold">{teach.phone}</td>
+                        <td className="p-3">
+                          <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                            teach.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-rose-500/10 text-rose-600'
+                          }`}>
+                            {teach.status}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right">
+                          <div className="flex items-center justify-end space-x-1.5">
+                            <button
+                              onClick={() => openEditTeacher(teach)}
+                              className="p-1 text-slate-400 hover:text-emerald-600 transition-colors"
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTeacher(teach.id)}
+                              className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {teachers
-                        .filter((t) =>
-                          t.name
-                            .toLowerCase()
-                            .includes(teacherSearch.toLowerCase()),
-                        )
-                        .filter((t) => {
-                          const dept =
-                            t.department ||
-                            (t.id === "t6" ? "SHS" : "Daycare-JHS");
-                          return (
-                            teacherDeptFilter === "All" ||
-                            dept === teacherDeptFilter
-                          );
-                        })
-                        .map((teach) => (
-                          <tr
-                            key={teach.id}
-                            className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300"
-                          >
-                            <td className="p-3">
-                              <div className="flex items-center space-x-2.5">
-                                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-[10px] text-emerald-800 overflow-hidden border border-slate-200/50 dark:border-slate-800 shrink-0">
-                                  {teach.profilePhoto ? (
-                                    <img
-                                      src={teach.profilePhoto}
-                                      alt={teach.name}
-                                      className="w-full h-full object-cover"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  ) : (
-                                    teach.name.substring(0, 2).toUpperCase()
-                                  )}
-                                </div>
-                                <div>
-                                  <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">
-                                    {teach.name}
-                                  </p>
-                                  <span className="text-[10px] text-slate-400 leading-none mt-0.5 inline-block">
-                                    {teach.gender}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="p-3 font-mono text-[10px] text-slate-400">
-                              {teach.staffNumber}
-                            </td>
-                            <td className="p-3">
-                              <span
-                                className={`text-[10px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                                  (teach.department ||
-                                    (teach.id === "t6"
-                                      ? "SHS"
-                                      : "Daycare-JHS")) === "SHS"
-                                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                                    : "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-                                }`}
-                              >
-                                {teach.department ||
-                                  (teach.id === "t6" ? "SHS" : "Daycare-JHS")}
-                              </span>
-                            </td>
-                            <td className="p-3">
-                              <span className="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">
-                                {teach.subjectId}
-                              </span>
-                            </td>
-                            <td className="p-3">{teach.email}</td>
-                            <td className="p-3 font-semibold">{teach.phone}</td>
-                            <td className="p-3">
-                              <span
-                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                                  teach.status === "Active"
-                                    ? "bg-emerald-500/10 text-emerald-600"
-                                    : "bg-rose-500/10 text-rose-600"
-                                }`}
-                              >
-                                {teach.status}
-                              </span>
-                            </td>
-                            <td className="p-3 text-right">
-                              <div className="flex items-center justify-end space-x-1.5">
-                                <button
-                                  onClick={() => openEditTeacher(teach)}
-                                  className="p-1 text-slate-400 hover:text-emerald-600 transition-colors"
-                                >
-                                  <Edit size={14} />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteTeacher(teach.id)}
-                                  className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </>
           )}
+
         </div>
       )}
 
       {/* ==================== 4. CLASSES & SUBJECTS ==================== */}
-      {activeTab === "classes" && (
+      {activeTab === 'classes' && (
         <div className="space-y-6 animate-fade-in">
+          
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-              Ghana Curriculum Class Divisions
-            </h2>
-            <p className="text-xs text-slate-400">
-              Review Form Teachers and syllabus subject lines mapped to academic
-              levels.
-            </p>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Ghana Curriculum Class Divisions</h2>
+            <p className="text-xs text-slate-400">Review Form Teachers and syllabus subject lines mapped to academic levels.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {classes.map((cls) => {
-              const formTeacher = teachers.find((t) => t.id === cls.teacherId);
-              const classSubs = subjects.filter(
-                (sub) => sub.classId === cls.id,
-              );
-
+              const formTeacher = teachers.find(t => t.id === cls.teacherId);
+              const classSubs = subjects.filter(sub => sub.classId === cls.id);
+              
               return (
-                <div
-                  key={cls.id}
-                  className={`p-5 rounded-xl border flex flex-col justify-between ${
-                    isDarkMode
-                      ? "bg-slate-900 border-slate-700"
-                      : "bg-white border-slate-300"
-                  }`}
-                >
+                <div key={cls.id} className={`p-5 rounded-xl border flex flex-col justify-between ${
+                  isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
+                }`}>
                   <div>
                     <div className="flex justify-between items-start pb-3 border-b border-slate-100 dark:border-slate-800">
                       <div>
-                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                          {cls.name}
-                        </h4>
-                        <span className="text-[10px] font-bold text-slate-400">
-                          {cls.gradeLevel} Curriculum
-                        </span>
+                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">{cls.name}</h4>
+                        <span className="text-[10px] font-bold text-slate-400">{cls.gradeLevel} Curriculum</span>
                       </div>
-                      <span className="text-[10px] bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded font-mono font-bold">
-                        {cls.room}
-                      </span>
+                      <span className="text-[10px] bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded font-mono font-bold">{cls.room}</span>
                     </div>
 
                     <div className="my-4 space-y-3">
                       <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block">
-                          Form Teacher
-                        </span>
-                        <p className="text-xs font-bold mt-0.5 text-emerald-700 dark:text-emerald-300">
-                          {formTeacher ? formTeacher.name : "Unassigned"}
-                        </p>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block">Form Teacher</span>
+                        <p className="text-xs font-bold mt-0.5 text-emerald-700 dark:text-emerald-300">{formTeacher ? formTeacher.name : 'Unassigned'}</p>
                       </div>
 
                       <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">
-                          Subjects Tracked
-                        </span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Subjects Tracked</span>
                         <div className="flex flex-wrap gap-1">
                           {classSubs.length > 0 ? (
-                            classSubs.map((s) => (
-                              <span
-                                key={s.id}
-                                className="text-[9px] bg-slate-50 dark:bg-slate-950 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-800 font-semibold text-slate-600 dark:text-slate-300"
-                              >
+                            classSubs.map(s => (
+                              <span key={s.id} className="text-[9px] bg-slate-50 dark:bg-slate-950 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-800 font-semibold text-slate-600 dark:text-slate-300">
                                 {s.name} ({s.code})
                               </span>
                             ))
                           ) : (
-                            <span className="text-[10px] text-slate-400 italic">
-                              No custom subject nodes registered.
-                            </span>
+                            <span className="text-[10px] text-slate-400 italic">No custom subject nodes registered.</span>
                           )}
                         </div>
                       </div>
@@ -4640,79 +3457,51 @@ export default function AdminDashboard({
                   </div>
 
                   <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex justify-between items-center">
-                    <span className="text-[10px] text-slate-400">
-                      Active Register
-                    </span>
-                    <span className="text-xs font-bold">
-                      {students.filter((s) => s.classId === cls.id).length}{" "}
-                      Students
-                    </span>
+                    <span className="text-[10px] text-slate-400">Active Register</span>
+                    <span className="text-xs font-bold">{students.filter(s => s.classId === cls.id).length} Students</span>
                   </div>
                 </div>
               );
             })}
           </div>
+
         </div>
       )}
 
       {/* ==================== 5. ATTENDANCE system ==================== */}
-      {activeTab === "attendance" && (
+      {activeTab === 'attendance' && (
         <div className="space-y-4 animate-fade-in">
+          
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-              Daily Attendance Registers
-            </h2>
-            <p className="text-xs text-slate-400">
-              Review roll call records logged by classroom Form Teachers.
-            </p>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Daily Attendance Registers</h2>
+            <p className="text-xs text-slate-400">Review roll call records logged by classroom Form Teachers.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {classes.map((cls) => {
-              const clsStudents = students.filter((s) => s.classId === cls.id);
-              const clsAttendance = attendance.filter(
-                (a) => a.classId === cls.id && a.date === "2026-07-02",
-              );
-              const presentCount = clsAttendance.filter(
-                (a) => a.status === "Present",
-              ).length;
-              const lateCount = clsAttendance.filter(
-                (a) => a.status === "Late",
-              ).length;
-              const absentCount = clsAttendance.filter(
-                (a) => a.status === "Absent",
-              ).length;
+              const clsStudents = students.filter(s => s.classId === cls.id);
+              const clsAttendance = attendance.filter(a => a.classId === cls.id && a.date === '2026-07-02');
+              const presentCount = clsAttendance.filter(a => a.status === 'Present').length;
+              const lateCount = clsAttendance.filter(a => a.status === 'Late').length;
+              const absentCount = clsAttendance.filter(a => a.status === 'Absent').length;
 
               return (
-                <div
-                  key={cls.id}
-                  className={`p-4 rounded-xl border ${
-                    isDarkMode
-                      ? "bg-slate-900 border-slate-800"
-                      : "bg-white border-slate-100"
-                  }`}
-                >
-                  <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-3 text-slate-900 dark:text-white">
-                    {cls.name} Register (Today)
-                  </h4>
-
+                <div key={cls.id} className={`p-4 rounded-xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                }`}>
+                  <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-3 text-slate-900 dark:text-white">{cls.name} Register (Today)</h4>
+                  
                   <div className="grid grid-cols-3 gap-2 text-center text-xs mb-4">
                     <div className="bg-emerald-500/10 p-2 rounded">
-                      <span className="font-bold text-emerald-600 block">
-                        {presentCount}
-                      </span>
+                      <span className="font-bold text-emerald-600 block">{presentCount}</span>
                       <span className="text-[9px] text-slate-400">Present</span>
                     </div>
                     <div className="bg-amber-500/10 p-2 rounded">
-                      <span className="font-bold text-amber-600 block">
-                        {lateCount}
-                      </span>
+                      <span className="font-bold text-amber-600 block">{lateCount}</span>
                       <span className="text-[9px] text-slate-400">Late</span>
                     </div>
                     <div className="bg-rose-500/10 p-2 rounded">
-                      <span className="font-bold text-rose-600 block">
-                        {absentCount}
-                      </span>
+                      <span className="font-bold text-rose-600 block">{absentCount}</span>
                       <span className="text-[9px] text-slate-400">Absent</span>
                     </div>
                   </div>
@@ -4720,34 +3509,27 @@ export default function AdminDashboard({
                   <div className="border-t border-slate-100 dark:border-slate-800 pt-2 flex items-center justify-between text-[11px] text-slate-400">
                     <span>Overall Rate:</span>
                     <span className="font-bold text-slate-800 dark:text-white">
-                      {clsStudents.length > 0
-                        ? Math.round(
-                            ((presentCount + lateCount) / clsStudents.length) *
-                              100,
-                          )
-                        : 0}
-                      %
+                      {clsStudents.length > 0 
+                        ? Math.round(((presentCount + lateCount) / clsStudents.length) * 100) 
+                        : 0}%
                     </span>
                   </div>
                 </div>
               );
             })}
           </div>
+
         </div>
       )}
 
       {/* ==================== 6. EXAMS & GRADES (GES Standards) ==================== */}
-      {activeTab === "grades" && (
+      {activeTab === 'grades' && (
         <div className="space-y-4 animate-fade-in">
+          
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                Terminal Examinations & Continual Assessments
-              </h2>
-              <p className="text-xs text-slate-400">
-                GES Class Score (30%) & Exam Score (70%) record collation
-                sheets.
-              </p>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Terminal Examinations & Continual Assessments</h2>
+              <p className="text-xs text-slate-400">GES Class Score (30%) & Exam Score (70%) record collation sheets.</p>
             </div>
             <button
               onClick={() => setIsGradeModalOpen(true)}
@@ -4762,57 +3544,40 @@ export default function AdminDashboard({
           {/* Filtering selection */}
           <div className="grid grid-cols-2 gap-3 max-w-md">
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                Select Class Grade
-              </label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Select Class Grade</label>
               <select
                 id="grade-class-filter"
                 value={gradeClassFilter}
                 onChange={(e) => setGradeClassFilter(e.target.value)}
                 className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 px-3 text-xs focus:outline-hidden focus:border-emerald-500 font-semibold text-slate-700 dark:text-white"
               >
-                {classes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
+                {classes.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                Select Curriculum Subject
-              </label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Select Curriculum Subject</label>
               <select
                 id="grade-subject-filter"
                 value={gradeSubjectFilter}
                 onChange={(e) => setGradeSubjectFilter(e.target.value)}
                 className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 px-3 text-xs focus:outline-hidden focus:border-emerald-500 font-semibold text-slate-700 dark:text-white"
               >
-                {subjects
-                  .filter((s) => s.classId === gradeClassFilter)
-                  .map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
+                {subjects.filter(s => s.classId === gradeClassFilter).map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
               </select>
             </div>
           </div>
 
           {/* Collated Grades Table */}
-          <div
-            className={`border rounded-xl overflow-hidden ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60"}`}
-          >
+          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
             <div className="overflow-x-auto">
-              <table
-                id="grades-ledger-table"
-                className="w-full text-left text-xs border-collapse"
-              >
+              <table id="grades-ledger-table" className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr
-                    className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                  >
+                  <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                     <th className="p-3">Student Name</th>
                     <th className="p-3">Assessment score (Max 30)</th>
                     <th className="p-3">Exam score (Max 70)</th>
@@ -4823,63 +3588,34 @@ export default function AdminDashboard({
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {students
-                    .filter((s) => s.classId === gradeClassFilter)
-                    .map((student) => {
-                      const studentGrade = grades.find(
-                        (g) =>
-                          g.studentId === student.id &&
-                          g.subjectId === gradeSubjectFilter,
-                      );
+                    .filter(s => s.classId === gradeClassFilter)
+                    .map(student => {
+                      const studentGrade = grades.find(g => g.studentId === student.id && g.subjectId === gradeSubjectFilter);
                       return (
-                        <tr
-                          key={student.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300"
-                        >
-                          <td className="p-3 font-extrabold text-slate-900 dark:text-white">
-                            {student.name}
-                          </td>
-                          <td className="p-3 font-mono font-semibold">
-                            {studentGrade
-                              ? `${studentGrade.classScore} / 30`
-                              : "—"}
-                          </td>
-                          <td className="p-3 font-mono font-semibold">
-                            {studentGrade
-                              ? `${studentGrade.examScore} / 70`
-                              : "—"}
-                          </td>
+                        <tr key={student.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
+                          <td className="p-3 font-extrabold text-slate-900 dark:text-white">{student.name}</td>
+                          <td className="p-3 font-mono font-semibold">{studentGrade ? `${studentGrade.classScore} / 30` : '—'}</td>
+                          <td className="p-3 font-mono font-semibold">{studentGrade ? `${studentGrade.examScore} / 70` : '—'}</td>
                           <td className="p-3 font-bold font-mono text-emerald-700 dark:text-emerald-400">
-                            {studentGrade ? `${studentGrade.totalScore}%` : "—"}
+                            {studentGrade ? `${studentGrade.totalScore}%` : '—'}
                           </td>
                           <td className="p-3">
                             {studentGrade ? (
-                              <span
-                                className={`text-[10px] font-extrabold px-2 py-0.5 rounded font-mono ${
-                                  studentGrade.grade === "A" ||
-                                  studentGrade.grade === "B"
-                                    ? "bg-emerald-500/10 text-emerald-600"
-                                    : studentGrade.grade === "C" ||
-                                        studentGrade.grade === "D"
-                                      ? "bg-amber-500/10 text-amber-600"
-                                      : "bg-rose-500/10 text-rose-600"
-                                }`}
-                              >
+                              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded font-mono ${
+                                studentGrade.grade === 'A' || studentGrade.grade === 'B' 
+                                  ? 'bg-emerald-500/10 text-emerald-600' 
+                                  : studentGrade.grade === 'C' || studentGrade.grade === 'D'
+                                    ? 'bg-amber-500/10 text-amber-600'
+                                    : 'bg-rose-500/10 text-rose-600'
+                              }`}>
                                 {studentGrade.grade}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-slate-400 italic">
-                                Not Inputted
-                              </span>
+                              <span className="text-[10px] text-slate-400 italic">Not Inputted</span>
                             )}
                           </td>
                           <td className="p-3 text-slate-500 dark:text-slate-400">
-                            {studentGrade ? (
-                              studentGrade.remarks
-                            ) : (
-                              <span className="text-[10px] italic text-slate-400">
-                                Assessments pending submission.
-                              </span>
-                            )}
+                            {studentGrade ? studentGrade.remarks : <span className="text-[10px] italic text-slate-400">Assessments pending submission.</span>}
                           </td>
                         </tr>
                       );
@@ -4888,21 +3624,18 @@ export default function AdminDashboard({
               </table>
             </div>
           </div>
+
         </div>
       )}
 
       {/* ==================== 7. TIMETABLE SCHEDULER ==================== */}
-      {activeTab === "timetable" && (
+      {activeTab === 'timetable' && (
         <div className="space-y-4 animate-fade-in">
+          
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                Daily Subject Block Calendars
-              </h2>
-              <p className="text-xs text-slate-400">
-                Establish and modify lesson hour tracks for different
-                classrooms.
-              </p>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Daily Subject Block Calendars</h2>
+              <p className="text-xs text-slate-400">Establish and modify lesson hour tracks for different classrooms.</p>
             </div>
             <button
               onClick={() => setIsTimetableModalOpen(true)}
@@ -4921,87 +3654,59 @@ export default function AdminDashboard({
               onChange={(e) => setGradeClassFilter(e.target.value)}
               className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/40 dark:border-slate-800 rounded-lg py-2 px-3 text-xs focus:outline-hidden focus:border-emerald-500 font-semibold text-slate-700 dark:text-white"
             >
-              {classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name} Calendar
-                </option>
+              {classes.map(c => (
+                <option key={c.id} value={c.id}>{c.name} Calendar</option>
               ))}
             </select>
           </div>
 
           {/* Simple Structured Calendar representation */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map(
-              (day) => {
-                const dayLessons = timetable.filter(
-                  (tt) => tt.classId === gradeClassFilter && tt.day === day,
-                );
-                return (
-                  <div
-                    key={day}
-                    className={`p-4 rounded-xl border flex flex-col justify-start min-h-[160px] ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800"
-                        : "bg-white border-slate-100"
-                    }`}
-                  >
-                    <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-3 text-emerald-800 dark:text-emerald-300">
-                      {day}
-                    </h4>
-
-                    <div className="space-y-2 flex-1">
-                      {dayLessons.length > 0 ? (
-                        dayLessons.map((les) => {
-                          const sub = subjects.find(
-                            (s) => s.id === les.subjectId,
-                          );
-                          const teach = teachers.find(
-                            (t) => t.id === les.teacherId,
-                          );
-                          return (
-                            <div
-                              key={les.id}
-                              onClick={() => setSelectedTimetableEntry(les)}
-                              className="p-2.5 bg-slate-55/40 hover:bg-emerald-50/50 dark:bg-slate-900/20 dark:hover:bg-slate-900/60 rounded-xl border border-slate-100/80 dark:border-slate-800 text-[11px] text-slate-500 cursor-pointer hover:shadow-xs transition-all hover:-translate-y-0.5"
-                            >
-                              <p className="font-bold text-slate-850 dark:text-slate-100">
-                                {sub ? sub.name : "Unknown"}
-                              </p>
-                              <span className="text-[10px] text-slate-400 block mt-1">
-                                {les.startTime} - {les.endTime}
-                              </span>
-                              <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">
-                                {teach ? teach.name : "No Teacher"}
-                              </span>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <span className="text-[10px] text-slate-400 italic block mt-4">
-                          Free Study Block
-                        </span>
-                      )}
-                    </div>
+            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
+              const dayLessons = timetable.filter(tt => tt.classId === gradeClassFilter && tt.day === day);
+              return (
+                <div key={day} className={`p-4 rounded-xl border flex flex-col justify-start min-h-[160px] ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
+                }`}>
+                  <h4 className="font-extrabold text-xs uppercase tracking-wide border-b pb-2 mb-3 text-emerald-800 dark:text-emerald-300">{day}</h4>
+                  
+                  <div className="space-y-2 flex-1">
+                    {dayLessons.length > 0 ? (
+                      dayLessons.map(les => {
+                        const sub = subjects.find(s => s.id === les.subjectId);
+                        const teach = teachers.find(t => t.id === les.teacherId);
+                        return (
+                          <div 
+                            key={les.id} 
+                            onClick={() => setSelectedTimetableEntry(les)}
+                            className="p-2.5 bg-slate-55/40 hover:bg-emerald-50/50 dark:bg-slate-900/20 dark:hover:bg-slate-900/60 rounded-xl border border-slate-100/80 dark:border-slate-800 text-[11px] text-slate-500 cursor-pointer hover:shadow-xs transition-all hover:-translate-y-0.5"
+                          >
+                            <p className="font-bold text-slate-850 dark:text-slate-100">{sub ? sub.name : 'Unknown'}</p>
+                            <span className="text-[10px] text-slate-400 block mt-1">{les.startTime} - {les.endTime}</span>
+                            <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">{teach ? teach.name : 'No Teacher'}</span>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <span className="text-[10px] text-slate-400 italic block mt-4">Free Study Block</span>
+                    )}
                   </div>
-                );
-              },
-            )}
+                </div>
+              );
+            })}
           </div>
+
         </div>
       )}
 
       {/* ==================== 8. ANNOUNCEMENTS system ==================== */}
-      {activeTab === "announcements" && (
+      {activeTab === 'announcements' && (
         <div className="space-y-4 animate-fade-in">
+          
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/40">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                Announcements & Bulletins
-              </h2>
-              <p className="text-xs text-slate-400">
-                Broadcast official school bulletins to parents, teachers, and
-                students.
-              </p>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Announcements & Bulletins</h2>
+              <p className="text-xs text-slate-400">Broadcast official school bulletins to parents, teachers, and students.</p>
             </div>
             <button
               onClick={() => setIsNoticeModalOpen(true)}
@@ -5015,40 +3720,31 @@ export default function AdminDashboard({
 
           {/* Featured swipeable bulletins carousel */}
           <div className="mb-6">
-            <FeaturedAnnouncementsCarousel
-              announcements={announcements}
+            <FeaturedAnnouncementsCarousel 
+              announcements={announcements} 
               onDeleteNotice={handleDeleteNotice}
               isAdmin={true}
             />
           </div>
 
           <div className="pt-2 border-t border-slate-200/40">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3">
-              All Active Dispatches
-            </h3>
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3">All Active Dispatches</h3>
           </div>
 
           <div className="space-y-4">
             {announcements.map((ann) => (
-              <div
-                key={ann.id}
-                className={`p-5 rounded-xl border relative overflow-hidden ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-700"
-                    : "bg-white border-slate-300"
-                }`}
-              >
+              <div key={ann.id} className={`p-5 rounded-xl border relative overflow-hidden ${
+                isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
+              }`}>
                 {/* Accent colored marker for visual appeal */}
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-600"></div>
-
+                
                 <div className="flex justify-between items-start pl-2">
                   <div>
                     <span className="text-[9px] font-extrabold bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded uppercase">
                       Target: {ann.targetAudience}
                     </span>
-                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-white mt-1.5">
-                      {ann.title}
-                    </h3>
+                    <h3 className="font-extrabold text-sm text-slate-900 dark:text-white mt-1.5">{ann.title}</h3>
                   </div>
                   <div className="flex items-center space-x-3 text-[11px] text-slate-400 font-medium">
                     <span>{ann.date}</span>
@@ -5062,94 +3758,81 @@ export default function AdminDashboard({
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-600 dark:text-slate-300 pl-2 mt-2 leading-relaxed whitespace-pre-line">
-                  {ann.content}
-                </p>
-
+                <p className="text-xs text-slate-600 dark:text-slate-300 pl-2 mt-2 leading-relaxed whitespace-pre-line">{ann.content}</p>
+                
                 <div className="border-t border-slate-100 dark:border-slate-800/80 mt-4 pt-2.5 pl-2 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
-                  <span>
-                    Author: {ann.authorName} ({ann.authorRole})
-                  </span>
+                  <span>Author: {ann.authorName} ({ann.authorRole})</span>
                   <span>Edweso Royal Academy official dispatch</span>
                 </div>
               </div>
             ))}
           </div>
+
         </div>
       )}
 
       {/* ==================== 9. PAYMENTS & FEES MANAGEMENTS ==================== */}
-      {activeTab === "payments" && (
+      {activeTab === 'payments' && (
         <div className="space-y-6 animate-fade-in">
+          
           <div className="pb-3 border-b border-slate-200/40 flex flex-col gap-4">
             <div>
-              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                Payments & Gateway Integration
-              </h2>
-              <p className="text-xs text-slate-400">
-                Review real-time collection transaction ledgers, specify bank
-                payout endpoints, or configure custom Paystack keys.
-              </p>
+              <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Payments & Gateway Integration</h2>
+              <p className="text-xs text-slate-400">Review real-time collection transaction ledgers, specify bank payout endpoints, or configure custom Paystack keys.</p>
             </div>
-
+            
             {/* Sub-tab Selection Buttons */}
             <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-lg border border-slate-200/40 dark:border-slate-800 w-fit">
               <button
-                onClick={() => setPaymentsSubTab("ledger")}
+                onClick={() => setPaymentsSubTab('ledger')}
                 className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
-                  paymentsSubTab === "ledger"
-                    ? "bg-emerald-600 text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  paymentsSubTab === 'ledger'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <History size={12} />
                 <span>Transaction Ledger</span>
               </button>
               <button
-                onClick={() => setPaymentsSubTab("pending-verification")}
+                onClick={() => setPaymentsSubTab('pending-verification')}
                 className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
-                  paymentsSubTab === "pending-verification"
-                    ? "bg-emerald-600 text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  paymentsSubTab === 'pending-verification'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <ShieldCheck size={12} />
-                <span>
-                  Pending Verification (
-                  {transactions.filter((t) => t.status === "Pending").length})
-                </span>
+                <span>Pending Verification ({transactions.filter(t => t.status === 'Pending').length})</span>
               </button>
               <button
-                onClick={() => setPaymentsSubTab("manual-approvals")}
+                onClick={() => setPaymentsSubTab('manual-approvals')}
                 className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
-                  paymentsSubTab === "manual-approvals"
-                    ? "bg-emerald-600 text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  paymentsSubTab === 'manual-approvals'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <FileText size={12} />
-                <span>
-                  Manual Approvals (
-                  {manualPayments.filter((p) => p.status === "Pending").length})
-                </span>
+                <span>Manual Approvals ({manualPayments.filter(p => p.status === 'Pending').length})</span>
               </button>
               <button
-                onClick={() => setPaymentsSubTab("bank-setup")}
+                onClick={() => setPaymentsSubTab('bank-setup')}
                 className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
-                  paymentsSubTab === "bank-setup"
-                    ? "bg-emerald-600 text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  paymentsSubTab === 'bank-setup'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <CreditCard size={12} />
                 <span>Bank & Payout Link</span>
               </button>
               <button
-                onClick={() => setPaymentsSubTab("scheduler")}
+                onClick={() => setPaymentsSubTab('scheduler')}
                 className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center space-x-1 ${
-                  paymentsSubTab === "scheduler"
-                    ? "bg-emerald-600 text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  paymentsSubTab === 'scheduler'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
                 <Calendar size={12} />
@@ -5158,1432 +3841,1022 @@ export default function AdminDashboard({
             </div>
           </div>
 
-          {paymentsSubTab === "ledger" &&
-            (() => {
-              // Apply filtering logic to transactions
-              const filteredTransactions = transactions
-                .filter((tx) => {
-                  const query = ledgerSearchQuery.toLowerCase().trim();
-                  const matchesSearch =
-                    !query ||
-                    tx.studentName.toLowerCase().includes(query) ||
-                    tx.reference.toLowerCase().includes(query) ||
-                    tx.paystackRef.toLowerCase().includes(query) ||
-                    tx.email.toLowerCase().includes(query);
+          {paymentsSubTab === 'ledger' && (() => {
+            // Apply filtering logic to transactions
+            const filteredTransactions = transactions.filter(tx => {
+              const query = ledgerSearchQuery.toLowerCase().trim();
+              const matchesSearch = !query || 
+                tx.studentName.toLowerCase().includes(query) ||
+                tx.reference.toLowerCase().includes(query) ||
+                tx.paystackRef.toLowerCase().includes(query) ||
+                tx.email.toLowerCase().includes(query);
 
-                  const matchesStatus =
-                    ledgerStatusFilter === "All" ||
-                    tx.status === ledgerStatusFilter;
-                  const matchesMethod =
-                    ledgerMethodFilter === "All" ||
-                    tx.paymentMethod === ledgerMethodFilter;
-                  const matchesTerm =
-                    ledgerTermFilter === "All" || tx.term === ledgerTermFilter;
+              const matchesStatus = ledgerStatusFilter === 'All' || tx.status === ledgerStatusFilter;
+              const matchesMethod = ledgerMethodFilter === 'All' || tx.paymentMethod === ledgerMethodFilter;
+              const matchesTerm = ledgerTermFilter === 'All' || tx.term === ledgerTermFilter;
 
-                  return (
-                    matchesSearch &&
-                    matchesStatus &&
-                    matchesMethod &&
-                    matchesTerm
-                  );
-                })
-                .sort((a, b) => {
-                  let comparison = 0;
-                  if (ledgerSortField === "date") {
-                    comparison = a.date.localeCompare(b.date);
-                  } else if (ledgerSortField === "amount") {
-                    comparison = a.amountGHS - b.amountGHS;
-                  } else if (ledgerSortField === "studentName") {
-                    comparison = a.studentName.localeCompare(b.studentName);
-                  }
-                  return ledgerSortOrder === "desc" ? -comparison : comparison;
-                });
+              return matchesSearch && matchesStatus && matchesMethod && matchesTerm;
+            }).sort((a, b) => {
+              let comparison = 0;
+              if (ledgerSortField === 'date') {
+                comparison = a.date.localeCompare(b.date);
+              } else if (ledgerSortField === 'amount') {
+                comparison = a.amountGHS - b.amountGHS;
+              } else if (ledgerSortField === 'studentName') {
+                comparison = a.studentName.localeCompare(b.studentName);
+              }
+              return ledgerSortOrder === 'desc' ? -comparison : comparison;
+            });
 
-              // Calculate ratios or sub-stats for our widgets
-              const successfulCount = transactions.filter(
-                (t) => t.status === "Successful",
-              ).length;
-              const cardCount = transactions.filter(
-                (t) => t.status === "Successful" && t.paymentMethod === "Card",
-              ).length;
-              const momoCount = transactions.filter(
-                (t) => t.status === "Successful" && t.paymentMethod !== "Card",
-              ).length;
-              const momoPercentage =
-                successfulCount > 0
-                  ? Math.round((momoCount / successfulCount) * 100)
-                  : 80;
+            // Calculate ratios or sub-stats for our widgets
+            const successfulCount = transactions.filter(t => t.status === 'Successful').length;
+            const cardCount = transactions.filter(t => t.status === 'Successful' && t.paymentMethod === 'Card').length;
+            const momoCount = transactions.filter(t => t.status === 'Successful' && t.paymentMethod !== 'Card').length;
+            const momoPercentage = successfulCount > 0 ? Math.round((momoCount / successfulCount) * 100) : 80;
 
-              const handleSweepFunds = () => {
-                setIsSweeping(true);
-                setSweepSuccess(false);
+            const handleSweepFunds = () => {
+              setIsSweeping(true);
+              setSweepSuccess(false);
+              setTimeout(() => {
+                setIsSweeping(false);
+                setSweepSuccess(true);
                 setTimeout(() => {
-                  setIsSweeping(false);
-                  setSweepSuccess(true);
-                  setTimeout(() => {
-                    setSweepSuccess(false);
-                  }, 5000);
-                }, 1500);
-              };
+                  setSweepSuccess(false);
+                }, 5000);
+              }, 1500);
+            };
 
-              return (
-                <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
-                  {/* Paystack Integration Active Alert Info */}
-                  <div className="p-3.5 rounded-xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-between flex-wrap gap-2 text-xs">
-                    <div className="flex items-center space-x-2.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <div>
-                        <span className="font-extrabold text-slate-900 dark:text-white uppercase text-[10px]">
-                          Live Paystack Webhook synchronized
-                        </span>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                          Listening for mobile money callbacks and card charge
-                          events on 0.0.0.0:3000/api/paystack-webhook
-                        </p>
-                      </div>
+            return (
+              <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
+                {/* Paystack Integration Active Alert Info */}
+                <div className="p-3.5 rounded-xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-between flex-wrap gap-2 text-xs">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <div>
+                      <span className="font-extrabold text-slate-900 dark:text-white uppercase text-[10px]">Live Paystack Webhook synchronized</span>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Listening for mobile money callbacks and card charge events on 0.0.0.0:3000/api/paystack-webhook</p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-[9px] font-mono bg-slate-100 dark:bg-slate-950 px-2 py-1 rounded text-slate-500 border border-slate-200/40 dark:border-slate-800 font-bold">
-                        MODE: SIMULATED LIVE
-                      </span>
-                      <button
-                        onClick={() => setIsSimulatePaymentModalOpen(true)}
-                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-md transition-all cursor-pointer flex items-center space-x-1"
-                      >
-                        <Sparkles size={11} className="animate-pulse" />
-                        <span>Simulate Paystack Deposit</span>
-                      </button>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[9px] font-mono bg-slate-100 dark:bg-slate-950 px-2 py-1 rounded text-slate-500 border border-slate-200/40 dark:border-slate-800 font-bold">MODE: SIMULATED LIVE</span>
+                    <button 
+                      onClick={() => setIsSimulatePaymentModalOpen(true)}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-md transition-all cursor-pointer flex items-center space-x-1"
+                    >
+                      <Sparkles size={11} className="animate-pulse" />
+                      <span>Simulate Paystack Deposit</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Stats Grid with matching styles */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="p-4 rounded-xl bg-slate-900 text-white border border-slate-800 flex flex-col justify-between shadow-xs">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Fees Collected</span>
+                        <History size={14} className="text-emerald-500" />
+                      </div>
+                      <span className="text-2xl font-extrabold font-mono mt-1.5 block text-white">GHS {totalRevenue.toFixed(2)}</span>
+                    </div>
+                    <div className="mt-3 text-[9px] text-slate-400 font-medium">
+                      Mobile Money Ratio: <span className="text-emerald-400 font-bold">{momoPercentage}% MoMo</span> / {100 - momoPercentage}% Cards
                     </div>
                   </div>
 
-                  {/* Quick Stats Grid with matching styles */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-xl bg-slate-900 text-white border border-slate-800 flex flex-col justify-between shadow-xs">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Total Fees Collected
-                          </span>
-                          <History size={14} className="text-emerald-500" />
-                        </div>
-                        <span className="text-2xl font-extrabold font-mono mt-1.5 block text-white">
-                          GHS {totalRevenue.toFixed(2)}
-                        </span>
+                  <div className="p-4 rounded-xl bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Outstanding Balance</span>
+                        <AlertTriangle size={14} className="text-rose-500" />
                       </div>
-                      <div className="mt-3 text-[9px] text-slate-400 font-medium">
-                        Mobile Money Ratio:{" "}
-                        <span className="text-emerald-400 font-bold">
-                          {momoPercentage}% MoMo
-                        </span>{" "}
-                        / {100 - momoPercentage}% Cards
-                      </div>
+                      <span className="text-2xl font-extrabold font-mono mt-1.5 block text-rose-900 dark:text-rose-100">GHS {outstandingFees.toFixed(2)}</span>
                     </div>
-
-                    <div className="p-4 rounded-xl bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider">
-                            Outstanding Balance
-                          </span>
-                          <AlertTriangle size={14} className="text-rose-500" />
-                        </div>
-                        <span className="text-2xl font-extrabold font-mono mt-1.5 block text-rose-900 dark:text-rose-100">
-                          GHS {outstandingFees.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="mt-3 text-[9px] text-rose-500 font-semibold">
-                        Requires active fee collector dunning alerts
-                      </div>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider">
-                            Transaction Count
-                          </span>
-                          <CheckSquare size={14} className="text-sky-500" />
-                        </div>
-                        <span className="text-2xl font-extrabold font-mono mt-1.5 block text-sky-950 dark:text-sky-100">
-                          {transactions.length} total tx
-                        </span>
-                      </div>
-                      <div className="mt-3 text-[9px] text-sky-600 font-semibold flex items-center justify-between">
-                        <span>{successfulCount} Successful</span>
-                        <span>
-                          {
-                            transactions.filter((t) => t.status === "Pending")
-                              .length
-                          }{" "}
-                          Pending
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Paystack Settlement Sweep Widget */}
-                    <div className="p-4 rounded-xl bg-emerald-500/5 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                            Paystack Bank Sweep
-                          </span>
-                          <CreditCard size={14} className="text-emerald-600" />
-                        </div>
-                        <span className="text-2xl font-extrabold font-mono mt-1.5 block text-emerald-900 dark:text-emerald-100">
-                          {sweepSuccess ? "GHS 0.00" : "GHS 12,400.00"}
-                        </span>
-                      </div>
-
-                      <div className="mt-2 flex items-center justify-between">
-                        {isSweeping ? (
-                          <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center space-x-1">
-                            <RefreshCw size={10} className="animate-spin" />
-                            <span>Sweeping to bank...</span>
-                          </span>
-                        ) : sweepSuccess ? (
-                          <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold">
-                            ✓ Settled (Ref: 904-STX)
-                          </span>
-                        ) : (
-                          <span className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold truncate max-w-[130px]">
-                            Payout: GCB Bank *4910
-                          </span>
-                        )}
-
-                        {!isSweeping && !sweepSuccess && (
-                          <button
-                            onClick={handleSweepFunds}
-                            className="text-[9px] bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-1.5 py-0.5 rounded cursor-pointer uppercase transition-colors"
-                          >
-                            Sweep Now
-                          </button>
-                        )}
-                      </div>
+                    <div className="mt-3 text-[9px] text-rose-500 font-semibold">
+                      Requires active fee collector dunning alerts
                     </div>
                   </div>
 
-                  {/* Monthly Cash Flow Trends Chart */}
-                  <div
-                    className={`p-5 rounded-2xl border transition-all ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800"
-                        : "bg-white border-slate-100 shadow-sm"
-                    }`}
-                    id="payments-cashflow-trends-card"
-                  >
-                    <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
-                      <div>
-                        <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                          Academic Year Cash Flow Trends
-                        </h3>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          Monthly breakdown of total fee payments collected
-                          throughout the academic year to track cash flow
-                          trends.
-                        </p>
+                  <div className="p-4 rounded-xl bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Transaction Count</span>
+                        <CheckSquare size={14} className="text-sky-500" />
                       </div>
-                      <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full font-bold">
-                        Cash Flow Analysis
-                      </span>
+                      <span className="text-2xl font-extrabold font-mono mt-1.5 block text-sky-950 dark:text-sky-100">{transactions.length} total tx</span>
                     </div>
-
-                    <div className="h-[200px] w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                          data={monthlyFeeCollections}
-                          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                        >
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                            stroke={isDarkMode ? "#1e293b" : "#f1f5f9"}
-                          />
-                          <XAxis
-                            dataKey="month"
-                            stroke={isDarkMode ? "#64748b" : "#94a3b8"}
-                            fontSize={10}
-                            fontWeight="bold"
-                            tickLine={false}
-                          />
-                          <YAxis
-                            stroke={isDarkMode ? "#64748b" : "#94a3b8"}
-                            fontSize={10}
-                            fontWeight="bold"
-                            tickLine={false}
-                            axisLine={false}
-                            tickFormatter={(v) => `GHS ${v}`}
-                          />
-                          <Tooltip
-                            cursor={{
-                              fill: isDarkMode
-                                ? "rgba(30, 41, 59, 0.4)"
-                                : "rgba(241, 245, 249, 0.6)",
-                            }}
-                            contentStyle={{
-                              backgroundColor: isDarkMode
-                                ? "#0f172a"
-                                : "#ffffff",
-                              borderColor: isDarkMode ? "#1e293b" : "#e2e8f0",
-                              borderRadius: "12px",
-                              fontSize: "11px",
-                              color: isDarkMode ? "#f8fafc" : "#0f172a",
-                              fontWeight: "bold",
-                              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                            }}
-                            formatter={(value: any) => [
-                              `GHS ${Number(value).toLocaleString()}`,
-                              "Collections",
-                            ]}
-                          />
-                          <Bar
-                            name="Collections"
-                            dataKey="Fee Collections (GHS)"
-                            fill="#10b981"
-                            radius={[4, 4, 0, 0]}
-                          >
-                            {monthlyFeeCollections.map((entry, index) => {
-                              const amount = entry["Fee Collections (GHS)"];
-                              const barColor =
-                                amount > 10000 ? "#059669" : "#10b981";
-                              return (
-                                <Cell
-                                  key={`cell-payments-tab-${index}`}
-                                  fill={barColor}
-                                />
-                              );
-                            })}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-emerald-600"></span>{" "}
-                        Peak Collection Volume (&gt;10,000 GHS)
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 ml-2"></span>{" "}
-                        Standard Collection Volume
-                      </span>
-                      <span>
-                        YTD Fee Revenue: GHS{" "}
-                        {monthlyFeeCollections
-                          .reduce(
-                            (sum, item) => sum + item["Fee Collections (GHS)"],
-                            0,
-                          )
-                          .toLocaleString()}
-                      </span>
+                    <div className="mt-3 text-[9px] text-sky-600 font-semibold flex items-center justify-between">
+                      <span>{successfulCount} Successful</span>
+                      <span>{transactions.filter(t => t.status === 'Pending').length} Pending</span>
                     </div>
                   </div>
 
-                  {/* Filter and Search Bar widget */}
-                  <div
-                    className={`p-4 rounded-xl border ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800"
-                        : "bg-slate-50 border-slate-200/60"
-                    } flex flex-col lg:flex-row lg:items-center justify-between gap-3`}
-                  >
-                    {/* Search box with left lookup icon */}
-                    <div className="relative flex-1">
-                      <Search
-                        size={14}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Search Payee Name, Paystack Ref, ID..."
-                        value={ledgerSearchQuery}
-                        onChange={(e) => setLedgerSearchQuery(e.target.value)}
-                        className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 pl-9 pr-4 py-2 rounded-lg text-xs font-medium focus:outline-hidden focus:ring-1 focus:ring-emerald-500 text-slate-800 dark:text-slate-100"
-                      />
-                      {ledgerSearchQuery && (
+                  {/* Paystack Settlement Sweep Widget */}
+                  <div className="p-4 rounded-xl bg-emerald-500/5 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Paystack Bank Sweep</span>
+                        <CreditCard size={14} className="text-emerald-600" />
+                      </div>
+                      <span className="text-2xl font-extrabold font-mono mt-1.5 block text-emerald-900 dark:text-emerald-100">
+                        {sweepSuccess ? 'GHS 0.00' : 'GHS 12,400.00'}
+                      </span>
+                    </div>
+                    
+                    <div className="mt-2 flex items-center justify-between">
+                      {isSweeping ? (
+                        <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center space-x-1">
+                          <RefreshCw size={10} className="animate-spin" />
+                          <span>Sweeping to bank...</span>
+                        </span>
+                      ) : sweepSuccess ? (
+                        <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold">
+                          ✓ Settled (Ref: 904-STX)
+                        </span>
+                      ) : (
+                        <span className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold truncate max-w-[130px]">
+                          Payout: GCB Bank *4910
+                        </span>
+                      )}
+                      
+                      {!isSweeping && !sweepSuccess && (
                         <button
-                          onClick={() => setLedgerSearchQuery("")}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 px-1 rounded font-bold cursor-pointer"
+                          onClick={handleSweepFunds}
+                          className="text-[9px] bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-1.5 py-0.5 rounded cursor-pointer uppercase transition-colors"
                         >
-                          Clear
+                          Sweep Now
                         </button>
                       )}
                     </div>
+                  </div>
+                </div>
 
-                    {/* Filter controls */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="flex items-center space-x-1">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">
-                          Status:
-                        </span>
-                        <select
-                          value={ledgerStatusFilter}
-                          onChange={(e) =>
-                            setLedgerStatusFilter(e.target.value as any)
-                          }
-                          className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
-                        >
-                          <option value="All">All Statuses</option>
-                          <option value="Successful">Successful</option>
-                          <option value="Pending">Pending</option>
-                          <option value="Failed">Failed</option>
-                        </select>
-                      </div>
+                {/* Monthly Cash Flow Trends Chart */}
+                <div className={`p-5 rounded-2xl border transition-all ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-sm'
+                }`} id="payments-cashflow-trends-card">
+                  <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
+                    <div>
+                      <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Academic Year Cash Flow Trends</h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Monthly breakdown of total fee payments collected throughout the academic year to track cash flow trends.</p>
+                    </div>
+                    <span className="text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full font-bold">
+                      Cash Flow Analysis
+                    </span>
+                  </div>
 
-                      <div className="flex items-center space-x-1">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">
-                          Channel:
-                        </span>
-                        <select
-                          value={ledgerMethodFilter}
-                          onChange={(e) =>
-                            setLedgerMethodFilter(e.target.value)
-                          }
-                          className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
-                        >
-                          <option value="All">All Channels</option>
-                          <option value="Card">Visa/Mastercard Card</option>
-                          <option value="MTN Mobile Money">
-                            MTN Mobile Money
-                          </option>
-                          <option value="Telecel Cash">Telecel Cash</option>
-                          <option value="AirtelTigo Money">
-                            AirtelTigo Money
-                          </option>
-                          <option value="Bank Transfer">Bank Transfer</option>
-                        </select>
-                      </div>
-
-                      <div className="flex items-center space-x-1">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">
-                          Term:
-                        </span>
-                        <select
-                          value={ledgerTermFilter}
-                          onChange={(e) =>
-                            setLedgerTermFilter(e.target.value as any)
-                          }
-                          className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
-                        >
-                          <option value="All">All Terms</option>
-                          <option value="Term 1">Term 1</option>
-                          <option value="Term 2">Term 2</option>
-                          <option value="Term 3">Term 3</option>
-                        </select>
-                      </div>
-
-                      {/* Sorting column toggles */}
-                      <div className="flex items-center border border-slate-200 dark:border-slate-850 rounded-lg overflow-hidden bg-white dark:bg-slate-950">
-                        <button
-                          onClick={() => {
-                            if (ledgerSortField === "date") {
-                              setLedgerSortOrder((prev) =>
-                                prev === "asc" ? "desc" : "asc",
-                              );
-                            } else {
-                              setLedgerSortField("date");
-                              setLedgerSortOrder("desc");
-                            }
+                  <div className="h-[200px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={monthlyFeeCollections} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
+                        <XAxis 
+                          dataKey="month" 
+                          stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                          fontSize={10} 
+                          fontWeight="bold"
+                          tickLine={false} 
+                        />
+                        <YAxis 
+                          stroke={isDarkMode ? "#64748b" : "#94a3b8"} 
+                          fontSize={10} 
+                          fontWeight="bold"
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(v) => `GHS ${v}`}
+                        />
+                        <Tooltip 
+                          cursor={{ fill: isDarkMode ? 'rgba(30, 41, 59, 0.4)' : 'rgba(241, 245, 249, 0.6)' }}
+                          contentStyle={{ 
+                            backgroundColor: isDarkMode ? '#0f172a' : '#ffffff', 
+                            borderColor: isDarkMode ? '#1e293b' : '#e2e8f0', 
+                            borderRadius: '12px', 
+                            fontSize: '11px',
+                            color: isDarkMode ? '#f8fafc' : '#0f172a',
+                            fontWeight: 'bold',
+                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                           }}
-                          className={`px-2.5 py-1.5 text-[10px] font-bold uppercase transition-colors flex items-center space-x-0.5 ${
-                            ledgerSortField === "date"
-                              ? "bg-emerald-600 text-white"
-                              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900"
-                          }`}
-                          title="Sort by Date"
-                        >
-                          <span>Date</span>
-                          <span className="text-[8px] font-mono">
-                            {ledgerSortField === "date"
-                              ? ledgerSortOrder === "desc"
-                                ? "▼"
-                                : "▲"
-                              : ""}
-                          </span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (ledgerSortField === "amount") {
-                              setLedgerSortOrder((prev) =>
-                                prev === "asc" ? "desc" : "asc",
+                          formatter={(value: any) => [`GHS ${Number(value).toLocaleString()}`, 'Collections']}
+                        />
+                        <Bar name="Collections" dataKey="Fee Collections (GHS)" fill="#10b981" radius={[4, 4, 0, 0]}>
+                          {
+                            monthlyFeeCollections.map((entry, index) => {
+                              const amount = entry['Fee Collections (GHS)'];
+                              const barColor = amount > 10000 ? '#059669' : '#10b981';
+                              return <Cell key={`cell-payments-tab-${index}`} fill={barColor} />;
+                            })
+                          }
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-600"></span> Peak Collection Volume (&gt;10,000 GHS)
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 ml-2"></span> Standard Collection Volume
+                    </span>
+                    <span>YTD Fee Revenue: GHS {monthlyFeeCollections.reduce((sum, item) => sum + item['Fee Collections (GHS)'], 0).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Filter and Search Bar widget */}
+                <div className={`p-4 rounded-xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200/60'
+                } flex flex-col lg:flex-row lg:items-center justify-between gap-3`}>
+                  
+                  {/* Search box with left lookup icon */}
+                  <div className="relative flex-1">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input 
+                      type="text" 
+                      placeholder="Search Payee Name, Paystack Ref, ID..."
+                      value={ledgerSearchQuery}
+                      onChange={(e) => setLedgerSearchQuery(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 pl-9 pr-4 py-2 rounded-lg text-xs font-medium focus:outline-hidden focus:ring-1 focus:ring-emerald-500 text-slate-800 dark:text-slate-100"
+                    />
+                    {ledgerSearchQuery && (
+                      <button 
+                        onClick={() => setLedgerSearchQuery('')} 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 px-1 rounded font-bold cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Filter controls */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center space-x-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Status:</span>
+                      <select 
+                        value={ledgerStatusFilter}
+                        onChange={(e) => setLedgerStatusFilter(e.target.value as any)}
+                        className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
+                      >
+                        <option value="All">All Statuses</option>
+                        <option value="Successful">Successful</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Failed">Failed</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center space-x-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Channel:</span>
+                      <select 
+                        value={ledgerMethodFilter}
+                        onChange={(e) => setLedgerMethodFilter(e.target.value)}
+                        className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
+                      >
+                        <option value="All">All Channels</option>
+                        <option value="Card">Visa/Mastercard Card</option>
+                        <option value="MTN Mobile Money">MTN Mobile Money</option>
+                        <option value="Telecel Cash">Telecel Cash</option>
+                        <option value="AirtelTigo Money">AirtelTigo Money</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center space-x-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">Term:</span>
+                      <select 
+                        value={ledgerTermFilter}
+                        onChange={(e) => setLedgerTermFilter(e.target.value as any)}
+                        className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 px-2 py-1.5 rounded-lg text-xs font-semibold focus:outline-hidden"
+                      >
+                        <option value="All">All Terms</option>
+                        <option value="Term 1">Term 1</option>
+                        <option value="Term 2">Term 2</option>
+                        <option value="Term 3">Term 3</option>
+                      </select>
+                    </div>
+
+                    {/* Sorting column toggles */}
+                    <div className="flex items-center border border-slate-200 dark:border-slate-850 rounded-lg overflow-hidden bg-white dark:bg-slate-950">
+                      <button
+                        onClick={() => {
+                          if (ledgerSortField === 'date') {
+                            setLedgerSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setLedgerSortField('date');
+                            setLedgerSortOrder('desc');
+                          }
+                        }}
+                        className={`px-2.5 py-1.5 text-[10px] font-bold uppercase transition-colors flex items-center space-x-0.5 ${
+                          ledgerSortField === 'date' 
+                            ? 'bg-emerald-600 text-white' 
+                            : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900'
+                        }`}
+                        title="Sort by Date"
+                      >
+                        <span>Date</span>
+                        <span className="text-[8px] font-mono">{ledgerSortField === 'date' ? (ledgerSortOrder === 'desc' ? '▼' : '▲') : ''}</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (ledgerSortField === 'amount') {
+                            setLedgerSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setLedgerSortField('amount');
+                            setLedgerSortOrder('desc');
+                          }
+                        }}
+                        className={`px-2.5 py-1.5 text-[10px] font-bold uppercase transition-colors flex items-center space-x-0.5 border-l border-slate-200 dark:border-slate-850 ${
+                          ledgerSortField === 'amount' 
+                            ? 'bg-emerald-600 text-white' 
+                            : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900'
+                        }`}
+                        title="Sort by Amount"
+                      >
+                        <span>Amount</span>
+                        <span className="text-[8px] font-mono">{ledgerSortField === 'amount' ? (ledgerSortOrder === 'desc' ? '▼' : '▲') : ''}</span>
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* Historical Table or Empty State */}
+                {filteredTransactions.length === 0 ? (
+                  <div className={`p-10 rounded-2xl border text-center ${
+                    isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'
+                  }`}>
+                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-950 flex items-center justify-center mx-auto mb-3">
+                      <Receipt size={20} className="text-slate-400" />
+                    </div>
+                    <h4 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">No matching transactions found</h4>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">There are no school tuition ledger records matching your selected query filters. Try clearing search criteria.</p>
+                    <button
+                      onClick={() => {
+                        setLedgerSearchQuery('');
+                        setLedgerStatusFilter('All');
+                        setLedgerMethodFilter('All');
+                        setLedgerTermFilter('All');
+                      }}
+                      className="mt-4 px-4 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-lg transition-all cursor-pointer"
+                    >
+                      Reset All Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider px-1">
+                      <span>Showing {filteredTransactions.length} of {transactions.length} Ledger Records</span>
+                      <span>Click row to audit Paystack Receipt</span>
+                    </div>
+
+                    <div className={`border rounded-2xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                      <div className="overflow-x-auto">
+                        <table id="payments-history-table" className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                              <th className="p-3">Reference / Paystack ID</th>
+                              <th className="p-3">Student payee</th>
+                              <th className="p-3">Terminal Amount</th>
+                              <th className="p-3">Channel / Provider</th>
+                              <th className="p-3">Timestamp</th>
+                              <th className="p-3">Term</th>
+                              <th className="p-3">Status</th>
+                              <th className="p-3 text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {filteredTransactions.map((tx) => {
+                              const std = students.find(s => s.id === tx.studentId);
+                              const classObj = classes.find(c => c.id === std?.classId);
+
+                              return (
+                                <tr 
+                                  key={tx.id} 
+                                  onClick={() => setSelectedLedgerTransaction(tx)}
+                                  className="hover:bg-emerald-500/5 dark:hover:bg-emerald-500/5 transition-colors font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
+                                >
+                                  <td className="p-3">
+                                    <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">{tx.reference}</p>
+                                    <p className="text-[9px] font-mono text-slate-400 mt-0.5 leading-none">{tx.paystackRef}</p>
+                                  </td>
+                                  <td className="p-3">
+                                    <p className="font-bold text-slate-800 dark:text-white leading-tight">{tx.studentName}</p>
+                                    <p className="text-[10px] text-slate-400 leading-none mt-0.5">
+                                      {classObj ? `${classObj.name} • ` : ''}{tx.email}
+                                    </p>
+                                  </td>
+                                  <td className="p-3 font-extrabold font-mono text-slate-900 dark:text-white">
+                                    GHS {tx.amountGHS.toFixed(2)}
+                                  </td>
+                                  <td className="p-3">
+                                    <span className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
+                                      tx.paymentMethod === 'Card' 
+                                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+                                        : tx.paymentMethod.includes('MTN')
+                                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                          : tx.paymentMethod.includes('Telecel')
+                                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                                            : 'bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200/40 dark:border-slate-800'
+                                    }`}>
+                                      {tx.paymentMethod === 'Card' ? <CreditCard size={10} /> : <Smartphone size={10} />}
+                                      <span>{tx.paymentMethod}</span>
+                                    </span>
+                                  </td>
+                                  <td className="p-3 text-slate-500 dark:text-slate-400 font-mono text-[11px]">{tx.date}</td>
+                                  <td className="p-3 text-slate-500 dark:text-slate-400 font-bold">{tx.term}</td>
+                                  <td className="p-3">
+                                    <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider ${
+                                      tx.status === 'Successful' 
+                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                                        : tx.status === 'Pending'
+                                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                          : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                                    }`}>
+                                      {tx.status}
+                                    </span>
+                                  </td>
+                                  <td className="p-3 text-right">
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedLedgerTransaction(tx);
+                                      }}
+                                      className="p-1 rounded-md bg-slate-100 dark:bg-slate-950 text-slate-500 hover:text-emerald-600 hover:bg-emerald-500/10 border border-slate-200/40 dark:border-slate-800 transition-colors cursor-pointer"
+                                    >
+                                      <Receipt size={13} />
+                                    </button>
+                                  </td>
+                                </tr>
                               );
-                            } else {
-                              setLedgerSortField("amount");
-                              setLedgerSortOrder("desc");
-                            }
-                          }}
-                          className={`px-2.5 py-1.5 text-[10px] font-bold uppercase transition-colors flex items-center space-x-0.5 border-l border-slate-200 dark:border-slate-850 ${
-                            ledgerSortField === "amount"
-                              ? "bg-emerald-600 text-white"
-                              : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900"
-                          }`}
-                          title="Sort by Amount"
-                        >
-                          <span>Amount</span>
-                          <span className="text-[8px] font-mono">
-                            {ledgerSortField === "amount"
-                              ? ledgerSortOrder === "desc"
-                                ? "▼"
-                                : "▲"
-                              : ""}
-                          </span>
-                        </button>
+                            })}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Historical Table or Empty State */}
-                  {filteredTransactions.length === 0 ? (
-                    <div
-                      className={`p-10 rounded-2xl border text-center ${
-                        isDarkMode
-                          ? "bg-slate-900 border-slate-800"
-                          : "bg-white border-slate-100 shadow-xs"
-                      }`}
-                    >
-                      <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-950 flex items-center justify-center mx-auto mb-3">
-                        <Receipt size={20} className="text-slate-400" />
-                      </div>
-                      <h4 className="font-extrabold text-sm text-slate-800 dark:text-slate-100">
-                        No matching transactions found
-                      </h4>
-                      <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">
-                        There are no school tuition ledger records matching your
-                        selected query filters. Try clearing search criteria.
-                      </p>
-                      <button
-                        onClick={() => {
-                          setLedgerSearchQuery("");
-                          setLedgerStatusFilter("All");
-                          setLedgerMethodFilter("All");
-                          setLedgerTermFilter("All");
-                        }}
-                        className="mt-4 px-4 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-lg transition-all cursor-pointer"
-                      >
-                        Reset All Filters
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider px-1">
-                        <span>
-                          Showing {filteredTransactions.length} of{" "}
-                          {transactions.length} Ledger Records
-                        </span>
-                        <span>Click row to audit Paystack Receipt</span>
-                      </div>
+                {/* Paystack Official Receipt Viewer Modal */}
+                {selectedLedgerTransaction && (() => {
+                  const tx = selectedLedgerTransaction;
+                  const std = students.find(s => s.id === tx.studentId);
+                  const classObj = classes.find(c => c.id === std?.classId);
+                  const paystackFee = tx.amountGHS * 0.0195 + 1.5;
+                  const netAmount = tx.amountGHS - paystackFee;
 
-                      <div
-                        className={`border rounded-2xl overflow-hidden ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60 shadow-xs"}`}
-                      >
-                        <div className="overflow-x-auto">
-                          <table
-                            id="payments-history-table"
-                            className="w-full text-left text-xs border-collapse"
-                          >
-                            <thead>
-                              <tr
-                                className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                              >
-                                <th className="p-3">Reference / Paystack ID</th>
-                                <th className="p-3">Student payee</th>
-                                <th className="p-3">Terminal Amount</th>
-                                <th className="p-3">Channel / Provider</th>
-                                <th className="p-3">Timestamp</th>
-                                <th className="p-3">Term</th>
-                                <th className="p-3">Status</th>
-                                <th className="p-3 text-right">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                              {filteredTransactions.map((tx) => {
-                                const std = students.find(
-                                  (s) => s.id === tx.studentId,
-                                );
-                                const classObj = classes.find(
-                                  (c) => c.id === std?.classId,
-                                );
-
-                                return (
-                                  <tr
-                                    key={tx.id}
-                                    onClick={() =>
-                                      setSelectedLedgerTransaction(tx)
-                                    }
-                                    className="hover:bg-emerald-500/5 dark:hover:bg-emerald-500/5 transition-colors font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
-                                  >
-                                    <td className="p-3">
-                                      <p className="font-extrabold text-xs text-slate-900 dark:text-white leading-tight">
-                                        {tx.reference}
-                                      </p>
-                                      <p className="text-[9px] font-mono text-slate-400 mt-0.5 leading-none">
-                                        {tx.paystackRef}
-                                      </p>
-                                    </td>
-                                    <td className="p-3">
-                                      <p className="font-bold text-slate-800 dark:text-white leading-tight">
-                                        {tx.studentName}
-                                      </p>
-                                      <p className="text-[10px] text-slate-400 leading-none mt-0.5">
-                                        {classObj ? `${classObj.name} • ` : ""}
-                                        {tx.email}
-                                      </p>
-                                    </td>
-                                    <td className="p-3 font-extrabold font-mono text-slate-900 dark:text-white">
-                                      GHS {tx.amountGHS.toFixed(2)}
-                                    </td>
-                                    <td className="p-3">
-                                      <span
-                                        className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
-                                          tx.paymentMethod === "Card"
-                                            ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
-                                            : tx.paymentMethod.includes("MTN")
-                                              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                                              : tx.paymentMethod.includes(
-                                                    "Telecel",
-                                                  )
-                                                ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
-                                                : "bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200/40 dark:border-slate-800"
-                                        }`}
-                                      >
-                                        {tx.paymentMethod === "Card" ? (
-                                          <CreditCard size={10} />
-                                        ) : (
-                                          <Smartphone size={10} />
-                                        )}
-                                        <span>{tx.paymentMethod}</span>
-                                      </span>
-                                    </td>
-                                    <td className="p-3 text-slate-500 dark:text-slate-400 font-mono text-[11px]">
-                                      {tx.date}
-                                    </td>
-                                    <td className="p-3 text-slate-500 dark:text-slate-400 font-bold">
-                                      {tx.term}
-                                    </td>
-                                    <td className="p-3">
-                                      <span
-                                        className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider ${
-                                          tx.status === "Successful"
-                                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                                            : tx.status === "Pending"
-                                              ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                                              : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-                                        }`}
-                                      >
-                                        {tx.status}
-                                      </span>
-                                    </td>
-                                    <td className="p-3 text-right">
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setSelectedLedgerTransaction(tx);
-                                        }}
-                                        className="p-1 rounded-md bg-slate-100 dark:bg-slate-950 text-slate-500 hover:text-emerald-600 hover:bg-emerald-500/10 border border-slate-200/40 dark:border-slate-800 transition-colors cursor-pointer"
-                                      >
-                                        <Receipt size={13} />
-                                      </button>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Paystack Official Receipt Viewer Modal */}
-                  {selectedLedgerTransaction &&
-                    (() => {
-                      const tx = selectedLedgerTransaction;
-                      const std = students.find((s) => s.id === tx.studentId);
-                      const classObj = classes.find(
-                        (c) => c.id === std?.classId,
-                      );
-                      const paystackFee = tx.amountGHS * 0.0195 + 1.5;
-                      const netAmount = tx.amountGHS - paystackFee;
-
-                      return (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-                          <div
-                            className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-scale-in transition-all ${
-                              isDarkMode
-                                ? "bg-slate-900 border-slate-800 text-white"
-                                : "bg-white border-slate-200 text-slate-800"
-                            }`}
-                          >
-                            <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60">
-                              <div className="flex items-center space-x-2">
-                                <span className="p-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                                  <Receipt size={16} />
-                                </span>
-                                <div>
-                                  <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-900 dark:text-white">
-                                    Paystack Receipt
-                                  </h3>
-                                  <p className="text-[9px] text-slate-400 uppercase font-bold font-mono">
-                                    ID: {tx.paystackRef}
-                                  </p>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() =>
-                                  setSelectedLedgerTransaction(null)
-                                }
-                                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                              >
-                                <X size={16} />
-                              </button>
-                            </div>
-
-                            {/* Thermal invoice printout-style content */}
-                            <div className="mt-4 p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-medium">
-                              {/* Status Header */}
-                              <div className="text-center pb-4 border-b border-dashed border-slate-200 dark:border-slate-800">
-                                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">
-                                  Payment Amount
-                                </span>
-                                <span className="text-3xl font-extrabold font-mono text-slate-900 dark:text-white">
-                                  GHS {tx.amountGHS.toFixed(2)}
-                                </span>
-
-                                <span
-                                  className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase mt-2 border ${
-                                    tx.status === "Successful"
-                                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                                      : tx.status === "Pending"
-                                        ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                                        : "bg-rose-500/10 text-rose-600 border-rose-500/20"
-                                  }`}
-                                >
-                                  <span
-                                    className={`w-1.5 h-1.5 rounded-full ${
-                                      tx.status === "Successful"
-                                        ? "bg-emerald-500"
-                                        : tx.status === "Pending"
-                                          ? "bg-amber-500"
-                                          : "bg-rose-500"
-                                    }`}
-                                  />
-                                  <span>{tx.status}</span>
-                                </span>
-                              </div>
-
-                              {/* Data Matrix */}
-                              <div className="py-4 space-y-2.5 text-xs border-b border-dashed border-slate-200 dark:border-slate-800">
-                                <div className="flex justify-between">
-                                  <span className="text-slate-400 font-semibold uppercase text-[9px]">
-                                    Receipt Reference
-                                  </span>
-                                  <span className="font-mono text-slate-900 dark:text-white font-extrabold">
-                                    {tx.reference}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-400 font-semibold uppercase text-[9px]">
-                                    Payee Student
-                                  </span>
-                                  <span className="font-bold text-slate-900 dark:text-white">
-                                    {tx.studentName} {std ? `(${std.id})` : ""}
-                                  </span>
-                                </div>
-                                {classObj && (
-                                  <div className="flex justify-between">
-                                    <span className="text-slate-400 font-semibold uppercase text-[9px]">
-                                      Student Class
-                                    </span>
-                                    <span className="font-bold text-slate-900 dark:text-white">
-                                      {classObj.name}
-                                    </span>
-                                  </div>
-                                )}
-                                <div className="flex justify-between">
-                                  <span className="text-slate-400 font-semibold uppercase text-[9px]">
-                                    Parent Contact
-                                  </span>
-                                  <span className="text-slate-900 dark:text-white font-semibold">
-                                    {tx.email}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-400 font-semibold uppercase text-[9px]">
-                                    Settlement Channel
-                                  </span>
-                                  <span className="font-bold text-slate-900 dark:text-white flex items-center space-x-1">
-                                    {tx.paymentMethod === "Card" ? (
-                                      <CreditCard size={11} />
-                                    ) : (
-                                      <Smartphone size={11} />
-                                    )}
-                                    <span>{tx.paymentMethod}</span>
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-400 font-semibold uppercase text-[9px]">
-                                    Timestamp
-                                  </span>
-                                  <span className="text-slate-900 dark:text-white font-mono text-[11px]">
-                                    {tx.date}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-400 font-semibold uppercase text-[9px]">
-                                    Academic Allocation
-                                  </span>
-                                  <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">
-                                    {tx.term} Fees
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Gateway pricing matrix */}
-                              <div className="pt-4 space-y-1.5 text-xs">
-                                <div className="flex justify-between text-[11px]">
-                                  <span className="text-slate-400 font-semibold">
-                                    Gross Charged
-                                  </span>
-                                  <span className="font-bold text-slate-800 dark:text-slate-200">
-                                    GHS {tx.amountGHS.toFixed(2)}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between text-[10px] text-slate-400">
-                                  <span className="italic">
-                                    Paystack Merchant Fee (1.95% + GHS 1.50)
-                                  </span>
-                                  <span>- GHS {paystackFee.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between text-xs font-bold pt-1.5 border-t border-slate-250 dark:border-slate-800">
-                                  <span className="text-slate-500">
-                                    School Net Revenue
-                                  </span>
-                                  <span className="text-emerald-600 dark:text-emerald-400 font-mono font-black">
-                                    GHS {netAmount.toFixed(2)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Dispatch audit timeline */}
-                            <div className="mt-4 space-y-2">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                                Dispatch Audit Log
-                              </span>
-                              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5 border border-slate-100 dark:border-slate-900/60 font-semibold">
-                                <div className="flex items-center space-x-2">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                  <span>
-                                    Gateway verified & cleared at {tx.date}
-                                  </span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                  <span>
-                                    PDF Tuition receipt dispatched to {tx.email}{" "}
-                                    (Status: DELIVERED)
-                                  </span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                  <span>
-                                    Simulated SMS alert linked via Paystack
-                                    payload webhook (Status: SENT)
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Interactive triggers */}
-                            <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between mt-4">
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={() =>
-                                    alert(
-                                      `DISPATCH SYSTEM: Spooling print output for transaction ${tx.reference}. Receipt queued to school network thermal printer GCB-04.`,
-                                    )
-                                  }
-                                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center space-x-1"
-                                >
-                                  <Printer size={13} />
-                                  <span>Print</span>
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    alert(
-                                      `DISPATCH SYSTEM: Receipt document simulated PDF generated. Download reference: PSTK-RECEIPT-${tx.reference}.pdf`,
-                                    )
-                                  }
-                                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center space-x-1"
-                                >
-                                  <Download size={13} />
-                                  <span>PDF</span>
-                                </button>
-                              </div>
-
-                              <button
-                                onClick={() => {
-                                  alert(
-                                    `Receipt successfully resent to ${tx.email}. SMS broadcasted.`,
-                                  );
-                                }}
-                                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer uppercase tracking-wider"
-                              >
-                                Resend Copy
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                  {/* Simulate Paystack Payment Modal */}
-                  {isSimulatePaymentModalOpen && (
+                  return (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-                      <div
-                        className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-scale-in ${
-                          isDarkMode
-                            ? "bg-slate-900 border-slate-800"
-                            : "bg-white border-slate-200"
-                        }`}
-                      >
-                        <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                      <div className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-scale-in transition-all ${
+                        isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+                      }`}>
+                        <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60">
                           <div className="flex items-center space-x-2">
-                            <Sparkles
-                              className="text-emerald-500 animate-spin"
-                              size={18}
-                            />
-                            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                              Simulate Paystack Deposit
-                            </h3>
+                            <span className="p-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                              <Receipt size={16} />
+                            </span>
+                            <div>
+                              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-900 dark:text-white">Paystack Receipt</h3>
+                              <p className="text-[9px] text-slate-400 uppercase font-bold font-mono">ID: {tx.paystackRef}</p>
+                            </div>
                           </div>
                           <button
-                            onClick={() => setIsSimulatePaymentModalOpen(false)}
-                            className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                            onClick={() => setSelectedLedgerTransaction(null)}
+                            className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                           >
                             <X size={16} />
                           </button>
                         </div>
 
-                        <form
-                          onSubmit={handleSimulatePaystackPayment}
-                          className="space-y-4 mt-4 text-xs font-semibold font-sans"
-                        >
-                          <div>
-                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">
-                              Select Student Payee
-                            </label>
-                            <select
-                              value={simStudentId}
-                              onChange={(e) => setSimStudentId(e.target.value)}
-                              required
-                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
-                            >
-                              <option value="">
-                                -- Choose student payee --
-                              </option>
-                              {students.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                  {s.name} (ID: {s.id}) — Outstanding: GHS{" "}
-                                  {s.balanceGHS.toFixed(2)}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">
-                              Tuition Payment Amount (GHS)
-                            </label>
-                            <input
-                              type="number"
-                              required
-                              placeholder="e.g. 1200.00"
-                              value={simAmount}
-                              onChange={(e) => setSimAmount(e.target.value)}
-                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium font-mono"
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">
-                                Payment Channel
-                              </label>
-                              <select
-                                value={simMethod}
-                                onChange={(e) =>
-                                  setSimMethod(e.target.value as any)
-                                }
-                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
-                              >
-                                <option value="Card">
-                                  Debit Card (Visa/Mastercard)
-                                </option>
-                                <option value="MTN Mobile Money">
-                                  MTN Mobile Money
-                                </option>
-                                <option value="Telecel Cash">
-                                  Telecel Cash
-                                </option>
-                                <option value="AirtelTigo Money">
-                                  AirtelTigo Money
-                                </option>
-                                <option value="Bank Transfer">
-                                  Bank Transfer
-                                </option>
-                              </select>
-                            </div>
-
-                            <div>
-                              <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">
-                                Academic Term
-                              </label>
-                              <select
-                                value={simTerm}
-                                onChange={(e) =>
-                                  setSimTerm(e.target.value as any)
-                                }
-                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
-                              >
-                                <option value="Term 1">Term 1 Fees</option>
-                                <option value="Term 2">Term 2 Fees</option>
-                                <option value="Term 3">Term 3 Fees</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">
-                              Simulated Gate Status
-                            </label>
-                            <select
-                              value={simStatus}
-                              onChange={(e) =>
-                                setSimStatus(e.target.value as any)
-                              }
-                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-bold"
-                            >
-                              <option value="Successful">
-                                Successful (Reconciles Balance & Dispatches
-                                Receipt)
-                              </option>
-                              <option value="Pending">
-                                Pending Verification (Leaves Balance
-                                Outstanding)
-                              </option>
-                              <option value="Failed">
-                                Failed (Logs Failure record on Ledger)
-                              </option>
-                            </select>
-                          </div>
-
-                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 flex justify-end space-x-2">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setIsSimulatePaymentModalOpen(false)
-                              }
-                              className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-xs font-bold"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="submit"
-                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold cursor-pointer text-xs uppercase tracking-wider"
-                            >
-                              Inject Transaction
-                            </button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-
-          {/* ==================== PENDING VERIFICATION APPROVAL QUEUE ==================== */}
-          {paymentsSubTab === "pending-verification" &&
-            (() => {
-              const pendingTransactions = transactions.filter((tx) => {
-                // Apply verification status filter
-                if (
-                  verificationStatusFilter !== "All" &&
-                  tx.status !== verificationStatusFilter
-                ) {
-                  return false;
-                }
-                // Apply search query filter
-                if (verificationSearchQuery.trim()) {
-                  const query = verificationSearchQuery.toLowerCase();
-                  return (
-                    tx.studentName.toLowerCase().includes(query) ||
-                    tx.reference.toLowerCase().includes(query) ||
-                    tx.paystackRef.toLowerCase().includes(query) ||
-                    (tx.studentId && tx.studentId.toLowerCase().includes(query))
-                  );
-                }
-                return true;
-              });
-
-              const pendingCount = transactions.filter(
-                (t) => t.status === "Pending",
-              ).length;
-              const pendingSum = transactions
-                .filter((t) => t.status === "Pending")
-                .reduce((sum, t) => sum + t.amountGHS, 0);
-
-              return (
-                <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
-                  {/* Stats block */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex flex-col justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider">
-                        Awaiting Verification Volume
-                      </span>
-                      <span className="text-xl font-extrabold font-mono mt-1">
-                        {pendingCount} Transactions (GHS {pendingSum.toFixed(2)}
-                        )
-                      </span>
-                    </div>
-                    <div className="p-4 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider">
-                        Verified & Dispatched Today
-                      </span>
-                      <span className="text-xl font-extrabold font-mono mt-1">
-                        {
-                          transactions.filter((t) => t.status === "Successful")
-                            .length
-                        }{" "}
-                        Cleared Ledgers
-                      </span>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`p-5 rounded-2xl border ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800"
-                        : "bg-white border-slate-200/60 shadow-xs"
-                    }`}
-                  >
-                    {/* Header info */}
-                    <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 flex-wrap gap-3">
-                      <div>
-                        <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
-                          <ShieldCheck className="text-amber-500" size={16} />
-                          <span>
-                            Bursar Gateway Payment Pending Verification
-                          </span>
-                        </h3>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          Audit and verify pending mobile wallet or bank
-                          transfer transactions. Approving will automatically
-                          deduct the student's balance, update ledger status to
-                          Successful, and trigger an official PDF receipt
-                          dispatched to the guardian's email.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Filters / Search Bar */}
-                    <div className="flex items-center justify-between flex-wrap gap-3 mb-4 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
-                      <div className="flex items-center space-x-1">
-                        {(
-                          ["Pending", "Successful", "Failed", "All"] as const
-                        ).map((filter) => {
-                          const count =
-                            filter === "All"
-                              ? transactions.length
-                              : transactions.filter((t) => t.status === filter)
-                                  .length;
-                          return (
-                            <button
-                              key={filter}
-                              type="button"
-                              onClick={() =>
-                                setVerificationStatusFilter(filter)
-                              }
-                              className={`px-3 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
-                                verificationStatusFilter === filter
-                                  ? "bg-emerald-600 text-white shadow-xs"
-                                  : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                              }`}
-                            >
-                              {filter} ({count})
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <div className="relative w-64">
-                        <Search
-                          className="absolute left-2.5 top-2 text-slate-400"
-                          size={12}
-                        />
-                        <input
-                          type="text"
-                          placeholder="Search student or ref..."
-                          value={verificationSearchQuery}
-                          onChange={(e) =>
-                            setVerificationSearchQuery(e.target.value)
-                          }
-                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 pl-8 pr-3 py-1 rounded-lg text-xs focus:outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Table */}
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse text-xs font-semibold text-slate-600">
-                        <thead>
-                          <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
-                            <th className="p-3">Reference / Paystack ID</th>
-                            <th className="p-3">Student Payee</th>
-                            <th className="p-3">Amount (GHS)</th>
-                            <th className="p-3">Channel / Method</th>
-                            <th className="p-3">Timestamp</th>
-                            <th className="p-3">Status</th>
-                            <th className="p-3 text-right">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
-                          {pendingTransactions.length > 0 ? (
-                            pendingTransactions.map((tx) => (
-                              <tr
-                                key={tx.id}
-                                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
-                              >
-                                <td className="p-3">
-                                  <div className="font-extrabold text-slate-900 dark:text-white">
-                                    {tx.reference}
-                                  </div>
-                                  <div className="text-[10px] text-slate-400 font-mono">
-                                    {tx.paystackRef}
-                                  </div>
-                                </td>
-                                <td className="p-3">
-                                  <div className="font-bold text-slate-900 dark:text-white">
-                                    {tx.studentName}
-                                  </div>
-                                  <div className="text-[10px] text-slate-400 font-mono">
-                                    ID: {tx.studentId}
-                                  </div>
-                                </td>
-                                <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-200">
-                                  GHS {tx.amountGHS.toFixed(2)}
-                                </td>
-                                <td className="p-3">
-                                  <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] border border-slate-200 dark:border-slate-700">
-                                    {tx.paymentMethod}
-                                  </span>
-                                </td>
-                                <td className="p-3 font-medium text-slate-500">
-                                  {tx.date}
-                                </td>
-                                <td className="p-3">
-                                  <span
-                                    className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
-                                      tx.status === "Successful"
-                                        ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400"
-                                        : tx.status === "Failed"
-                                          ? "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400"
-                                          : "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400"
-                                    }`}
-                                  >
-                                    {tx.status}
-                                  </span>
-                                </td>
-                                <td className="p-3 text-right">
-                                  {tx.status === "Pending" ? (
-                                    <button
-                                      onClick={() =>
-                                        handleApprovePendingTransaction(tx.id)
-                                      }
-                                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[10px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center space-x-1 ml-auto"
-                                    >
-                                      <Check size={10} />
-                                      <span>Verify & Approve</span>
-                                    </button>
-                                  ) : (
-                                    <span className="text-slate-400 italic text-[10px]">
-                                      Verified / Cleared
-                                    </span>
-                                  )}
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td
-                                colSpan={7}
-                                className="text-center py-12 text-slate-400 italic"
-                              >
-                                No payment transactions found matching the
-                                current status filter.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
-          {/* ==================== MANUAL RECEIPTS APPROVAL QUEUE ==================== */}
-          {paymentsSubTab === "manual-approvals" &&
-            (() => {
-              const filteredManualPayments = manualPayments.filter((req) => {
-                if (manualStatusFilter === "All") return true;
-                return req.status === manualStatusFilter;
-              });
-              return (
-                <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
-                  <div
-                    className={`p-5 rounded-2xl border ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800"
-                        : "bg-white border-slate-200/60 shadow-xs"
-                    }`}
-                  >
-                    <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 flex-wrap gap-3">
-                      <div>
-                        <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
-                          <FileText className="text-emerald-500" size={16} />
-                          <span>Bursar Offline Receipt Verification Queue</span>
-                          {session?.role === "super_admin" ? (
-                            <span className="bg-amber-500/10 text-amber-600 border border-amber-500/30 font-black text-[9px] px-2 py-0.5 rounded-full uppercase flex items-center space-x-1 inline-flex">
-                              <ShieldCheck size={10} />
-                              <span>Super Admin Approval Executive Mode</span>
+                        {/* Thermal invoice printout-style content */}
+                        <div className="mt-4 p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-medium">
+                          
+                          {/* Status Header */}
+                          <div className="text-center pb-4 border-b border-dashed border-slate-200 dark:border-slate-800">
+                            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Payment Amount</span>
+                            <span className="text-3xl font-extrabold font-mono text-slate-900 dark:text-white">GHS {tx.amountGHS.toFixed(2)}</span>
+                            
+                            <span className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase mt-2 border ${
+                              tx.status === 'Successful'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                                : tx.status === 'Pending'
+                                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                                  : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                            }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${
+                                tx.status === 'Successful' ? 'bg-emerald-500' : tx.status === 'Pending' ? 'bg-amber-500' : 'bg-rose-500'
+                              }`} />
+                              <span>{tx.status}</span>
                             </span>
-                          ) : (
-                            <span className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 font-bold text-[9px] px-2 py-0.5 rounded-full uppercase flex items-center space-x-1 inline-flex">
-                              <Lock size={10} />
-                              <span>Requires Super Admin Sign-off</span>
-                            </span>
-                          )}
-                        </h3>
-                        <p className="text-[11px] text-slate-400 mt-0.5">
-                          Verify uploaded mobile money and bank deposit slips.
-                          All financial approvals are strictly reserved for
-                          Super Admin (Founder & Executive Chairman).
-                        </p>
-                      </div>
+                          </div>
 
-                      <div className="flex items-center space-x-2">
-                        {session?.role === "super_admin" &&
-                          manualPayments.some(
-                            (p) => p.status === "Pending",
-                          ) && (
-                            <button
-                              type="button"
-                              onClick={handleBatchApproveFinancialRequests}
-                              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-extrabold text-xs flex items-center space-x-1 shadow-sm transition-all cursor-pointer"
-                            >
-                              <ShieldCheck size={14} />
-                              <span>
-                                Batch Executive Approve All (
-                                {
-                                  manualPayments.filter(
-                                    (p) => p.status === "Pending",
-                                  ).length
-                                }
-                                )
+                          {/* Data Matrix */}
+                          <div className="py-4 space-y-2.5 text-xs border-b border-dashed border-slate-200 dark:border-slate-800">
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Receipt Reference</span>
+                              <span className="font-mono text-slate-900 dark:text-white font-extrabold">{tx.reference}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Payee Student</span>
+                              <span className="font-bold text-slate-900 dark:text-white">{tx.studentName} {std ? `(${std.id})` : ''}</span>
+                            </div>
+                            {classObj && (
+                              <div className="flex justify-between">
+                                <span className="text-slate-400 font-semibold uppercase text-[9px]">Student Class</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{classObj.name}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Parent Contact</span>
+                              <span className="text-slate-900 dark:text-white font-semibold">{tx.email}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Settlement Channel</span>
+                              <span className="font-bold text-slate-900 dark:text-white flex items-center space-x-1">
+                                {tx.paymentMethod === 'Card' ? <CreditCard size={11} /> : <Smartphone size={11} />}
+                                <span>{tx.paymentMethod}</span>
                               </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Timestamp</span>
+                              <span className="text-slate-900 dark:text-white font-mono text-[11px]">{tx.date}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400 font-semibold uppercase text-[9px]">Academic Allocation</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{tx.term} Fees</span>
+                            </div>
+                          </div>
+
+                          {/* Gateway pricing matrix */}
+                          <div className="pt-4 space-y-1.5 text-xs">
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-slate-400 font-semibold">Gross Charged</span>
+                              <span className="font-bold text-slate-800 dark:text-slate-200">GHS {tx.amountGHS.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-[10px] text-slate-400">
+                              <span className="italic">Paystack Merchant Fee (1.95% + GHS 1.50)</span>
+                              <span>- GHS {paystackFee.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-xs font-bold pt-1.5 border-t border-slate-250 dark:border-slate-800">
+                              <span className="text-slate-500">School Net Revenue</span>
+                              <span className="text-emerald-600 dark:text-emerald-400 font-mono font-black">GHS {netAmount.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Dispatch audit timeline */}
+                        <div className="mt-4 space-y-2">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Dispatch Audit Log</span>
+                          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 text-[11px] text-slate-500 dark:text-slate-400 space-y-1.5 border border-slate-100 dark:border-slate-900/60 font-semibold">
+                            <div className="flex items-center space-x-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span>Gateway verified & cleared at {tx.date}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span>PDF Tuition receipt dispatched to {tx.email} (Status: DELIVERED)</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span>Simulated SMS alert linked via Paystack payload webhook (Status: SENT)</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Interactive triggers */}
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between mt-4">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => alert(`DISPATCH SYSTEM: Spooling print output for transaction ${tx.reference}. Receipt queued to school network thermal printer GCB-04.`)}
+                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center space-x-1"
+                            >
+                              <Printer size={13} />
+                              <span>Print</span>
                             </button>
-                          )}
+                            <button
+                              onClick={() => alert(`DISPATCH SYSTEM: Receipt document simulated PDF generated. Download reference: PSTK-RECEIPT-${tx.reference}.pdf`)}
+                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center space-x-1"
+                            >
+                              <Download size={13} />
+                              <span>PDF</span>
+                            </button>
+                          </div>
+                          
+                          <button
+                            onClick={() => {
+                              alert(`Receipt successfully resent to ${tx.email}. SMS broadcasted.`);
+                            }}
+                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer uppercase tracking-wider"
+                          >
+                            Resend Copy
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Simulate Paystack Payment Modal */}
+                {isSimulatePaymentModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+                    <div className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-scale-in ${
+                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                    }`}>
+                      <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                        <div className="flex items-center space-x-2">
+                          <Sparkles className="text-emerald-500 animate-spin" size={18} />
+                          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Simulate Paystack Deposit</h3>
+                        </div>
                         <button
-                          type="button"
-                          onClick={() => setIsDirectPaymentModalOpen(true)}
-                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center space-x-1 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                          onClick={() => setIsSimulatePaymentModalOpen(false)}
+                          className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                         >
-                          <Plus size={14} />
-                          <span>Record Offline Cash/Bank Payment</span>
+                          <X size={16} />
                         </button>
                       </div>
-                    </div>
 
-                    {/* Status Filters and Queue Counts */}
-                    <div className="flex items-center justify-between flex-wrap gap-2 mb-4 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
-                      <div className="flex items-center space-x-1">
-                        {(
-                          ["All", "Pending", "Approved", "Rejected"] as const
-                        ).map((filter) => {
-                          const count =
-                            filter === "All"
-                              ? manualPayments.length
-                              : manualPayments.filter(
-                                  (p) => p.status === filter,
-                                ).length;
-                          return (
-                            <button
-                              key={filter}
-                              type="button"
-                              onClick={() => setManualStatusFilter(filter)}
-                              className={`px-3 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
-                                manualStatusFilter === filter
-                                  ? "bg-emerald-600 text-white shadow-xs"
-                                  : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                              }`}
+                      <form onSubmit={handleSimulatePaystackPayment} className="space-y-4 mt-4 text-xs font-semibold font-sans">
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Select Student Payee</label>
+                          <select
+                            value={simStudentId}
+                            onChange={(e) => setSimStudentId(e.target.value)}
+                            required
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          >
+                            <option value="">-- Choose student payee --</option>
+                            {students.map(s => (
+                              <option key={s.id} value={s.id}>
+                                {s.name} (ID: {s.id}) — Outstanding: GHS {s.balanceGHS.toFixed(2)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Tuition Payment Amount (GHS)</label>
+                          <input
+                            type="number"
+                            required
+                            placeholder="e.g. 1200.00"
+                            value={simAmount}
+                            onChange={(e) => setSimAmount(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium font-mono"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Payment Channel</label>
+                            <select
+                              value={simMethod}
+                              onChange={(e) => setSimMethod(e.target.value as any)}
+                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
                             >
-                              {filter} ({count})
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <span className="text-[10px] text-slate-400 font-bold">
-                        Showing {filteredManualPayments.length} of{" "}
-                        {manualPayments.length} requests
-                      </span>
+                              <option value="Card">Debit Card (Visa/Mastercard)</option>
+                              <option value="MTN Mobile Money">MTN Mobile Money</option>
+                              <option value="Telecel Cash">Telecel Cash</option>
+                              <option value="AirtelTigo Money">AirtelTigo Money</option>
+                              <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Academic Term</label>
+                            <select
+                              value={simTerm}
+                              onChange={(e) => setSimTerm(e.target.value as any)}
+                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                            >
+                              <option value="Term 1">Term 1 Fees</option>
+                              <option value="Term 2">Term 2 Fees</option>
+                              <option value="Term 3">Term 3 Fees</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-bold">Simulated Gate Status</label>
+                          <select
+                            value={simStatus}
+                            onChange={(e) => setSimStatus(e.target.value as any)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2.5 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-bold"
+                          >
+                            <option value="Successful">Successful (Reconciles Balance & Dispatches Receipt)</option>
+                            <option value="Pending">Pending Verification (Leaves Balance Outstanding)</option>
+                            <option value="Failed">Failed (Logs Failure record on Ledger)</option>
+                          </select>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 flex justify-end space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsSimulatePaymentModalOpen(false)}
+                            className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-xs font-bold"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold cursor-pointer text-xs uppercase tracking-wider"
+                          >
+                            Inject Transaction
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* ==================== PENDING VERIFICATION APPROVAL QUEUE ==================== */}
+          {paymentsSubTab === 'pending-verification' && (() => {
+            const pendingTransactions = transactions.filter((tx) => {
+              // Apply verification status filter
+              if (verificationStatusFilter !== 'All' && tx.status !== verificationStatusFilter) {
+                return false;
+              }
+              // Apply search query filter
+              if (verificationSearchQuery.trim()) {
+                const query = verificationSearchQuery.toLowerCase();
+                return (
+                  tx.studentName.toLowerCase().includes(query) ||
+                  tx.reference.toLowerCase().includes(query) ||
+                  tx.paystackRef.toLowerCase().includes(query) ||
+                  (tx.studentId && tx.studentId.toLowerCase().includes(query))
+                );
+              }
+              return true;
+            });
+
+            const pendingCount = transactions.filter(t => t.status === 'Pending').length;
+            const pendingSum = transactions.filter(t => t.status === 'Pending').reduce((sum, t) => sum + t.amountGHS, 0);
+
+            return (
+              <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
+                {/* Stats block */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex flex-col justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Awaiting Verification Volume</span>
+                    <span className="text-xl font-extrabold font-mono mt-1">
+                      {pendingCount} Transactions (GHS {pendingSum.toFixed(2)})
+                    </span>
+                  </div>
+                  <div className="p-4 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Verified & Dispatched Today</span>
+                    <span className="text-xl font-extrabold font-mono mt-1">
+                      {transactions.filter(t => t.status === 'Successful').length} Cleared Ledgers
+                    </span>
+                  </div>
+                </div>
+
+                <div className={`p-5 rounded-2xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  {/* Header info */}
+                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 flex-wrap gap-3">
+                    <div>
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
+                        <ShieldCheck className="text-amber-500" size={16} />
+                        <span>Bursar Gateway Payment Pending Verification</span>
+                      </h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Audit and verify pending mobile wallet or bank transfer transactions. Approving will automatically deduct the student's balance, update ledger status to Successful, and trigger an official PDF receipt dispatched to the guardian's email.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Filters / Search Bar */}
+                  <div className="flex items-center justify-between flex-wrap gap-3 mb-4 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center space-x-1">
+                      {(['Pending', 'Successful', 'Failed', 'All'] as const).map((filter) => {
+                        const count = filter === 'All'
+                          ? transactions.length
+                          : transactions.filter(t => t.status === filter).length;
+                        return (
+                          <button
+                            key={filter}
+                            type="button"
+                            onClick={() => setVerificationStatusFilter(filter)}
+                            className={`px-3 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
+                              verificationStatusFilter === filter
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                          >
+                            {filter} ({count})
+                          </button>
+                        );
+                      })}
                     </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse text-xs font-semibold text-slate-600">
-                        <thead>
-                          <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
-                            <th className="p-3">Student Name / ID</th>
-                            <th className="p-3">Amount (GHS)</th>
-                            <th className="p-3">Channel / Method</th>
-                            <th className="p-3">Ref Code / Slip No.</th>
-                            <th className="p-3">Uploaded Receipt</th>
-                            <th className="p-3">Status</th>
-                            <th className="p-3 text-right">
-                              Actions / Review Details
-                            </th>
+                    <div className="relative w-64">
+                      <Search className="absolute left-2.5 top-2 text-slate-400" size={12} />
+                      <input
+                        type="text"
+                        placeholder="Search student or ref..."
+                        value={verificationSearchQuery}
+                        onChange={(e) => setVerificationSearchQuery(e.target.value)}
+                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 pl-8 pr-3 py-1 rounded-lg text-xs focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs font-semibold text-slate-600">
+                      <thead>
+                        <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                          <th className="p-3">Reference / Paystack ID</th>
+                          <th className="p-3">Student Payee</th>
+                          <th className="p-3">Amount (GHS)</th>
+                          <th className="p-3">Channel / Method</th>
+                          <th className="p-3">Timestamp</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
+                        {pendingTransactions.length > 0 ? (
+                          pendingTransactions.map((tx) => (
+                            <tr key={tx.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                              <td className="p-3">
+                                <div className="font-extrabold text-slate-900 dark:text-white">{tx.reference}</div>
+                                <div className="text-[10px] text-slate-400 font-mono">{tx.paystackRef}</div>
+                              </td>
+                              <td className="p-3">
+                                <div className="font-bold text-slate-900 dark:text-white">{tx.studentName}</div>
+                                <div className="text-[10px] text-slate-400 font-mono">ID: {tx.studentId}</div>
+                              </td>
+                              <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-200">
+                                GHS {tx.amountGHS.toFixed(2)}
+                              </td>
+                              <td className="p-3">
+                                <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded text-[10px] border border-slate-200 dark:border-slate-700">
+                                  {tx.paymentMethod}
+                                </span>
+                              </td>
+                              <td className="p-3 font-medium text-slate-500">
+                                {tx.date}
+                              </td>
+                              <td className="p-3">
+                                <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
+                                  tx.status === 'Successful'
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                    : tx.status === 'Failed'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400'
+                                    : 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400'
+                                }`}>
+                                  {tx.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-right">
+                                {tx.status === 'Pending' ? (
+                                  <button
+                                    onClick={() => handleApprovePendingTransaction(tx.id)}
+                                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-[10px] font-bold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center space-x-1 ml-auto"
+                                  >
+                                    <Check size={10} />
+                                    <span>Verify & Approve</span>
+                                  </button>
+                                ) : (
+                                  <span className="text-slate-400 italic text-[10px]">Verified / Cleared</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={7} className="text-center py-12 text-slate-400 italic">
+                              No payment transactions found matching the current status filter.
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
-                          {filteredManualPayments.length > 0 ? (
-                            filteredManualPayments.map((req) => (
-                              <tr
-                                key={req.id}
-                                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
-                              >
-                                <td className="p-3">
-                                  <div className="font-bold text-slate-900 dark:text-white">
-                                    {req.studentName}
-                                  </div>
-                                  <div className="text-[10px] text-slate-400 font-mono">
-                                    ID: {req.studentId}
-                                  </div>
-                                </td>
-                                <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-200">
-                                  GHS {req.amountGHS.toFixed(2)}
-                                </td>
-                                <td className="p-3 font-medium text-slate-500 dark:text-slate-400">
-                                  {req.paymentMethod}
-                                </td>
-                                <td className="p-3 font-mono text-[11px] text-slate-500 dark:text-slate-400">
-                                  {req.referenceCode}
-                                </td>
-                                <td className="p-3">
-                                  {req.receiptImage ? (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        const win = window.open();
-                                        if (win) {
-                                          win.document.write(`
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ==================== MANUAL RECEIPTS APPROVAL QUEUE ==================== */}
+          {paymentsSubTab === 'manual-approvals' && (() => {
+            const filteredManualPayments = manualPayments.filter((req) => {
+              if (manualStatusFilter === 'All') return true;
+              return req.status === manualStatusFilter;
+            });
+            return (
+              <div className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100">
+                <div className={`p-5 rounded-2xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4 flex-wrap gap-3">
+                    <div>
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center space-x-2">
+                        <FileText className="text-emerald-500" size={16} />
+                        <span>Bursar Offline Receipt Verification Queue</span>
+                        {session?.role === 'super_admin' ? (
+                          <span className="bg-amber-500/10 text-amber-600 border border-amber-500/30 font-black text-[9px] px-2 py-0.5 rounded-full uppercase flex items-center space-x-1 inline-flex">
+                            <ShieldCheck size={10} />
+                            <span>Super Admin Approval Executive Mode</span>
+                          </span>
+                        ) : (
+                          <span className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 font-bold text-[9px] px-2 py-0.5 rounded-full uppercase flex items-center space-x-1 inline-flex">
+                            <Lock size={10} />
+                            <span>Requires Super Admin Sign-off</span>
+                          </span>
+                        )}
+                      </h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Verify uploaded mobile money and bank deposit slips. All financial approvals are strictly reserved for Super Admin (Founder & Executive Chairman).
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      {session?.role === 'super_admin' && manualPayments.some(p => p.status === 'Pending') && (
+                        <button
+                          type="button"
+                          onClick={handleBatchApproveFinancialRequests}
+                          className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg font-extrabold text-xs flex items-center space-x-1 shadow-sm transition-all cursor-pointer"
+                        >
+                          <ShieldCheck size={14} />
+                          <span>Batch Executive Approve All ({manualPayments.filter(p => p.status === 'Pending').length})</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsDirectPaymentModalOpen(true)}
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center space-x-1 shadow-xs hover:shadow-md transition-all cursor-pointer"
+                      >
+                        <Plus size={14} />
+                        <span>Record Offline Cash/Bank Payment</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Status Filters and Queue Counts */}
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-4 bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center space-x-1">
+                      {(['All', 'Pending', 'Approved', 'Rejected'] as const).map((filter) => {
+                        const count = filter === 'All' 
+                          ? manualPayments.length 
+                          : manualPayments.filter(p => p.status === filter).length;
+                        return (
+                          <button
+                            key={filter}
+                            type="button"
+                            onClick={() => setManualStatusFilter(filter)}
+                            className={`px-3 py-1 rounded-md font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
+                              manualStatusFilter === filter
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                            }`}
+                          >
+                            {filter} ({count})
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-bold">
+                      Showing {filteredManualPayments.length} of {manualPayments.length} requests
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs font-semibold text-slate-600">
+                      <thead>
+                        <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                          <th className="p-3">Student Name / ID</th>
+                          <th className="p-3">Amount (GHS)</th>
+                          <th className="p-3">Channel / Method</th>
+                          <th className="p-3">Ref Code / Slip No.</th>
+                          <th className="p-3">Uploaded Receipt</th>
+                          <th className="p-3">Status</th>
+                          <th className="p-3 text-right">Actions / Review Details</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
+                        {filteredManualPayments.length > 0 ? (
+                          filteredManualPayments.map((req) => (
+                            <tr key={req.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                              <td className="p-3">
+                                <div className="font-bold text-slate-900 dark:text-white">{req.studentName}</div>
+                                <div className="text-[10px] text-slate-400 font-mono">ID: {req.studentId}</div>
+                              </td>
+                              <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-200">
+                                GHS {req.amountGHS.toFixed(2)}
+                              </td>
+                              <td className="p-3 font-medium text-slate-500 dark:text-slate-400">
+                                {req.paymentMethod}
+                              </td>
+                              <td className="p-3 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                                {req.referenceCode}
+                              </td>
+                              <td className="p-3">
+                                {req.receiptImage ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const win = window.open();
+                                      if (win) {
+                                        win.document.write(`
                                           <html>
                                             <head><title>Receipt Slip - ${req.id}</title></head>
                                             <body style="margin:0; background:#0f172a; display:flex; align-items:center; justify-content:center; height:100vh;">
@@ -6591,304 +4864,226 @@ export default function AdminDashboard({
                                             </body>
                                           </html>
                                         `);
-                                        } else {
-                                          alert(
-                                            "Could not open preview. Popups might be blocked.",
-                                          );
-                                        }
-                                      }}
-                                      className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20 rounded font-bold text-[10px] flex items-center space-x-1 cursor-pointer"
-                                    >
-                                      <Eye size={12} />
-                                      <span>View Slip</span>
-                                    </button>
-                                  ) : (
-                                    <span className="text-slate-400 italic font-medium text-[10px]">
-                                      No image attached
-                                    </span>
-                                  )}
-                                </td>
-                                <td className="p-3">
-                                  <span
-                                    className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
-                                      req.status === "Approved"
-                                        ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                                        : req.status === "Rejected"
-                                          ? "bg-rose-50 text-rose-700 border-rose-100"
-                                          : "bg-amber-50 text-amber-700 border-amber-100"
-                                    }`}
+                                      } else {
+                                        alert('Could not open preview. Popups might be blocked.');
+                                      }
+                                    }}
+                                    className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20 rounded font-bold text-[10px] flex items-center space-x-1 cursor-pointer"
                                   >
-                                    {req.status}
-                                  </span>
-                                </td>
-                                <td className="p-3 text-right">
-                                  {req.status === "Pending" ? (
-                                    <div className="flex items-center justify-end space-x-2">
-                                      {rejectingId === req.id ? (
-                                        <div className="flex flex-col space-y-1.5 w-48 text-left bg-slate-50 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                                          <input
-                                            type="text"
-                                            placeholder="Reason for declining..."
-                                            value={rejectReason}
-                                            onChange={(e) =>
-                                              setRejectReason(e.target.value)
-                                            }
-                                            className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-750 p-1 rounded font-normal text-[10px] text-slate-800 dark:text-slate-200 focus:outline-hidden"
-                                          />
-                                          <div className="flex justify-end space-x-1">
-                                            <button
-                                              onClick={() => {
-                                                setRejectingId(null);
-                                                setRejectReason("");
-                                              }}
-                                              className="px-1.5 py-0.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-[9px] cursor-pointer"
-                                            >
-                                              Cancel
-                                            </button>
-                                            <button
-                                              onClick={() =>
-                                                handleRejectManualPayment(
-                                                  req.id,
-                                                )
-                                              }
-                                              className="px-1.5 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-[9px] font-bold cursor-pointer"
-                                            >
-                                              Confirm Decline
-                                            </button>
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <>
-                                          <button
-                                            onClick={() =>
-                                              handleApproveManualPayment(req.id)
-                                            }
-                                            className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center space-x-1 ${
-                                              session?.role === "super_admin"
-                                                ? "bg-amber-600 hover:bg-amber-500 text-white"
-                                                : "bg-slate-200 dark:bg-slate-800 text-slate-500"
-                                            }`}
-                                          >
-                                            <ShieldCheck size={11} />
-                                            <span>
-                                              {session?.role === "super_admin"
-                                                ? "Super Admin Approve"
-                                                : "Requires Super Admin"}
-                                            </span>
-                                          </button>
+                                    <Eye size={12} />
+                                    <span>View Slip</span>
+                                  </button>
+                                ) : (
+                                  <span className="text-slate-400 italic font-medium text-[10px]">No image attached</span>
+                                )}
+                              </td>
+                              <td className="p-3">
+                                <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase border ${
+                                  req.status === 'Approved'
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                    : req.status === 'Rejected'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-100'
+                                    : 'bg-amber-50 text-amber-700 border-amber-100'
+                                }`}>
+                                  {req.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-right">
+                                {req.status === 'Pending' ? (
+                                  <div className="flex items-center justify-end space-x-2">
+                                    {rejectingId === req.id ? (
+                                      <div className="flex flex-col space-y-1.5 w-48 text-left bg-slate-50 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                                        <input
+                                          type="text"
+                                          placeholder="Reason for declining..."
+                                          value={rejectReason}
+                                          onChange={(e) => setRejectReason(e.target.value)}
+                                          className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-750 p-1 rounded font-normal text-[10px] text-slate-800 dark:text-slate-200 focus:outline-hidden"
+                                        />
+                                        <div className="flex justify-end space-x-1">
                                           <button
                                             onClick={() => {
-                                              if (
-                                                session?.role !== "super_admin"
-                                              ) {
-                                                alert(
-                                                  "FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) can decline fee receipt submissions.",
-                                                );
-                                                return;
-                                              }
-                                              setRejectingId(req.id);
+                                              setRejectingId(null);
+                                              setRejectReason('');
                                             }}
-                                            className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-md text-[10px] font-bold transition-all cursor-pointer"
+                                            className="px-1.5 py-0.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-[9px] cursor-pointer"
                                           >
-                                            Decline
+                                            Cancel
                                           </button>
-                                        </>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <div className="text-[10px] text-slate-400 font-medium">
-                                      {req.status === "Approved" ? (
-                                        <span>
-                                          Verified by{" "}
-                                          <strong>{req.reviewedBy}</strong>
-                                        </span>
-                                      ) : (
-                                        <span className="text-rose-500">
-                                          Reason:{" "}
-                                          <strong>{req.rejectReason}</strong>
-                                        </span>
-                                      )}
-                                    </div>
-                                  )}
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td
-                                colSpan={7}
-                                className="text-center py-12 text-slate-400 italic"
-                              >
-                                No manual payment receipt upload requests found
-                                matching current filter.
+                                          <button
+                                            onClick={() => handleRejectManualPayment(req.id)}
+                                            className="px-1.5 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-[9px] font-bold cursor-pointer"
+                                          >
+                                            Confirm Decline
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <button
+                                          onClick={() => handleApproveManualPayment(req.id)}
+                                          className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center space-x-1 ${
+                                            session?.role === 'super_admin'
+                                              ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                                              : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
+                                          }`}
+                                        >
+                                          <ShieldCheck size={11} />
+                                          <span>{session?.role === 'super_admin' ? 'Super Admin Approve' : 'Requires Super Admin'}</span>
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            if (session?.role !== 'super_admin') {
+                                              alert('FINANCIAL GOVERNANCE RESTRICTION: Only Super Admin (Founder Nana Kwasi Edweso II) can decline fee receipt submissions.');
+                                              return;
+                                            }
+                                            setRejectingId(req.id);
+                                          }}
+                                          className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-md text-[10px] font-bold transition-all cursor-pointer"
+                                        >
+                                          Decline
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="text-[10px] text-slate-400 font-medium">
+                                    {req.status === 'Approved' ? (
+                                      <span>Verified by <strong>{req.reviewedBy}</strong></span>
+                                    ) : (
+                                      <span className="text-rose-500">Reason: <strong>{req.rejectReason}</strong></span>
+                                    )}
+                                  </div>
+                                )}
                               </td>
                             </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={7} className="text-center py-12 text-slate-400 italic">
+                              No manual payment receipt upload requests found matching current filter.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
                   </div>
+                </div>
 
-                  {/* Direct payment recording modal inside the scope */}
-                  {isDirectPaymentModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-                      <div
-                        className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-fade-in ${
-                          isDarkMode
-                            ? "bg-slate-900 border-slate-800"
-                            : "bg-white border-slate-200"
-                        }`}
-                      >
-                        <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60">
-                          <div className="flex items-center space-x-2">
-                            <Receipt className="text-emerald-500" size={18} />
-                            <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                              Record Offline Tuition Payment
-                            </h3>
-                          </div>
-                          <button
-                            onClick={() => setIsDirectPaymentModalOpen(false)}
-                            className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                {/* Direct payment recording modal inside the scope */}
+                {isDirectPaymentModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+                    <div className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl animate-fade-in ${
+                      isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                    }`}>
+                      <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                        <div className="flex items-center space-x-2">
+                          <Receipt className="text-emerald-500" size={18} />
+                          <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">Record Offline Tuition Payment</h3>
+                        </div>
+                        <button
+                          onClick={() => setIsDirectPaymentModalOpen(false)}
+                          className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleRecordDirectPayment} className="space-y-4 mt-4 text-xs font-semibold">
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">Select Student payee</label>
+                          <select
+                            value={directStudentId}
+                            onChange={(e) => setDirectStudentId(e.target.value)}
+                            required
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
                           >
-                            <X size={16} />
-                          </button>
+                            <option value="">-- Choose student --</option>
+                            {students.map(s => (
+                              <option key={s.id} value={s.id}>
+                                {s.name} (ID: {s.id}) — Bal: GHS {s.balanceGHS.toFixed(2)}
+                              </option>
+                            ))}
+                          </select>
                         </div>
 
-                        <form
-                          onSubmit={handleRecordDirectPayment}
-                          className="space-y-4 mt-4 text-xs font-semibold"
-                        >
-                          <div>
-                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                              Select Student payee
-                            </label>
-                            <select
-                              value={directStudentId}
-                              onChange={(e) =>
-                                setDirectStudentId(e.target.value)
-                              }
-                              required
-                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
-                            >
-                              <option value="">-- Choose student --</option>
-                              {students.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                  {s.name} (ID: {s.id}) — Bal: GHS{" "}
-                                  {s.balanceGHS.toFixed(2)}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">Payment Amount (GHS)</label>
+                          <input
+                            type="number"
+                            required
+                            placeholder="e.g. 1500.00"
+                            value={directAmount}
+                            onChange={(e) => setDirectAmount(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          />
+                        </div>
 
-                          <div>
-                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                              Payment Amount (GHS)
-                            </label>
-                            <input
-                              type="number"
-                              required
-                              placeholder="e.g. 1500.00"
-                              value={directAmount}
-                              onChange={(e) => setDirectAmount(e.target.value)}
-                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
-                            />
-                          </div>
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">Payment Channel / Method</label>
+                          <select
+                            value={directMethod}
+                            onChange={(e) => setDirectMethod(e.target.value as any)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          >
+                            <option value="Cash">Physical Cash Payment</option>
+                            <option value="Bank Transfer">Direct Bank Transfer</option>
+                            <option value="MTN Mobile Money">MTN Mobile Money (Bursar)</option>
+                            <option value="Telecel Cash">Telecel Cash (Bursar)</option>
+                            <option value="AirtelTigo Money">AirtelTigo Money (Bursar)</option>
+                          </select>
+                        </div>
 
-                          <div>
-                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                              Payment Channel / Method
-                            </label>
-                            <select
-                              value={directMethod}
-                              onChange={(e) =>
-                                setDirectMethod(e.target.value as any)
-                              }
-                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
-                            >
-                              <option value="Cash">
-                                Physical Cash Payment
-                              </option>
-                              <option value="Bank Transfer">
-                                Direct Bank Transfer
-                              </option>
-                              <option value="MTN Mobile Money">
-                                MTN Mobile Money (Bursar)
-                              </option>
-                              <option value="Telecel Cash">
-                                Telecel Cash (Bursar)
-                              </option>
-                              <option value="AirtelTigo Money">
-                                AirtelTigo Money (Bursar)
-                              </option>
-                            </select>
-                          </div>
+                        <div>
+                          <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">Bank Receipt / Trans Ref No.</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. TX-98218-GCB"
+                            value={directReference}
+                            onChange={(e) => setDirectReference(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
+                          />
+                        </div>
 
-                          <div>
-                            <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                              Bank Receipt / Trans Ref No.
-                            </label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="e.g. TX-98218-GCB"
-                              value={directReference}
-                              onChange={(e) =>
-                                setDirectReference(e.target.value)
-                              }
-                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-2 rounded-xl text-slate-800 dark:text-slate-100 focus:outline-hidden text-xs font-medium"
-                            />
-                          </div>
-
-                          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 flex justify-end space-x-2">
-                            <button
-                              type="button"
-                              onClick={() => setIsDirectPaymentModalOpen(false)}
-                              className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:bg-slate-150 cursor-pointer"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="submit"
-                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold cursor-pointer flex items-center space-x-1"
-                            >
-                              <ShieldCheck size={14} />
-                              <span>
-                                {session?.role === "super_admin"
-                                  ? "Record & Authorize Payment"
-                                  : "Record & Request Super Admin Approval"}
-                              </span>
-                            </button>
-                          </div>
-                        </form>
-                      </div>
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/60 flex justify-end space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsDirectPaymentModalOpen(false)}
+                            className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-500 hover:bg-slate-150 cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold cursor-pointer flex items-center space-x-1"
+                          >
+                            <ShieldCheck size={14} />
+                            <span>{session?.role === 'super_admin' ? 'Record & Authorize Payment' : 'Record & Request Super Admin Approval'}</span>
+                          </button>
+                        </div>
+                      </form>
                     </div>
-                  )}
-                </div>
-              );
-            })()}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* ==================== BANK & GATEWAY LINK LAYOUT ==================== */}
-          {paymentsSubTab === "bank-setup" && (
+          {paymentsSubTab === 'bank-setup' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in text-slate-800 dark:text-slate-100">
+              
               {/* Left Column: Paystack Keys & Core Gateway Integration */}
               <div className="lg:col-span-5 space-y-6">
-                <div
-                  className={`p-5 rounded-2xl border transition-all ${
-                    isDarkMode
-                      ? "bg-slate-900 border-slate-800"
-                      : "bg-white border-slate-200/60 shadow-xs"
-                  }`}
-                >
+                <div className={`p-5 rounded-2xl border transition-all ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
                   <div className="flex items-center space-x-2 pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4">
                     <Lock className="text-emerald-500" size={18} />
                     <div>
-                      <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-805 dark:text-slate-100">
-                        Paystack Keys & Mode
-                      </h3>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        Define your API keys and toggle the transaction router
-                        environment.
-                      </p>
+                      <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-805 dark:text-slate-100">Paystack Keys & Mode</h3>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Define your API keys and toggle the transaction router environment.</p>
                     </div>
                   </div>
 
@@ -6898,28 +5093,24 @@ export default function AdminDashboard({
                       <span className="text-slate-500">Gateway Status</span>
                       <span className="flex items-center space-x-1.5 font-bold">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span className="text-emerald-600 dark:text-emerald-400">
-                          Natively Connected
-                        </span>
+                        <span className="text-emerald-600 dark:text-emerald-400">Natively Connected</span>
                       </span>
                     </div>
 
                     {/* Mode Selection */}
                     <div>
-                      <label className="block text-slate-500 dark:text-slate-400 mb-1.5">
-                        Environment Mode
-                      </label>
+                      <label className="block text-slate-500 dark:text-slate-400 mb-1.5">Environment Mode</label>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
                           onClick={() => {
-                            setPaystackMode("test");
-                            localStorage.setItem("era_paystack_mode", "test");
+                            setPaystackMode('test');
+                            localStorage.setItem('era_paystack_mode', 'test');
                           }}
                           className={`py-2 px-3 rounded-lg border font-bold text-center transition-all cursor-pointer ${
-                            paystackMode === "test"
-                              ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                              : "border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-950"
+                            paystackMode === 'test'
+                              ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                              : 'border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-950'
                           }`}
                         >
                           Test Mode
@@ -6927,69 +5118,55 @@ export default function AdminDashboard({
                         <button
                           type="button"
                           onClick={() => {
-                            setPaystackMode("live");
-                            localStorage.setItem("era_paystack_mode", "live");
+                            setPaystackMode('live');
+                            localStorage.setItem('era_paystack_mode', 'live');
                           }}
                           className={`py-2 px-3 rounded-lg border font-bold text-center transition-all cursor-pointer ${
-                            paystackMode === "live"
-                              ? "border-emerald-600 bg-emerald-600 text-white shadow-xs"
-                              : "border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-950"
+                            paystackMode === 'live'
+                              ? 'border-emerald-600 bg-emerald-600 text-white shadow-xs'
+                              : 'border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-950'
                           }`}
                         >
                           Live Mode
                         </button>
                       </div>
                       <p className="text-[10px] text-slate-400 mt-1 font-medium leading-normal">
-                        {paystackMode === "test"
-                          ? "Simulates actual checkouts using mock payment cards and simulated Momo networks."
-                          : "Warning: Live mode requires real credit cards or mobile money wallets to process actual currency collections."}
+                        {paystackMode === 'test' 
+                          ? 'Simulates actual checkouts using mock payment cards and simulated Momo networks.' 
+                          : 'Warning: Live mode requires real credit cards or mobile money wallets to process actual currency collections.'}
                       </p>
                     </div>
 
                     {/* Public Key */}
                     <div>
-                      <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                        Paystack Public Key
-                      </label>
+                      <label className="block text-slate-500 dark:text-slate-400 mb-1">Paystack Public Key</label>
                       <input
                         type="text"
                         placeholder="pk_test_..."
                         value={paystackPublicKey}
                         onChange={(e) => {
                           setPaystackPublicKey(e.target.value);
-                          localStorage.setItem(
-                            "era_paystack_pub_key",
-                            e.target.value,
-                          );
+                          localStorage.setItem('era_paystack_pub_key', e.target.value);
                         }}
                         className={`w-full p-2.5 rounded-lg border text-xs font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                          isDarkMode
-                            ? "bg-slate-950 border-slate-800 text-slate-100"
-                            : "bg-white border-slate-200 text-slate-800"
+                          isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
                         }`}
                       />
                     </div>
 
                     {/* Secret Key */}
                     <div>
-                      <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                        Paystack Secret Key
-                      </label>
+                      <label className="block text-slate-500 dark:text-slate-400 mb-1">Paystack Secret Key</label>
                       <input
                         type="password"
                         placeholder="sk_test_..."
                         value={paystackSecretKey}
                         onChange={(e) => {
                           setPaystackSecretKey(e.target.value);
-                          localStorage.setItem(
-                            "era_paystack_sec_key",
-                            e.target.value,
-                          );
+                          localStorage.setItem('era_paystack_sec_key', e.target.value);
                         }}
                         className={`w-full p-2.5 rounded-lg border text-xs font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                          isDarkMode
-                            ? "bg-slate-950 border-slate-800 text-slate-100"
-                            : "bg-white border-slate-200 text-slate-800"
+                          isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
                         }`}
                       />
                     </div>
@@ -6997,120 +5174,63 @@ export default function AdminDashboard({
                 </div>
 
                 {/* Secure Badge Card */}
-                <div
-                  className={`p-4 rounded-xl border flex items-start space-x-3 ${
-                    isDarkMode
-                      ? "bg-slate-950 border-slate-800/60"
-                      : "bg-emerald-50/30 border-emerald-100"
-                  }`}
-                >
-                  <ShieldCheck
-                    className="text-emerald-600 shrink-0 mt-0.5"
-                    size={18}
-                  />
+                <div className={`p-4 rounded-xl border flex items-start space-x-3 ${
+                  isDarkMode ? 'bg-slate-950 border-slate-800/60' : 'bg-emerald-50/30 border-emerald-100'
+                }`}>
+                  <ShieldCheck className="text-emerald-600 shrink-0 mt-0.5" size={18} />
                   <div className="text-[11px] leading-normal font-medium text-slate-500 dark:text-slate-400">
-                    <span className="font-extrabold text-slate-800 dark:text-slate-200 block mb-0.5">
-                      PCI-DSS Compliant Infrastructure
-                    </span>
-                    All credential exchanges are processed via 256-bit SSL
-                    transport tunnels. Your secret keys are kept encrypted in
-                    local storage, isolated completely from standard browser
-                    tracking scripts.
+                    <span className="font-extrabold text-slate-800 dark:text-slate-200 block mb-0.5">PCI-DSS Compliant Infrastructure</span>
+                    All credential exchanges are processed via 256-bit SSL transport tunnels. Your secret keys are kept encrypted in local storage, isolated completely from standard browser tracking scripts.
                   </div>
                 </div>
               </div>
 
               {/* Right Column: Payout Bank Link / Mobile Money Merchant */}
               <div className="lg:col-span-7 space-y-6">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    setIsVerifyingPayout(true);
-                    setPayoutConfigError("");
-                    setPayoutConfigSuccess("");
-
-                    setTimeout(() => {
-                      if (
-                        payoutMethod === "bank" &&
-                        payoutAccountNumber.length < 8
-                      ) {
-                        setPayoutConfigError(
-                          "Invalid bank account number. It must be at least 8 digits long.",
-                        );
-                        setIsVerifyingPayout(false);
-                        return;
-                      }
-                      if (
-                        payoutMethod === "momo" &&
-                        payoutMomoNumber.length < 9
-                      ) {
-                        setPayoutConfigError(
-                          "Invalid mobile wallet number. It must be at least 9 digits.",
-                        );
-                        setIsVerifyingPayout(false);
-                        return;
-                      }
-
-                      localStorage.setItem("era_paystack_mode", paystackMode);
-                      localStorage.setItem(
-                        "era_paystack_pub_key",
-                        paystackPublicKey,
-                      );
-                      localStorage.setItem(
-                        "era_paystack_sec_key",
-                        paystackSecretKey,
-                      );
-                      localStorage.setItem("era_payout_method", payoutMethod);
-                      localStorage.setItem(
-                        "era_payout_bank_name",
-                        payoutBankName,
-                      );
-                      localStorage.setItem(
-                        "era_payout_acc_num",
-                        payoutAccountNumber,
-                      );
-                      localStorage.setItem(
-                        "era_payout_acc_name",
-                        payoutAccountName,
-                      );
-                      localStorage.setItem(
-                        "era_payout_branch",
-                        payoutBankBranch,
-                      );
-                      localStorage.setItem(
-                        "era_payout_momo_provider",
-                        payoutMomoProvider,
-                      );
-                      localStorage.setItem(
-                        "era_payout_momo_num",
-                        payoutMomoNumber,
-                      );
-                      localStorage.setItem("era_payout_verified", "true");
-
-                      setIsPayoutVerified(true);
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  setIsVerifyingPayout(true);
+                  setPayoutConfigError('');
+                  setPayoutConfigSuccess('');
+                  
+                  setTimeout(() => {
+                    if (payoutMethod === 'bank' && payoutAccountNumber.length < 8) {
+                      setPayoutConfigError('Invalid bank account number. It must be at least 8 digits long.');
                       setIsVerifyingPayout(false);
-                      setPayoutConfigSuccess(
-                        "Success! Payout destination verified by Paystack Resolver Service and linked to your account.",
-                      );
-                    }, 1500);
-                  }}
-                  className={`p-5 rounded-2xl border transition-all ${
-                    isDarkMode
-                      ? "bg-slate-900 border-slate-800"
-                      : "bg-white border-slate-200/60 shadow-xs"
-                  }`}
-                >
+                      return;
+                    }
+                    if (payoutMethod === 'momo' && payoutMomoNumber.length < 9) {
+                      setPayoutConfigError('Invalid mobile wallet number. It must be at least 9 digits.');
+                      setIsVerifyingPayout(false);
+                      return;
+                    }
+                    
+                    localStorage.setItem('era_paystack_mode', paystackMode);
+                    localStorage.setItem('era_paystack_pub_key', paystackPublicKey);
+                    localStorage.setItem('era_paystack_sec_key', paystackSecretKey);
+                    localStorage.setItem('era_payout_method', payoutMethod);
+                    localStorage.setItem('era_payout_bank_name', payoutBankName);
+                    localStorage.setItem('era_payout_acc_num', payoutAccountNumber);
+                    localStorage.setItem('era_payout_acc_name', payoutAccountName);
+                    localStorage.setItem('era_payout_branch', payoutBankBranch);
+                    localStorage.setItem('era_payout_momo_provider', payoutMomoProvider);
+                    localStorage.setItem('era_payout_momo_num', payoutMomoNumber);
+                    localStorage.setItem('era_payout_verified', 'true');
+                    
+                    setIsPayoutVerified(true);
+                    setIsVerifyingPayout(false);
+                    setPayoutConfigSuccess('Success! Payout destination verified by Paystack Resolver Service and linked to your account.');
+                  }, 1500);
+                }} className={`p-5 rounded-2xl border transition-all ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
+                  
                   <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60 mb-4">
                     <div className="flex items-center space-x-2">
                       <Building className="text-emerald-500" size={18} />
                       <div>
-                        <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                          Payout Settlement Bank Link
-                        </h3>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          Route accumulated student tuition fees directly to
-                          your certified bank account.
-                        </p>
+                        <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-100">Payout Settlement Bank Link</h3>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Route accumulated student tuition fees directly to your certified bank account.</p>
                       </div>
                     </div>
                     {isPayoutVerified ? (
@@ -7127,17 +5247,15 @@ export default function AdminDashboard({
                   <div className="space-y-4 text-xs font-semibold">
                     {/* Switch: Bank Account vs MoMo Wallet */}
                     <div>
-                      <label className="block text-slate-500 dark:text-slate-400 mb-1.5">
-                        Settlement Method
-                      </label>
+                      <label className="block text-slate-500 dark:text-slate-400 mb-1.5">Settlement Method</label>
                       <div className="flex bg-slate-50 dark:bg-slate-950 p-1 rounded-lg border border-slate-100 dark:border-slate-800">
                         <button
                           type="button"
-                          onClick={() => setPayoutMethod("bank")}
+                          onClick={() => setPayoutMethod('bank')}
                           className={`flex-1 py-2 rounded-md font-bold text-center text-xs transition-all cursor-pointer flex items-center justify-center space-x-2 ${
-                            payoutMethod === "bank"
-                              ? "bg-white dark:bg-slate-850 text-slate-900 dark:text-white shadow-xs"
-                              : "text-slate-400 dark:text-slate-500 hover:text-slate-700"
+                            payoutMethod === 'bank'
+                              ? 'bg-white dark:bg-slate-850 text-slate-900 dark:text-white shadow-xs'
+                              : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'
                           }`}
                         >
                           <Building size={14} />
@@ -7145,11 +5263,11 @@ export default function AdminDashboard({
                         </button>
                         <button
                           type="button"
-                          onClick={() => setPayoutMethod("momo")}
+                          onClick={() => setPayoutMethod('momo')}
                           className={`flex-1 py-2 rounded-md font-bold text-center text-xs transition-all cursor-pointer flex items-center justify-center space-x-2 ${
-                            payoutMethod === "momo"
-                              ? "bg-white dark:bg-slate-850 text-slate-900 dark:text-white shadow-xs"
-                              : "text-slate-400 dark:text-slate-500 hover:text-slate-700"
+                            payoutMethod === 'momo'
+                              ? 'bg-white dark:bg-slate-850 text-slate-900 dark:text-white shadow-xs'
+                              : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'
                           }`}
                         >
                           <Smartphone size={14} />
@@ -7159,67 +5277,39 @@ export default function AdminDashboard({
                     </div>
 
                     {/* Bank fields */}
-                    {payoutMethod === "bank" && (
+                    {payoutMethod === 'bank' && (
                       <div className="space-y-4 animate-fade-in">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                              Select Bank
-                            </label>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Select Bank</label>
                             <select
                               value={payoutBankName}
-                              onChange={(e) =>
-                                setPayoutBankName(e.target.value)
-                              }
+                              onChange={(e) => setPayoutBankName(e.target.value)}
                               className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                                isDarkMode
-                                  ? "bg-slate-950 border-slate-800 text-slate-100 font-medium"
-                                  : "bg-white border-slate-200 text-slate-800"
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100 font-medium' : 'bg-white border-slate-200 text-slate-800'
                               }`}
                             >
-                              <option value="GCB Bank PLC">
-                                GCB Bank PLC (Ghana Commercial Bank)
-                              </option>
-                              <option value="Consolidated Bank Ghana (CBG)">
-                                Consolidated Bank Ghana (CBG)
-                              </option>
-                              <option value="Ecobank Ghana PLC">
-                                Ecobank Ghana PLC
-                              </option>
-                              <option value="Stanbic Bank Ghana">
-                                Stanbic Bank Ghana
-                              </option>
-                              <option value="Absa Bank Ghana">
-                                Absa Bank Ghana
-                              </option>
-                              <option value="Fidelity Bank Ghana">
-                                Fidelity Bank Ghana
-                              </option>
-                              <option value="Zenith Bank Ghana">
-                                Zenith Bank Ghana
-                              </option>
+                              <option value="GCB Bank PLC">GCB Bank PLC (Ghana Commercial Bank)</option>
+                              <option value="Consolidated Bank Ghana (CBG)">Consolidated Bank Ghana (CBG)</option>
+                              <option value="Ecobank Ghana PLC">Ecobank Ghana PLC</option>
+                              <option value="Stanbic Bank Ghana">Stanbic Bank Ghana</option>
+                              <option value="Absa Bank Ghana">Absa Bank Ghana</option>
+                              <option value="Fidelity Bank Ghana">Fidelity Bank Ghana</option>
+                              <option value="Zenith Bank Ghana">Zenith Bank Ghana</option>
                               <option value="CalBank PLC">CalBank PLC</option>
-                              <option value="Société Générale Ghana">
-                                Société Générale Ghana
-                              </option>
+                              <option value="Société Générale Ghana">Société Générale Ghana</option>
                             </select>
                           </div>
                           <div>
-                            <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                              Bank Branch
-                            </label>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Bank Branch</label>
                             <input
                               type="text"
                               required
                               placeholder="e.g. Ejisu Main Branch"
                               value={payoutBankBranch}
-                              onChange={(e) =>
-                                setPayoutBankBranch(e.target.value)
-                              }
+                              onChange={(e) => setPayoutBankBranch(e.target.value)}
                               className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                                isDarkMode
-                                  ? "bg-slate-950 border-slate-800 text-slate-100"
-                                  : "bg-white border-slate-200 text-slate-800"
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
                               }`}
                             />
                           </div>
@@ -7227,43 +5317,29 @@ export default function AdminDashboard({
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                              Account Number
-                            </label>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Account Number</label>
                             <input
                               type="text"
                               required
                               maxLength={16}
                               placeholder="e.g. 1011130004521"
                               value={payoutAccountNumber}
-                              onChange={(e) =>
-                                setPayoutAccountNumber(
-                                  e.target.value.replace(/\D/g, ""),
-                                )
-                              }
+                              onChange={(e) => setPayoutAccountNumber(e.target.value.replace(/\D/g, ''))}
                               className={`w-full p-2.5 rounded-lg border text-xs font-mono focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                                isDarkMode
-                                  ? "bg-slate-950 border-slate-800 text-slate-100"
-                                  : "bg-white border-slate-200 text-slate-800"
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
                               }`}
                             />
                           </div>
                           <div>
-                            <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                              Account Holder Name
-                            </label>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Account Holder Name</label>
                             <input
                               type="text"
                               required
                               placeholder="e.g. Edweso Royal Academy Ltd"
                               value={payoutAccountName}
-                              onChange={(e) =>
-                                setPayoutAccountName(e.target.value)
-                              }
+                              onChange={(e) => setPayoutAccountName(e.target.value)}
                               className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                                isDarkMode
-                                  ? "bg-slate-950 border-slate-800 text-slate-100"
-                                  : "bg-white border-slate-200 text-slate-800"
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
                               }`}
                             />
                           </div>
@@ -7272,57 +5348,35 @@ export default function AdminDashboard({
                     )}
 
                     {/* MoMo fields */}
-                    {payoutMethod === "momo" && (
+                    {payoutMethod === 'momo' && (
                       <div className="space-y-4 animate-fade-in">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                              Mobile Operator
-                            </label>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Mobile Operator</label>
                             <select
                               value={payoutMomoProvider}
-                              onChange={(e) =>
-                                setPayoutMomoProvider(e.target.value)
-                              }
+                              onChange={(e) => setPayoutMomoProvider(e.target.value)}
                               className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                                isDarkMode
-                                  ? "bg-slate-950 border-slate-800 text-slate-100 font-medium"
-                                  : "bg-white border-slate-200 text-slate-800"
+                                isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100 font-medium' : 'bg-white border-slate-200 text-slate-800'
                               }`}
                             >
-                              <option value="MTN Mobile Money">
-                                MTN Mobile Money
-                              </option>
+                              <option value="MTN Mobile Money">MTN Mobile Money</option>
                               <option value="Telecel Cash">Telecel Cash</option>
-                              <option value="AirtelTigo Money">
-                                AirtelTigo Money
-                              </option>
+                              <option value="AirtelTigo Money">AirtelTigo Money</option>
                             </select>
                           </div>
                           <div>
-                            <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                              Merchant Wallet Number
-                            </label>
+                            <label className="block text-slate-500 dark:text-slate-400 mb-1">Merchant Wallet Number</label>
                             <div className="relative">
-                              <span className="absolute left-3 top-2.5 font-bold text-slate-400 text-xs">
-                                +233
-                              </span>
+                              <span className="absolute left-3 top-2.5 font-bold text-slate-400 text-xs">+233</span>
                               <input
                                 type="tel"
                                 required
                                 placeholder="244123456"
                                 value={payoutMomoNumber}
-                                onChange={(e) =>
-                                  setPayoutMomoNumber(
-                                    e.target.value
-                                      .replace(/\D/g, "")
-                                      .slice(0, 9),
-                                  )
-                                }
+                                onChange={(e) => setPayoutMomoNumber(e.target.value.replace(/\D/g, '').slice(0, 9))}
                                 className={`w-full p-2.5 pl-14 rounded-lg border text-xs font-semibold focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                                  isDarkMode
-                                    ? "bg-slate-950 border-slate-800 text-slate-100"
-                                    : "bg-white border-slate-200 text-slate-800"
+                                  isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
                                 }`}
                               />
                             </div>
@@ -7330,21 +5384,15 @@ export default function AdminDashboard({
                         </div>
 
                         <div>
-                          <label className="block text-slate-500 dark:text-slate-400 mb-1">
-                            Registered Merchant / Business Name
-                          </label>
+                          <label className="block text-slate-500 dark:text-slate-400 mb-1">Registered Merchant / Business Name</label>
                           <input
                             type="text"
                             required
                             placeholder="e.g. Edweso Royal Academy Merchant Billing"
                             value={payoutAccountName}
-                            onChange={(e) =>
-                              setPayoutAccountName(e.target.value)
-                            }
+                            onChange={(e) => setPayoutAccountName(e.target.value)}
                             className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                              isDarkMode
-                                ? "bg-slate-950 border-slate-800 text-slate-100"
-                                : "bg-white border-slate-200 text-slate-800"
+                              isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'
                             }`}
                           />
                         </div>
@@ -7388,82 +5436,48 @@ export default function AdminDashboard({
                 </form>
 
                 {/* Settlement Information Box */}
-                <div
-                  className={`p-5 rounded-2xl border ${
-                    isDarkMode
-                      ? "bg-slate-900 border-slate-800"
-                      : "bg-white border-slate-200/60 shadow-xs"
-                  }`}
-                >
+                <div className={`p-5 rounded-2xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
                   <div className="flex items-center space-x-2 mb-3">
                     <Info className="text-slate-400" size={16} />
-                    <h4 className="font-extrabold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wide">
-                      Payout Settlement Policy
-                    </h4>
+                    <h4 className="font-extrabold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wide">Payout Settlement Policy</h4>
                   </div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal space-y-2 font-medium">
                     <p>
-                      <strong>Automatic Settlement (T+1):</strong> All student
-                      tuition, cafeteria deposits, and bus levies processed via
-                      card or mobile money during a calendar day are cleared,
-                      batched, and deposited directly into your linked{" "}
-                      <strong>
-                        {payoutMethod === "bank"
-                          ? payoutBankName
-                          : payoutMomoProvider}
-                      </strong>{" "}
-                      account on the next banking day.
+                      <strong>Automatic Settlement (T+1):</strong> All student tuition, cafeteria deposits, and bus levies processed via card or mobile money during a calendar day are cleared, batched, and deposited directly into your linked <strong>{payoutMethod === 'bank' ? payoutBankName : payoutMomoProvider}</strong> account on the next banking day.
                     </p>
                     <p>
-                      <strong>Standard Service Fee:</strong> Paystack collects a
-                      native processing rate of <strong>1.95%</strong> on local
-                      Ghanaian cards and mobile money networks. Edweso Royal
-                      Academy doesn't impose additional surcharges on parental
-                      checkouts.
+                      <strong>Standard Service Fee:</strong> Paystack collects a native processing rate of <strong>1.95%</strong> on local Ghanaian cards and mobile money networks. Edweso Royal Academy doesn't impose additional surcharges on parental checkouts.
                     </p>
                     <p>
-                      <strong>Failed Settlement Attempts:</strong> If your bank
-                      rejects a transfer due to incorrect account naming or
-                      locked accounts, Paystack will immediately hold the funds,
-                      send a system diagnostic alert, and retry once you resolve
-                      and update details above.
+                      <strong>Failed Settlement Attempts:</strong> If your bank rejects a transfer due to incorrect account naming or locked accounts, Paystack will immediately hold the funds, send a system diagnostic alert, and retry once you resolve and update details above.
                     </p>
                   </div>
                 </div>
               </div>
+
             </div>
           )}
 
-          {paymentsSubTab === "scheduler" && (
-            <div
-              className="space-y-6 animate-fade-in"
-              id="payment-scheduler-panel"
-            >
+          {paymentsSubTab === 'scheduler' && (
+            <div className="space-y-6 animate-fade-in" id="payment-scheduler-panel">
+              
               <div className="pb-2 border-b border-slate-200/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <h3 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-                    Recurring Payment Scheduler
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    Establish automated recurrence rules to periodically audit
-                    outstanding student balances and dispatch personalized email
-                    alerts to parents.
-                  </p>
+                  <h3 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Recurring Payment Scheduler</h3>
+                  <p className="text-xs text-slate-400">Establish automated recurrence rules to periodically audit outstanding student balances and dispatch personalized email alerts to parents.</p>
                 </div>
-
+                
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setIsCreatePlanOpen(!isCreatePlanOpen)}
                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wide rounded-lg flex items-center space-x-1.5 cursor-pointer shadow-xs"
                   >
                     <Plus size={14} />
-                    <span>
-                      {isCreatePlanOpen
-                        ? "Cancel Form"
-                        : "Create Schedule Plan"}
-                    </span>
+                    <span>{isCreatePlanOpen ? 'Cancel Form' : 'Create Schedule Plan'}</span>
                   </button>
-
+                  
                   <button
                     onClick={handleSimulateCronRun}
                     className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs uppercase tracking-wide rounded-lg flex items-center space-x-1.5 cursor-pointer shadow-xs"
@@ -7476,106 +5490,61 @@ export default function AdminDashboard({
               </div>
 
               {schedulerNotification && (
-                <div
-                  className={`p-4 rounded-xl border text-xs font-semibold flex items-center space-x-2 ${
-                    schedulerNotification.type === "success"
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                      : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
-                  }`}
-                >
-                  <span
-                    className={`h-2 w-2 rounded-full ${schedulerNotification.type === "success" ? "bg-emerald-500" : "bg-rose-500"}`}
-                  />
+                <div className={`p-4 rounded-xl border text-xs font-semibold flex items-center space-x-2 ${
+                  schedulerNotification.type === 'success' 
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+                    : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+                }`}>
+                  <span className={`h-2 w-2 rounded-full ${schedulerNotification.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                   <span>{schedulerNotification.message}</span>
                 </div>
               )}
 
               {/* Quick Metrics Grid */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div
-                  className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100 shadow-xs"}`}
-                >
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Active Schedules
-                  </span>
+                <div className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Schedules</span>
                   <div className="mt-2 flex items-baseline justify-between">
-                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">
-                      {schedulerPlans.filter((p) => p.isActive).length}
-                    </span>
-                    <span className="text-[10px] text-emerald-500 font-bold">
-                      Active
-                    </span>
+                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">{schedulerPlans.filter(p => p.isActive).length}</span>
+                    <span className="text-[10px] text-emerald-500 font-bold">Active</span>
                   </div>
                 </div>
-                <div
-                  className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100 shadow-xs"}`}
-                >
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Total Schedules
-                  </span>
+                <div className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Schedules</span>
                   <div className="mt-2 flex items-baseline justify-between">
-                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">
-                      {schedulerPlans.length}
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-bold">
-                      Configured
-                    </span>
+                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">{schedulerPlans.length}</span>
+                    <span className="text-[10px] text-slate-400 font-bold">Configured</span>
                   </div>
                 </div>
-                <div
-                  className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100 shadow-xs"}`}
-                >
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Cron Run Logs
-                  </span>
+                <div className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cron Run Logs</span>
                   <div className="mt-2 flex items-baseline justify-between">
-                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">
-                      {schedulerLogs.length}
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-bold">
-                      Executions
-                    </span>
+                    <span className="text-2xl font-extrabold text-slate-800 dark:text-white font-mono">{schedulerLogs.length}</span>
+                    <span className="text-[10px] text-slate-400 font-bold">Executions</span>
                   </div>
                 </div>
-                <div
-                  className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100 shadow-xs"}`}
-                >
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Outstanding Pupils
-                  </span>
+                <div className={`p-4 rounded-xl border flex flex-col justify-between ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-xs'}`}>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outstanding Pupils</span>
                   <div className="mt-2 flex items-baseline justify-between">
-                    <span className="text-2xl font-extrabold text-rose-500 font-mono">
-                      {students.filter((s) => s.balanceGHS > 0).length}
-                    </span>
-                    <span className="text-[10px] text-rose-500 font-bold">
-                      With Balance
-                    </span>
+                    <span className="text-2xl font-extrabold text-rose-500 font-mono">{students.filter(s => s.balanceGHS > 0).length}</span>
+                    <span className="text-[10px] text-rose-500 font-bold">With Balance</span>
                   </div>
                 </div>
               </div>
 
               {/* CREATE SCHEDULE FORM (COLLAPSIBLE) */}
               {isCreatePlanOpen && (
-                <form
-                  onSubmit={handleCreatePlan}
-                  className={`p-6 rounded-2xl border transition-all space-y-4 animate-fade-in ${
-                    isDarkMode
-                      ? "bg-slate-950 border-slate-850"
-                      : "bg-slate-50/50 border-slate-200"
-                  }`}
-                >
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 border-b pb-2 mb-2">
-                    Configure Automated Recurrence Rules
-                  </h4>
-
+                <form onSubmit={handleCreatePlan} className={`p-6 rounded-2xl border transition-all space-y-4 animate-fade-in ${
+                  isDarkMode ? 'bg-slate-950 border-slate-850' : 'bg-slate-50/50 border-slate-200'
+                }`}>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 border-b pb-2 mb-2">Configure Automated Recurrence Rules</h4>
+                  
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Column - Input Fields */}
                     <div className="lg:col-span-2 space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-bold">
                         <div>
-                          <label className="block text-[10px] text-slate-400 uppercase mb-1">
-                            Schedule Rule Name
-                          </label>
+                          <label className="block text-[10px] text-slate-400 uppercase mb-1">Schedule Rule Name</label>
                           <input
                             type="text"
                             required
@@ -7583,26 +5552,18 @@ export default function AdminDashboard({
                             value={newPlanName}
                             onChange={(e) => setNewPlanName(e.target.value)}
                             className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                              isDarkMode
-                                ? "bg-slate-900 border-slate-850 text-white"
-                                : "bg-white border-slate-200 text-slate-800"
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
                             }`}
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] text-slate-400 uppercase mb-1">
-                            Audit Recurrence Frequency
-                          </label>
+                          <label className="block text-[10px] text-slate-400 uppercase mb-1">Audit Recurrence Frequency</label>
                           <select
                             value={newPlanFrequency}
-                            onChange={(e) =>
-                              setNewPlanFrequency(e.target.value as any)
-                            }
+                            onChange={(e) => setNewPlanFrequency(e.target.value as any)}
                             className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                              isDarkMode
-                                ? "bg-slate-900 border-slate-850 text-white"
-                                : "bg-white border-slate-200 text-slate-800"
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
                             }`}
                           >
                             <option value="Daily">Daily Run</option>
@@ -7613,25 +5574,17 @@ export default function AdminDashboard({
                         </div>
 
                         <div>
-                          <label className="block text-[10px] text-slate-400 uppercase mb-1">
-                            Target Audience Segment
-                          </label>
+                          <label className="block text-[10px] text-slate-400 uppercase mb-1">Target Audience Segment</label>
                           <select
                             value={newPlanTarget}
                             onChange={(e) => setNewPlanTarget(e.target.value)}
                             className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                              isDarkMode
-                                ? "bg-slate-900 border-slate-850 text-white"
-                                : "bg-white border-slate-200 text-slate-800"
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
                             }`}
                           >
-                            <option value="AllOutstanding">
-                              All Pupils with Unpaid Balance
-                            </option>
-                            {classes.map((cl) => (
-                              <option key={cl.id} value={cl.id}>
-                                Only {cl.name} Pupils
-                              </option>
+                            <option value="AllOutstanding">All Pupils with Unpaid Balance</option>
+                            {classes.map(cl => (
+                              <option key={cl.id} value={cl.id}>Only {cl.name} Pupils</option>
                             ))}
                           </select>
                         </div>
@@ -7639,9 +5592,7 @@ export default function AdminDashboard({
 
                       <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-xs font-bold">
                         <div>
-                          <label className="block text-[10px] text-slate-400 uppercase mb-1">
-                            Outgoing Email Subject
-                          </label>
+                          <label className="block text-[10px] text-slate-400 uppercase mb-1">Outgoing Email Subject</label>
                           <input
                             type="text"
                             required
@@ -7649,9 +5600,7 @@ export default function AdminDashboard({
                             value={newPlanSubject}
                             onChange={(e) => setNewPlanSubject(e.target.value)}
                             className={`w-full p-2.5 rounded-lg border text-xs focus:outline-hidden focus:ring-1 focus:ring-emerald-500 ${
-                              isDarkMode
-                                ? "bg-slate-900 border-slate-850 text-white"
-                                : "bg-white border-slate-200 text-slate-800"
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
                             }`}
                           />
                         </div>
@@ -7660,17 +5609,8 @@ export default function AdminDashboard({
                       <div className="grid grid-cols-1 md:grid-cols-1 gap-4 text-xs font-bold">
                         <div>
                           <div className="flex justify-between items-center mb-1">
-                            <label className="block text-[10px] text-slate-400 uppercase">
-                              Email Template Body
-                            </label>
-                            <span className="text-[9px] font-mono text-slate-400 font-normal font-sans">
-                              Use tags:{" "}
-                              <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{parent_name}`}</code>
-                              ,{" "}
-                              <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{student_name}`}</code>
-                              ,{" "}
-                              <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{outstanding_balance}`}</code>
-                            </span>
+                            <label className="block text-[10px] text-slate-400 uppercase">Email Template Body</label>
+                            <span className="text-[9px] font-mono text-slate-400 font-normal font-sans">Use tags: <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{parent_name}`}</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{student_name}`}</code>, <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-[8px] font-semibold text-emerald-600 font-mono">{`{outstanding_balance}`}</code></span>
                           </div>
                           <textarea
                             rows={6}
@@ -7678,9 +5618,7 @@ export default function AdminDashboard({
                             value={newPlanTemplate}
                             onChange={(e) => setNewPlanTemplate(e.target.value)}
                             className={`w-full p-2.5 rounded-lg border text-xs leading-relaxed focus:outline-hidden focus:ring-1 focus:ring-emerald-500 font-mono ${
-                              isDarkMode
-                                ? "bg-slate-900 border-slate-850 text-white"
-                                : "bg-white border-slate-200 text-slate-800"
+                              isDarkMode ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-200 text-slate-800'
                             }`}
                           />
                         </div>
@@ -7690,98 +5628,58 @@ export default function AdminDashboard({
                     {/* Right Column - Live Preview & Audience Lists */}
                     <div className="space-y-4">
                       {/* Live Template Preview Card */}
-                      <div
-                        className={`p-4 rounded-xl border space-y-3 ${isDarkMode ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200 shadow-xs"}`}
-                      >
+                      <div className={`p-4 rounded-xl border space-y-3 ${isDarkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-white border-slate-200 shadow-xs'}`}>
                         <div className="flex items-center justify-between border-b pb-1.5 border-slate-200/50 dark:border-slate-800/80">
                           <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center space-x-1">
                             <Sparkles size={10} className="animate-pulse" />
                             <span>Live Template Preview</span>
                           </span>
-                          <span className="text-[8px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-bold uppercase">
-                            Sample Data
-                          </span>
+                          <span className="text-[8px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-bold uppercase">Sample Data</span>
                         </div>
-
+                        
                         <div className="space-y-1 text-xs">
-                          <div className="text-[10px] text-slate-400 font-mono">
-                            <span className="font-bold">To:</span>{" "}
-                            guardian_email@domain.com
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-mono font-bold truncate">
-                            <span className="font-bold">Subject:</span>{" "}
-                            {newPlanSubject || "(No Subject specified)"}
-                          </div>
+                          <div className="text-[10px] text-slate-400 font-mono"><span className="font-bold">To:</span> guardian_email@domain.com</div>
+                          <div className="text-[10px] text-slate-400 font-mono font-bold truncate"><span className="font-bold">Subject:</span> {newPlanSubject || '(No Subject specified)'}</div>
                         </div>
 
-                        <div
-                          className={`p-3 rounded-lg border text-xs font-semibold leading-relaxed font-sans min-h-[140px] whitespace-pre-wrap ${
-                            isDarkMode
-                              ? "bg-slate-950 text-slate-300 border-slate-850"
-                              : "bg-slate-50 text-slate-700 border-slate-150 shadow-inner"
-                          }`}
-                        >
+                        <div className={`p-3 rounded-lg border text-xs font-semibold leading-relaxed font-sans min-h-[140px] whitespace-pre-wrap ${
+                          isDarkMode ? 'bg-slate-950 text-slate-300 border-slate-850' : 'bg-slate-50 text-slate-700 border-slate-150 shadow-inner'
+                        }`}>
                           {(() => {
-                            let body = newPlanTemplate || "";
-                            body = body.replace(/{parent_name}/g, "Abena Osei");
-                            body = body.replace(
-                              /{student_name}/g,
-                              "Kwame Osei",
-                            );
-                            body = body.replace(
-                              /{outstanding_balance}/g,
-                              "680.00",
-                            );
-                            return body || "Begin typing template body...";
+                            let body = newPlanTemplate || '';
+                            body = body.replace(/{parent_name}/g, 'Abena Osei');
+                            body = body.replace(/{student_name}/g, 'Kwame Osei');
+                            body = body.replace(/{outstanding_balance}/g, '680.00');
+                            return body || 'Begin typing template body...';
                           })()}
                         </div>
                       </div>
 
                       {/* Audience Segment Preview */}
                       {(() => {
-                        let targetStudents = students.filter(
-                          (s) => s.balanceGHS > 0,
-                        );
-                        if (newPlanTarget !== "AllOutstanding") {
-                          targetStudents = targetStudents.filter(
-                            (s) => s.classId === newPlanTarget,
-                          );
+                        let targetStudents = students.filter(s => s.balanceGHS > 0);
+                        if (newPlanTarget !== 'AllOutstanding') {
+                          targetStudents = targetStudents.filter(s => s.classId === newPlanTarget);
                         }
                         return (
-                          <div
-                            className={`p-4 rounded-xl border space-y-2 ${isDarkMode ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200 shadow-xs"}`}
-                          >
+                          <div className={`p-4 rounded-xl border space-y-2 ${isDarkMode ? 'bg-slate-900/40 border-slate-800' : 'bg-white border-slate-200 shadow-xs'}`}>
                             <div className="flex justify-between items-center border-b pb-1">
                               <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                Target Recipients ({targetStudents.length}{" "}
-                                pupils)
+                                Target Recipients ({targetStudents.length} pupils)
                               </span>
-                              <span className="text-[8px] text-slate-400 font-mono">
-                                Current outstanding
-                              </span>
+                              <span className="text-[8px] text-slate-400 font-mono">Current outstanding</span>
                             </div>
                             <div className="max-h-[130px] overflow-y-auto space-y-1.5 pr-1">
                               {targetStudents.length === 0 ? (
-                                <div className="text-[10px] text-slate-400 italic font-semibold text-center py-4">
-                                  No outstanding pupils in this segment
-                                </div>
+                                <div className="text-[10px] text-slate-400 italic font-semibold text-center py-4">No outstanding pupils in this segment</div>
                               ) : (
-                                targetStudents.map((st) => (
-                                  <div
-                                    key={st.id}
-                                    className="flex justify-between items-center text-[10px] py-0.5 font-semibold text-slate-600 dark:text-slate-400"
-                                  >
+                                targetStudents.map(st => (
+                                  <div key={st.id} className="flex justify-between items-center text-[10px] py-0.5 font-semibold text-slate-600 dark:text-slate-400">
                                     <div className="truncate max-w-[150px]">
-                                      <div className="text-slate-800 dark:text-white font-bold">
-                                        {st.name}
-                                      </div>
-                                      <div className="text-[9px] text-slate-400 font-normal">
-                                        Guardian: {st.parentName}
-                                      </div>
+                                      <div className="text-slate-800 dark:text-white font-bold">{st.name}</div>
+                                      <div className="text-[9px] text-slate-400 font-normal">Guardian: {st.parentName}</div>
                                     </div>
-                                    <span className="font-mono text-rose-500 font-bold">
-                                      GHS {st.balanceGHS.toFixed(2)}
-                                    </span>
+                                    <span className="font-mono text-rose-500 font-bold">GHS {st.balanceGHS.toFixed(2)}</span>
                                   </div>
                                 ))
                               )}
@@ -7797,9 +5695,7 @@ export default function AdminDashboard({
                       type="button"
                       onClick={() => setIsCreatePlanOpen(false)}
                       className={`px-4 py-2 border rounded-lg text-xs font-extrabold uppercase tracking-wide cursor-pointer ${
-                        isDarkMode
-                          ? "border-slate-800 text-slate-400 hover:bg-slate-900"
-                          : "border-slate-200 text-slate-500 hover:bg-slate-100"
+                        isDarkMode ? 'border-slate-800 text-slate-400 hover:bg-slate-900' : 'border-slate-200 text-slate-500 hover:bg-slate-100'
                       }`}
                     >
                       Cancel
@@ -7817,29 +5713,20 @@ export default function AdminDashboard({
 
               {/* CORES AND SCHEDULER PLANS GRID */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
                 {/* PLAN LISTING PANEL */}
-                <div
-                  className={`p-5 rounded-2xl border lg:col-span-2 ${
-                    isDarkMode
-                      ? "bg-slate-900 border-slate-800"
-                      : "bg-white border-slate-200/60 shadow-xs"
-                  }`}
-                >
+                <div className={`p-5 rounded-2xl border lg:col-span-2 ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
                   <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
-                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">
-                      Configured Scheduler Plans
-                    </h4>
-                    <span className="text-[10px] text-slate-400 font-semibold font-sans">
-                      Running behind-the-scenes chron
-                    </span>
+                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">Configured Scheduler Plans</h4>
+                    <span className="text-[10px] text-slate-400 font-semibold font-sans">Running behind-the-scenes chron</span>
                   </div>
 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr
-                          className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                        >
+                        <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                           <th className="p-3">Schedule Name</th>
                           <th className="p-3">Audience Segment</th>
                           <th className="p-3">Recurrence</th>
@@ -7851,81 +5738,51 @@ export default function AdminDashboard({
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {schedulerPlans.length === 0 ? (
                           <tr>
-                            <td
-                              colSpan={6}
-                              className="p-8 text-center text-slate-400 italic font-semibold"
-                            >
-                              No recurrence plans configured. Click "Create
-                              Schedule Plan" to build one.
+                            <td colSpan={6} className="p-8 text-center text-slate-400 italic font-semibold">
+                              No recurrence plans configured. Click "Create Schedule Plan" to build one.
                             </td>
                           </tr>
                         ) : (
-                          schedulerPlans.map((plan) => {
-                            const targetClass = classes.find(
-                              (c) => c.id === plan.targetAudience,
-                            );
+                          schedulerPlans.map(plan => {
+                            const targetClass = classes.find(c => c.id === plan.targetAudience);
                             return (
-                              <tr
-                                key={plan.id}
-                                className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300"
-                              >
+                              <tr key={plan.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300">
                                 <td className="p-3 font-bold text-slate-900 dark:text-white">
                                   <div>{plan.name}</div>
-                                  <div className="text-[9px] text-slate-400 font-normal truncate max-w-xs mt-0.5">
-                                    {plan.emailSubject}
-                                  </div>
+                                  <div className="text-[9px] text-slate-400 font-normal truncate max-w-xs mt-0.5">{plan.emailSubject}</div>
                                 </td>
                                 <td className="p-3">
-                                  {plan.targetAudience === "AllOutstanding" ? (
-                                    <span className="text-[9px] bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded text-slate-600 dark:text-slate-400 uppercase font-bold">
-                                      All Debtors
-                                    </span>
+                                  {plan.targetAudience === 'AllOutstanding' ? (
+                                    <span className="text-[9px] bg-slate-100 dark:bg-slate-950 px-2 py-0.5 rounded text-slate-600 dark:text-slate-400 uppercase font-bold">All Debtors</span>
                                   ) : (
-                                    <span className="text-[9px] bg-sky-500/10 text-sky-600 px-2 py-0.5 rounded uppercase font-bold">
-                                      {targetClass
-                                        ? targetClass.name
-                                        : "Unknown Class"}
-                                    </span>
+                                    <span className="text-[9px] bg-sky-500/10 text-sky-600 px-2 py-0.5 rounded uppercase font-bold">{targetClass ? targetClass.name : 'Unknown Class'}</span>
                                   )}
                                 </td>
-                                <td className="p-3 font-mono text-[10px]">
-                                  {plan.frequency}
-                                </td>
+                                <td className="p-3 font-mono text-[10px]">{plan.frequency}</td>
                                 <td className="p-3 text-[10px] text-slate-400 font-mono">
                                   <div>Next: {plan.nextRunDate}</div>
-                                  {plan.lastRunDate && (
-                                    <div className="text-[9px] text-emerald-500/80">
-                                      Last: {plan.lastRunDate}
-                                    </div>
-                                  )}
+                                  {plan.lastRunDate && <div className="text-[9px] text-emerald-500/80">Last: {plan.lastRunDate}</div>}
                                 </td>
                                 <td className="p-3">
                                   <button
-                                    onClick={() =>
-                                      handleTogglePlanActive(plan.id)
-                                    }
+                                    onClick={() => handleTogglePlanActive(plan.id)}
                                     className={`px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase transition-all tracking-wider cursor-pointer ${
                                       plan.isActive
-                                        ? "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
-                                        : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200"
+                                        ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:bg-slate-200'
                                     }`}
                                   >
-                                    {plan.isActive ? "● Active" : "○ Paused"}
+                                    {plan.isActive ? '● Active' : '○ Paused'}
                                   </button>
                                 </td>
                                 <td className="p-3 text-right">
                                   <div className="flex items-center justify-end space-x-1.5">
                                     <button
-                                      onClick={() =>
-                                        handleRunSinglePlan(plan.id)
-                                      }
+                                      onClick={() => handleRunSinglePlan(plan.id)}
                                       className="p-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg transition-colors cursor-pointer"
                                       title="Run Auditing Plan Now"
                                     >
-                                      <Play
-                                        size={12}
-                                        className="fill-current"
-                                      />
+                                      <Play size={12} className="fill-current" />
                                     </button>
                                     <button
                                       onClick={() => handleDeletePlan(plan.id)}
@@ -7946,68 +5803,49 @@ export default function AdminDashboard({
                 </div>
 
                 {/* RUN LOGS AUDIT TRAIL */}
-                <div
-                  className={`p-5 rounded-2xl border ${
-                    isDarkMode
-                      ? "bg-slate-900 border-slate-800"
-                      : "bg-white border-slate-200/60 shadow-xs"
-                  }`}
-                >
+                <div className={`p-5 rounded-2xl border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'
+                }`}>
                   <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800/60 mb-4">
-                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">
-                      Cron Execution History
-                    </h4>
-                    <span
-                      className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"
-                      title="Cron Listener Active"
-                    />
+                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">Cron Execution History</h4>
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" title="Cron Listener Active" />
                   </div>
 
                   <div className="space-y-4 max-h-[350px] overflow-y-auto pr-1">
                     {schedulerLogs.length === 0 ? (
                       <div className="text-center py-12 text-slate-400 italic text-xs font-semibold">
-                        No automation logs recorded yet. Use the "Simulate
-                        Scheduler Cron Run" button above to execute active
-                        schedules.
+                        No automation logs recorded yet. Use the "Simulate Scheduler Cron Run" button above to execute active schedules.
                       </div>
                     ) : (
-                      schedulerLogs.map((log) => (
-                        <div
-                          key={log.id}
+                      schedulerLogs.map(log => (
+                        <div 
+                          key={log.id} 
                           onClick={() => setSelectedLogForModal(log)}
                           className={`p-3 rounded-xl border space-y-2 text-xs font-semibold cursor-pointer transition-all hover:scale-[1.01] ${
-                            isDarkMode
-                              ? "bg-slate-950/40 border-slate-800 hover:bg-slate-900 hover:border-slate-700"
-                              : "bg-slate-50/50 border-slate-150 hover:bg-slate-100/70 hover:border-slate-300 hover:shadow-xs"
+                            isDarkMode 
+                              ? 'bg-slate-950/40 border-slate-800 hover:bg-slate-900 hover:border-slate-700' 
+                              : 'bg-slate-50/50 border-slate-150 hover:bg-slate-100/70 hover:border-slate-300 hover:shadow-xs'
                           }`}
                           title="Click to view full dispatch audit trail"
                         >
                           <div className="flex justify-between items-start">
-                            <span className="font-bold text-slate-800 dark:text-white leading-tight block truncate max-w-[140px]">
-                              {log.planName}
-                            </span>
+                            <span className="font-bold text-slate-800 dark:text-white leading-tight block truncate max-w-[140px]">{log.planName}</span>
                             <div className="flex items-center space-x-1.5">
-                              <span className="text-[9px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-black font-mono">
-                                SUCCESS
-                              </span>
+                              <span className="text-[9px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-black font-mono">SUCCESS</span>
                               <Eye size={11} className="text-slate-400" />
                             </div>
                           </div>
 
                           <div className="text-[10px] text-slate-400 flex items-center justify-between font-mono">
                             <span>{log.runDate}</span>
-                            <span className="text-slate-500 font-bold">
-                              {log.emailsSentCount} emails sent
-                            </span>
+                            <span className="text-slate-500 font-bold">{log.emailsSentCount} emails sent</span>
                           </div>
 
                           {log.recipientNames.length > 0 && (
                             <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800/40">
-                              <span className="text-[9px] uppercase tracking-wider text-slate-400 block mb-0.5">
-                                Notified Guardians:
-                              </span>
+                              <span className="text-[9px] uppercase tracking-wider text-slate-400 block mb-0.5">Notified Guardians:</span>
                               <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                                {log.recipientNames.join(", ")}
+                                {log.recipientNames.join(', ')}
                               </div>
                             </div>
                           )}
@@ -8016,15 +5854,20 @@ export default function AdminDashboard({
                     )}
                   </div>
                 </div>
+
               </div>
+
             </div>
           )}
+
         </div>
       )}
 
+
       {/* ==================== 10. PUBLIC WEB INQUIRIES LEDGER ==================== */}
-      {activeTab === "inquiries" && (
+      {activeTab === 'inquiries' && (
         <div className="space-y-6 animate-fade-in">
+          
           <div className="pb-3 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
               <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
@@ -8034,11 +5877,7 @@ export default function AdminDashboard({
                   <span>n8n Webhook Active</span>
                 </span>
               </h2>
-              <p className="text-xs text-slate-400">
-                Directly captures admissions applications and parent feedback
-                submitted from the school website and n8n webhook workflow
-                dispatcher.
-              </p>
+              <p className="text-xs text-slate-400">Directly captures admissions applications and parent feedback submitted from the school website and n8n webhook workflow dispatcher.</p>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -8051,47 +5890,61 @@ export default function AdminDashboard({
             </div>
           </div>
 
+          {/* n8n Webhook Integration Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div className="p-3.5 bg-gradient-to-r from-emerald-900/10 via-teal-900/5 to-slate-900/10 border border-emerald-500/20 rounded-xl space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">n8n Enrollment Webhook:</span>
+                <span className="text-[9px] font-mono text-emerald-700 dark:text-emerald-300 font-extrabold bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800">
+                  Auto Fallback Active
+                </span>
+              </div>
+              <code className="bg-slate-900 text-emerald-400 px-2 py-1 rounded text-[10px] font-mono select-all block truncate">
+                https://yaw0869.app.n8n.cloud/webhook-test/edweso-enrollment
+              </code>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                Payload: <span className="font-mono font-bold text-slate-700 dark:text-slate-300">parent_name, parent_contact, parent_email, student_full_name, student_dob, student_grade_interest</span>
+              </p>
+            </div>
+
+            <div className="p-3.5 bg-gradient-to-r from-indigo-900/10 via-sky-900/5 to-slate-900/10 border border-indigo-500/20 rounded-xl space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">n8n Payment Confirm Webhook:</span>
+                <span className="text-[9px] font-mono text-indigo-700 dark:text-indigo-300 font-extrabold bg-indigo-100 dark:bg-indigo-950 px-2 py-0.5 rounded border border-indigo-300 dark:border-indigo-800">
+                  Paystack Listener Active
+                </span>
+              </div>
+              <code className="bg-slate-900 text-indigo-300 px-2 py-1 rounded text-[10px] font-mono select-all block truncate">
+                https://yaw0869.app.n8n.cloud/webhook-test/edweso-payment-confirm
+              </code>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                Payload: <span className="font-mono font-bold text-slate-700 dark:text-slate-300">applicationId, payment_status, paystack_reference, amount_paid, currency</span>
+              </p>
+            </div>
+          </div>
+
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex flex-col justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider">
-                Total Received Inquiries
-              </span>
-              <span className="text-xl font-extrabold font-mono mt-1">
-                {inquiries.length} Inquiries
-              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider">Total Received Inquiries</span>
+              <span className="text-xl font-extrabold font-mono mt-1">{inquiries.length} Inquiries</span>
             </div>
             <div className="p-4 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 flex flex-col justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider">
-                Awaiting Staff Review
-              </span>
-              <span className="text-xl font-extrabold font-mono mt-1">
-                {inquiries.filter((i) => i.status === "Pending").length} Pending
-              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider">Awaiting Staff Review</span>
+              <span className="text-xl font-extrabold font-mono mt-1">{inquiries.filter(i => i.status === 'Pending').length} Pending</span>
             </div>
             <div className="p-4 rounded-xl bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 flex flex-col justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider font-sans">
-                Processed Admissions
-              </span>
-              <span className="text-xl font-extrabold mt-1">
-                {inquiries.filter((i) => i.status !== "Pending").length} Handled
-              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider font-sans">Processed Admissions</span>
+              <span className="text-xl font-extrabold mt-1">{inquiries.filter(i => i.status !== 'Pending').length} Handled</span>
             </div>
           </div>
 
           {/* Table list */}
-          <div
-            className={`border rounded-xl overflow-hidden ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60"}`}
-          >
+          <div className={`border rounded-xl overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'}`}>
             <div className="overflow-x-auto">
-              <table
-                id="web-inquiries-table"
-                className="w-full text-left text-xs border-collapse"
-              >
+              <table id="web-inquiries-table" className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr
-                    className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                  >
+                  <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                     <th className="p-3">Ref ID</th>
                     <th className="p-3">Category</th>
                     <th className="p-3">Parent Details</th>
@@ -8105,10 +5958,7 @@ export default function AdminDashboard({
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {inquiries.length === 0 ? (
                     <tr>
-                      <td
-                        colSpan={8}
-                        className="p-8 text-center text-slate-400 italic font-semibold"
-                      >
+                      <td colSpan={8} className="p-8 text-center text-slate-400 italic font-semibold">
                         No inquiries submitted yet.
                       </td>
                     </tr>
@@ -8116,54 +5966,39 @@ export default function AdminDashboard({
                     inquiries.map((inq) => {
                       // Extract student name/DOB fallback from message if old entry
                       let dobVal = inq.studentDob;
-                      if (!dobVal && inq.message.includes("Date of Birth:")) {
-                        const match = inq.message.match(
-                          /Date of Birth:\s*([^\n]+)/,
-                        );
+                      if (!dobVal && inq.message.includes('Date of Birth:')) {
+                        const match = inq.message.match(/Date of Birth:\s*([^\n]+)/);
                         if (match) dobVal = match[1].trim();
                       }
                       let studentNameVal = inq.studentName;
-                      if (!studentNameVal && inq.message.includes("Student:")) {
+                      if (!studentNameVal && inq.message.includes('Student:')) {
                         const match = inq.message.match(/Student:\s*([^\n]+)/);
                         if (match) studentNameVal = match[1].trim();
                       }
 
                       return (
-                        <tr
-                          key={inq.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300 font-semibold text-xs"
-                        >
-                          <td className="p-3 font-mono text-[10px] font-bold text-emerald-600">
-                            {inq.id}
-                          </td>
+                        <tr key={inq.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300 font-semibold text-xs">
+                          <td className="p-3 font-mono text-[10px] font-bold text-emerald-600">{inq.id}</td>
                           <td className="p-3">
-                            <span
-                              className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                                inq.type === "Admission"
-                                  ? "bg-amber-500/10 text-amber-600"
-                                  : inq.type === "General"
-                                    ? "bg-sky-500/10 text-sky-600"
-                                    : "bg-pink-500/10 text-pink-600"
-                              }`}
-                            >
+                            <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                              inq.type === 'Admission' 
+                                ? 'bg-amber-500/10 text-amber-600' 
+                                : inq.type === 'General'
+                                  ? 'bg-sky-500/10 text-sky-600'
+                                  : 'bg-pink-500/10 text-pink-600'
+                            }`}>
                               {inq.type}
                             </span>
                           </td>
                           <td className="p-3">
-                            <p className="font-bold text-slate-800 dark:text-white leading-tight">
-                              {inq.name}
-                            </p>
-                            <p className="text-[10px] text-slate-400 leading-none mt-0.5">
-                              {inq.phone}
-                            </p>
+                            <p className="font-bold text-slate-800 dark:text-white leading-tight">{inq.name}</p>
+                            <p className="text-[10px] text-slate-400 leading-none mt-0.5">{inq.phone}</p>
                           </td>
                           <td className="p-3">
-                            {studentNameVal ||
-                            inq.studentGradeLevel ||
-                            dobVal ? (
+                            {studentNameVal || inq.studentGradeLevel || dobVal ? (
                               <div>
                                 <p className="font-bold text-slate-800 dark:text-white leading-tight">
-                                  {studentNameVal || "Student"}
+                                  {studentNameVal || 'Student'}
                                 </p>
                                 <div className="flex items-center space-x-1.5 mt-0.5 flex-wrap gap-y-0.5">
                                   {inq.studentGradeLevel && (
@@ -8179,28 +6014,17 @@ export default function AdminDashboard({
                                 </div>
                               </div>
                             ) : (
-                              <span className="text-[10px] text-slate-400 italic">
-                                N/A
-                              </span>
+                              <span className="text-[10px] text-slate-400 italic">N/A</span>
                             )}
                           </td>
                           <td className="p-3 max-w-xs">
-                            <p className="truncate text-slate-500 dark:text-slate-400">
-                              {inq.message}
-                            </p>
+                            <p className="truncate text-slate-500 dark:text-slate-400">{inq.message}</p>
                           </td>
-                          <td className="p-3 text-slate-400 text-[10px]">
-                            {inq.date}
-                          </td>
+                          <td className="p-3 text-slate-400 text-[10px]">{inq.date}</td>
                           <td className="p-3">
                             <select
                               value={inq.status}
-                              onChange={(e) =>
-                                handleInquiryStatusChange(
-                                  inq.id,
-                                  e.target.value as any,
-                                )
-                              }
+                              onChange={(e) => handleInquiryStatusChange(inq.id, e.target.value as any)}
                               className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-1 rounded text-[10px] font-bold focus:outline-hidden"
                             >
                               <option value="Pending">Pending</option>
@@ -8236,210 +6060,136 @@ export default function AdminDashboard({
           </div>
 
           {/* Detailed Selected Inquiry Modal */}
-          {selectedInquiry &&
-            (() => {
-              let modalDob = selectedInquiry.studentDob;
-              if (
-                !modalDob &&
-                selectedInquiry.message.includes("Date of Birth:")
-              ) {
-                const match = selectedInquiry.message.match(
-                  /Date of Birth:\s*([^\n]+)/,
-                );
-                if (match) modalDob = match[1].trim();
-              }
-              let modalStudentName = selectedInquiry.studentName;
-              if (
-                !modalStudentName &&
-                selectedInquiry.message.includes("Student:")
-              ) {
-                const match =
-                  selectedInquiry.message.match(/Student:\s*([^\n]+)/);
-                if (match) modalStudentName = match[1].trim();
-              }
+          {selectedInquiry && (() => {
+            let modalDob = selectedInquiry.studentDob;
+            if (!modalDob && selectedInquiry.message.includes('Date of Birth:')) {
+              const match = selectedInquiry.message.match(/Date of Birth:\s*([^\n]+)/);
+              if (match) modalDob = match[1].trim();
+            }
+            let modalStudentName = selectedInquiry.studentName;
+            if (!modalStudentName && selectedInquiry.message.includes('Student:')) {
+              const match = selectedInquiry.message.match(/Student:\s*([^\n]+)/);
+              if (match) modalStudentName = match[1].trim();
+            }
 
-              return (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
-                  <div
-                    className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border ${
-                      isDarkMode
-                        ? "bg-slate-900 border-slate-800 text-white"
-                        : "bg-white border-slate-200 text-slate-800"
-                    }`}
-                  >
-                    <div className="flex justify-between items-center border-b pb-2 mb-4 border-slate-100 dark:border-slate-800">
+            return (
+              <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
+                <div className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+                }`}>
+                  <div className="flex justify-between items-center border-b pb-2 mb-4 border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-mono font-bold text-emerald-600">[{selectedInquiry.id}]</span>
+                      <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ledger Details</span>
+                    </div>
+                    <button 
+                      onClick={() => setSelectedInquiry(null)}
+                      className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-slate-400 hover:text-slate-950 dark:hover:text-white text-xs cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 text-xs font-medium">
+                    {/* Parent Contact Info */}
+                    <div className="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
+                      <div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">Parent / Sender Name</p>
+                        <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">Inquiry Type</p>
+                        <p className="font-extrabold text-emerald-600 mt-0.5 uppercase tracking-wide">{selectedInquiry.type}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">Contact Phone</p>
+                        <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.phone}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase">Contact Email</p>
+                        <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">{selectedInquiry.email}</p>
+                      </div>
+                    </div>
+
+                    {/* Student & DOB Details Card */}
+                    {(modalStudentName || selectedInquiry.studentGradeLevel || modalDob) && (
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-lg space-y-2">
+                        <p className="text-[9px] text-emerald-700 dark:text-emerald-400 font-black uppercase tracking-wider">Student & Enrollment Specifications</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div>
+                            <p className="text-[9px] text-slate-400 uppercase font-bold">Student Name</p>
+                            <p className="font-extrabold text-slate-800 dark:text-white text-xs">{modalStudentName || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] text-slate-400 uppercase font-bold">Grade Interest</p>
+                            <p className="font-extrabold text-emerald-600 text-xs">{selectedInquiry.studentGradeLevel || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] text-slate-400 uppercase font-bold">Date of Birth (DOB)</p>
+                            <p className="font-extrabold font-mono text-slate-800 dark:text-white text-xs">{modalDob || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">Detailed Message / Special Instructions</p>
+                      <div className="p-3.5 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-800 leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line text-[11px]">
+                        {selectedInquiry.message}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
                       <div className="flex items-center space-x-2">
-                        <span className="text-xs font-mono font-bold text-emerald-600">
-                          [{selectedInquiry.id}]
-                        </span>
-                        <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">
-                          Ledger Details
-                        </span>
+                        <span className="text-[10px] text-slate-400 font-bold">Update Status:</span>
+                        <select
+                          value={selectedInquiry.status}
+                          onChange={(e) => {
+                            handleInquiryStatusChange(selectedInquiry.id, e.target.value as any);
+                            setSelectedInquiry({ ...selectedInquiry, status: e.target.value as any });
+                          }}
+                          className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-1 rounded text-[10px] font-bold focus:outline-hidden"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Reviewed">Reviewed</option>
+                          <option value="Contacted">Contacted</option>
+                        </select>
                       </div>
                       <button
                         onClick={() => setSelectedInquiry(null)}
-                        className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-slate-400 hover:text-slate-950 dark:hover:text-white text-xs cursor-pointer"
+                        className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase rounded cursor-pointer"
                       >
-                        ✕
+                        Close Viewer
                       </button>
-                    </div>
-
-                    <div className="space-y-4 text-xs font-medium">
-                      {/* Parent Contact Info */}
-                      <div className="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-950 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
-                        <div>
-                          <p className="text-[9px] text-slate-400 font-bold uppercase">
-                            Parent / Sender Name
-                          </p>
-                          <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">
-                            {selectedInquiry.name}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-slate-400 font-bold uppercase">
-                            Inquiry Type
-                          </p>
-                          <p className="font-extrabold text-emerald-600 mt-0.5 uppercase tracking-wide">
-                            {selectedInquiry.type}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-slate-400 font-bold uppercase">
-                            Contact Phone
-                          </p>
-                          <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">
-                            {selectedInquiry.phone}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-slate-400 font-bold uppercase">
-                            Contact Email
-                          </p>
-                          <p className="font-extrabold text-slate-800 dark:text-white mt-0.5">
-                            {selectedInquiry.email}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Student & DOB Details Card */}
-                      {(modalStudentName ||
-                        selectedInquiry.studentGradeLevel ||
-                        modalDob) && (
-                        <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-lg space-y-2">
-                          <p className="text-[9px] text-emerald-700 dark:text-emerald-400 font-black uppercase tracking-wider">
-                            Student & Enrollment Specifications
-                          </p>
-                          <div className="grid grid-cols-3 gap-2">
-                            <div>
-                              <p className="text-[9px] text-slate-400 uppercase font-bold">
-                                Student Name
-                              </p>
-                              <p className="font-extrabold text-slate-800 dark:text-white text-xs">
-                                {modalStudentName || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-[9px] text-slate-400 uppercase font-bold">
-                                Grade Interest
-                              </p>
-                              <p className="font-extrabold text-emerald-600 text-xs">
-                                {selectedInquiry.studentGradeLevel || "N/A"}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-[9px] text-slate-400 uppercase font-bold">
-                                Date of Birth (DOB)
-                              </p>
-                              <p className="font-extrabold font-mono text-slate-800 dark:text-white text-xs">
-                                {modalDob || "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <div>
-                        <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">
-                          Detailed Message / Special Instructions
-                        </p>
-                        <div className="p-3.5 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-800 leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line text-[11px]">
-                          {selectedInquiry.message}
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center pt-2">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-[10px] text-slate-400 font-bold">
-                            Update Status:
-                          </span>
-                          <select
-                            value={selectedInquiry.status}
-                            onChange={(e) => {
-                              handleInquiryStatusChange(
-                                selectedInquiry.id,
-                                e.target.value as any,
-                              );
-                              setSelectedInquiry({
-                                ...selectedInquiry,
-                                status: e.target.value as any,
-                              });
-                            }}
-                            className="bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-1 rounded text-[10px] font-bold focus:outline-hidden"
-                          >
-                            <option value="Pending">Pending</option>
-                            <option value="Reviewed">Reviewed</option>
-                            <option value="Contacted">Contacted</option>
-                          </select>
-                        </div>
-                        <button
-                          onClick={() => setSelectedInquiry(null)}
-                          className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] uppercase rounded cursor-pointer"
-                        >
-                          Close Viewer
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
-              );
-            })()}
+              </div>
+            );
+          })()}
+
         </div>
       )}
 
+
       {/* ==================== 11. SIMULATED EMAIL LOGS & COMPOSER ==================== */}
-      {activeTab === "emails" && (
+      {activeTab === 'emails' && (
         <div className="space-y-6 animate-fade-in">
+          
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-              Email Dispatch Control
-            </h2>
-            <p className="text-xs text-slate-400">
-              Compose custom emails, review logs, and broadcast simulated
-              academic and financial announcements to student guardians.
-            </p>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">Email Dispatch Control</h2>
+            <p className="text-xs text-slate-400">Compose custom emails, review logs, and broadcast simulated academic and financial announcements to student guardians.</p>
           </div>
 
           {/* Quick Metrics & Actions Banner */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div
-              className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 ${
-                isDarkMode
-                  ? "bg-slate-900 border-slate-800"
-                  : "bg-white border-slate-200/60"
-              }`}
-            >
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">
-                  Outbox Volume
-                </span>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  {emails.length} Simulated Emails
-                </h3>
-                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                  Simulated mail servers are fully operational. Dispatched
-                  emails represent live triggers to parent and guardian address
-                  targets.
-                </p>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Outbox Volume</span>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">{emails.length} Simulated Emails</h3>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">Simulated mail servers are fully operational. Dispatched emails represent live triggers to parent and guardian address targets.</p>
               </div>
               <div className="pt-2">
                 <span className="text-xs font-bold text-emerald-600 flex items-center space-x-1">
@@ -8449,24 +6199,14 @@ export default function AdminDashboard({
               </div>
             </div>
 
-            <div
-              className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 lg:col-span-2 ${
-                isDarkMode
-                  ? "bg-slate-900 border-slate-800"
-                  : "bg-white border-slate-200/60"
-              }`}
-            >
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 lg:col-span-2 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">
-                  Automated & Bulk Dispatchers
-                </span>
-                <h3 className="text-sm font-extrabold text-slate-800 dark:text-white mt-2">
-                  Trigger Simulated Fee Notifications
-                </h3>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Automated & Bulk Dispatchers</span>
+                <h3 className="text-sm font-extrabold text-slate-800 dark:text-white mt-2">Trigger Simulated Fee Notifications</h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Automatically queries all students with outstanding balances
-                  (GHS &gt; 0) and issues customized reminders with their exact
-                  balances, Paystack links, and instructions.
+                  Automatically queries all students with outstanding balances (GHS &gt; 0) and issues customized reminders with their exact balances, Paystack links, and instructions.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2.5 pt-2">
@@ -8476,53 +6216,34 @@ export default function AdminDashboard({
                   className="px-4 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-extrabold text-[11px] uppercase tracking-wide rounded-lg shadow-xs flex items-center space-x-1"
                 >
                   <AlertTriangle size={14} className="mr-1" />
-                  <span>
-                    Notify Outstanding Balances (
-                    {students.filter((s) => s.balanceGHS > 0).length})
-                  </span>
+                  <span>Notify Outstanding Balances ({students.filter(s => s.balanceGHS > 0).length})</span>
                 </button>
                 <div className="text-[10px] text-slate-400 flex items-center">
-                  <span>
-                    * Sends simulated alerts to guardian emails in real-time.
-                  </span>
+                  <span>* Sends simulated alerts to guardian emails in real-time.</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
             {/* COMPOSER PANEL */}
-            <div
-              className={`p-5 rounded-2xl border h-fit space-y-4 ${
-                isDarkMode
-                  ? "bg-slate-900 border-slate-800"
-                  : "bg-white border-slate-200/60"
-              }`}
-            >
-              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2">
-                Simulated Custom Composer
-              </h3>
+            <div className={`p-5 rounded-2xl border h-fit space-y-4 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
+              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2">Simulated Custom Composer</h3>
 
               {composerNotification && (
-                <div
-                  className={`p-3 rounded-lg text-xs font-semibold ${
-                    composerNotification.type === "success"
-                      ? "bg-emerald-500/10 text-emerald-600"
-                      : "bg-rose-500/10 text-rose-600"
-                  }`}
-                >
+                <div className={`p-3 rounded-lg text-xs font-semibold ${
+                  composerNotification.type === 'success' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-rose-500/10 text-rose-600'
+                }`}>
                   {composerNotification.message}
                 </div>
               )}
 
-              <form
-                onSubmit={handleComposeEmailSubmit}
-                className="space-y-4 text-xs"
-              >
+              <form onSubmit={handleComposeEmailSubmit} className="space-y-4 text-xs">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Target Pupil & Guardian
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Target Pupil & Guardian</label>
                   <select
                     required
                     value={composerStudentId}
@@ -8530,7 +6251,7 @@ export default function AdminDashboard({
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
                   >
                     <option value="">-- Select Student Recipient --</option>
-                    {students.map((st) => (
+                    {students.map(st => (
                       <option key={st.id} value={st.id}>
                         {st.name} (Guardian: {st.parentName} - {st.parentEmail})
                       </option>
@@ -8539,9 +6260,7 @@ export default function AdminDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Email Subject
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email Subject</label>
                   <input
                     type="text"
                     required
@@ -8553,9 +6272,7 @@ export default function AdminDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Email Content Body
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Email Content Body</label>
                   <textarea
                     rows={6}
                     required
@@ -8576,26 +6293,15 @@ export default function AdminDashboard({
             </div>
 
             {/* OUTBOX DISPATCH LOG */}
-            <div
-              className={`p-5 rounded-2xl border lg:col-span-2 ${
-                isDarkMode
-                  ? "bg-slate-900 border-slate-800"
-                  : "bg-white border-slate-200/60"
-              }`}
-            >
-              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-4">
-                Simulated Outbox Log
-              </h3>
+            <div className={`p-5 rounded-2xl border lg:col-span-2 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
+              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-4">Simulated Outbox Log</h3>
 
               <div className="overflow-x-auto">
-                <table
-                  id="simulated-emails-table"
-                  className="w-full text-left text-xs border-collapse"
-                >
+                <table id="simulated-emails-table" className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr
-                      className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                    >
+                    <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                       <th className="p-3">Ref ID</th>
                       <th className="p-3">Type</th>
                       <th className="p-3">Recipient Guardian</th>
@@ -8607,47 +6313,29 @@ export default function AdminDashboard({
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {emails.length === 0 ? (
                       <tr>
-                        <td
-                          colSpan={6}
-                          className="p-8 text-center text-slate-400 italic font-semibold"
-                        >
+                        <td colSpan={6} className="p-8 text-center text-slate-400 italic font-semibold">
                           No simulated emails sent yet in this session.
                         </td>
                       </tr>
                     ) : (
                       emails.map((em) => (
-                        <tr
-                          key={em.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300"
-                        >
-                          <td className="p-3 font-mono text-[10px] text-emerald-600">
-                            {em.id}
-                          </td>
+                        <tr key={em.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300">
+                          <td className="p-3 font-mono text-[10px] text-emerald-600">{em.id}</td>
                           <td className="p-3">
-                            <span
-                              className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                                em.type === "Announcement"
-                                  ? "bg-amber-500/10 text-amber-600"
-                                  : "bg-rose-500/10 text-rose-600"
-                              }`}
-                            >
+                            <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                              em.type === 'Announcement' 
+                                ? 'bg-amber-500/10 text-amber-600' 
+                                : 'bg-rose-500/10 text-rose-600'
+                            }`}>
                               {em.type}
                             </span>
                           </td>
                           <td className="p-3">
-                            <p className="font-bold text-slate-800 dark:text-white leading-tight">
-                              {em.recipientName}
-                            </p>
-                            <p className="text-[10px] text-slate-400 leading-none mt-0.5">
-                              {em.recipientEmail}
-                            </p>
+                            <p className="font-bold text-slate-800 dark:text-white leading-tight">{em.recipientName}</p>
+                            <p className="text-[10px] text-slate-400 leading-none mt-0.5">{em.recipientEmail}</p>
                           </td>
-                          <td className="p-3 max-w-xs truncate">
-                            {em.subject}
-                          </td>
-                          <td className="p-3 text-slate-400 text-[10px]">
-                            {em.sentAt}
-                          </td>
+                          <td className="p-3 max-w-xs truncate">{em.subject}</td>
+                          <td className="p-3 text-slate-400 text-[10px]">{em.sentAt}</td>
                           <td className="p-3 text-right">
                             <div className="flex items-center justify-end space-x-2">
                               <button
@@ -8661,16 +6349,12 @@ export default function AdminDashboard({
                                 onClick={() => {
                                   setDeleteConfirm({
                                     isOpen: true,
-                                    title: "Delete Email Dispatch",
-                                    message:
-                                      "Are you sure you want to delete this simulated email dispatch record? This will permanently remove the log entry.",
+                                    title: 'Delete Email Dispatch',
+                                    message: 'Are you sure you want to delete this simulated email dispatch record? This will permanently remove the log entry.',
                                     onConfirm: () => {
                                       onDeleteEmail(em.id);
-                                      setDeleteConfirm((prev) => ({
-                                        ...prev,
-                                        isOpen: false,
-                                      }));
-                                    },
+                                      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+                                    }
                                   });
                                 }}
                                 className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
@@ -8687,28 +6371,21 @@ export default function AdminDashboard({
                 </table>
               </div>
             </div>
+
           </div>
 
           {/* VIEW EMAIL DETAILS MODAL */}
           {selectedEmailDetails && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
-              <div
-                className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800 text-white"
-                    : "bg-white border-slate-200 text-slate-800"
-                }`}
-              >
+              <div className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+              }`}>
                 <div className="flex justify-between items-center border-b pb-2 mb-4 border-slate-100 dark:border-slate-800">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs font-mono font-bold text-emerald-600">
-                      [{selectedEmailDetails.id}]
-                    </span>
-                    <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">
-                      Simulated SMTP Payload
-                    </span>
+                    <span className="text-xs font-mono font-bold text-emerald-600">[{selectedEmailDetails.id}]</span>
+                    <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Simulated SMTP Payload</span>
                   </div>
-                  <button
+                  <button 
                     onClick={() => setSelectedEmailDetails(null)}
                     className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-slate-400 hover:text-slate-950 dark:hover:text-white text-xs"
                   >
@@ -8718,40 +6395,14 @@ export default function AdminDashboard({
 
                 <div className="space-y-4 text-xs font-medium">
                   <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-lg border border-slate-100 dark:border-slate-800 space-y-1.5 leading-tight text-slate-500 dark:text-slate-400">
-                    <p>
-                      <span className="font-bold text-slate-700 dark:text-slate-300">
-                        From:
-                      </span>{" "}
-                      Edweso Royal Academy Dispatches
-                      &lt;admin-dispatch@edweso.edu.gh&gt;
-                    </p>
-                    <p>
-                      <span className="font-bold text-slate-700 dark:text-slate-300">
-                        To:
-                      </span>{" "}
-                      {selectedEmailDetails.recipientName} &lt;
-                      {selectedEmailDetails.recipientEmail}&gt;
-                    </p>
-                    <p>
-                      <span className="font-bold text-slate-700 dark:text-slate-300">
-                        Date:
-                      </span>{" "}
-                      {selectedEmailDetails.sentAt}
-                    </p>
-                    <p>
-                      <span className="font-bold text-slate-700 dark:text-slate-300">
-                        Subject:
-                      </span>{" "}
-                      <span className="text-slate-800 dark:text-white font-bold">
-                        {selectedEmailDetails.subject}
-                      </span>
-                    </p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300">From:</span> Edweso Royal Academy Dispatches &lt;admin-dispatch@edweso.edu.gh&gt;</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300">To:</span> {selectedEmailDetails.recipientName} &lt;{selectedEmailDetails.recipientEmail}&gt;</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300">Date:</span> {selectedEmailDetails.sentAt}</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300">Subject:</span> <span className="text-slate-800 dark:text-white font-bold">{selectedEmailDetails.subject}</span></p>
                   </div>
 
                   <div>
-                    <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">
-                      Email Body Markup
-                    </p>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">Email Body Markup</p>
                     <div className="p-4 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-800 leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-line text-[11px] font-mono">
                       {selectedEmailDetails.body}
                     </div>
@@ -8773,46 +6424,29 @@ export default function AdminDashboard({
               </div>
             </div>
           )}
+
         </div>
       )}
 
+
       {/* ==================== SIMULATED SMS LOGS & COMPOSER ==================== */}
-      {activeTab === "sms" && (
-        <div
-          className="space-y-6 animate-fade-in"
-          id="sms-dispatch-control-panel"
-        >
+      {activeTab === 'sms' && (
+        <div className="space-y-6 animate-fade-in" id="sms-dispatch-control-panel">
+          
           <div className="pb-2 border-b border-slate-200/40">
-            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-              SMS Dispatch Control
-            </h2>
-            <p className="text-xs text-slate-400">
-              Compose custom SMS messages, trigger automated notifications, and
-              review simulated carrier dispatches to parents.
-            </p>
+            <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">SMS Dispatch Control</h2>
+            <p className="text-xs text-slate-400">Compose custom SMS messages, trigger automated notifications, and review simulated carrier dispatches to parents.</p>
           </div>
 
           {/* Quick Metrics & Actions Banner */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div
-              className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 ${
-                isDarkMode
-                  ? "bg-slate-900 border-slate-800"
-                  : "bg-white border-slate-200/60"
-              }`}
-            >
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">
-                  Outbox Volume
-                </span>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-                  {sms.length} Dispatched SMS
-                </h3>
-                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                  Simulated cellular SMS gateways are fully operational.
-                  Dispatched messages are immediately visible in Parent
-                  Dashboards.
-                </p>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Outbox Volume</span>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mt-1">{sms.length} Dispatched SMS</h3>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">Simulated cellular SMS gateways are fully operational. Dispatched messages are immediately visible in Parent Dashboards.</p>
               </div>
               <div className="pt-2">
                 <span className="text-xs font-bold text-emerald-600 flex items-center space-x-1">
@@ -8822,24 +6456,14 @@ export default function AdminDashboard({
               </div>
             </div>
 
-            <div
-              className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 lg:col-span-2 ${
-                isDarkMode
-                  ? "bg-slate-900 border-slate-800"
-                  : "bg-white border-slate-200/60"
-              }`}
-            >
+            <div className={`p-5 rounded-2xl border flex flex-col justify-between space-y-4 lg:col-span-2 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">
-                  Automated SMS Reminders
-                </span>
-                <h3 className="text-sm font-extrabold text-slate-800 dark:text-white mt-2">
-                  Trigger Simulated Fee Alerts (SMS + Email)
-                </h3>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block tracking-wider">Automated SMS Reminders</span>
+                <h3 className="text-sm font-extrabold text-slate-800 dark:text-white mt-2">Trigger Simulated Fee Alerts (SMS + Email)</h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Queries student ledgers for pupils with unpaid fees, compiles
-                  precise outstanding balances, and broadcasts simulated SMS
-                  alerts to parent phone lines with online pay links.
+                  Queries student ledgers for pupils with unpaid fees, compiles precise outstanding balances, and broadcasts simulated SMS alerts to parent phone lines with online pay links.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2.5 pt-2">
@@ -8849,54 +6473,34 @@ export default function AdminDashboard({
                   className="px-4 py-2.5 bg-rose-700 hover:bg-rose-600 text-white font-extrabold text-[11px] uppercase tracking-wide rounded-lg shadow-xs flex items-center space-x-1"
                 >
                   <Smartphone size={14} className="mr-1" />
-                  <span>
-                    Send Fee Reminders (
-                    {students.filter((s) => s.balanceGHS > 0).length})
-                  </span>
+                  <span>Send Fee Reminders ({students.filter(s => s.balanceGHS > 0).length})</span>
                 </button>
                 <div className="text-[10px] text-slate-400 flex items-center">
-                  <span>
-                    * Sends high-priority SMS alerts to guardian cellular
-                    numbers.
-                  </span>
+                  <span>* Sends high-priority SMS alerts to guardian cellular numbers.</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
             {/* COMPOSER PANEL */}
-            <div
-              className={`p-5 rounded-2xl border h-fit space-y-4 ${
-                isDarkMode
-                  ? "bg-slate-900 border-slate-800"
-                  : "bg-white border-slate-200/60"
-              }`}
-            >
-              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2">
-                Simulated SMS Composer
-              </h3>
+            <div className={`p-5 rounded-2xl border h-fit space-y-4 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
+              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2">Simulated SMS Composer</h3>
 
               {smsComposerNotification && (
-                <div
-                  className={`p-3 rounded-lg text-xs font-semibold ${
-                    smsComposerNotification.type === "success"
-                      ? "bg-emerald-500/10 text-emerald-600"
-                      : "bg-rose-500/10 text-rose-600"
-                  }`}
-                >
+                <div className={`p-3 rounded-lg text-xs font-semibold ${
+                  smsComposerNotification.type === 'success' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-rose-500/10 text-rose-600'
+                }`}>
                   {smsComposerNotification.message}
                 </div>
               )}
 
-              <form
-                onSubmit={handleComposeSMSSubmit}
-                className="space-y-4 text-xs font-bold"
-              >
+              <form onSubmit={handleComposeSMSSubmit} className="space-y-4 text-xs font-bold">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Recipient Student & Parent
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Recipient Student & Parent</label>
                   <select
                     required
                     value={smsComposerStudentId}
@@ -8904,7 +6508,7 @@ export default function AdminDashboard({
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
                   >
                     <option value="">-- Select Parent Recipient --</option>
-                    {students.map((st) => (
+                    {students.map(st => (
                       <option key={st.id} value={st.id}>
                         {st.name} ({st.parentName} - {st.parentPhone})
                       </option>
@@ -8913,32 +6517,22 @@ export default function AdminDashboard({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    SMS Notification Category
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">SMS Notification Category</label>
                   <select
                     required
                     value={smsComposerType}
                     onChange={(e) => setSmsComposerType(e.target.value as any)}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
                   >
-                    <option value="Announcement">
-                      Announcement / Urgent Notice
-                    </option>
+                    <option value="Announcement">Announcement / Urgent Notice</option>
                     <option value="FeeDeadline">Fee Collection Deadline</option>
-                    <option value="Attendance">
-                      Attendance / Safety Alert
-                    </option>
-                    <option value="MorningReport">
-                      Academic Progress / Morning Report
-                    </option>
+                    <option value="Attendance">Attendance / Safety Alert</option>
+                    <option value="MorningReport">Academic Progress / Morning Report</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    SMS Message Text (Max 200 chars)
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">SMS Message Text (Max 200 chars)</label>
                   <textarea
                     rows={4}
                     required
@@ -8963,26 +6557,15 @@ export default function AdminDashboard({
             </div>
 
             {/* OUTBOX DISPATCH LOG */}
-            <div
-              className={`p-5 rounded-2xl border lg:col-span-2 ${
-                isDarkMode
-                  ? "bg-slate-900 border-slate-800"
-                  : "bg-white border-slate-200/60"
-              }`}
-            >
-              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-4">
-                Simulated SMS Ledger
-              </h3>
+            <div className={`p-5 rounded-2xl border lg:col-span-2 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60'
+            }`}>
+              <h3 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 border-b pb-2 mb-4">Simulated SMS Ledger</h3>
 
               <div className="overflow-x-auto">
-                <table
-                  id="simulated-sms-table"
-                  className="w-full text-left text-xs border-collapse"
-                >
+                <table id="simulated-sms-table" className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr
-                      className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? "bg-slate-950/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}
-                    >
+                    <tr className={`border-b font-extrabold uppercase tracking-wider text-[10px] text-slate-400 ${isDarkMode ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
                       <th className="p-3">Ref ID</th>
                       <th className="p-3">Category</th>
                       <th className="p-3">Recipient Parent</th>
@@ -8994,49 +6577,33 @@ export default function AdminDashboard({
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                     {sms.length === 0 ? (
                       <tr>
-                        <td
-                          colSpan={6}
-                          className="p-8 text-center text-slate-400 italic font-semibold"
-                        >
+                        <td colSpan={6} className="p-8 text-center text-slate-400 italic font-semibold">
                           No simulated SMS messages sent yet in this session.
                         </td>
                       </tr>
                     ) : (
                       sms.map((s) => (
-                        <tr
-                          key={s.id}
-                          className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300 font-mono"
-                        >
-                          <td className="p-3 font-mono text-[10px] text-emerald-600">
-                            {s.id}
-                          </td>
+                        <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-semibold text-slate-700 dark:text-slate-300 font-mono">
+                          <td className="p-3 font-mono text-[10px] text-emerald-600">{s.id}</td>
                           <td className="p-3">
-                            <span
-                              className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
-                                s.type === "Announcement"
-                                  ? "bg-amber-500/10 text-amber-600"
-                                  : s.type === "FeeDeadline"
-                                    ? "bg-rose-500/10 text-rose-600"
-                                    : s.type === "Attendance"
-                                      ? "bg-emerald-500/10 text-emerald-600"
-                                      : "bg-sky-500/10 text-sky-600"
-                              }`}
-                            >
+                            <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded uppercase ${
+                              s.type === 'Announcement' 
+                                ? 'bg-amber-500/10 text-amber-600' 
+                                : s.type === 'FeeDeadline'
+                                ? 'bg-rose-500/10 text-rose-600'
+                                : s.type === 'Attendance'
+                                ? 'bg-emerald-500/10 text-emerald-600'
+                                : 'bg-sky-500/10 text-sky-600'
+                            }`}>
                               {s.type}
                             </span>
                           </td>
                           <td className="p-3 font-sans">
-                            <p className="font-bold text-slate-800 dark:text-white leading-tight">
-                              {s.recipientName}
-                            </p>
-                            <p className="text-[10px] text-slate-400 leading-none mt-0.5">
-                              {s.recipientPhone}
-                            </p>
+                            <p className="font-bold text-slate-800 dark:text-white leading-tight">{s.recipientName}</p>
+                            <p className="text-[10px] text-slate-400 leading-none mt-0.5">{s.recipientPhone}</p>
                           </td>
                           <td className="p-3 max-w-xs truncate">{s.message}</td>
-                          <td className="p-3 text-slate-400 text-[10px]">
-                            {s.sentAt}
-                          </td>
+                          <td className="p-3 text-slate-400 text-[10px]">{s.sentAt}</td>
                           <td className="p-3 text-right">
                             <div className="flex items-center justify-end space-x-2">
                               <button
@@ -9050,16 +6617,12 @@ export default function AdminDashboard({
                                 onClick={() => {
                                   setDeleteConfirm({
                                     isOpen: true,
-                                    title: "Delete SMS Log",
-                                    message:
-                                      "Are you sure you want to delete this simulated SMS dispatch record? This will permanently remove the log entry.",
+                                    title: 'Delete SMS Log',
+                                    message: 'Are you sure you want to delete this simulated SMS dispatch record? This will permanently remove the log entry.',
                                     onConfirm: () => {
                                       onDeleteSMS(s.id);
-                                      setDeleteConfirm((prev) => ({
-                                        ...prev,
-                                        isOpen: false,
-                                      }));
-                                    },
+                                      setDeleteConfirm(prev => ({ ...prev, isOpen: false }));
+                                    }
                                   });
                                 }}
                                 className="p-1 text-slate-400 hover:text-rose-600 transition-colors"
@@ -9076,31 +6639,21 @@ export default function AdminDashboard({
                 </table>
               </div>
             </div>
+
           </div>
 
           {/* VIEW SMS DETAILS MODAL */}
           {selectedSMSDetails && (
-            <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in"
-              id="sms-view-details-modal"
-            >
-              <div
-                className={`p-6 rounded-xl shadow-2xl max-w-md w-full border ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800 text-white"
-                    : "bg-white border-slate-200 text-slate-800"
-                }`}
-              >
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in" id="sms-view-details-modal">
+              <div className={`p-6 rounded-xl shadow-2xl max-w-md w-full border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+              }`}>
                 <div className="flex justify-between items-center border-b pb-2 mb-4 border-slate-100 dark:border-slate-800">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs font-mono font-bold text-emerald-600">
-                      [{selectedSMSDetails.id}]
-                    </span>
-                    <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">
-                      Gateway Cellular Payload
-                    </span>
+                    <span className="text-xs font-mono font-bold text-emerald-600">[{selectedSMSDetails.id}]</span>
+                    <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Gateway Cellular Payload</span>
                   </div>
-                  <button
+                  <button 
                     onClick={() => setSelectedSMSDetails(null)}
                     className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-slate-400 hover:text-slate-950 dark:hover:text-white text-xs"
                   >
@@ -9110,37 +6663,14 @@ export default function AdminDashboard({
 
                 <div className="space-y-4 text-xs font-medium">
                   <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-lg border border-slate-100 dark:border-slate-800 space-y-1.5 leading-tight text-slate-500 dark:text-slate-400">
-                    <p>
-                      <span className="font-bold text-slate-700 dark:text-slate-300 font-sans">
-                        From Carrier ID:
-                      </span>{" "}
-                      ERA_SMS_GATEWAY
-                    </p>
-                    <p>
-                      <span className="font-bold text-slate-700 dark:text-slate-300 font-sans">
-                        To Mobile:
-                      </span>{" "}
-                      {selectedSMSDetails.recipientPhone} (
-                      {selectedSMSDetails.recipientName})
-                    </p>
-                    <p>
-                      <span className="font-bold text-slate-700 dark:text-slate-300 font-sans">
-                        Timestamp:
-                      </span>{" "}
-                      {selectedSMSDetails.sentAt}
-                    </p>
-                    <p>
-                      <span className="font-bold text-slate-700 dark:text-slate-300 font-sans">
-                        Type Category:
-                      </span>{" "}
-                      {selectedSMSDetails.type}
-                    </p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300 font-sans">From Carrier ID:</span> ERA_SMS_GATEWAY</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300 font-sans">To Mobile:</span> {selectedSMSDetails.recipientPhone} ({selectedSMSDetails.recipientName})</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300 font-sans">Timestamp:</span> {selectedSMSDetails.sentAt}</p>
+                    <p><span className="font-bold text-slate-700 dark:text-slate-300 font-sans">Type Category:</span> {selectedSMSDetails.type}</p>
                   </div>
 
                   <div>
-                    <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">
-                      Dispatched SMS Message
-                    </p>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase mb-1">Dispatched SMS Message</p>
                     <div className="p-4 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-800 leading-relaxed text-slate-700 dark:text-slate-300 font-mono text-[11px] whitespace-pre-wrap">
                       {selectedSMSDetails.message}
                     </div>
@@ -9162,12 +6692,15 @@ export default function AdminDashboard({
               </div>
             </div>
           )}
+
         </div>
       )}
 
+
       {/* ==================== 12. AUTOMATED SYSTEM DIAGNOSTICS ==================== */}
-      {activeTab === "diagnostics" && (
+      {activeTab === 'diagnostics' && (
         <div className="space-y-6 animate-fade-in">
+          
           <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
@@ -9176,118 +6709,86 @@ export default function AdminDashboard({
                 </span>
                 <span>Automated Diagnostic & Anomaly System</span>
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Real-time heuristics monitor flagging brute-force logins,
-                unrecognized admin ingress, and terminal tuition collection
-                deficits.
-              </p>
+              <p className="text-xs text-slate-400 mt-0.5">Real-time heuristics monitor flagging brute-force logins, unrecognized admin ingress, and terminal tuition collection deficits.</p>
             </div>
-
+            
             <button
               onClick={handleRunDiagnosticScan}
               disabled={diagnosticScanLoading}
               className={`px-4 py-2 bg-emerald-700 hover:bg-emerald-600 disabled:bg-emerald-800/40 text-white font-extrabold text-[11px] uppercase tracking-wider rounded-xl shadow-xs flex items-center space-x-1.5 transition-all cursor-pointer`}
             >
-              <RefreshCw
-                size={13}
-                className={diagnosticScanLoading ? "animate-spin" : ""}
-              />
-              <span>
-                {diagnosticScanLoading
-                  ? "Scanning Registers..."
-                  : "Trigger Live Scan"}
-              </span>
+              <RefreshCw size={13} className={diagnosticScanLoading ? "animate-spin" : ""} />
+              <span>{diagnosticScanLoading ? "Scanning Registers..." : "Trigger Live Scan"}</span>
             </button>
           </div>
 
           {/* Diagnostics Hub Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
             {/* Left Column: Config Panel & Live Simulators */}
             <div className="space-y-6">
+              
               {/* Card 1: Diagnostic Rules Config */}
-              <div
-                className={`p-5 rounded-2xl border ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800"
-                    : "bg-white border-slate-200/60 shadow-sm"
-                }`}
-              >
+              <div className={`p-5 rounded-2xl border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-sm'
+              }`}>
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-4 flex items-center space-x-2">
                   <span className="w-1.5 h-3 rounded bg-amber-500"></span>
                   <span>Alert Threshold Heuristics</span>
                 </h3>
-
+                
                 <div className="space-y-4 text-xs font-medium">
                   {/* Slider 1: Failed Logins limit */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between">
-                      <label className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">
-                        Failed Login Alarm Threshold
-                      </label>
-                      <span className="font-mono text-rose-500 font-bold">
-                        {failedLoginsLimit} attempts
-                      </span>
+                      <label className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">Failed Login Alarm Threshold</label>
+                      <span className="font-mono text-rose-500 font-bold">{failedLoginsLimit} attempts</span>
                     </div>
-                    <input
-                      type="range"
-                      min="2"
-                      max="10"
-                      value={failedLoginsLimit}
-                      onChange={(e) =>
-                        setFailedLoginsLimit(parseInt(e.target.value))
-                      }
+                    <input 
+                      type="range" 
+                      min="2" 
+                      max="10" 
+                      value={failedLoginsLimit} 
+                      onChange={(e) => setFailedLoginsLimit(parseInt(e.target.value))}
                       className="w-full accent-rose-600 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
                     />
                     <p className="text-[10px] text-slate-400 leading-normal">
-                      Flags any profile experiencing sequential auth failures
-                      within a 10-minute slot.
+                      Flags any profile experiencing sequential auth failures within a 10-minute slot.
                     </p>
                   </div>
 
                   {/* Slider 2: Unpaid Fee threshold */}
                   <div className="space-y-1.5 pt-2">
                     <div className="flex justify-between">
-                      <label className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">
-                        Unpaid Fees Alarm Limit
-                      </label>
-                      <span className="font-mono text-rose-500 font-bold">
-                        GHS {unpaidFeeThreshold.toLocaleString()}
-                      </span>
+                      <label className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">Unpaid Fees Alarm Limit</label>
+                      <span className="font-mono text-rose-500 font-bold">GHS {unpaidFeeThreshold.toLocaleString()}</span>
                     </div>
-                    <input
-                      type="range"
-                      min="500"
-                      max="3000"
+                    <input 
+                      type="range" 
+                      min="500" 
+                      max="3000" 
                       step="100"
-                      value={unpaidFeeThreshold}
-                      onChange={(e) =>
-                        setUnpaidFeeThreshold(parseInt(e.target.value))
-                      }
+                      value={unpaidFeeThreshold} 
+                      onChange={(e) => setUnpaidFeeThreshold(parseInt(e.target.value))}
                       className="w-full accent-rose-600 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer"
                     />
                     <p className="text-[10px] text-slate-400 leading-normal">
-                      Triggers instant cash-flow warnings on any pupil whose
-                      balance exceeds this number.
+                      Triggers instant cash-flow warnings on any pupil whose balance exceeds this number.
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Card 2: Interactive Anomaly Simulators */}
-              <div
-                className={`p-5 rounded-2xl border ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800"
-                    : "bg-white border-slate-200/60 shadow-sm"
-                }`}
-              >
+              <div className={`p-5 rounded-2xl border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-sm'
+              }`}>
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-3 flex items-center space-x-2">
                   <span className="w-1.5 h-3 rounded bg-rose-500"></span>
                   <span>Attack & Pattern Simulators</span>
                 </h3>
                 <p className="text-[10px] text-slate-400 leading-relaxed mb-4">
-                  Manually trigger security threats or financial ledger spikes
-                  to test the automated diagnostics live.
+                  Manually trigger security threats or financial ledger spikes to test the automated diagnostics live.
                 </p>
 
                 <div className="space-y-2.5">
@@ -9297,17 +6798,10 @@ export default function AdminDashboard({
                     className="w-full p-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-left transition-all group flex items-center justify-between"
                   >
                     <div className="space-y-0.5">
-                      <span className="text-[11px] font-extrabold text-rose-700 dark:text-rose-400 block">
-                        Simulate Brute-Force Logins
-                      </span>
-                      <span className="text-[9px] text-slate-400 block font-semibold">
-                        Triggers a high-priority IP password-attack alert
-                      </span>
+                      <span className="text-[11px] font-extrabold text-rose-700 dark:text-rose-400 block">Simulate Brute-Force Logins</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold">Triggers a high-priority IP password-attack alert</span>
                     </div>
-                    <AlertTriangle
-                      size={15}
-                      className="text-rose-500 group-hover:scale-110 transition-transform shrink-0"
-                    />
+                    <AlertTriangle size={15} className="text-rose-500 group-hover:scale-110 transition-transform shrink-0" />
                   </button>
 
                   <button
@@ -9316,37 +6810,24 @@ export default function AdminDashboard({
                     className="w-full p-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-left transition-all group flex items-center justify-between"
                   >
                     <div className="space-y-0.5">
-                      <span className="text-[11px] font-extrabold text-amber-700 dark:text-amber-400 block">
-                        Simulate Sudden Fee Spikes
-                      </span>
-                      <span className="text-[9px] text-slate-400 block font-semibold">
-                        Generates tuition-ledger outstanding delta alarms
-                      </span>
+                      <span className="text-[11px] font-extrabold text-amber-700 dark:text-amber-400 block">Simulate Sudden Fee Spikes</span>
+                      <span className="text-[9px] text-slate-400 block font-semibold">Generates tuition-ledger outstanding delta alarms</span>
                     </div>
-                    <CreditCard
-                      size={15}
-                      className="text-amber-500 group-hover:scale-110 transition-transform shrink-0"
-                    />
+                    <CreditCard size={15} className="text-amber-500 group-hover:scale-110 transition-transform shrink-0" />
                   </button>
                 </div>
               </div>
 
               {/* Card 3: Disaster Recovery & Database Backups */}
-              <div
-                className={`p-5 rounded-2xl border ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800"
-                    : "bg-white border-slate-200/60 shadow-sm"
-                }`}
-              >
+              <div className={`p-5 rounded-2xl border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-sm'
+              }`}>
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-3 flex items-center space-x-2">
                   <span className="w-1.5 h-3 rounded bg-emerald-500"></span>
                   <span>Disaster Recovery & Backups</span>
                 </h3>
                 <p className="text-[10px] text-slate-400 leading-relaxed mb-4">
-                  Download a secure backup of the entire school register state,
-                  or restore a previous snapshot to instantly synchronize
-                  student files and records.
+                  Download a secure backup of the entire school register state, or restore a previous snapshot to instantly synchronize student files and records.
                 </p>
 
                 <div className="space-y-3">
@@ -9377,183 +6858,120 @@ export default function AdminDashboard({
                   </div>
                 </div>
               </div>
+
             </div>
 
             {/* Right Columns: Live Alerts List & Resolution Log */}
             <div className="lg:col-span-2 space-y-6">
+              
               {/* Alert Metrics Ribbon */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div
-                  className={`p-4 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-300 shadow-xs"}`}
-                >
-                  <span className="text-[9px] text-slate-400 uppercase font-bold block">
-                    Total Anomalies
-                  </span>
-                  <span className="text-lg font-black block mt-1 text-slate-800 dark:text-white">
-                    {allDiagnosticAlerts.length}
-                  </span>
+                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-xs'}`}>
+                  <span className="text-[9px] text-slate-400 uppercase font-bold block">Total Anomalies</span>
+                  <span className="text-lg font-black block mt-1 text-slate-800 dark:text-white">{allDiagnosticAlerts.length}</span>
                 </div>
-                <div
-                  className={`p-4 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-300 shadow-xs"}`}
-                >
-                  <span className="text-[9px] text-rose-500 uppercase font-black block">
-                    Active Risks
-                  </span>
-                  <span className="text-lg font-black block mt-1 text-rose-600">
-                    {activeUnresolvedAlerts.length}
-                  </span>
+                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-xs'}`}>
+                  <span className="text-[9px] text-rose-500 uppercase font-black block">Active Risks</span>
+                  <span className="text-lg font-black block mt-1 text-rose-600">{activeUnresolvedAlerts.length}</span>
                 </div>
-                <div
-                  className={`p-4 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-300 shadow-xs"}`}
-                >
-                  <span className="text-[9px] text-amber-500 uppercase font-black block">
-                    High Severity
-                  </span>
+                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-xs'}`}>
+                  <span className="text-[9px] text-amber-500 uppercase font-black block">High Severity</span>
                   <span className="text-lg font-black block mt-1 text-amber-500">
-                    {
-                      activeUnresolvedAlerts.filter(
-                        (a) => a.severity === "High",
-                      ).length
-                    }
+                    {activeUnresolvedAlerts.filter(a => a.severity === 'High').length}
                   </span>
                 </div>
-                <div
-                  className={`p-4 rounded-xl border ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-300 shadow-xs"}`}
-                >
-                  <span className="text-[9px] text-emerald-500 uppercase font-black block">
-                    Resolved
-                  </span>
-                  <span className="text-lg font-black block mt-1 text-emerald-600">
-                    {resolvedAlerts.length}
-                  </span>
+                <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-xs'}`}>
+                  <span className="text-[9px] text-emerald-500 uppercase font-black block">Resolved</span>
+                  <span className="text-lg font-black block mt-1 text-emerald-600">{resolvedAlerts.length}</span>
                 </div>
               </div>
 
               {/* Core Active Diagnostic Alerts Section */}
-              <div
-                className={`p-5 rounded-2xl border ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-700"
-                    : "bg-white border-slate-300 shadow-sm"
-                }`}
-              >
+              <div className={`p-5 rounded-2xl border ${
+                isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300 shadow-sm'
+              }`}>
+                
                 {/* Header and Category Filters */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
                   <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                      Live Diagnostic Monitor
-                    </h3>
-                    <p className="text-[10px] text-slate-400 mt-0.5">
-                      Real-time heuristics anomalies stream
-                    </p>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">Live Diagnostic Monitor</h3>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Real-time heuristics anomalies stream</p>
                   </div>
-
+                  
                   <div className="flex flex-wrap gap-1">
-                    {(["All", "Security", "Finance", "System"] as const).map(
-                      (cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => setActiveDiagnosticCategory(cat)}
-                          className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase transition-all ${
-                            activeDiagnosticCategory === cat
-                              ? "bg-rose-600 text-white shadow-xs"
-                              : isDarkMode
-                                ? "bg-slate-800 text-slate-400 hover:text-white"
-                                : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ),
-                    )}
+                    {(['All', 'Security', 'Finance', 'System'] as const).map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setActiveDiagnosticCategory(cat)}
+                        className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase transition-all ${
+                          activeDiagnosticCategory === cat
+                            ? 'bg-rose-600 text-white shadow-xs'
+                            : isDarkMode
+                              ? 'bg-slate-800 text-slate-400 hover:text-white'
+                              : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
                 {/* Alerts Stream */}
                 <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-                  {activeUnresolvedAlerts.filter(
-                    (a) =>
-                      activeDiagnosticCategory === "All" ||
-                      a.category === activeDiagnosticCategory,
-                  ).length === 0 ? (
+                  {activeUnresolvedAlerts.filter(a => activeDiagnosticCategory === 'All' || a.category === activeDiagnosticCategory).length === 0 ? (
                     <div className="py-12 text-center text-slate-400 space-y-2 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                      <ShieldCheck
-                        size={32}
-                        className="mx-auto text-emerald-600 animate-pulse"
-                      />
+                      <ShieldCheck size={32} className="mx-auto text-emerald-600 animate-pulse" />
                       <div className="space-y-0.5">
-                        <p className="text-xs font-extrabold text-slate-700 dark:text-slate-200">
-                          No Active Vulnerabilities Blocked
-                        </p>
-                        <p className="text-[10px] text-slate-400">
-                          All student portal sessions, login IP grids, and fee
-                          outstanding ledgers are healthy.
-                        </p>
+                        <p className="text-xs font-extrabold text-slate-700 dark:text-slate-200">No Active Vulnerabilities Blocked</p>
+                        <p className="text-[10px] text-slate-400">All student portal sessions, login IP grids, and fee outstanding ledgers are healthy.</p>
                       </div>
                     </div>
                   ) : (
                     activeUnresolvedAlerts
-                      .filter(
-                        (a) =>
-                          activeDiagnosticCategory === "All" ||
-                          a.category === activeDiagnosticCategory,
-                      )
+                      .filter(a => activeDiagnosticCategory === 'All' || a.category === activeDiagnosticCategory)
                       .map((alert) => {
-                        const isHigh = alert.severity === "High";
-                        const isMed = alert.severity === "Medium";
-                        const isSec = alert.category === "Security";
-                        const isFin = alert.category === "Finance";
+                        const isHigh = alert.severity === 'High';
+                        const isMed = alert.severity === 'Medium';
+                        const isSec = alert.category === 'Security';
+                        const isFin = alert.category === 'Finance';
 
                         return (
-                          <div
+                          <div 
                             key={alert.id}
                             className={`p-3.5 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:-translate-y-0.5 ${
-                              isHigh
-                                ? "bg-rose-500/5 border-rose-500/30 shadow-xs"
+                              isHigh 
+                                ? 'bg-rose-500/5 border-rose-500/30 shadow-xs' 
                                 : isMed
-                                  ? "bg-amber-500/5 border-amber-500/30"
-                                  : "bg-blue-500/5 border-blue-500/30"
+                                  ? 'bg-amber-500/5 border-amber-500/30'
+                                  : 'bg-blue-500/5 border-blue-500/30'
                             }`}
                           >
                             <div className="flex items-start space-x-3 flex-1 min-w-0">
-                              <div
-                                className={`p-2 rounded-lg shrink-0 mt-0.5 ${
-                                  isHigh
-                                    ? "bg-rose-500/15 text-rose-600 dark:text-rose-400"
-                                    : isMed
-                                      ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                                      : "bg-blue-500/15 text-blue-600 dark:text-blue-400"
-                                }`}
-                              >
-                                {isSec ? (
-                                  <ShieldAlert size={16} />
-                                ) : (
-                                  <CreditCard size={16} />
-                                )}
+                              <div className={`p-2 rounded-lg shrink-0 mt-0.5 ${
+                                isHigh 
+                                  ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400' 
+                                  : isMed
+                                    ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                                    : 'bg-blue-500/15 text-blue-600 dark:text-blue-400'
+                              }`}>
+                                {isSec ? <ShieldAlert size={16} /> : <CreditCard size={16} />}
                               </div>
                               <div className="space-y-1 min-w-0">
                                 <div className="flex items-center space-x-2">
-                                  <span
-                                    className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
-                                      isHigh
-                                        ? "bg-rose-600/15 text-rose-600"
-                                        : isMed
-                                          ? "bg-amber-600/15 text-amber-600"
-                                          : "bg-blue-600/15 text-blue-600"
-                                    }`}
-                                  >
+                                  <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                                    isHigh 
+                                      ? 'bg-rose-600/15 text-rose-600' 
+                                      : isMed
+                                        ? 'bg-amber-600/15 text-amber-600'
+                                        : 'bg-blue-600/15 text-blue-600'
+                                  }`}>
                                     {alert.severity} Priority
                                   </span>
-                                  <span className="text-[10px] text-slate-400 font-bold uppercase">
-                                    {alert.category}
-                                  </span>
-                                  <span className="text-[9px] text-slate-400">
-                                    {alert.timestamp}
-                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-bold uppercase">{alert.category}</span>
+                                  <span className="text-[9px] text-slate-400">{alert.timestamp}</span>
                                 </div>
-                                <h4 className="text-[11px] font-black text-slate-800 dark:text-white truncate">
-                                  {alert.title}
-                                </h4>
+                                <h4 className="text-[11px] font-black text-slate-800 dark:text-white truncate">{alert.title}</h4>
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold leading-relaxed line-clamp-2">
                                   {alert.description}
                                 </p>
@@ -9563,13 +6981,11 @@ export default function AdminDashboard({
                             {/* Action Buttons */}
                             <div className="flex flex-wrap items-center gap-1.5 shrink-0 self-end md:self-center">
                               <button
-                                onClick={() =>
-                                  setSelectedDiagnosticAlert(alert)
-                                }
+                                onClick={() => setSelectedDiagnosticAlert(alert)}
                                 className={`p-1.5 rounded-lg border ${
-                                  isDarkMode
-                                    ? "border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white"
-                                    : "border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-900"
+                                  isDarkMode 
+                                    ? 'border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white' 
+                                    : 'border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-900'
                                 }`}
                                 title="Inspect Details"
                               >
@@ -9578,12 +6994,7 @@ export default function AdminDashboard({
 
                               {isSec && alert.metadata?.ipAddress && (
                                 <button
-                                  onClick={() =>
-                                    handleBlockIP(
-                                      alert.id,
-                                      alert.metadata!.ipAddress!,
-                                    )
-                                  }
+                                  onClick={() => handleBlockIP(alert.id, alert.metadata!.ipAddress!)}
                                   className="px-2 py-1 bg-slate-900 dark:bg-slate-950 text-slate-100 hover:bg-black font-extrabold text-[9px] uppercase tracking-wider rounded-lg"
                                 >
                                   Block IP
@@ -9592,12 +7003,7 @@ export default function AdminDashboard({
 
                               {isSec && alert.metadata?.targetUser && (
                                 <button
-                                  onClick={() =>
-                                    handleResetUserPassword(
-                                      alert.id,
-                                      alert.metadata!.targetUser!,
-                                    )
-                                  }
+                                  onClick={() => handleResetUserPassword(alert.id, alert.metadata!.targetUser!)}
                                   className="px-2 py-1 bg-rose-700 hover:bg-rose-600 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg"
                                 >
                                   Lock/Reset
@@ -9606,12 +7012,7 @@ export default function AdminDashboard({
 
                               {isFin && alert.metadata?.studentId && (
                                 <button
-                                  onClick={() =>
-                                    handleSendQuickEmail(
-                                      alert.id,
-                                      alert.metadata!.studentId!,
-                                    )
-                                  }
+                                  onClick={() => handleSendQuickEmail(alert.id, alert.metadata!.studentId!)}
                                   className="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg flex items-center space-x-1"
                                 >
                                   <span>Email Guardian</span>
@@ -9630,26 +7031,20 @@ export default function AdminDashboard({
                       })
                   )}
                 </div>
+
               </div>
 
               {/* Resolved / Cleared Audit Log */}
-              <div
-                className={`p-5 rounded-2xl border ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800"
-                    : "bg-white border-slate-200/60 shadow-sm"
-                }`}
-              >
+              <div className={`p-5 rounded-2xl border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-sm'
+              }`}>
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 mb-3 flex items-center space-x-2">
                   <span className="p-1 rounded bg-emerald-500/10 text-emerald-600">
                     <ShieldCheck size={14} />
                   </span>
                   <span>Remediation & Diagnostic Audit Log</span>
                 </h3>
-                <p className="text-[10px] text-slate-400 leading-normal mb-4">
-                  Permanent registry of resolved vulnerabilities and manual
-                  security clearances.
-                </p>
+                <p className="text-[10px] text-slate-400 leading-normal mb-4">Permanent registry of resolved vulnerabilities and manual security clearances.</p>
 
                 <div className="overflow-x-auto text-[10px] font-medium leading-normal">
                   <table className="w-full text-left">
@@ -9665,36 +7060,23 @@ export default function AdminDashboard({
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-850 font-mono text-slate-500 dark:text-slate-400 leading-normal">
                       {resolvedAlerts.length === 0 ? (
                         <tr>
-                          <td
-                            colSpan={5}
-                            className="py-4 text-center text-slate-400 italic"
-                          >
-                            No resolved records logged in active session cache
-                          </td>
+                          <td colSpan={5} className="py-4 text-center text-slate-400 italic">No resolved records logged in active session cache</td>
                         </tr>
                       ) : (
-                        resolvedAlerts.map((alert) => (
-                          <tr
-                            key={alert.id}
-                            className="hover:bg-slate-50/40 dark:hover:bg-slate-950/20"
-                          >
-                            <td className="py-2.5 font-bold text-slate-600 dark:text-slate-300">
-                              {alert.id.substring(0, 15)}
-                            </td>
-                            <td className="py-2.5 font-semibold text-slate-700 dark:text-slate-200">
-                              {alert.title}
-                            </td>
+                        resolvedAlerts.map(alert => (
+                          <tr key={alert.id} className="hover:bg-slate-50/40 dark:hover:bg-slate-950/20">
+                            <td className="py-2.5 font-bold text-slate-600 dark:text-slate-300">{alert.id.substring(0, 15)}</td>
+                            <td className="py-2.5 font-semibold text-slate-700 dark:text-slate-200">{alert.title}</td>
                             <td className="py-2.5">
-                              {alert.category === "Security"
-                                ? "Ingress Blacklist / Password Invalidated"
-                                : alert.id.includes("student")
-                                  ? "Dispatched standard payment reminder email"
-                                  : "Database ledger threshold marked safe"}
+                              {alert.category === 'Security' 
+                                ? 'Ingress Blacklist / Password Invalidated'
+                                : alert.id.includes('student')
+                                  ? 'Dispatched standard payment reminder email'
+                                  : 'Database ledger threshold marked safe'
+                              }
                             </td>
                             <td className="py-2.5">Principal Appiah</td>
-                            <td className="py-2.5 text-right font-black text-emerald-600">
-                              CLEARED
-                            </td>
+                            <td className="py-2.5 text-right font-black text-emerald-600">CLEARED</td>
                           </tr>
                         ))
                       )}
@@ -9702,34 +7084,28 @@ export default function AdminDashboard({
                   </table>
                 </div>
               </div>
+
             </div>
+
           </div>
 
           {/* DETAILED ALERT INSPECTOR REPORT MODAL */}
           {selectedDiagnosticAlert && (
             <div className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
-              <div
-                className={`p-6 rounded-2xl shadow-2xl max-w-lg w-full border ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800 text-white"
-                    : "bg-white border-slate-200 text-slate-800"
-                }`}
-              >
+              <div className={`p-6 rounded-2xl shadow-2xl max-w-lg w-full border ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+              }`}>
                 <div className="flex justify-between items-center border-b pb-3 mb-4 border-slate-100 dark:border-slate-800">
                   <div className="flex items-center space-x-2">
                     <span className="p-1.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 shrink-0">
                       <ShieldAlert size={16} />
                     </span>
                     <div>
-                      <h4 className="text-xs uppercase font-black tracking-widest text-slate-400">
-                        Diagnostic Threat Analysis Sheet
-                      </h4>
-                      <p className="text-[9px] font-mono text-rose-500">
-                        REF: {selectedDiagnosticAlert.id}
-                      </p>
+                      <h4 className="text-xs uppercase font-black tracking-widest text-slate-400">Diagnostic Threat Analysis Sheet</h4>
+                      <p className="text-[9px] font-mono text-rose-500">REF: {selectedDiagnosticAlert.id}</p>
                     </div>
                   </div>
-                  <button
+                  <button 
                     onClick={() => setSelectedDiagnosticAlert(null)}
                     className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 font-extrabold text-slate-400 hover:text-slate-950 dark:hover:text-white text-xs"
                   >
@@ -9738,114 +7114,56 @@ export default function AdminDashboard({
                 </div>
 
                 <div className="space-y-4 text-xs font-medium leading-relaxed">
+                  
                   {/* Alert Core Stats */}
                   <div className="grid grid-cols-3 gap-2 text-center text-[10px] uppercase font-bold">
                     <div className="p-2 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-lg">
-                      <span className="text-[9px] text-slate-400 block mb-0.5">
-                        Category
-                      </span>
-                      <span className="text-slate-800 dark:text-white">
-                        {selectedDiagnosticAlert.category}
-                      </span>
+                      <span className="text-[9px] text-slate-400 block mb-0.5">Category</span>
+                      <span className="text-slate-800 dark:text-white">{selectedDiagnosticAlert.category}</span>
                     </div>
                     <div className="p-2 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-lg">
-                      <span className="text-[9px] text-slate-400 block mb-0.5">
-                        Priority Level
-                      </span>
-                      <span
-                        className={
-                          selectedDiagnosticAlert.severity === "High"
-                            ? "text-rose-600 font-black"
-                            : "text-amber-500"
-                        }
-                      >
+                      <span className="text-[9px] text-slate-400 block mb-0.5">Priority Level</span>
+                      <span className={selectedDiagnosticAlert.severity === 'High' ? 'text-rose-600 font-black' : 'text-amber-500'}>
                         {selectedDiagnosticAlert.severity}
                       </span>
                     </div>
                     <div className="p-2 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-lg">
-                      <span className="text-[9px] text-slate-400 block mb-0.5">
-                        Audit Stamp
-                      </span>
-                      <span className="text-slate-600 dark:text-slate-300 font-mono">
-                        {selectedDiagnosticAlert.timestamp}
-                      </span>
+                      <span className="text-[9px] text-slate-400 block mb-0.5">Audit Stamp</span>
+                      <span className="text-slate-600 dark:text-slate-300 font-mono">{selectedDiagnosticAlert.timestamp}</span>
                     </div>
                   </div>
 
                   {/* Core Description */}
                   <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-850 text-slate-600 dark:text-slate-300">
-                    <p className="font-extrabold text-slate-800 dark:text-slate-100 mb-1">
-                      {selectedDiagnosticAlert.title}
-                    </p>
+                    <p className="font-extrabold text-slate-800 dark:text-slate-100 mb-1">{selectedDiagnosticAlert.title}</p>
                     <p>{selectedDiagnosticAlert.description}</p>
                   </div>
 
                   {/* Source Payload Metadata */}
                   {selectedDiagnosticAlert.metadata && (
                     <div>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase mb-1.5 tracking-wider">
-                        Source Metadata Packet
-                      </p>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase mb-1.5 tracking-wider">Source Metadata Packet</p>
                       <div className="p-3 bg-slate-100/60 dark:bg-slate-950 rounded-lg border border-slate-200/40 dark:border-slate-850 font-mono text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 space-y-1">
                         {selectedDiagnosticAlert.metadata.ipAddress && (
-                          <p>
-                            <span className="font-bold text-slate-700 dark:text-slate-300">
-                              Origin IP:
-                            </span>{" "}
-                            {selectedDiagnosticAlert.metadata.ipAddress}
-                          </p>
+                          <p><span className="font-bold text-slate-700 dark:text-slate-300">Origin IP:</span> {selectedDiagnosticAlert.metadata.ipAddress}</p>
                         )}
                         {selectedDiagnosticAlert.metadata.location && (
-                          <p>
-                            <span className="font-bold text-slate-700 dark:text-slate-300">
-                              Geo Location:
-                            </span>{" "}
-                            {selectedDiagnosticAlert.metadata.location}
-                          </p>
+                          <p><span className="font-bold text-slate-700 dark:text-slate-300">Geo Location:</span> {selectedDiagnosticAlert.metadata.location}</p>
                         )}
-                        {selectedDiagnosticAlert.metadata.attemptsCount !==
-                          undefined && (
-                          <p>
-                            <span className="font-bold text-slate-700 dark:text-slate-300">
-                              Auth Actions:
-                            </span>{" "}
-                            {selectedDiagnosticAlert.metadata.attemptsCount}{" "}
-                            sequential actions flagged
-                          </p>
+                        {selectedDiagnosticAlert.metadata.attemptsCount !== undefined && (
+                          <p><span className="font-bold text-slate-700 dark:text-slate-300">Auth Actions:</span> {selectedDiagnosticAlert.metadata.attemptsCount} sequential actions flagged</p>
                         )}
                         {selectedDiagnosticAlert.metadata.targetUser && (
-                          <p>
-                            <span className="font-bold text-slate-700 dark:text-slate-300">
-                              Subject Account:
-                            </span>{" "}
-                            {selectedDiagnosticAlert.metadata.targetUser}
-                          </p>
+                          <p><span className="font-bold text-slate-700 dark:text-slate-300">Subject Account:</span> {selectedDiagnosticAlert.metadata.targetUser}</p>
                         )}
                         {selectedDiagnosticAlert.metadata.studentName && (
-                          <p>
-                            <span className="font-bold text-slate-700 dark:text-slate-300">
-                              Affected Pupil:
-                            </span>{" "}
-                            {selectedDiagnosticAlert.metadata.studentName}
-                          </p>
+                          <p><span className="font-bold text-slate-700 dark:text-slate-300">Affected Pupil:</span> {selectedDiagnosticAlert.metadata.studentName}</p>
                         )}
                         {selectedDiagnosticAlert.metadata.className && (
-                          <p>
-                            <span className="font-bold text-slate-700 dark:text-slate-300">
-                              Target Cohort:
-                            </span>{" "}
-                            {selectedDiagnosticAlert.metadata.className}
-                          </p>
+                          <p><span className="font-bold text-slate-700 dark:text-slate-300">Target Cohort:</span> {selectedDiagnosticAlert.metadata.className}</p>
                         )}
-                        {selectedDiagnosticAlert.metadata.amountSpike !==
-                          undefined && (
-                          <p>
-                            <span className="font-bold text-slate-700 dark:text-slate-300">
-                              Unpaid Invoice Balance:
-                            </span>{" "}
-                            GHS{" "}
-                            {selectedDiagnosticAlert.metadata.amountSpike.toLocaleString()}
-                          </p>
+                        {selectedDiagnosticAlert.metadata.amountSpike !== undefined && (
+                          <p><span className="font-bold text-slate-700 dark:text-slate-300">Unpaid Invoice Balance:</span> GHS {selectedDiagnosticAlert.metadata.amountSpike.toLocaleString()}</p>
                         )}
                       </div>
                     </div>
@@ -9853,13 +7171,12 @@ export default function AdminDashboard({
 
                   {/* Recommendations */}
                   <div>
-                    <p className="text-[9px] text-slate-400 font-bold uppercase mb-1 tracking-wider">
-                      Recommended Remediation Action
-                    </p>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase mb-1 tracking-wider">Recommended Remediation Action</p>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
-                      {selectedDiagnosticAlert.category === "Security"
-                        ? "Immediate recommended safety measure: Deploy security policy to blacklist the originating IP block. Issued password resets invalidate current session keys on all mobile devices."
-                        : "Immediate recommended billing measure: Email tuition alert reminder directly to guardians. This sends outstanding balances alongside their encrypted secure billing link."}
+                      {selectedDiagnosticAlert.category === 'Security' 
+                        ? 'Immediate recommended safety measure: Deploy security policy to blacklist the originating IP block. Issued password resets invalidate current session keys on all mobile devices.'
+                        : 'Immediate recommended billing measure: Email tuition alert reminder directly to guardians. This sends outstanding balances alongside their encrypted secure billing link.'
+                      }
                     </p>
                   </div>
 
@@ -9869,39 +7186,31 @@ export default function AdminDashboard({
                       <span className="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
                       <span>Secure Diagnostics Audit Trail Active</span>
                     </div>
-
+                    
                     <div className="flex space-x-2">
-                      {selectedDiagnosticAlert.category === "Security" &&
-                        selectedDiagnosticAlert.metadata?.ipAddress && (
-                          <button
-                            onClick={() => {
-                              handleBlockIP(
-                                selectedDiagnosticAlert.id,
-                                selectedDiagnosticAlert.metadata!.ipAddress!,
-                              );
-                              setSelectedDiagnosticAlert(null);
-                            }}
-                            className="px-3.5 py-2 bg-slate-900 text-white font-bold text-[10px] uppercase rounded-xl"
-                          >
-                            Block IP
-                          </button>
-                        )}
+                      {selectedDiagnosticAlert.category === 'Security' && selectedDiagnosticAlert.metadata?.ipAddress && (
+                        <button
+                          onClick={() => {
+                            handleBlockIP(selectedDiagnosticAlert.id, selectedDiagnosticAlert.metadata!.ipAddress!);
+                            setSelectedDiagnosticAlert(null);
+                          }}
+                          className="px-3.5 py-2 bg-slate-900 text-white font-bold text-[10px] uppercase rounded-xl"
+                        >
+                          Block IP
+                        </button>
+                      )}
 
-                      {selectedDiagnosticAlert.category === "Finance" &&
-                        selectedDiagnosticAlert.metadata?.studentId && (
-                          <button
-                            onClick={() => {
-                              handleSendQuickEmail(
-                                selectedDiagnosticAlert.id,
-                                selectedDiagnosticAlert.metadata!.studentId!,
-                              );
-                              setSelectedDiagnosticAlert(null);
-                            }}
-                            className="px-3.5 py-2 bg-emerald-700 text-white font-bold text-[10px] uppercase rounded-xl"
-                          >
-                            Email Parent
-                          </button>
-                        )}
+                      {selectedDiagnosticAlert.category === 'Finance' && selectedDiagnosticAlert.metadata?.studentId && (
+                        <button
+                          onClick={() => {
+                            handleSendQuickEmail(selectedDiagnosticAlert.id, selectedDiagnosticAlert.metadata!.studentId!);
+                            setSelectedDiagnosticAlert(null);
+                          }}
+                          className="px-3.5 py-2 bg-emerald-700 text-white font-bold text-[10px] uppercase rounded-xl"
+                        >
+                          Email Parent
+                        </button>
+                      )}
 
                       <button
                         onClick={() => {
@@ -9914,466 +7223,355 @@ export default function AdminDashboard({
                       </button>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>
           )}
+
         </div>
       )}
 
+
       {/* ==================== 13. SYSTEM ACTIVITY EVENT LOGS ==================== */}
-      {activeTab === "activities" &&
-        (() => {
-          // Calculations for filtering & pagination
-          const filteredActivities = activitiesList.filter((act) => {
-            const matchesSearch =
-              act.user.toLowerCase().includes(activitySearch.toLowerCase()) ||
-              act.details
-                .toLowerCase()
-                .includes(activitySearch.toLowerCase()) ||
-              act.type.toLowerCase().includes(activitySearch.toLowerCase());
-            const matchesType =
-              activityTypeFilter === "all" || act.type === activityTypeFilter;
-            return matchesSearch && matchesType;
-          });
+      {activeTab === 'activities' && (() => {
+        // Calculations for filtering & pagination
+        const filteredActivities = activitiesList.filter(act => {
+          const matchesSearch = 
+            act.user.toLowerCase().includes(activitySearch.toLowerCase()) || 
+            act.details.toLowerCase().includes(activitySearch.toLowerCase()) ||
+            act.type.toLowerCase().includes(activitySearch.toLowerCase());
+          const matchesType = activityTypeFilter === 'all' || act.type === activityTypeFilter;
+          return matchesSearch && matchesType;
+        });
 
-          const ITEMS_PER_PAGE = 10;
-          const totalActivityPages =
-            Math.ceil(filteredActivities.length / ITEMS_PER_PAGE) || 1;
-          const currentActivityPage = Math.min(
-            activityPage,
-            totalActivityPages,
-          );
-          const startIndex = (currentActivityPage - 1) * ITEMS_PER_PAGE;
-          const paginatedActivities = filteredActivities.slice(
-            startIndex,
-            startIndex + ITEMS_PER_PAGE,
-          );
+        const ITEMS_PER_PAGE = 10;
+        const totalActivityPages = Math.ceil(filteredActivities.length / ITEMS_PER_PAGE) || 1;
+        const currentActivityPage = Math.min(activityPage, totalActivityPages);
+        const startIndex = (currentActivityPage - 1) * ITEMS_PER_PAGE;
+        const paginatedActivities = filteredActivities.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-          // Stats counts
-          const countLogin = activitiesList.filter(
-            (a) => a.type === "login",
-          ).length;
-          const countGrade = activitiesList.filter(
-            (a) => a.type === "grade",
-          ).length;
-          const countAttendance = activitiesList.filter(
-            (a) => a.type === "attendance",
-          ).length;
+        // Stats counts
+        const countLogin = activitiesList.filter(a => a.type === 'login').length;
+        const countGrade = activitiesList.filter(a => a.type === 'grade').length;
+        const countAttendance = activitiesList.filter(a => a.type === 'attendance').length;
 
-          const handleAddSimulatedActivity = (
-            type: "login" | "grade" | "attendance",
-          ) => {
-            let user = "Admin (Principal Appiah)";
-            let details = "";
-            if (type === "login") {
-              details = "Logged in securely to manage school system logs";
-            } else if (type === "grade") {
-              details =
-                "Updated terminal assessment ledger scores JHS 2 English";
-            } else if (type === "attendance") {
-              details = "Approved terminal attendance summary sheet JHS 3";
-            }
-            SchoolDatabase.addSystemActivity(type, user, details);
-            setActivitiesList(SchoolDatabase.getSystemActivities());
+        const handleAddSimulatedActivity = (type: 'login' | 'grade' | 'attendance') => {
+          let user = 'Admin (Principal Appiah)';
+          let details = '';
+          if (type === 'login') {
+            details = 'Logged in securely to manage school system logs';
+          } else if (type === 'grade') {
+            details = 'Updated terminal assessment ledger scores JHS 2 English';
+          } else if (type === 'attendance') {
+            details = 'Approved terminal attendance summary sheet JHS 3';
+          }
+          SchoolDatabase.addSystemActivity(type, user, details);
+          setActivitiesList(SchoolDatabase.getSystemActivities());
+          setActivityPage(1);
+        };
+
+        const handleClearAllActivities = () => {
+          if (window.confirm('Are you sure you want to clear system activity history?')) {
+            SchoolDatabase.saveSystemActivities([]);
+            setActivitiesList([]);
             setActivityPage(1);
-          };
+          }
+        };
 
-          const handleClearAllActivities = () => {
-            if (
-              window.confirm(
-                "Are you sure you want to clear system activity history?",
-              )
-            ) {
-              SchoolDatabase.saveSystemActivities([]);
-              setActivitiesList([]);
-              setActivityPage(1);
-            }
-          };
-
-          return (
-            <div className="space-y-6 animate-fade-in">
-              {/* Header section */}
-              <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
-                    <span className="p-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                      <History size={18} />
-                    </span>
-                    <span>System Activity Logs</span>
-                  </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Real-time audit trailing of all portal authentication, term
-                    academic score updates, and classroom roll-call submissions.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      setActivitiesList(SchoolDatabase.getSystemActivities());
-                    }}
-                    className={`px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl border border-slate-200/50 dark:border-slate-700 flex items-center space-x-1 cursor-pointer transition-all`}
-                  >
-                    <RefreshCw size={12} />
-                    <span>Refresh Feed</span>
-                  </button>
-                  <button
-                    onClick={handleClearAllActivities}
-                    className={`px-3 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] uppercase tracking-wider rounded-xl border border-rose-200/40 dark:border-rose-900 flex items-center space-x-1 cursor-pointer transition-all`}
-                  >
-                    <Trash2 size={12} />
-                    <span>Clear Logs</span>
-                  </button>
-                </div>
+        return (
+          <div className="space-y-6 animate-fade-in">
+            {/* Header section */}
+            <div className="pb-2 border-b border-slate-200/40 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
+                  <span className="p-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <History size={18} />
+                  </span>
+                  <span>System Activity Logs</span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">Real-time audit trailing of all portal authentication, term academic score updates, and classroom roll-call submissions.</p>
               </div>
 
-              {/* Event Type Counters */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div
-                  className={`p-4 rounded-2xl border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60 shadow-xs"}`}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setActivitiesList(SchoolDatabase.getSystemActivities());
+                  }}
+                  className={`px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl border border-slate-200/50 dark:border-slate-700 flex items-center space-x-1 cursor-pointer transition-all`}
                 >
-                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block mb-1">
-                    Total Logs
-                  </span>
-                  <div className="flex items-baseline space-x-1.5">
-                    <span className="text-lg font-extrabold font-mono text-slate-950 dark:text-white">
-                      {activitiesList.length}
-                    </span>
-                    <span className="text-[10px] text-slate-400">
-                      events recorded
-                    </span>
-                  </div>
-                </div>
-                <div
-                  className={`p-4 rounded-2xl border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60 shadow-xs"}`}
+                  <RefreshCw size={12} />
+                  <span>Refresh Feed</span>
+                </button>
+                <button
+                  onClick={handleClearAllActivities}
+                  className={`px-3 py-2 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-extrabold text-[10px] uppercase tracking-wider rounded-xl border border-rose-200/40 dark:border-rose-900 flex items-center space-x-1 cursor-pointer transition-all`}
                 >
-                  <span className="text-[10px] text-emerald-500 uppercase font-black tracking-widest block mb-1">
-                    Logins
-                  </span>
-                  <div className="flex items-baseline space-x-1.5">
-                    <span className="text-lg font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
-                      {countLogin}
-                    </span>
-                    <span className="text-[10px] text-slate-400">
-                      auth sessions
-                    </span>
-                  </div>
-                </div>
-                <div
-                  className={`p-4 rounded-2xl border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60 shadow-xs"}`}
-                >
-                  <span className="text-[10px] text-amber-500 uppercase font-black tracking-widest block mb-1">
-                    Grades Uploaded
-                  </span>
-                  <div className="flex items-baseline space-x-1.5">
-                    <span className="text-lg font-extrabold font-mono text-amber-600 dark:text-amber-400">
-                      {countGrade}
-                    </span>
-                    <span className="text-[10px] text-slate-400">
-                      ledger updates
-                    </span>
-                  </div>
-                </div>
-                <div
-                  className={`p-4 rounded-2xl border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60 shadow-xs"}`}
-                >
-                  <span className="text-[10px] text-purple-500 uppercase font-black tracking-widest block mb-1">
-                    Attendance Roll
-                  </span>
-                  <div className="flex items-baseline space-x-1.5">
-                    <span className="text-lg font-extrabold font-mono text-purple-600 dark:text-purple-400">
-                      {countAttendance}
-                    </span>
-                    <span className="text-[10px] text-slate-400">
-                      roll submissions
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Live Testing Simulation & Tools Grid */}
-              <div
-                className={`p-4 rounded-2xl border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60 shadow-xs"} grid grid-cols-1 md:grid-cols-3 gap-4 items-center`}
-              >
-                <div className="md:col-span-1">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                    <Activity
-                      size={14}
-                      className="text-emerald-500 animate-pulse"
-                    />
-                    <span>Interactive Audit Simulator</span>
-                  </h4>
-                  <p className="text-[10px] text-slate-400 mt-1 leading-normal">
-                    Inject live simulated school activities to verify search
-                    queries, page routing, and filter configurations instantly.
-                  </p>
-                </div>
-                <div className="md:col-span-2 flex flex-wrap gap-2 md:justify-end">
-                  <button
-                    type="button"
-                    onClick={() => handleAddSimulatedActivity("login")}
-                    className="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all flex items-center gap-1.5"
-                  >
-                    <LogIn size={12} />
-                    <span>Simulate Login</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAddSimulatedActivity("grade")}
-                    className="px-3.5 py-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all flex items-center gap-1.5"
-                  >
-                    <Award size={12} />
-                    <span>Simulate Score Upload</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAddSimulatedActivity("attendance")}
-                    className="px-3.5 py-2 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900 text-purple-800 dark:text-purple-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-all flex items-center gap-1.5"
-                  >
-                    <CheckSquare size={12} />
-                    <span>Simulate Roll Call</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Filter and Search controls */}
-              <div
-                className={`p-4 rounded-2xl border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60 shadow-xs"} flex flex-col sm:flex-row items-center justify-between gap-4 text-xs`}
-              >
-                <div className="relative w-full sm:w-72">
-                  <Search
-                    size={14}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search Operator, Details..."
-                    value={activitySearch}
-                    onChange={(e) => {
-                      setActivitySearch(e.target.value);
-                      setActivityPage(1);
-                    }}
-                    className={`w-full pl-9 pr-8 py-2 border rounded-xl font-medium focus:outline-hidden focus:ring-1 transition-all ${
-                      isDarkMode
-                        ? "bg-slate-950 border-slate-800 focus:border-emerald-700 focus:ring-emerald-700/50 text-white"
-                        : "bg-white border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/50 text-slate-800"
-                    }`}
-                  />
-                  {activitySearch && (
-                    <button
-                      onClick={() => {
-                        setActivitySearch("");
-                        setActivityPage(1);
-                      }}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
-                    >
-                      <X size={13} />
-                    </button>
-                  )}
-                </div>
-
-                {/* Event Type Tabs Filter */}
-                <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/40 dark:border-slate-800 w-full sm:w-auto shrink-0 overflow-x-auto gap-0.5">
-                  {(["all", "login", "grade", "attendance"] as const).map(
-                    (type) => (
-                      <button
-                        key={type}
-                        onClick={() => {
-                          setActivityTypeFilter(type);
-                          setActivityPage(1);
-                        }}
-                        className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                          activityTypeFilter === type
-                            ? "bg-white dark:bg-slate-850 text-emerald-700 dark:text-emerald-400 shadow-xs"
-                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ),
-                  )}
-                </div>
-              </div>
-
-              {/* Paginated Results Table */}
-              <div
-                className={`rounded-2xl border overflow-hidden ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200/60 shadow-xs"}`}
-              >
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr
-                        className={`border-b font-black uppercase text-[10px] tracking-wider text-slate-400 ${
-                          isDarkMode
-                            ? "border-slate-800 bg-slate-950/40"
-                            : "border-slate-200/60 bg-slate-50/55"
-                        }`}
-                      >
-                        <th className="p-3.5 w-32">Event Type</th>
-                        <th className="p-3.5 w-48">Operator</th>
-                        <th className="p-3.5">Details</th>
-                        <th className="p-3.5 w-36 text-right">Timestamp</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200/40 dark:divide-slate-800/40">
-                      {paginatedActivities.length > 0 ? (
-                        paginatedActivities.map((act) => (
-                          <tr
-                            key={act.id}
-                            className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300"
-                          >
-                            <td className="p-3.5">
-                              {act.type === "login" && (
-                                <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                                  <LogIn size={10} />
-                                  <span>LOGIN</span>
-                                </span>
-                              )}
-                              {act.type === "grade" && (
-                                <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                                  <Award size={10} />
-                                  <span>GRADE</span>
-                                </span>
-                              )}
-                              {act.type === "attendance" && (
-                                <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                                  <CheckSquare size={10} />
-                                  <span>ATTENDANCE</span>
-                                </span>
-                              )}
-                            </td>
-                            <td className="p-3.5 font-bold text-slate-900 dark:text-white">
-                              {act.user}
-                            </td>
-                            <td className="p-3.5">{act.details}</td>
-                            <td className="p-3.5 text-right font-mono text-[10px] text-slate-400">
-                              {act.timestamp}
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={4} className="p-8 text-center">
-                            <div className="flex flex-col items-center justify-center space-y-2">
-                              <History
-                                size={24}
-                                className="text-slate-300 animate-pulse"
-                              />
-                              <p className="text-slate-400 font-bold">
-                                No system activities found
-                              </p>
-                              <p className="text-[11px] text-slate-400 leading-normal max-w-xs mx-auto">
-                                Try clearing search parameters, selecting
-                                another event type filter, or injecting
-                                simulated audit feeds above.
-                              </p>
-                              {(activitySearch ||
-                                activityTypeFilter !== "all") && (
-                                <button
-                                  onClick={() => {
-                                    setActivitySearch("");
-                                    setActivityTypeFilter("all");
-                                    setActivityPage(1);
-                                  }}
-                                  className="px-3 py-1.5 mt-2 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-xs"
-                                >
-                                  Reset Search Filters
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Pagination Controls */}
-                {filteredActivities.length > 0 && (
-                  <div
-                    className={`p-3.5 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 font-semibold ${
-                      isDarkMode
-                        ? "border-slate-800 bg-slate-950/25"
-                        : "border-slate-200/60 bg-slate-50/20"
-                    }`}
-                  >
-                    <div>
-                      Showing{" "}
-                      <span className="text-slate-700 dark:text-white font-extrabold">
-                        {startIndex + 1}
-                      </span>{" "}
-                      to{" "}
-                      <span className="text-slate-700 dark:text-white font-extrabold">
-                        {Math.min(
-                          startIndex + ITEMS_PER_PAGE,
-                          filteredActivities.length,
-                        )}
-                      </span>{" "}
-                      of{" "}
-                      <span className="text-slate-700 dark:text-white font-extrabold">
-                        {filteredActivities.length}
-                      </span>{" "}
-                      entries
-                    </div>
-
-                    <div className="flex items-center space-x-1.5">
-                      <button
-                        type="button"
-                        disabled={currentActivityPage === 1}
-                        onClick={() => setActivityPage(currentActivityPage - 1)}
-                        className={`p-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-all ${
-                          isDarkMode
-                            ? "border-slate-800 hover:bg-slate-800 disabled:opacity-30"
-                            : "border-slate-200 hover:bg-slate-100 disabled:opacity-30"
-                        }`}
-                        title="Previous Page"
-                      >
-                        <ChevronLeft size={14} />
-                      </button>
-
-                      <div className="font-bold">
-                        Page{" "}
-                        <span className="text-slate-700 dark:text-white font-extrabold">
-                          {currentActivityPage}
-                        </span>{" "}
-                        of{" "}
-                        <span className="text-slate-700 dark:text-white font-extrabold">
-                          {totalActivityPages}
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        disabled={currentActivityPage === totalActivityPages}
-                        onClick={() => setActivityPage(currentActivityPage + 1)}
-                        className={`p-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-all ${
-                          isDarkMode
-                            ? "border-slate-800 hover:bg-slate-800 disabled:opacity-30"
-                            : "border-slate-200 hover:bg-slate-100 disabled:opacity-30"
-                        }`}
-                        title="Next Page"
-                      >
-                        <ChevronRight size={14} />
-                      </button>
-                    </div>
-                  </div>
-                )}
+                  <Trash2 size={12} />
+                  <span>Clear Logs</span>
+                </button>
               </div>
             </div>
-          );
-        })()}
+
+            {/* Event Type Counters */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest block mb-1">Total Logs</span>
+                <div className="flex items-baseline space-x-1.5">
+                  <span className="text-lg font-extrabold font-mono text-slate-950 dark:text-white">{activitiesList.length}</span>
+                  <span className="text-[10px] text-slate-400">events recorded</span>
+                </div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                <span className="text-[10px] text-emerald-500 uppercase font-black tracking-widest block mb-1">Logins</span>
+                <div className="flex items-baseline space-x-1.5">
+                  <span className="text-lg font-extrabold font-mono text-emerald-600 dark:text-emerald-400">{countLogin}</span>
+                  <span className="text-[10px] text-slate-400">auth sessions</span>
+                </div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                <span className="text-[10px] text-amber-500 uppercase font-black tracking-widest block mb-1">Grades Uploaded</span>
+                <div className="flex items-baseline space-x-1.5">
+                  <span className="text-lg font-extrabold font-mono text-amber-600 dark:text-amber-400">{countGrade}</span>
+                  <span className="text-[10px] text-slate-400">ledger updates</span>
+                </div>
+              </div>
+              <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+                <span className="text-[10px] text-purple-500 uppercase font-black tracking-widest block mb-1">Attendance Roll</span>
+                <div className="flex items-baseline space-x-1.5">
+                  <span className="text-lg font-extrabold font-mono text-purple-600 dark:text-purple-400">{countAttendance}</span>
+                  <span className="text-[10px] text-slate-400">roll submissions</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Testing Simulation & Tools Grid */}
+            <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'} grid grid-cols-1 md:grid-cols-3 gap-4 items-center`}>
+              <div className="md:col-span-1">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                  <Activity size={14} className="text-emerald-500 animate-pulse" />
+                  <span>Interactive Audit Simulator</span>
+                </h4>
+                <p className="text-[10px] text-slate-400 mt-1 leading-normal">
+                  Inject live simulated school activities to verify search queries, page routing, and filter configurations instantly.
+                </p>
+              </div>
+              <div className="md:col-span-2 flex flex-wrap gap-2 md:justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleAddSimulatedActivity('login')}
+                  className="px-3.5 py-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all flex items-center gap-1.5"
+                >
+                  <LogIn size={12} />
+                  <span>Simulate Login</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddSimulatedActivity('grade')}
+                  className="px-3.5 py-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all flex items-center gap-1.5"
+                >
+                  <Award size={12} />
+                  <span>Simulate Score Upload</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAddSimulatedActivity('attendance')}
+                  className="px-3.5 py-2 bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900 text-purple-800 dark:text-purple-300 font-extrabold text-[10px] uppercase tracking-wider rounded-xl cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-all flex items-center gap-1.5"
+                >
+                  <CheckSquare size={12} />
+                  <span>Simulate Roll Call</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filter and Search controls */}
+            <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'} flex flex-col sm:flex-row items-center justify-between gap-4 text-xs`}>
+              <div className="relative w-full sm:w-72">
+                <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search Operator, Details..."
+                  value={activitySearch}
+                  onChange={(e) => {
+                    setActivitySearch(e.target.value);
+                    setActivityPage(1);
+                  }}
+                  className={`w-full pl-9 pr-8 py-2 border rounded-xl font-medium focus:outline-hidden focus:ring-1 transition-all ${
+                    isDarkMode 
+                      ? 'bg-slate-950 border-slate-800 focus:border-emerald-700 focus:ring-emerald-700/50 text-white' 
+                      : 'bg-white border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/50 text-slate-800'
+                  }`}
+                />
+                {activitySearch && (
+                  <button
+                    onClick={() => {
+                      setActivitySearch('');
+                      setActivityPage(1);
+                    }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+
+              {/* Event Type Tabs Filter */}
+              <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/40 dark:border-slate-800 w-full sm:w-auto shrink-0 overflow-x-auto gap-0.5">
+                {(['all', 'login', 'grade', 'attendance'] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setActivityTypeFilter(type);
+                      setActivityPage(1);
+                    }}
+                    className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                      activityTypeFilter === type
+                        ? 'bg-white dark:bg-slate-850 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Paginated Results Table */}
+            <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/60 shadow-xs'}`}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className={`border-b font-black uppercase text-[10px] tracking-wider text-slate-400 ${
+                      isDarkMode ? 'border-slate-800 bg-slate-950/40' : 'border-slate-200/60 bg-slate-50/55'
+                    }`}>
+                      <th className="p-3.5 w-32">Event Type</th>
+                      <th className="p-3.5 w-48">Operator</th>
+                      <th className="p-3.5">Details</th>
+                      <th className="p-3.5 w-36 text-right">Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200/40 dark:divide-slate-800/40">
+                    {paginatedActivities.length > 0 ? (
+                      paginatedActivities.map((act) => (
+                        <tr key={act.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors font-medium text-slate-700 dark:text-slate-300">
+                          <td className="p-3.5">
+                            {act.type === 'login' && (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                <LogIn size={10} />
+                                <span>LOGIN</span>
+                              </span>
+                            )}
+                            {act.type === 'grade' && (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                <Award size={10} />
+                                <span>GRADE</span>
+                              </span>
+                            )}
+                            {act.type === 'attendance' && (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                <CheckSquare size={10} />
+                                <span>ATTENDANCE</span>
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3.5 font-bold text-slate-900 dark:text-white">
+                            {act.user}
+                          </td>
+                          <td className="p-3.5">
+                            {act.details}
+                          </td>
+                          <td className="p-3.5 text-right font-mono text-[10px] text-slate-400">
+                            {act.timestamp}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="p-8 text-center">
+                          <div className="flex flex-col items-center justify-center space-y-2">
+                            <History size={24} className="text-slate-300 animate-pulse" />
+                            <p className="text-slate-400 font-bold">No system activities found</p>
+                            <p className="text-[11px] text-slate-400 leading-normal max-w-xs mx-auto">
+                              Try clearing search parameters, selecting another event type filter, or injecting simulated audit feeds above.
+                            </p>
+                            {(activitySearch || activityTypeFilter !== 'all') && (
+                              <button
+                                onClick={() => {
+                                  setActivitySearch('');
+                                  setActivityTypeFilter('all');
+                                  setActivityPage(1);
+                                }}
+                                className="px-3 py-1.5 mt-2 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-xs"
+                              >
+                                Reset Search Filters
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Controls */}
+              {filteredActivities.length > 0 && (
+                <div className={`p-3.5 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 font-semibold ${
+                  isDarkMode ? 'border-slate-800 bg-slate-950/25' : 'border-slate-200/60 bg-slate-50/20'
+                }`}>
+                  <div>
+                    Showing <span className="text-slate-700 dark:text-white font-extrabold">{startIndex + 1}</span> to{' '}
+                    <span className="text-slate-700 dark:text-white font-extrabold">
+                      {Math.min(startIndex + ITEMS_PER_PAGE, filteredActivities.length)}
+                    </span>{' '}
+                    of <span className="text-slate-700 dark:text-white font-extrabold">{filteredActivities.length}</span> entries
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    <button
+                      type="button"
+                      disabled={currentActivityPage === 1}
+                      onClick={() => setActivityPage(currentActivityPage - 1)}
+                      className={`p-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-all ${
+                        isDarkMode 
+                          ? 'border-slate-800 hover:bg-slate-800 disabled:opacity-30' 
+                          : 'border-slate-200 hover:bg-slate-100 disabled:opacity-30'
+                      }`}
+                      title="Previous Page"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+
+                    <div className="font-bold">
+                      Page <span className="text-slate-700 dark:text-white font-extrabold">{currentActivityPage}</span> of{' '}
+                      <span className="text-slate-700 dark:text-white font-extrabold">{totalActivityPages}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={currentActivityPage === totalActivityPages}
+                      onClick={() => setActivityPage(currentActivityPage + 1)}
+                      className={`p-1.5 rounded-lg border flex items-center justify-center cursor-pointer transition-all ${
+                        isDarkMode 
+                          ? 'border-slate-800 hover:bg-slate-800 disabled:opacity-30' 
+                          : 'border-slate-200 hover:bg-slate-100 disabled:opacity-30'
+                      }`}
+                      title="Next Page"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ==================== 10. LESSON PLANNER & SYLLABUS BOARDS ==================== */}
-      {activeTab === "syllabus" && (
+      {activeTab === 'syllabus' && (
         <SyllabusBoard
-          session={{
-            id: "admin",
-            role: "admin",
-            name: "ERA Admin Office",
-            username: "admin",
-            email: "admin@school.com",
-          }}
+          session={{ id: 'admin', role: 'admin', name: 'ERA Admin Office', username: 'admin', email: 'admin@school.com' }}
           subjects={subjects}
           syllabusPlans={syllabusPlans}
           onUpdateSyllabusPlans={onUpdateSyllabusPlans || (() => {})}
@@ -10382,7 +7580,7 @@ export default function AdminDashboard({
       )}
 
       {/* ==================== 11. SMART TEACHER COVER & SUBSTITUTION ASSISTANT ==================== */}
-      {activeTab === "substitution" && (
+      {activeTab === 'substitution' && (
         <SubstitutionAssistant
           teachers={teachers}
           subjects={subjects}
@@ -10396,6 +7594,7 @@ export default function AdminDashboard({
         />
       )}
 
+
       {/* ========================================================
           ==================== CRUD MODALS AREA ====================
           ======================================================== */}
@@ -10403,43 +7602,25 @@ export default function AdminDashboard({
       {/* 1. Student Add/Edit Modal */}
       {isStudentModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div
-            className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
-              isDarkMode
-                ? "bg-slate-900 border-slate-800 text-white"
-                : "bg-white border-slate-200 text-slate-800"
-            }`}
-          >
+          <div className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
+            isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
             <h4 className="font-extrabold text-sm uppercase tracking-wide border-b pb-2 mb-4">
-              {editingStudent
-                ? `Modify Pupil: ${editingStudent.name}`
-                : "Register New Pupil"}
+              {editingStudent ? `Modify Pupil: ${editingStudent.name}` : 'Register New Pupil'}
             </h4>
 
-            <form
-              onSubmit={handleStudentSubmit}
-              className="space-y-3.5 text-xs"
-            >
+            <form onSubmit={handleStudentSubmit} className="space-y-3.5 text-xs">
               {/* Photo Management */}
               <div className="flex items-center space-x-3.5 p-3 rounded-lg border border-slate-200/40 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
                 <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-850 flex items-center justify-center overflow-hidden border border-slate-200/50 dark:border-slate-700 shrink-0">
                   {studentForm.profilePhoto ? (
-                    <img
-                      src={studentForm.profilePhoto}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
+                    <img src={studentForm.profilePhoto} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
-                    <span className="text-[9px] font-bold text-slate-400">
-                      NO PHOTO
-                    </span>
+                    <span className="text-[9px] font-bold text-slate-400">NO PHOTO</span>
                   )}
                 </div>
                 <div className="flex-1 space-y-1">
-                  <p className="font-bold text-[10px] text-slate-400 uppercase">
-                    Profile Photo
-                  </p>
+                  <p className="font-bold text-[10px] text-slate-400 uppercase">Profile Photo</p>
                   <div className="flex items-center gap-2">
                     <label className="px-2 py-1 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors shadow-xs">
                       <span>Upload</span>
@@ -10451,18 +7632,13 @@ export default function AdminDashboard({
                           const file = e.target.files?.[0];
                           if (file) {
                             if (file.size > 2 * 1024 * 1024) {
-                              alert(
-                                "File size exceeds 2MB limit. Please upload a smaller image.",
-                              );
+                              alert('File size exceeds 2MB limit. Please upload a smaller image.');
                               return;
                             }
                             const reader = new FileReader();
                             reader.onload = (event) => {
                               if (event.target?.result) {
-                                setStudentForm({
-                                  ...studentForm,
-                                  profilePhoto: event.target.result as string,
-                                });
+                                setStudentForm({ ...studentForm, profilePhoto: event.target.result as string });
                               }
                             };
                             reader.readAsDataURL(file);
@@ -10483,28 +7659,14 @@ export default function AdminDashboard({
                       }}
                       className="px-2 py-1 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors shadow-xs flex items-center gap-1"
                     >
-                      <Camera
-                        size={12}
-                        className={
-                          isStudentCameraActive
-                            ? "text-emerald-500 animate-pulse"
-                            : "text-slate-400"
-                        }
-                      />
-                      <span>
-                        {isStudentCameraActive ? "Stop Camera" : "Take Photo"}
-                      </span>
+                      <Camera size={12} className={isStudentCameraActive ? "text-emerald-500 animate-pulse" : "text-slate-400"} />
+                      <span>{isStudentCameraActive ? "Stop Camera" : "Take Photo"}</span>
                     </button>
 
                     {studentForm.profilePhoto && (
                       <button
                         type="button"
-                        onClick={() =>
-                          setStudentForm({
-                            ...studentForm,
-                            profilePhoto: undefined,
-                          })
-                        }
+                        onClick={() => setStudentForm({ ...studentForm, profilePhoto: undefined })}
                         className="px-2 py-1 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-all"
                       >
                         Remove
@@ -10521,7 +7683,7 @@ export default function AdminDashboard({
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
                     Live Camera Feed
                   </p>
-
+                  
                   {studentCameraError ? (
                     <div className="text-rose-500 text-[10px] font-semibold bg-rose-500/10 p-2 rounded border border-rose-500/20">
                       {studentCameraError}
@@ -10564,61 +7726,41 @@ export default function AdminDashboard({
                       Cancel
                     </button>
                   </div>
-
+                  
                   {/* Hidden Canvas used for grabbing high-quality frames */}
                   <canvas ref={studentCanvasRef} className="hidden" />
                 </div>
               )}
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Full Pupil Name
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Full Pupil Name</label>
                 <input
                   type="text"
                   required
                   value={studentForm.name}
-                  onChange={(e) =>
-                    setStudentForm({ ...studentForm, name: e.target.value })
-                  }
+                  onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded text-xs focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Class Grade
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Class Grade</label>
                   <select
                     value={studentForm.classId}
-                    onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        classId: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setStudentForm({ ...studentForm, classId: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
-                    {classes.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
+                    {classes.map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Gender
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Gender</label>
                   <select
                     value={studentForm.gender}
-                    onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        gender: e.target.value as any,
-                      })
-                    }
+                    onChange={(e) => setStudentForm({ ...studentForm, gender: e.target.value as any })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
                     <option value="Male">Male</option>
@@ -10629,88 +7771,56 @@ export default function AdminDashboard({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Admission DOB
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Admission DOB</label>
                   <input
                     type="date"
                     required
                     value={studentForm.dob}
-                    onChange={(e) =>
-                      setStudentForm({ ...studentForm, dob: e.target.value })
-                    }
+                    onChange={(e) => setStudentForm({ ...studentForm, dob: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Term Fee Balance (GHS)
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Term Fee Balance (GHS)</label>
                   <input
                     type="number"
                     required
                     value={studentForm.balanceGHS}
-                    onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        balanceGHS: Number(e.target.value),
-                      })
-                    }
+                    onChange={(e) => setStudentForm({ ...studentForm, balanceGHS: Number(e.target.value) })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Guardian Name
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Guardian Name</label>
                 <input
                   type="text"
                   required
                   value={studentForm.parentName}
-                  onChange={(e) =>
-                    setStudentForm({
-                      ...studentForm,
-                      parentName: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setStudentForm({ ...studentForm, parentName: e.target.value })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded text-xs focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Guardian Phone (+233)
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Guardian Phone (+233)</label>
                   <input
                     type="tel"
                     required
                     value={studentForm.parentPhone}
-                    onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        parentPhone: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setStudentForm({ ...studentForm, parentPhone: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Guardian Email
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Guardian Email</label>
                   <input
                     type="email"
                     required
                     value={studentForm.parentEmail}
-                    onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        parentEmail: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setStudentForm({ ...studentForm, parentEmail: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded text-xs focus:outline-hidden"
                   />
                 </div>
@@ -10718,17 +7828,10 @@ export default function AdminDashboard({
 
               {editingStudent && (
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Account Status
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Account Status</label>
                   <select
                     value={studentForm.status}
-                    onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        status: e.target.value as any,
-                      })
-                    }
+                    onChange={(e) => setStudentForm({ ...studentForm, status: e.target.value as any })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
                     <option value="Active">Active</option>
@@ -10763,43 +7866,25 @@ export default function AdminDashboard({
       {/* 2. Teacher Add/Edit Modal */}
       {isTeacherModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div
-            className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
-              isDarkMode
-                ? "bg-slate-900 border-slate-800 text-white"
-                : "bg-white border-slate-200 text-slate-800"
-            }`}
-          >
+          <div className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
+            isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
             <h4 className="font-extrabold text-sm uppercase tracking-wide border-b pb-2 mb-4">
-              {editingTeacher
-                ? `Modify Faculty: ${editingTeacher.name}`
-                : "Onboard New Faculty"}
+              {editingTeacher ? `Modify Faculty: ${editingTeacher.name}` : 'Onboard New Faculty'}
             </h4>
 
-            <form
-              onSubmit={handleTeacherSubmit}
-              className="space-y-3.5 text-xs"
-            >
+            <form onSubmit={handleTeacherSubmit} className="space-y-3.5 text-xs">
               {/* Photo Management */}
               <div className="flex items-center space-x-3.5 p-3 rounded-lg border border-slate-200/40 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
                 <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-850 flex items-center justify-center overflow-hidden border border-slate-200/50 dark:border-slate-700 shrink-0">
                   {teacherForm.profilePhoto ? (
-                    <img
-                      src={teacherForm.profilePhoto}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
+                    <img src={teacherForm.profilePhoto} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   ) : (
-                    <span className="text-[9px] font-bold text-slate-400">
-                      NO PHOTO
-                    </span>
+                    <span className="text-[9px] font-bold text-slate-400">NO PHOTO</span>
                   )}
                 </div>
                 <div className="flex-1 space-y-1">
-                  <p className="font-bold text-[10px] text-slate-400 uppercase">
-                    Profile Photo
-                  </p>
+                  <p className="font-bold text-[10px] text-slate-400 uppercase">Profile Photo</p>
                   <div className="flex items-center gap-2">
                     <label className="px-2 py-1 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors shadow-xs">
                       <span>Upload</span>
@@ -10811,18 +7896,13 @@ export default function AdminDashboard({
                           const file = e.target.files?.[0];
                           if (file) {
                             if (file.size > 2 * 1024 * 1024) {
-                              alert(
-                                "File size exceeds 2MB limit. Please upload a smaller image.",
-                              );
+                              alert('File size exceeds 2MB limit. Please upload a smaller image.');
                               return;
                             }
                             const reader = new FileReader();
                             reader.onload = (event) => {
                               if (event.target?.result) {
-                                setTeacherForm({
-                                  ...teacherForm,
-                                  profilePhoto: event.target.result as string,
-                                });
+                                setTeacherForm({ ...teacherForm, profilePhoto: event.target.result as string });
                               }
                             };
                             reader.readAsDataURL(file);
@@ -10833,12 +7913,7 @@ export default function AdminDashboard({
                     {teacherForm.profilePhoto && (
                       <button
                         type="button"
-                        onClick={() =>
-                          setTeacherForm({
-                            ...teacherForm,
-                            profilePhoto: undefined,
-                          })
-                        }
+                        onClick={() => setTeacherForm({ ...teacherForm, profilePhoto: undefined })}
                         className="px-2 py-1 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/20 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-all"
                       >
                         Remove
@@ -10849,57 +7924,37 @@ export default function AdminDashboard({
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Teacher Full Name
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Teacher Full Name</label>
                 <input
                   type="text"
                   required
                   value={teacherForm.name}
-                  onChange={(e) =>
-                    setTeacherForm({ ...teacherForm, name: e.target.value })
-                  }
+                  onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Staff ID
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Staff ID</label>
                   <input
                     type="text"
                     required
                     readOnly={editingTeacher !== null}
                     value={teacherForm.staffNumber}
-                    onChange={(e) =>
-                      setTeacherForm({
-                        ...teacherForm,
-                        staffNumber: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setTeacherForm({ ...teacherForm, staffNumber: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded font-mono font-bold focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Subject Specialty
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Subject Specialty</label>
                   <select
                     value={teacherForm.subjectId}
-                    onChange={(e) =>
-                      setTeacherForm({
-                        ...teacherForm,
-                        subjectId: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setTeacherForm({ ...teacherForm, subjectId: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
                     <option value="Mathematics">Mathematics</option>
-                    <option value="Integrated Science">
-                      Integrated Science
-                    </option>
+                    <option value="Integrated Science">Integrated Science</option>
                     <option value="English Language">English Language</option>
                     <option value="Social Studies">Social Studies</option>
                     <option value="ICT">ICT</option>
@@ -10910,17 +7965,10 @@ export default function AdminDashboard({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Gender
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Gender</label>
                   <select
                     value={teacherForm.gender}
-                    onChange={(e) =>
-                      setTeacherForm({
-                        ...teacherForm,
-                        gender: e.target.value as any,
-                      })
-                    }
+                    onChange={(e) => setTeacherForm({ ...teacherForm, gender: e.target.value as any })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
                     <option value="Male">Male</option>
@@ -10928,17 +7976,10 @@ export default function AdminDashboard({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Employment Status
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Employment Status</label>
                   <select
                     value={teacherForm.status}
-                    onChange={(e) =>
-                      setTeacherForm({
-                        ...teacherForm,
-                        status: e.target.value as any,
-                      })
-                    }
+                    onChange={(e) => setTeacherForm({ ...teacherForm, status: e.target.value as any })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
                     <option value="Active">Active</option>
@@ -10948,52 +7989,35 @@ export default function AdminDashboard({
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Department Assignment
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Department Assignment</label>
                 <select
                   value={teacherForm.department}
-                  onChange={(e) =>
-                    setTeacherForm({
-                      ...teacherForm,
-                      department: e.target.value as any,
-                    })
-                  }
+                  onChange={(e) => setTeacherForm({ ...teacherForm, department: e.target.value as any })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                 >
-                  <option value="Daycare-JHS">
-                    Daycare-JHS (Basic Education)
-                  </option>
+                  <option value="Daycare-JHS">Daycare-JHS (Basic Education)</option>
                   <option value="SHS">SHS (Senior High School)</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Faculty Email
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Faculty Email</label>
                 <input
                   type="email"
                   required
                   value={teacherForm.email}
-                  onChange={(e) =>
-                    setTeacherForm({ ...teacherForm, email: e.target.value })
-                  }
+                  onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded focus:outline-hidden"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Faculty Mobile Contact
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Faculty Mobile Contact</label>
                 <input
                   type="tel"
                   required
                   value={teacherForm.phone}
-                  onChange={(e) =>
-                    setTeacherForm({ ...teacherForm, phone: e.target.value })
-                  }
+                  onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded focus:outline-hidden"
                 />
               </div>
@@ -11023,68 +8047,45 @@ export default function AdminDashboard({
       {/* 3. Broadcast Notice Modal */}
       {isNoticeModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div
-            className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
-              isDarkMode
-                ? "bg-slate-900 border-slate-800 text-white"
-                : "bg-white border-slate-200 text-slate-800"
-            }`}
-          >
-            <h4 className="font-extrabold text-sm uppercase tracking-wide border-b pb-2 mb-4">
-              Broadcast Official School Bulletin
-            </h4>
+          <div className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
+            isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
+            <h4 className="font-extrabold text-sm uppercase tracking-wide border-b pb-2 mb-4">Broadcast Official School Bulletin</h4>
 
             <form onSubmit={handleNoticeSubmit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Bulletin Title
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Bulletin Title</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. 2nd Term Examination Fee structure"
                   value={noticeForm.title}
-                  onChange={(e) =>
-                    setNoticeForm({ ...noticeForm, title: e.target.value })
-                  }
+                  onChange={(e) => setNoticeForm({ ...noticeForm, title: e.target.value })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded focus:outline-hidden font-bold"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Target Audience
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Target Audience</label>
                 <select
                   value={noticeForm.targetAudience}
-                  onChange={(e) =>
-                    setNoticeForm({
-                      ...noticeForm,
-                      targetAudience: e.target.value as any,
-                    })
-                  }
+                  onChange={(e) => setNoticeForm({ ...noticeForm, targetAudience: e.target.value as any })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                 >
-                  <option value="All">
-                    All Portal users (Teachers, Parents, Students)
-                  </option>
+                  <option value="All">All Portal users (Teachers, Parents, Students)</option>
                   <option value="Teachers">Faculty Staff Only</option>
                   <option value="Students">Registered Students Only</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Bulletin message Content
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Bulletin message Content</label>
                 <textarea
                   required
                   rows={4}
                   placeholder="Draft official announcement contents here..."
                   value={noticeForm.content}
-                  onChange={(e) =>
-                    setNoticeForm({ ...noticeForm, content: e.target.value })
-                  }
+                  onChange={(e) => setNoticeForm({ ...noticeForm, content: e.target.value })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2.5 rounded focus:outline-hidden leading-relaxed"
                 />
               </div>
@@ -11114,68 +8115,43 @@ export default function AdminDashboard({
       {/* 4. Exam Terminal Score Input Modal */}
       {isGradeModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div
-            className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
-              isDarkMode
-                ? "bg-slate-900 border-slate-800 text-white"
-                : "bg-white border-slate-200 text-slate-800"
-            }`}
-          >
-            <h4 className="font-extrabold text-sm uppercase tracking-wide border-b pb-2 mb-4">
-              Input Pupil Exam Record
-            </h4>
+          <div className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
+            isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
+            <h4 className="font-extrabold text-sm uppercase tracking-wide border-b pb-2 mb-4">Input Pupil Exam Record</h4>
 
             <form onSubmit={handleGradeSubmit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                  Select Pupil
-                </label>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Select Pupil</label>
                 <select
                   value={gradeForm.studentId}
-                  onChange={(e) =>
-                    setGradeForm({ ...gradeForm, studentId: e.target.value })
-                  }
+                  onChange={(e) => setGradeForm({ ...gradeForm, studentId: e.target.value })}
                   className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                 >
-                  {students.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} ({classes.find((c) => c.id === s.classId)?.name})
-                    </option>
+                  {students.map(s => (
+                    <option key={s.id} value={s.id}>{s.name} ({classes.find(c => c.id === s.classId)?.name})</option>
                   ))}
                 </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Select Subject
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Select Subject</label>
                   <select
                     value={gradeForm.subjectId}
-                    onChange={(e) =>
-                      setGradeForm({ ...gradeForm, subjectId: e.target.value })
-                    }
+                    onChange={(e) => setGradeForm({ ...gradeForm, subjectId: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
-                    {subjects.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
+                    {subjects.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Term
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Term</label>
                   <select
                     value={gradeForm.term}
-                    onChange={(e) =>
-                      setGradeForm({
-                        ...gradeForm,
-                        term: e.target.value as any,
-                      })
-                    }
+                    onChange={(e) => setGradeForm({ ...gradeForm, term: e.target.value as any })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
                     <option value="Term 1">Term 1</option>
@@ -11187,40 +8163,26 @@ export default function AdminDashboard({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Class Assessment Score (Max 30)
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Class Assessment Score (Max 30)</label>
                   <input
                     type="number"
                     min={0}
                     max={30}
                     required
                     value={gradeForm.classScore}
-                    onChange={(e) =>
-                      setGradeForm({
-                        ...gradeForm,
-                        classScore: Number(e.target.value),
-                      })
-                    }
+                    onChange={(e) => setGradeForm({ ...gradeForm, classScore: Number(e.target.value) })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden font-bold"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Terminal Exam Score (Max 70)
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Terminal Exam Score (Max 70)</label>
                   <input
                     type="number"
                     min={0}
                     max={70}
                     required
                     value={gradeForm.examScore}
-                    onChange={(e) =>
-                      setGradeForm({
-                        ...gradeForm,
-                        examScore: Number(e.target.value),
-                      })
-                    }
+                    onChange={(e) => setGradeForm({ ...gradeForm, examScore: Number(e.target.value) })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden font-bold"
                   />
                 </div>
@@ -11251,55 +8213,30 @@ export default function AdminDashboard({
       {/* 5. Timetable Entry Block Modal */}
       {isTimetableModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div
-            className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
-              isDarkMode
-                ? "bg-slate-900 border-slate-800 text-white"
-                : "bg-white border-slate-200 text-slate-800"
-            }`}
-          >
-            <h4 className="font-extrabold text-sm uppercase tracking-wide border-b pb-2 mb-4">
-              Create Timetable Hour Block
-            </h4>
+          <div className={`p-6 rounded-xl shadow-2xl max-w-md w-full border animate-fade-in ${
+            isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
+            <h4 className="font-extrabold text-sm uppercase tracking-wide border-b pb-2 mb-4">Create Timetable Hour Block</h4>
 
-            <form
-              onSubmit={handleTimetableSubmit}
-              className="space-y-3.5 text-xs"
-            >
+            <form onSubmit={handleTimetableSubmit} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Target Class
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Target Class</label>
                   <select
                     value={timetableForm.classId}
-                    onChange={(e) =>
-                      setTimetableForm({
-                        ...timetableForm,
-                        classId: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setTimetableForm({ ...timetableForm, classId: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
-                    {classes.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
+                    {classes.map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Day of Week
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Day of Week</label>
                   <select
                     value={timetableForm.day}
-                    onChange={(e) =>
-                      setTimetableForm({
-                        ...timetableForm,
-                        day: e.target.value as any,
-                      })
-                    }
+                    onChange={(e) => setTimetableForm({ ...timetableForm, day: e.target.value as any })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
                     <option value="Monday">Monday</option>
@@ -11313,44 +8250,26 @@ export default function AdminDashboard({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Curriculum Subject
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Curriculum Subject</label>
                   <select
                     value={timetableForm.subjectId}
-                    onChange={(e) =>
-                      setTimetableForm({
-                        ...timetableForm,
-                        subjectId: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setTimetableForm({ ...timetableForm, subjectId: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
-                    {subjects.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name} ({s.code})
-                      </option>
+                    {subjects.map(s => (
+                      <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Assigned Teacher
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Assigned Teacher</label>
                   <select
                     value={timetableForm.teacherId}
-                    onChange={(e) =>
-                      setTimetableForm({
-                        ...timetableForm,
-                        teacherId: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setTimetableForm({ ...timetableForm, teacherId: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden bg-white dark:bg-slate-950"
                   >
-                    {teachers.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name}
-                      </option>
+                    {teachers.map(t => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
                     ))}
                   </select>
                 </div>
@@ -11358,38 +8277,24 @@ export default function AdminDashboard({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Start Time Hour
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Start Time Hour</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. 08:30"
                     value={timetableForm.startTime}
-                    onChange={(e) =>
-                      setTimetableForm({
-                        ...timetableForm,
-                        startTime: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setTimetableForm({ ...timetableForm, startTime: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden font-bold"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    End Time Hour
-                  </label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">End Time Hour</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. 10:00"
                     value={timetableForm.endTime}
-                    onChange={(e) =>
-                      setTimetableForm({
-                        ...timetableForm,
-                        endTime: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setTimetableForm({ ...timetableForm, endTime: e.target.value })}
                     className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 p-2 rounded focus:outline-hidden font-bold"
                   />
                 </div>
@@ -11419,15 +8324,10 @@ export default function AdminDashboard({
 
       {/* ==================== DELETE CONFIRMATION MODAL ==================== */}
       {deleteConfirm.isOpen && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in"
-          id="delete-confirmation-modal"
-        >
-          <div
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in" id="delete-confirmation-modal">
+          <div 
             className={`p-6 rounded-2xl shadow-2xl max-w-md w-full border ${
-              isDarkMode
-                ? "bg-slate-900 border-slate-800 text-white"
-                : "bg-white border-slate-200 text-slate-850"
+              isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-850'
             }`}
           >
             <div className="flex items-start space-x-4">
@@ -11436,16 +8336,14 @@ export default function AdminDashboard({
               </div>
               <div className="space-y-1.5 flex-1">
                 <h3 className="text-base font-black tracking-tight leading-snug">
-                  {deleteConfirm.title || "Are you sure?"}
+                  {deleteConfirm.title || 'Are you sure?'}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-semibold">
                   {deleteConfirm.message}
                 </p>
               </div>
-              <button
-                onClick={() =>
-                  setDeleteConfirm((prev) => ({ ...prev, isOpen: false }))
-                }
+              <button 
+                onClick={() => setDeleteConfirm(prev => ({ ...prev, isOpen: false }))}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors shrink-0 p-1 rounded-lg"
               >
                 <X size={18} />
@@ -11455,13 +8353,11 @@ export default function AdminDashboard({
             <div className="flex space-x-2.5 mt-6 justify-end">
               <button
                 type="button"
-                onClick={() =>
-                  setDeleteConfirm((prev) => ({ ...prev, isOpen: false }))
-                }
+                onClick={() => setDeleteConfirm(prev => ({ ...prev, isOpen: false }))}
                 className={`px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all border ${
-                  isDarkMode
-                    ? "bg-slate-800 hover:bg-slate-700 border-slate-750 text-slate-300"
-                    : "bg-slate-100 hover:bg-slate-200 border-slate-200/60 text-slate-700"
+                  isDarkMode 
+                    ? 'bg-slate-800 hover:bg-slate-700 border-slate-750 text-slate-300' 
+                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200/60 text-slate-700'
                 }`}
               >
                 Cancel
@@ -11480,67 +8376,43 @@ export default function AdminDashboard({
       )}
 
       {/* ==================== OFFICIAL PRINTABLE REPORT CARD MODAL (ADMIN VIEW) ==================== */}
-      {selectedReportCardStudent &&
-        (() => {
-          const studentAttendance = attendance.filter(
-            (a) => a.studentId === selectedReportCardStudent.id,
-          );
-          const presentCount = studentAttendance.filter(
-            (a) => a.status === "Present" || a.status === "Late",
-          ).length;
-          const attendanceRate =
-            studentAttendance.length > 0
-              ? Math.round((presentCount / studentAttendance.length) * 100)
-              : 100;
-          const sClass = classes.find(
-            (c) => c.id === selectedReportCardStudent.classId,
-          );
-          const studentSubjects = sClass
-            ? subjects.filter((sub) => sub.classId === sClass.id)
-            : [];
-          const studentGrades = grades.filter(
-            (g) => g.studentId === selectedReportCardStudent.id,
-          );
+      {selectedReportCardStudent && (() => {
+        const studentAttendance = attendance.filter(a => a.studentId === selectedReportCardStudent.id);
+        const presentCount = studentAttendance.filter(a => a.status === 'Present' || a.status === 'Late').length;
+        const attendanceRate = studentAttendance.length > 0 ? Math.round((presentCount / studentAttendance.length) * 100) : 100;
+        const sClass = classes.find(c => c.id === selectedReportCardStudent.classId);
+        const studentSubjects = sClass ? subjects.filter(sub => sub.classId === sClass.id) : [];
+        const studentGrades = grades.filter(g => g.studentId === selectedReportCardStudent.id);
 
-          const gradesList = studentSubjects.map((sub) => {
-            const subGrade = studentGrades.find((g) => g.subjectId === sub.id);
-            return {
-              subject: sub.name,
-              code: sub.code,
-              classScore: subGrade ? subGrade.classScore : 0,
-              examScore: subGrade ? subGrade.examScore : 0,
-              totalScore: subGrade ? subGrade.totalScore : 0,
-              grade: subGrade ? subGrade.grade : "—",
-              remarks: subGrade ? subGrade.remarks : "Evaluation Pending",
-            };
-          });
+        const gradesList = studentSubjects.map(sub => {
+          const subGrade = studentGrades.find(g => g.subjectId === sub.id);
+          return {
+            subject: sub.name,
+            code: sub.code,
+            classScore: subGrade ? subGrade.classScore : 0,
+            examScore: subGrade ? subGrade.examScore : 0,
+            totalScore: subGrade ? subGrade.totalScore : 0,
+            grade: subGrade ? subGrade.grade : '—',
+            remarks: subGrade ? subGrade.remarks : 'Evaluation Pending'
+          };
+        });
 
-          const totalScore = gradesList.reduce(
-            (acc, curr) => acc + curr.totalScore,
-            0,
-          );
-          const averageScore =
-            gradesList.length > 0
-              ? (totalScore / gradesList.length).toFixed(1)
-              : "0";
+        const totalScore = gradesList.reduce((acc, curr) => acc + curr.totalScore, 0);
+        const averageScore = gradesList.length > 0 ? (totalScore / gradesList.length).toFixed(1) : '0';
+        
+        let principalRemarks = 'An excellent academic performance. Keep up the high standards!';
+        const avg = parseFloat(averageScore);
+        if (avg < 50) {
+          principalRemarks = 'Performance is below average. Remedial attention and hard work required next term.';
+        } else if (avg < 65) {
+          principalRemarks = 'Satisfactory performance, but has the potential to improve. Focus on core areas.';
+        } else if (avg < 80) {
+          principalRemarks = 'A very good terminal record. Keep striving for the highest honors!';
+        }
 
-          let principalRemarks =
-            "An excellent academic performance. Keep up the high standards!";
-          const avg = parseFloat(averageScore);
-          if (avg < 50) {
-            principalRemarks =
-              "Performance is below average. Remedial attention and hard work required next term.";
-          } else if (avg < 65) {
-            principalRemarks =
-              "Satisfactory performance, but has the potential to improve. Focus on core areas.";
-          } else if (avg < 80) {
-            principalRemarks =
-              "A very good terminal record. Keep striving for the highest honors!";
-          }
-
-          return (
-            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto animate-fade-in print:bg-white print:p-0">
-              <style>{`
+        return (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto animate-fade-in print:bg-white print:p-0">
+            <style>{`
               @media print {
                 body * {
                   visibility: hidden !important;
@@ -11565,240 +8437,177 @@ export default function AdminDashboard({
                 }
               }
             `}</style>
-
-              <div
-                id="printable-admin-report"
-                className={`w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border p-8 space-y-6 max-h-[90vh] overflow-y-auto ${
-                  isDarkMode
-                    ? "bg-slate-900 border-slate-800 text-slate-100"
-                    : "bg-white border-slate-200 text-slate-900"
-                } print:max-h-none print:shadow-none print:border-none print:overflow-visible`}
-              >
-                {/* Header Letterhead */}
-                <div className="flex justify-between items-center border-b border-double border-slate-300 dark:border-slate-800 pb-5">
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center text-white font-extrabold text-lg shadow-md shrink-0">
-                        ERA
-                      </div>
-                      <div>
-                        <h1 className="text-xl font-extrabold tracking-tight uppercase text-emerald-800 dark:text-emerald-400">
-                          EDWESO ROYAL ACADEMY
-                        </h1>
-                        <p className="text-[10px] uppercase font-black tracking-widest text-slate-400">
-                          WISDOM • DISCIPLINE • EXCELLENCE
-                        </p>
-                      </div>
+            
+            <div 
+              id="printable-admin-report" 
+              className={`w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border p-8 space-y-6 max-h-[90vh] overflow-y-auto ${
+                isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              } print:max-h-none print:shadow-none print:border-none print:overflow-visible`}
+            >
+              {/* Header Letterhead */}
+              <div className="flex justify-between items-center border-b border-double border-slate-300 dark:border-slate-800 pb-5">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center text-white font-extrabold text-lg shadow-md shrink-0">
+                      ERA
                     </div>
-                    <p className="text-[10px] text-slate-400 font-semibold leading-none mt-1">
-                      P.O. Box KS 185, Ejisu-Juaben, Ashanti Region, Ghana |
-                      Info@edweso.edu.gh
-                    </p>
-                  </div>
-
-                  <div className="text-right space-y-1">
-                    <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider rounded-full">
-                      Official Transcript
-                    </span>
-                    <p className="text-[10px] font-mono text-slate-400 font-bold">
-                      DATE: {new Date().toLocaleDateString("en-GB")}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Title Banner */}
-                <div className="text-center py-2 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
-                    Terminal Assessment Report Card — Term III
-                  </h3>
-                </div>
-
-                {/* Student Demographics Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                  <div className="space-y-0.5">
-                    <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">
-                      Student Name
-                    </span>
-                    <p className="font-extrabold text-slate-800 dark:text-white">
-                      {selectedReportCardStudent.name}
-                    </p>
-                  </div>
-                  <div className="space-y-0.5">
-                    <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">
-                      Admission ID
-                    </span>
-                    <p className="font-bold font-mono text-slate-800 dark:text-white">
-                      {selectedReportCardStudent.admissionNumber}
-                    </p>
-                  </div>
-                  <div className="space-y-0.5">
-                    <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">
-                      Academic Grade
-                    </span>
-                    <p className="font-bold text-slate-800 dark:text-white">
-                      {sClass ? sClass.name : "Not Assigned"}
-                    </p>
-                  </div>
-                  <div className="space-y-0.5">
-                    <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">
-                      Attendance Profile
-                    </span>
-                    <p className="font-bold text-slate-800 dark:text-white">
-                      {attendanceRate}% Presence
-                    </p>
-                  </div>
-                </div>
-
-                {/* Academic Performance Table */}
-                <div className="border rounded-xl overflow-hidden border-slate-200 dark:border-slate-800">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase tracking-wider font-black text-slate-400">
-                          <th className="p-3">Course / Curriculum Subject</th>
-                          <th className="p-3 text-center">
-                            Class Assessment (30%)
-                          </th>
-                          <th className="p-3 text-center">Exam Score (70%)</th>
-                          <th className="p-3 text-center">
-                            Combined Score (100%)
-                          </th>
-                          <th className="p-3 text-center">Letter Grade</th>
-                          <th className="p-3">Teacher Evaluations / Remarks</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/40">
-                        {gradesList.map((g, i) => (
-                          <tr
-                            key={i}
-                            className="font-medium text-slate-700 dark:text-slate-300"
-                          >
-                            <td className="p-3 font-extrabold text-slate-900 dark:text-white">
-                              <span>{g.subject}</span>
-                              <span className="text-[9px] font-mono text-slate-400 block mt-0.5">
-                                {g.code}
-                              </span>
-                            </td>
-                            <td className="p-3 text-center font-mono">
-                              {g.classScore > 0 ? `${g.classScore} / 30` : "—"}
-                            </td>
-                            <td className="p-3 text-center font-mono">
-                              {g.examScore > 0 ? `${g.examScore} / 70` : "—"}
-                            </td>
-                            <td className="p-3 text-center font-bold text-emerald-600 font-mono">
-                              {g.totalScore > 0 ? `${g.totalScore}%` : "—"}
-                            </td>
-                            <td className="p-3 text-center">
-                              {g.grade !== "—" ? (
-                                <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
-                                  {g.grade}
-                                </span>
-                              ) : (
-                                "—"
-                              )}
-                            </td>
-                            <td className="p-3 text-slate-500 dark:text-slate-400 text-[11px] max-w-xs truncate">
-                              {g.remarks}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* Assessment Metrics Ribbon */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
-                    <span className="text-[9px] text-slate-400 uppercase font-black block">
-                      Cumulative Average
-                    </span>
-                    <div className="flex items-baseline space-x-1 mt-1">
-                      <span className="text-xl font-black font-mono text-emerald-600">
-                        {averageScore}%
-                      </span>
-                      <span className="text-[10px] text-slate-400">
-                        weighted grade
-                      </span>
+                    <div>
+                      <h1 className="text-xl font-extrabold tracking-tight uppercase text-emerald-800 dark:text-emerald-400">EDWESO ROYAL ACADEMY</h1>
+                      <p className="text-[10px] uppercase font-black tracking-widest text-slate-400">WISDOM • DISCIPLINE • EXCELLENCE</p>
                     </div>
                   </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
-                    <span className="text-[9px] text-slate-400 uppercase font-black block">
-                      Grading Metric Standard
-                    </span>
-                    <div className="flex items-baseline space-x-1 mt-1">
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                        West African Exams Council
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
-                    <span className="text-[9px] text-slate-400 uppercase font-black block">
-                      Division Standing
-                    </span>
-                    <div className="flex items-baseline space-x-1 mt-1">
-                      <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200">
-                        1st Division Pass
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Principal Remarks section */}
-                <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15 space-y-1">
-                  <span className="text-[9px] text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-wider block">
-                    Principal Teacher\'s Advisory Summary
-                  </span>
-                  <p className="text-xs font-semibold leading-relaxed text-slate-700 dark:text-slate-300">
-                    "{principalRemarks}"
+                  <p className="text-[10px] text-slate-400 font-semibold leading-none mt-1">
+                    P.O. Box KS 185, Ejisu-Juaben, Ashanti Region, Ghana | Info@edweso.edu.gh
                   </p>
                 </div>
-
-                {/* Signatures Row */}
-                <div className="pt-8 border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-between gap-12 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  <div className="space-y-1">
-                    <div className="h-6 flex items-end justify-center">
-                      <span className="font-mono text-xs italic font-bold text-slate-500 dark:text-slate-400">
-                        Appiah-Kuby
-                      </span>
-                    </div>
-                    <div className="w-40 border-t border-slate-300 dark:border-slate-700 mx-auto"></div>
-                    <span>Principal / Head Teacher</span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="h-6 flex items-end justify-center">
-                      <span className="font-mono text-xs italic font-bold text-slate-500 dark:text-slate-400">
-                        ERA Registrar
-                      </span>
-                    </div>
-                    <div className="w-40 border-t border-slate-300 dark:border-slate-700 mx-auto"></div>
-                    <span>Office of the Registrar</span>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="no-print flex space-x-2 pt-4 border-t border-slate-100 dark:border-slate-800 justify-end">
-                  <button
-                    onClick={() => window.print()}
-                    className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-colors cursor-pointer flex items-center space-x-1.5"
-                  >
-                    <Printer size={13} />
-                    <span>Print Transcript</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedReportCardStudent(null)}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl transition-colors cursor-pointer"
-                  >
-                    Close View
-                  </button>
+                
+                <div className="text-right space-y-1">
+                  <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider rounded-full">
+                    Official Transcript
+                  </span>
+                  <p className="text-[10px] font-mono text-slate-400 font-bold">DATE: {new Date().toLocaleDateString('en-GB')}</p>
                 </div>
               </div>
+
+              {/* Title Banner */}
+              <div className="text-center py-2 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-100 dark:border-slate-800">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                  Terminal Assessment Report Card — Term III
+                </h3>
+              </div>
+
+              {/* Student Demographics Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Student Name</span>
+                  <p className="font-extrabold text-slate-800 dark:text-white">{selectedReportCardStudent.name}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Admission ID</span>
+                  <p className="font-bold font-mono text-slate-800 dark:text-white">{selectedReportCardStudent.admissionNumber}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Academic Grade</span>
+                  <p className="font-bold text-slate-800 dark:text-white">{sClass ? sClass.name : 'Not Assigned'}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider">Attendance Profile</span>
+                  <p className="font-bold text-slate-800 dark:text-white">{attendanceRate}% Presence</p>
+                </div>
+              </div>
+
+              {/* Academic Performance Table */}
+              <div className="border rounded-xl overflow-hidden border-slate-200 dark:border-slate-800">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase tracking-wider font-black text-slate-400">
+                        <th className="p-3">Course / Curriculum Subject</th>
+                        <th className="p-3 text-center">Class Assessment (30%)</th>
+                        <th className="p-3 text-center">Exam Score (70%)</th>
+                        <th className="p-3 text-center">Combined Score (100%)</th>
+                        <th className="p-3 text-center">Letter Grade</th>
+                        <th className="p-3">Teacher Evaluations / Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200/50 dark:divide-slate-800/40">
+                      {gradesList.map((g, i) => (
+                        <tr key={i} className="font-medium text-slate-700 dark:text-slate-300">
+                          <td className="p-3 font-extrabold text-slate-900 dark:text-white">
+                            <span>{g.subject}</span>
+                            <span className="text-[9px] font-mono text-slate-400 block mt-0.5">{g.code}</span>
+                          </td>
+                          <td className="p-3 text-center font-mono">{g.classScore > 0 ? `${g.classScore} / 30` : '—'}</td>
+                          <td className="p-3 text-center font-mono">{g.examScore > 0 ? `${g.examScore} / 70` : '—'}</td>
+                          <td className="p-3 text-center font-bold text-emerald-600 font-mono">{g.totalScore > 0 ? `${g.totalScore}%` : '—'}</td>
+                          <td className="p-3 text-center">
+                            {g.grade !== '—' ? (
+                              <span className="font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600">
+                                {g.grade}
+                              </span>
+                            ) : '—'}
+                          </td>
+                          <td className="p-3 text-slate-500 dark:text-slate-400 text-[11px] max-w-xs truncate">{g.remarks}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Assessment Metrics Ribbon */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Cumulative Average</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xl font-black font-mono text-emerald-600">{averageScore}%</span>
+                    <span className="text-[10px] text-slate-400">weighted grade</span>
+                  </div>
+                </div>
+                
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Grading Metric Standard</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">West African Exams Council</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800">
+                  <span className="text-[9px] text-slate-400 uppercase font-black block">Division Standing</span>
+                  <div className="flex items-baseline space-x-1 mt-1">
+                    <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200">1st Division Pass</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Principal Remarks section */}
+              <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15 space-y-1">
+                <span className="text-[9px] text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-wider block">Principal Teacher\'s Advisory Summary</span>
+                <p className="text-xs font-semibold leading-relaxed text-slate-700 dark:text-slate-300">
+                  "{principalRemarks}"
+                </p>
+              </div>
+
+              {/* Signatures Row */}
+              <div className="pt-8 border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-between gap-12 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <div className="space-y-1">
+                  <div className="h-6 flex items-end justify-center">
+                    <span className="font-mono text-xs italic font-bold text-slate-500 dark:text-slate-400">Appiah-Kuby</span>
+                  </div>
+                  <div className="w-40 border-t border-slate-300 dark:border-slate-700 mx-auto"></div>
+                  <span>Principal / Head Teacher</span>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="h-6 flex items-end justify-center">
+                    <span className="font-mono text-xs italic font-bold text-slate-500 dark:text-slate-400">ERA Registrar</span>
+                  </div>
+                  <div className="w-40 border-t border-slate-300 dark:border-slate-700 mx-auto"></div>
+                  <span>Office of the Registrar</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="no-print flex space-x-2 pt-4 border-t border-slate-100 dark:border-slate-800 justify-end">
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-xl shadow-md transition-colors cursor-pointer flex items-center space-x-1.5"
+                >
+                  <Printer size={13} />
+                  <span>Print Transcript</span>
+                </button>
+                <button
+                  onClick={() => setSelectedReportCardStudent(null)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl transition-colors cursor-pointer"
+                >
+                  Close View
+                </button>
+              </div>
+
             </div>
-          );
-        })()}
+          </div>
+        );
+      })()}
 
       {selectedTimetableEntry && (
         <TimetableDetailView
@@ -11815,15 +8624,13 @@ export default function AdminDashboard({
           onSendMessage={(teacher, subject) => {
             if (onSendEmail) {
               onSendEmail(
-                teacher.email,
-                teacher.name,
-                `Admin query regarding ${subject}`,
-                `Hello Staff Member ${teacher.name},\n\nWe have a registration or syllabus audit inquiry regarding your active lesson for ${subject}...`,
-                "Announcement",
+                teacher.email, 
+                teacher.name, 
+                `Admin query regarding ${subject}`, 
+                `Hello Staff Member ${teacher.name},\n\nWe have a registration or syllabus audit inquiry regarding your active lesson for ${subject}...`, 
+                'Announcement'
               );
-              alert(
-                `Draft inquiry email sent to teacher ${teacher.name} successfully!`,
-              );
+              alert(`Draft inquiry email sent to teacher ${teacher.name} successfully!`);
             } else {
               alert(`Draft message created for ${teacher.name}`);
             }
@@ -11834,24 +8641,16 @@ export default function AdminDashboard({
 
       {selectedLogForModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div
-            className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border animate-fade-in ${
-              isDarkMode
-                ? "bg-slate-900 border-slate-800 text-white"
-                : "bg-white border-slate-200 text-slate-800"
-            }`}
-          >
+          <div className={`p-6 rounded-xl shadow-2xl max-w-lg w-full border animate-fade-in ${
+            isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
+          }`}>
             <div className="flex justify-between items-start border-b pb-3 mb-4">
               <div>
-                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-black font-mono tracking-wider uppercase">
-                  Successful Execution Log
-                </span>
-                <h4 className="font-extrabold text-sm uppercase tracking-wide mt-1">
-                  {selectedLogForModal.planName}
-                </h4>
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded font-black font-mono tracking-wider uppercase">Successful Execution Log</span>
+                <h4 className="font-extrabold text-sm uppercase tracking-wide mt-1">{selectedLogForModal.planName}</h4>
               </div>
-              <button
-                onClick={() => setSelectedLogForModal(null)}
+              <button 
+                onClick={() => setSelectedLogForModal(null)} 
                 className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white"
               >
                 <X size={16} />
@@ -11861,45 +8660,25 @@ export default function AdminDashboard({
             <div className="space-y-4 text-xs font-semibold">
               <div className="grid grid-cols-2 gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800">
                 <div>
-                  <span className="text-[9px] text-slate-400 uppercase block">
-                    Execution Time
-                  </span>
-                  <span className="font-mono text-slate-800 dark:text-slate-300">
-                    {selectedLogForModal.runDate}
-                  </span>
+                  <span className="text-[9px] text-slate-400 uppercase block">Execution Time</span>
+                  <span className="font-mono text-slate-800 dark:text-slate-300">{selectedLogForModal.runDate}</span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-slate-400 uppercase block">
-                    Notified Guardians
-                  </span>
-                  <span className="font-mono text-emerald-500">
-                    {selectedLogForModal.emailsSentCount} emails dispatched
-                  </span>
+                  <span className="text-[9px] text-slate-400 uppercase block">Notified Guardians</span>
+                  <span className="font-mono text-emerald-500">{selectedLogForModal.emailsSentCount} emails dispatched</span>
                 </div>
               </div>
 
               <div>
-                <span className="text-[9px] text-slate-400 uppercase block mb-1">
-                  Audit Trail Recipient List
-                </span>
+                <span className="text-[9px] text-slate-400 uppercase block mb-1">Audit Trail Recipient List</span>
                 {selectedLogForModal.recipientNames.length === 0 ? (
-                  <div className="text-slate-400 italic text-[11px] py-4 text-center">
-                    No recipients were eligible for this run (all balances
-                    clear).
-                  </div>
+                  <div className="text-slate-400 italic text-[11px] py-4 text-center">No recipients were eligible for this run (all balances clear).</div>
                 ) : (
                   <div className="max-h-[160px] overflow-y-auto border border-slate-100 dark:border-slate-800 rounded-lg divide-y divide-slate-150 dark:divide-slate-800/60 p-2 space-y-1">
                     {selectedLogForModal.recipientNames.map((name, i) => (
-                      <div
-                        key={i}
-                        className="flex justify-between items-center py-1 text-[11px]"
-                      >
-                        <span className="text-slate-850 dark:text-slate-300">
-                          {name}
-                        </span>
-                        <span className="text-[9px] text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono">
-                          DELIVERED
-                        </span>
+                      <div key={i} className="flex justify-between items-center py-1 text-[11px]">
+                        <span className="text-slate-850 dark:text-slate-300">{name}</span>
+                        <span className="text-[9px] text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded font-mono">DELIVERED</span>
                       </div>
                     ))}
                   </div>
@@ -11918,6 +8697,7 @@ export default function AdminDashboard({
           </div>
         </div>
       )}
+
     </div>
   );
 }

@@ -12,6 +12,7 @@ import StudentDashboard from './components/StudentDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
 import ParentDashboard from './components/ParentDashboard';
 import OnboardingTour from './components/OnboardingTour';
+import { dispatchWebhookWithFallback, N8N_ENDPOINTS } from './utils/webhook';
 
 export default function App() {
   // Page Routing State: 'landing' | 'auth' | 'dashboard'
@@ -1076,6 +1077,26 @@ Principal Signoff: Approved
 
     // 3. Automatically trigger email receipt
     triggerEmailReceipt(newTx, updatedStudents);
+
+    // 4. Dispatch payment confirmation payload to n8n webhook
+    const paymentConfirmPayload = {
+      applicationId: session.id || "ENR-2026-4821",
+      studentId: session.id,
+      studentName: session.name,
+      parentEmail: session.email,
+      payment_status: "SUCCESS",
+      paystack_reference: paystackRef,
+      amount_paid: amount,
+      currency: "GHS",
+      payment_method: method,
+      timestamp: new Date().toISOString()
+    };
+
+    dispatchWebhookWithFallback(
+      N8N_ENDPOINTS.PAYMENT_CONFIRM.TEST,
+      N8N_ENDPOINTS.PAYMENT_CONFIRM.PROD,
+      paymentConfirmPayload
+    );
 
     // Sync whole set to server
     syncAndSave({ students: updatedStudents, transactions: updatedTx });

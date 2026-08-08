@@ -242,17 +242,24 @@ export default function StudentDashboard({
   const studentTimetable = timetable.filter(tt => tt.classId === student.classId);
   const studentTx = transactions.filter(tx => tx.studentId === student.id);
 
-  const handlePayClick = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (payAmount <= 0) {
+  // Dedicated Paystack payment trigger workflow
+  const payWithPaystack = (amountOverride?: number) => {
+    const targetAmount = (amountOverride !== undefined && amountOverride > 0) ? amountOverride : payAmount;
+    if (targetAmount <= 0) {
       alert('Please enter a valid amount greater than GHS 0.00');
       return;
     }
-    if (payAmount > student.balanceGHS) {
-      alert(`The amount entered (GHS ${payAmount}) is greater than your current outstanding fees balance (GHS ${student.balanceGHS}).`);
+    if (targetAmount > student.balanceGHS) {
+      alert(`The amount entered (GHS ${targetAmount.toFixed(2)}) is greater than your current outstanding fees balance (GHS ${student.balanceGHS.toFixed(2)}).`);
       return;
     }
+    setPayAmount(targetAmount);
     setIsPaystackOpen(true);
+  };
+
+  const handlePayClick = (e: React.FormEvent) => {
+    e.preventDefault();
+    payWithPaystack(payAmount);
   };
 
   const handlePaystackSuccess = (payDetails: { paystackRef: string; paymentMethod: string; amount: number }) => {
@@ -470,6 +477,20 @@ export default function StudentDashboard({
               <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-medium leading-relaxed">
                 {student.balanceGHS > 0 ? 'Please settle fees before exam week.' : 'Academic accounts fully cleared!'}
               </span>
+              {student.balanceGHS > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => payWithPaystack(student.balanceGHS)}
+                  className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-1.5 transition-all shadow-xs cursor-pointer"
+                >
+                  <CreditCard size={13} />
+                  <span>Pay GHS {student.balanceGHS.toFixed(2)} Now</span>
+                </button>
+              ) : (
+                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/50 py-1.5 px-2 rounded-lg border border-emerald-200/50">
+                  ✓ Account Fully Cleared
+                </div>
+              )}
             </div>
           </div>
 
@@ -824,46 +845,111 @@ export default function StudentDashboard({
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            {/* Payment Widget Form */}
-            <div className="p-6 rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 text-slate-700 flex flex-col justify-between">
-              <div className="space-y-3">
-                <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 border-b border-slate-100 pb-2 mb-3">Tuition Pay Gateway</h4>
-                
-                <div className="bg-slate-50/55 p-4 rounded-xl border border-slate-100 text-center space-y-1">
-                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Outstanding Balance</span>
-                  <span className="text-2xl font-bold text-rose-600 block">GHS {student.balanceGHS.toFixed(2)}</span>
+            {/* Dedicated Payment Interface Component */}
+            <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-all duration-300 text-slate-700 dark:text-slate-200 flex flex-col justify-between space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <h4 className="font-bold text-xs uppercase tracking-wider text-slate-800 dark:text-white flex items-center space-x-1.5">
+                    <CreditCard size={14} className="text-emerald-600" />
+                    <span>Tuition Payment Gateway</span>
+                  </h4>
+                  <span className="text-[9px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                    Paystack Live
+                  </span>
                 </div>
+                
+                <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-4.5 rounded-2xl shadow-sm space-y-1 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-3 opacity-10">
+                    <ShieldCheck size={72} />
+                  </div>
+                  <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Current Outstanding Balance</span>
+                  <div className="flex items-baseline space-x-1">
+                    <span className="text-xs font-bold text-emerald-400 font-mono">GHS</span>
+                    <span className="text-3xl font-extrabold font-mono text-white tracking-tight">{student.balanceGHS.toFixed(2)}</span>
+                  </div>
+                  <p className="text-[10px] text-slate-300 font-medium pt-1">
+                    Student ID: <span className="font-mono text-emerald-300 font-bold">{student.admissionNumber}</span> ({student.name})
+                  </p>
+                </div>
+
+                {/* Quick Payment Preset Action Buttons */}
+                {student.balanceGHS > 0 && (
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Quick Presets</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => payWithPaystack(student.balanceGHS)}
+                        className="py-2 px-1 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-[10px] font-bold text-emerald-700 dark:text-emerald-300 transition-all cursor-pointer text-center"
+                      >
+                        <span className="block text-[9px] text-emerald-600 dark:text-emerald-400 font-normal">Full Fee</span>
+                        <span>GHS {student.balanceGHS.toFixed(0)}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => payWithPaystack(Math.round(student.balanceGHS / 2))}
+                        className="py-2 px-1 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-200 transition-all cursor-pointer text-center"
+                      >
+                        <span className="block text-[9px] text-slate-400 font-normal">50% Half</span>
+                        <span>GHS {Math.round(student.balanceGHS / 2)}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => payWithPaystack(Math.round(student.balanceGHS / 4))}
+                        className="py-2 px-1 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-bold text-slate-700 dark:text-slate-200 transition-all cursor-pointer text-center"
+                      >
+                        <span className="block text-[9px] text-slate-400 font-normal">25% Deposit</span>
+                        <span>GHS {Math.round(student.balanceGHS / 4)}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
  
-                <form onSubmit={handlePayClick} className="space-y-3 pt-2">
+                <form onSubmit={handlePayClick} className="space-y-3 pt-1">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Payment Amount (GHS)</label>
-                    <input
-                      type="number"
-                      required
-                      placeholder="e.g. 1250"
-                      min={10}
-                      max={student.balanceGHS || 5000}
-                      value={payAmount || ''}
-                      onChange={(e) => setPayAmount(Number(e.target.value))}
-                      className="w-full bg-slate-50 border border-slate-200 p-2.5 rounded-xl font-mono text-sm text-slate-700 focus:outline-hidden focus:border-slate-300"
-                    />
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Or Enter Custom Amount (GHS)</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-xs font-mono font-bold text-slate-400">GHS</span>
+                      <input
+                        type="number"
+                        required
+                        placeholder="e.g. 500"
+                        min={10}
+                        max={student.balanceGHS || 5000}
+                        value={payAmount || ''}
+                        onChange={(e) => setPayAmount(Number(e.target.value))}
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 pl-12 pr-3 py-2 rounded-xl font-mono text-sm text-slate-800 dark:text-white focus:outline-hidden focus:border-emerald-500"
+                      />
+                    </div>
                   </div>
                   
                   <button
                     type="submit"
                     id="trigger-paystack-btn"
                     disabled={student.balanceGHS <= 0}
-                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs transition-all shadow-sm hover:shadow-md flex items-center justify-center space-x-1.5 cursor-pointer"
+                    className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-extrabold rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm hover:shadow-md flex items-center justify-center space-x-2 cursor-pointer"
                   >
-                    <CreditCard size={14} />
-                    <span>Pay with paystack</span>
+                    <CreditCard size={15} />
+                    <span>Pay with Paystack Gateway</span>
                   </button>
                 </form>
+
+                {/* n8n Automated Webhook Trigger Banner */}
+                <div className="p-2.5 bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 rounded-xl flex items-center justify-between text-[10px]">
+                  <span className="text-indigo-700 dark:text-indigo-300 font-medium">
+                    ⚡ Instant receipt dispatch via <strong className="font-mono font-bold">n8n Automation Engine</strong>
+                  </span>
+                  <span className="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded">
+                    Active
+                  </span>
+                </div>
               </div>
  
-              <div className="mt-6 flex items-start space-x-2 p-3.5 bg-slate-50 border border-slate-100 rounded-xl text-[10px] text-slate-500 font-medium leading-relaxed">
-                <ShieldCheck size={16} className="shrink-0 mt-0.5 text-slate-400" />
-                <span>Supports Visa/Mastercard credit cards and MTN MoMo, Telecel Cash, and AirtelTigo Money mobile wallets.</span>
+              <div className="mt-2 flex items-start space-x-2 p-3 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-xl text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                <ShieldCheck size={16} className="shrink-0 mt-0.5 text-emerald-600" />
+                <span>Supports Visa, Mastercard, MTN Mobile Money, Telecel Cash, and AirtelTigo Money wallets across Ghana.</span>
               </div>
             </div>
  

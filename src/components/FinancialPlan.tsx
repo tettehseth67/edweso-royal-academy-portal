@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { dispatchWebhookWithFallback, N8N_ENDPOINTS } from '../utils/webhook';
 import { 
   CreditCard, Landmark, Coins, FileText, ChevronRight, Calculator, 
   Percent, ShieldAlert, Sparkles, TrendingUp, HelpCircle, GraduationCap, 
@@ -169,8 +170,26 @@ export default function FinancialPlan({ isDarkMode = false }: FinancialPlanProps
   };
 
   const handleFinalizePayment = () => {
+    const generatedRef = 'ERA-PAY-' + Math.floor(100000 + Math.random() * 900000);
     setPaymentSuccess(true);
-    setPaidReference('ERA-PAY-' + Math.floor(100000 + Math.random() * 900000));
+    setPaidReference(generatedRef);
+
+    // Dispatch payment confirmation payload to n8n
+    const paymentConfirmPayload = {
+      applicationId: "ENR-2026-4821",
+      payment_status: "SUCCESS",
+      paystack_reference: generatedRef,
+      amount_paid: grandTotal || 500.00,
+      currency: "GHS",
+      payment_method: paystackChannel === 'card' ? 'Card' : `Momo (${momoProvider})`,
+      timestamp: new Date().toISOString()
+    };
+
+    dispatchWebhookWithFallback(
+      N8N_ENDPOINTS.PAYMENT_CONFIRM.TEST,
+      N8N_ENDPOINTS.PAYMENT_CONFIRM.PROD,
+      paymentConfirmPayload
+    );
   };
 
   // Forecasting Scenarios
