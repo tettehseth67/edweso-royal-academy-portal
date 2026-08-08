@@ -5893,9 +5893,9 @@ export default function AdminDashboard({
           {/* n8n Webhook Integration Card */}
           <div className="p-3.5 bg-gradient-to-r from-emerald-900/10 via-teal-900/5 to-slate-900/10 border border-emerald-500/20 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
             <div className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">n8n Workflow Endpoint:</span>
-                <code className="bg-slate-900 text-emerald-400 px-2 py-0.5 rounded text-[11px] font-mono select-all">https://yaw0869.app.n8n.cloud/webhook/edweso-enrollment</code>
+              <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">n8n Test Webhook Endpoint:</span>
+                <code className="bg-slate-900 text-emerald-400 px-2 py-0.5 rounded text-[11px] font-mono select-all">https://yaw0869.app.n8n.cloud/webhook-test/edweso-enrollment</code>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
                 Payload Parameters: <span className="font-mono font-bold text-slate-700 dark:text-slate-300">parent_name, parent_contact, parent_email, student_full_name, student_dob, student_grade_interest, special_instructions</span>
@@ -5903,7 +5903,7 @@ export default function AdminDashboard({
             </div>
             <div className="shrink-0 text-right">
               <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-300 font-extrabold bg-emerald-100 dark:bg-emerald-950 px-2.5 py-1 rounded-md border border-emerald-300 dark:border-emerald-800">
-                Google Sheets & Multi-Route Agent Dispatcher Ready
+                Auto Fallback to Production Active
               </span>
             </div>
           </div>

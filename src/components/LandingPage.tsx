@@ -58,6 +58,7 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
     student_grade_interest: 'Grade 1',
     special_instructions: ''
   });
+  const [useTestWebhook, setUseTestWebhook] = useState(true);
   const [isSubmittingAdmission, setIsSubmittingAdmission] = useState(false);
   const [isAdmissionSubmitted, setIsAdmissionSubmitted] = useState(false);
   const [admissionResponseText, setAdmissionResponseText] = useState<string | null>(null);
@@ -195,11 +196,21 @@ export default function LandingPage({ onNavigateToLogin, onToggleAccessibility }
     };
 
     try {
-      const res = await fetch("https://yaw0869.app.n8n.cloud/webhook/edweso-enrollment", {
+      // First attempt test webhook URL as requested, fallback to production webhook if test mode is inactive (404)
+      let res = await fetch("https://yaw0869.app.n8n.cloud/webhook-test/edweso-enrollment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
+
+      if (!res.ok && res.status === 404) {
+        console.log("Test webhook inactive (404). Trying production webhook endpoint...");
+        res = await fetch("https://yaw0869.app.n8n.cloud/webhook/edweso-enrollment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
+        });
+      }
 
       if (!res.ok) {
         const errorText = await res.text().catch(() => '');
