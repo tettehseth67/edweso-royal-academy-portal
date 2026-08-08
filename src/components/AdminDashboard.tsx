@@ -880,10 +880,10 @@ export default function AdminDashboard({
     return (localStorage.getItem('era_paystack_mode') as 'test' | 'live') || 'test';
   });
   const [paystackPublicKey, setPaystackPublicKey] = useState(() => {
-    return localStorage.getItem('era_paystack_pub_key') || 'pk_test_edweso7a8d9b1c0e2f3g4h5i6j7k8l9';
+    return localStorage.getItem('era_paystack_pub_key') || 'pk_test_2afa47492f88c123f7d148aaad08be306d865f12';
   });
   const [paystackSecretKey, setPaystackSecretKey] = useState(() => {
-    return localStorage.getItem('era_paystack_sec_key') || 'sk_test_edweso9876543210abcdefghijklmnop';
+    return localStorage.getItem('era_paystack_sec_key') || 'sk_test_ecf4c780b6c8105d4eb0f16d1acab214ea46182c';
   });
   const [payoutMethod, setPayoutMethod] = useState<'bank' | 'momo'>(() => {
     return (localStorage.getItem('era_payout_method') as 'bank' | 'momo') || 'bank';
